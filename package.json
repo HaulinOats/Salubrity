@@ -1,0 +1,18 @@
+{
+  "name": "lookup-server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "express": "^4.17.1"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node server.js",
+    "client": "node start-client.js",
+    "dev": "echo \"This command has been deprecated. Use 'npm start'\" && exit 1"
+  },
+  "devDependencies": {
+    "concurrently": "3.1.0"
+  }
+}
