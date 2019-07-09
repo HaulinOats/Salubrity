@@ -24,6 +24,12 @@ export default class App extends Component{
       <div>
         <h1>Home Page</h1>
         <button onClick={(e)=>{this.callHome()}}>Call Home Route</button>
+        <div className="float-right">
+          <label className="vas-checkbox">
+            <input type="checkbox"/>
+            <span className="vas-checkmark vas-right" data-size="lg"></span>
+          </label>
+        </div>
       </div>
     )
   }
