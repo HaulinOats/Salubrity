@@ -1,6 +1,7 @@
 /* font-family: 'Roboto', sans-serif;
 font-family: 'Rubik', sans-serif; */
 body {
+  font-size:16px;
   margin: 0;
   font-family: 'Rubik', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -14,61 +15,4 @@ input[type="checkbox"] {
   cursor: pointer;
   height: 0;
   width: 0;
-}
-.vas-checkbox {
-  position:relative;
-}
-.vas-checkmark{
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 25px;
-  width: 25px;
-  background-color: #eee;
-  border-radius: 3px;
-  box-shadow: 0px 0px 0px 3px deepskyblue;
-}
-.vas-right {
-  left: auto;
-  right: 0;
-}
-.vas-checkmark[data-size="md"]{
-  height: 40px;
-  width: 40px;
-}
-.vas-checkmark[data-size="lg"]{
-  height: 55px;
-  width: 55px;
-}
-/* On mouse-over, add a grey background color */
-.vas-checkbox:hover input ~ .vas-checkmark {
-  background-color: #ccc;
-}
-
-/* When the checkbox is checked, add a blue background */
-.vas-checkbox input:checked ~ .vas-checkmark {
-  background-color: #2196F3;
-}
-
-/* Create the checkmark/indicator (hidden when not checked) */
-.vas-checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-/* Show the checkmark when checked */
-.vas-checkbox input:checked ~ .vas-checkmark:after {
-  display: block;
-}
-
-/* Style the checkmark/indicator */
-.vas-checkbox .vas-checkmark:after {
-  left: 32%;
-  top: 0%;
-  width: 36%;
-  height: 84%;
-  border: solid white;
-  border-width: 0px 6px 6px 0px;
-  transform: rotate(45deg);
 }

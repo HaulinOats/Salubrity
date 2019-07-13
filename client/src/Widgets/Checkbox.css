@@ -1,0 +1,61 @@
+.vas-checkbox {
+
+}
+.vas-checkbox-label {
+  position:relative;
+}
+.vas-checkbox-checkmark{
+  position: absolute;
+  top: 0;
+  left: 0px;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  border-radius: 5px;
+  border: solid 3px deepskyblue;
+}
+.vas-right {
+  left: auto;
+  right: 0;
+}
+.vas-checkbox-checkmark[data-size="md"]{
+  height: 40px;
+  width: 40px;
+}
+.vas-checkbox-checkmark[data-size="lg"]{
+  height: 55px;
+  width: 55px;
+}
+/* On mouse-over, add a grey background color */
+.vas-checkbox-label:hover input ~ .vas-checkbox-checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.vas-checkbox-label input:checked ~ .vas-checkbox-checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.vas-checkbox-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.vas-checkbox-label input:checked ~ .vas-checkbox-checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.vas-checkbox-label .vas-checkbox-checkmark:after {
+  left: 31%;
+  top: 0%;
+  width: 27%;
+  height: 80%;
+  border: solid white;
+  border-width: 0px 6px 6px 0px;
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}

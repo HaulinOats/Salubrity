@@ -9,8 +9,6 @@ ReactDOM.render(
 <Router>
     <div>
     <Switch>
-        {/* <Route path="/admin" component={Admin} />
-        <Route path="/:listId" component={Main} /> */}
         <Route path="/" component={Home} />
     </Switch>
     </div>

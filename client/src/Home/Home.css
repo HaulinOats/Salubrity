@@ -1,6 +1,30 @@
-h1 {
-    font-family: 'Rubik', sans-serif;
+.vas-app-container {
+    margin-top:15px;
 }
-button {
-    font-size:40px;
+.vas-home-nav-tabs {
+    position: relative;
+}
+.vas-home-tabContent{
+    border:solid thin lightgrey;
+    border-top:none;
+}
+.vas-nav-link {
+    cursor:pointer;
+}
+.vas-nav-link[aria-selected="false"]{
+    background:whitesmoke;
+    border-bottom: solid 1px lightgrey;
+}
+.vas-home-table {
+    margin-bottom:0;
+}
+.vas-home-thead {
+    background:lightgrey;
+}
+.vas-home-tr {
+    cursor:pointer;
+}
+.vas-home-addCall {
+    position: absolute;
+    right:0;
 }
