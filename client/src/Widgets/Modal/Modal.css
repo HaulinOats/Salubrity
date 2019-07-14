@@ -1,0 +1,51 @@
+.vas-modal-container {
+  display: flex;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+.vas-modal-container[data-isOpen=false]{
+  display:none;
+}
+.vas-modal-clickguard {
+  position: absolute;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background:black;
+  opacity:0.5;
+}
+.vas-modal-content {
+  display: flex;
+  background: white;
+  z-index: 1;
+}
+.vas-modal-content-closeBtn {
+  position: absolute;
+  font-size: 125%;
+  top: 0;
+  right: 0;
+  margin: 1% 2% 1% 4%;
+  cursor: pointer;
+}
+.vas-modal-content-inner {
+  position: relative;
+  padding:5%;
+}
+.vas-modal-content.buttonContainer{
+  justify-content: center;
+  display: flex;
+}
+.vas-modal-content-buttonContainer {
+  display: flex;
+  justify-content: center;
+}
+.vas-modal-cancel {
+  margin-right:2%;
+}
+.vas-modal-confirm {
+  margin-left:2%;
+}

@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
-import Modal from '../Widgets/Modal';
+import Modal from '../Widgets/Modal/Modal';
 import './Home.css';
 
 export default class Home extends Component{
   constructor(props){
     super(props);
+    this.toggleHandler = this.toggleHandler.bind(this);
     this.state = {
-      modalOpen:false,
+      modalIsOpen:false,
       openItems:[
         {
           roomNumber:1001,
@@ -36,14 +37,14 @@ export default class Home extends Component{
     }
   }
 
-  closeModal(){
-    console.log('close modal');
-    this.setState({ open: false })
+  toggleHandler() {
+    this.setState({
+      modalIsOpen: !this.state.modalIsOpen
+    });
   }
 
   render(){
     return(
-      <div>
         <div className="container-fluid vas-app-container">
           <ul className="nav nav-tabs vas-home-nav-tabs" id="myTab" role="tablist">
             <li className="nav-item">
@@ -52,8 +53,7 @@ export default class Home extends Component{
             <li className="nav-item">
                 <a className="nav-link vas-nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Completed</a>
             </li>
-            <button type="button" className="btn btn-primary vas-home-addCall">Add Call</button>
-            <Modal/>
+            <button type="button" className="btn btn-primary vas-home-addCall" onClick={()=>{this.setState({modalIsOpen:true})}}>Add Call</button>
           </ul>
           <div className="tab-content vas-home-tabContent" id="myTabContent">
             <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -84,8 +84,8 @@ export default class Home extends Component{
               Hi
             </div>
           </div>
+          {this.state.modalIsOpen && <Modal toggleModal={this.toggleHandler}/>}
         </div>
-      </div>
     )
   }
 }
