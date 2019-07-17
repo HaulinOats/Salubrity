@@ -10,12 +10,12 @@ export default class Home extends Component{
     this.sliderEnd = this.sliderEnd.bind(this);
     this.state = {
       modalIsOpen:false,
-      sliderValue:0,
+      endTaskSliderValue:0,
+      portacathCathflowActive:false,
+      picclineCathflowActive:false,
+      activeBoxesArr:[],
       activeRecord:{
-        roomNumber:1001,
-        jobRequest:"PIV",
-        contact:1482,
-        callTime:"0900"
+        roomNumber:1001
       },
       queueItems:[
         {
@@ -79,24 +79,47 @@ export default class Home extends Component{
   }
 
   sliderChange(e){
-    console.log('sliderChange');
     this.setState({
-      sliderValue:e.target.value
+      endTaskSliderValue:e.target.value
     })
   }
 
   sliderEnd(e){
-    if(this.state.sliderValue < 100){
+    if(this.state.endTaskSliderValue < 100){
       this.setState({
-        sliderValue:0
+        endTaskSliderValue:0,
+        activeBoxesArr:[]
       })
+    } else {
+      var activeBoxesArr = [];
+      var checkboxes = document.querySelectorAll('input[type=checkbox]:checked');
+      var radio = document.querySelectorAll('input[type=radio]:checked');
+      checkboxes.forEach((el)=>{
+        activeBoxesArr.push(el.id);
+      });
+      radio.forEach((el)=>{
+        activeBoxesArr.push(el.id);
+      });
+      this.setState({
+        activeBoxesArr:activeBoxesArr,
+        modalIsOpen:true,
+        endTaskSliderValue:0
+      });
     }
+  }
+
+  resetPage(){
+    var checkboxesAndRadioBtns = document.querySelectorAll('input:checked');
+    checkboxesAndRadioBtns.forEach((el)=>{
+      el.checked = false;
+    });
   }
 
   render(){
     return(
         <div className="container-fluid vas-app-container">
-          <button type="button" className="btn btn-primary vas-queue-addCall" onClick={()=>{this.setState({modalIsOpen:true})}}>Add Call</button>
+          {/* <button type="button" className="btn btn-primary vas-queue-addCall" onClick={()=>{this.setState({modalIsOpen:true})}}>Add Call</button> */}
+          <button type="button" className="btn btn-primary vas-queue-addCall">Add Call</button>
           <ul className="nav nav-tabs vas-home-nav-tabs" id="myTab" role="tablist">
             <li className="nav-item vas-home-nav-item">
               <a className="nav-link vas-nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Active/Open</a>
@@ -110,137 +133,231 @@ export default class Home extends Component{
           </ul>
           <div className="tab-content vas-main-tabContent" id="myTabContent">
             <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-              <header className="vas-main-header"><p>Room: <b>{this.state.activeRecord.roomNumber}</b></p></header>
+              <header className="vas-main-header">
+                <p className="vas-main-header-text">Room: <b>{this.state.activeRecord.roomNumber}</b></p>
+                <button className="vas-reset-btn" onClick={this.resetPage}>Reset Form</button>
+              </header>
               <div className="vas-main-inner-container">
-                <div className="vas-main-inner-container-row">
-                  <span className="vas-main-btn-section">
-                    <span className="vas-main-btn-section-leader">
-                      <button className="btn vas-main-btn vas-main-needle-btn">PIV Start</button>
+                <header className="vas-main-inner-container-header">
+                  <p>PIV Start</p>
+                </header>
+                <div className="vas-main-inner-container-main">
+                  <div className="vas-main-inner-container-row">
+                    <span className="vas-single-select-group">
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="piv-24" name="piv-dose" />
+                      <label className="vas-btn" htmlFor="piv-24">24g</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="piv-22" name="piv-dose"/>
+                      <label className="vas-btn" htmlFor="piv-22">22g</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="piv-20" name="piv-dose"/>
+                      <label className="vas-btn" htmlFor="piv-20">20g</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="piv-18" name="piv-dose"/>
+                      <label className="vas-btn" htmlFor="piv-18">18g</label>
                     </span>
-                    <span className="vas-main-btn-section-child">
-                      <button className="btn vas-main-btn vas-main-sub-btn vas-main-btn-active">24g</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">22g</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">20g</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">18g</button>
+                    <span className="vas-single-select-group">
                       <p className="d-inline mr-2">Attempts:</p>
-                      <button className="btn vas-main-btn vas-main-sub-btn vas-main-btn-active">1</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">2</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">US Used</button>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="piv-attempt-1" name="piv-attempt" />
+                      <label className="vas-btn" htmlFor="piv-attempt-1">1</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="piv-attempt-2" name="piv-attempt" />
+                      <label className="vas-btn" htmlFor="piv-attempt-2">2</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="piv-us" name="piv-attempt" />
+                      <label className="vas-btn" htmlFor="piv-us">US Used</label>
                     </span>
-                  </span>
+                  </div>
                 </div>
-                <div className="vas-main-inner-container-row">
-                  <span className="vas-main-btn-section">
-                    <span className="vas-main-btn-section-leader">
-                      <button className="btn vas-main-btn vas-main-needle-btn">Lab Draw</button>
+              </div>
+              <div className="vas-main-inner-container">
+                <header className="vas-main-inner-container-header">
+                  <p>Lab Draw</p>
+                </header>
+                <div className="vas-main-inner-container-main">
+                  <div className="vas-main-inner-container-row">
+                    <span className="vas-single-select-group">
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-iv" name="lab-draw" />
+                      <label className="vas-btn" htmlFor="lab-draw-iv">From IV</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-labs" name="lab-draw"/>
+                      <label className="vas-btn" htmlFor="lab-draw-labs">Labs Only</label>
                     </span>
-                    <span className="vas-main-btn-section-child">
-                      <button className="btn vas-main-btn vas-main-sub-btn vas-main-btn-active">From IV</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Labs only</button>
+                    <span className="vas-single-select-group">
                       <p className="d-inline mr-2">Attempts:</p>
-                      <button className="btn vas-main-btn vas-main-sub-btn vas-main-btn-active">1</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">2</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">US Used</button>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-attempt-1" name="lab-draw-attempt" />
+                      <label className="vas-btn" htmlFor="lab-draw-attempt-1">1</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-attempt-2" name="lab-draw-attempt" />
+                      <label className="vas-btn" htmlFor="lab-draw-attempt-2">2</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-us" name="lab-draw-attempt" />
+                      <label className="vas-btn" htmlFor="lab-draw-us">US Used</label>
                     </span>
-                  </span>
+                  </div>
                 </div>
               </div>
               <div className="vas-main-inner-container">
-                <div className="vas-main-inner-container-row">
-                  <span className="vas-main-btn-section">
-                    <button className="btn vas-main-btn vas-main-sub-btn vas-main-btn-active">IV Flushed</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Saline Locked</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Dressing Changed</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Dressing Reinforced</button>
-                  </span>
+                <header className="vas-main-inner-container-header">
+                  <p>Site Care</p>
+                </header>
+                <div className="vas-main-inner-container-main">
+                  <div className="vas-main-inner-container-row">
+                    <span className="vas-multi-select-group">
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="site-care-iv-flushed" name="site-care" />
+                      <label className="vas-btn" htmlFor="site-care-iv-flushed">IV Flushed</label>
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="site-care-saline-locked" name="site-care" />
+                      <label className="vas-btn" htmlFor="site-care-saline-locked">Saline Locked</label>
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="site-care-dressing-changed" name="site-care" />
+                      <label className="vas-btn" htmlFor="site-care-dressing-changed">Dressing Changed</label>
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="site-care-dressing-reinforced" name="site-care" />
+                      <label className="vas-btn" htmlFor="site-care-dressing-reinforced">Dressing Reinforced</label>
+                    </span>
+                  </div>
                 </div>
               </div>
               <div className="vas-main-inner-container">
-                <div className="vas-main-inner-container-row">
-                  <span className="vas-main-btn-section">
-                    <span className="vas-main-btn-section-leader">
-                      <button className="btn vas-main-btn vas-main-discontinue-btn">DC IV</button>
+                <header className="vas-main-inner-container-header">
+                  <p>DC IV</p>
+                </header>
+                <div className="vas-main-inner-container-main">
+                  <div className="vas-main-inner-container-row">
+                    <span className="vas-multi-select-group">
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="dc-iv-infiltration" name="dc-iv" />
+                      <label className="vas-btn" htmlFor="dc-iv-infiltration">Infiltration</label>
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="dc-iv-phlebitis" name="dc-iv" />
+                      <label className="vas-btn" htmlFor="dc-iv-phlebitis">Phlebitis</label>
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="dc-iv-pt-removed" name="dc-iv" />
+                      <label className="vas-btn" htmlFor="dc-iv-pt-removed">PT Removed</label>
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="dc-iv-leaking" name="dc-iv" />
+                      <label className="vas-btn" htmlFor="dc-iv-leaking">Leaking</label>
+                      <input type="checkbox" className="vas-main-select-input vas-multi-select" id="dc-iv-bleeding" name="dc-iv" />
+                      <label className="vas-btn" htmlFor="dc-iv-bleeding">Bleeding</label>
                     </span>
-                    <span className="vas-main-btn-section-child">
-                      <button className="btn vas-main-btn vas-main-sub-btn">Site Rotation</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Infiltration</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Phlebitis</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">PT Removed</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Leaking</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Bleeding</button>
-                    </span>
-                  </span>
+                  </div>
                 </div>
               </div>
               <div className="vas-main-inner-container">
-                <div className="vas-main-inner-container-row">
-                  <p className="d-inline mr-2">Port-a-Cath</p>
-                  <span className="vas-main-btn-section">
-                    <span className="vas-main-btn-section-leader">
-                      <button className="btn vas-main-btn vas-main-needle-btn">Access</button>
-                    </span>
-                    <span className="vas-main-btn-section-child">
-                      <p className="d-inline">Attempts:</p>
-                      <button className="btn vas-main-btn vas-main-sub-btn">1</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">2</button>
-                    </span>
-                  </span>
-                </div>
-                <div className="vas-main-inner-container-row">
-                  <button className="btn vas-main-btn vas-main-critical-btn">Cathflo</button>
-                  <span className="vas-main-btn-section">
-                    <span className="vas-main-btn-section-leader">
-                      <button className="btn vas-main-btn vas-main-discontinue-btn">Deaccess</button>
-                    </span>
-                    <span className="vas-main-btn-section-child">
-                      <button className="btn vas-main-btn vas-main-sub-btn">Contaminated</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Therapy Complete</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Needle Change</button>
-                    </span>
-                  </span>
-                </div>
-              </div>
-              <div className="vas-main-inner-container">
-                <div className="vas-main-inner-container-row">
-                  <p className="d-inline mr-2">PICC Line</p>
-                  <span className="vas-main-btn-section">
-                    <span className="vas-main-btn-section-leader">
-                      <button className="btn vas-main-btn vas-main-discontinue-btn">Removal</button>
-                    </span>
-                    <span className="vas-main-btn-section-child">
-                      <button className="btn vas-main-btn vas-main-sub-btn">Therapy Complete</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Discharge</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Clotted</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">Conteminated</button>
-                      <button className="btn vas-main-btn vas-main-sub-btn">PT Removed</button>
-                    </span>
-                  </span>
-                </div>
-                <div className="vas-main-inner-container-row">
-                  <span className="vas-main-btn-section">
-                    <button className="btn vas-main-btn vas-main-critical-btn">Cathflo</button>
-                  </span>
+                <header className="vas-main-inner-container-header">
+                  <p>Port-a-Cath</p>
+                </header>
+                <div className="vas-main-inner-container-main">
+                  <div className="vas-main-inner-container-main-sub">
+                    <header className="vas-main-inner-container-sub-header">
+                      <p>Access Attempts:</p>
+                    </header>
+                    <div className="vas-main-inner-container-row">
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="pac-access-attempt-1" name="pac-access" />
+                      <label className="vas-btn" htmlFor="pac-access-attempt-1">1</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="pac-access-attempt-2" name="pac-access" />
+                      <label className="vas-btn" htmlFor="pac-access-attempt-2">2</label>
+                    </div>
+                  </div>
+                  <div className="vas-main-inner-container-main-sub">
+                    <header className="vas-main-inner-container-sub-header">
+                      <p>Deaccess</p>
+                    </header>
+                    <div className="vas-main-inner-container-row">
+                      <span className="vas-single-select-group">
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="pac-deaccess-contaminated" name="pac-deaccess" />
+                        <label className="vas-btn" htmlFor="pac-deaccess-contaminated">Contaminated</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="pac-deaccess-therapy-complete" name="pac-deaccess" />
+                        <label className="vas-btn" htmlFor="pac-deaccess-therapy-complete">Therapy Complete</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="pac-deaccess-needle-change" name="pac-deaccess" />
+                        <label className="vas-btn" htmlFor="pac-deaccess-needle-change">Needle Change</label>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="vas-main-inner-container-row">
+                    <div className="vas-main-cathflow-container">
+                      <button className="btn vas-main-btn vas-main-cathflow-btn" onClick={()=>{this.setState({portacathCathflowActive:!this.state.portacathCathflowActive})}}>Cathflow</button>
+                      {this.state.portacathCathflowActive &&
+                      <span className="vas-main-cathflow-btn-container">
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="pac-cathflow-initiated" name="pac-cathflow" />
+                        <label className="vas-btn" htmlFor="pac-cathflow-initiated">Initiated</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="pac-cathflow-completed" name="pac-cathflow" />
+                        <label className="vas-btn" htmlFor="pac-cathflow-completed">Completed</label>
+                      </span>
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="vas-main-inner-container">
-                <div className="vas-main-inner-container-row">
-                  <span className="vas-main-btn-section-leader">
-                    <button className="btn vas-main-btn vas-main-discontinue-btn">Dressing Change</button>
-                  </span>
-                  <span className="vas-main-btn-section-child">
-                    <button className="btn vas-main-btn vas-main-sub-btn">PICC</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Port-a-Cath</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Central Line</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Mid Line</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Per Protocol</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Bleeding</button>
-                    <button className="btn vas-main-btn vas-main-sub-btn">Dressing Compromised</button>
-                  </span>
+                <header className="vas-main-inner-container-header">
+                  <p>PICC Line</p>
+                </header>
+                <div className="vas-main-inner-container-main">
+                  <div className="vas-main-inner-container-main-sub">
+                    <header className="vas-main-inner-container-sub-header">
+                      <p>Removal</p>
+                    </header>
+                    <div className="vas-main-inner-container-row">
+                      <span className="vas-single-select-group">
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="picc-line-therapy-complete" name="picc-line" />
+                        <label className="vas-btn" htmlFor="picc-line-therapy-complete">Therapy Complete</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="picc-line-discharge" name="picc-line" />
+                        <label className="vas-btn" htmlFor="picc-line-discharge">Discharge</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="picc-line-clotted" name="picc-line" />
+                        <label className="vas-btn" htmlFor="picc-line-clotted">Clotted</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="picc-line-contaminated" name="picc-line" />
+                        <label className="vas-btn" htmlFor="picc-line-contaminated">Contaminated</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="picc-line-pt-removal" name="picc-line" />
+                        <label className="vas-btn" htmlFor="picc-line-pt-removal">PT Removal</label>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="vas-main-inner-container-row">
+                    <div className="vas-main-cathflow-container">
+                      <button className="btn vas-main-btn vas-main-cathflow-btn" onClick={()=>{this.setState({picclineCathflowActive:!this.state.picclineCathflowActive})}}>Cathflow</button>
+                      {this.state.picclineCathflowActive &&
+                      <span className="vas-main-cathflow-btn-container">
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="picc-line-cathflow-initiated" name="picc-line-cathflow" />
+                        <label className="vas-btn" htmlFor="picc-line-cathflow-initiated">Initiated</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="picc-line-cathflow-completed" name="picc-line-cathflow" />
+                        <label className="vas-btn" htmlFor="picc-line-cathflow-completed">Completed</label>
+                      </span>
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="vas-main-inner-container">
-                <p>Slide to end task </p>
-                <input type="range" value={this.state.sliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />
+                <header className="vas-main-inner-container-header">
+                  <p>Dressing Change</p>
+                </header>
+                <div className="vas-main-inner-container-main">
+                  <div className="vas-main-inner-container-main-sub">
+                    <header className="vas-main-inner-container-sub-header">
+                      <p>What:</p>
+                    </header>
+                    <div className="vas-main-inner-container-row">
+                      <span className="vas-single-select-group">
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="dressing-change-picc" name="dressing-change-what" />
+                        <label className="vas-btn" htmlFor="dressing-change-picc">PICC</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="dressing-change-pac" name="dressing-change-what" />
+                        <label className="vas-btn" htmlFor="dressing-change-pac">Port-a-Cath</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="dressing-change-central-line" name="dressing-change-what" />
+                        <label className="vas-btn" htmlFor="dressing-change-central-line">Central Line</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="dressing-change-mid-line" name="dressing-change-what" />
+                        <label className="vas-btn" htmlFor="dressing-change-mid-line">Mid Line</label>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="vas-main-inner-container-main-sub">
+                    <header className="vas-main-inner-container-sub-header">
+                      <p>Why:</p>
+                    </header>
+                    <div className="vas-main-inner-container-row">
+                      <span className="vas-single-select-group">
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="dressing-change-per-protocol" name="dressing-change-why" />
+                        <label className="vas-btn" htmlFor="dressing-change-per-protocol">Per Protocol</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="dressing-change-bleeding" name="dressing-change-why" />
+                        <label className="vas-btn" htmlFor="dressing-change-bleeding">Bleeding</label>
+                        <input type="radio" className="vas-main-select-input vas-single-select" id="dressing-change-dressing-compromised" name="dressing-change-why" />
+                        <label className="vas-btn" htmlFor="dressing-change-dressing-compromised">Dressing Compromised</label>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="vas-main-inner-container vas-main-inner-container-final">
+                <header className="vas-main-inner-container-header vas-main-inner-container-final-header">
+                  <p>Slide to complete task</p>
+                </header>
+                <input type="range" value={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />
               </div>
             </div>
             <div className="tab-pane fade" id="queue" role="tabpanel" aria-labelledby="queue-tab">
@@ -292,7 +409,7 @@ export default class Home extends Component{
               </table>
             </div>
           </div>
-          {this.state.modalIsOpen && <Modal toggleModal={this.toggleHandler}/>}
+          {this.state.modalIsOpen && <Modal selectedIds={this.state.activeBoxesArr} toggleModal={this.toggleHandler}/>}
         </div>
     )
   }

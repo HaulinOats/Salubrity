@@ -1,9 +1,15 @@
 .vas-modal-container {
+  position: fixed;
+  display: -ms-flexbox;
   display: flex;
   top: 0;
   left: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 2000;
+  -ms-flex-align: center;
   align-items: center;
+  -ms-flex-pack: center;
   justify-content: center;
 }
 .vas-modal-container[data-isOpen=false]{
@@ -33,7 +39,9 @@
 }
 .vas-modal-content-inner {
   position: relative;
-  padding:5%;
+  padding: 5%;
+  width: auto;
+  min-width: 350px;
 }
 .vas-modal-content.buttonContainer{
   justify-content: center;

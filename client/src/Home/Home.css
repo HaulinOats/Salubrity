@@ -2,13 +2,15 @@
     margin-top:15px;
 }
 .vas-main-header {
+  position:relative;
   padding: 2% 1% 1% 1%;
+  background-color: cadetblue;
+  color: white;
+  box-shadow: inset 0px 10px 5px -8px white;
 }
 .vas-main-header p{
-    font-size:150%;
-}
-.vas-main-header b{
-    color:slategrey;
+  font-size:150%;
+  text-shadow: 1px 2px 1px black;
 }
 .vas-home-nav-tabs {
     position: relative;
@@ -37,21 +39,39 @@
   border-bottom: 2px solid white !important;
 }
 /* Main tab/page  */
-.vas-main-header p{
-    font-size:150%;
-}
-.vas-main-header b{
-    color:slategrey;
-}
 .vas-main-inner-container {
-  padding: 10px;
   border-top: solid 2px cadetblue;
 }
+.vas-main-inner-container-final {
+  background:lightblue;
+}
+.vas-main-inner-container-final {
+  background-color:bisque;
+}
+.vas-main-inner-container-header {
+  padding: 1%;
+  background-color: darkcyan;
+  color: white;
+  box-shadow: inset 0px -4px 8px -7px black;
+}
+.vas-main-inner-container-final-header {
+  background-color:darkorange;
+  box-shadow: none;
+}
+.vas-main-inner-container-main {
+  padding:10px;
+  background: #c5d5e6;
+}
 .vas-main-inner-container-row {
+  position: relative;
   margin:10px 0;
 }
 .vas-main-btn-section {
   margin-right:15px;
+}
+.vas-main-btn {
+  background-color:white;
+  margin:5px;
 }
 .vas-main-needle-btn {
   background:#28a745;
@@ -61,11 +81,12 @@
   background:darkblue;
   color:white;
 }
-.vas-main-critical-btn {
+.vas-main-cathflow-btn {
   background-color: darkorange;
-}
-.vas-main-btn {
-  margin:5px;
+  margin-left: auto;
+  margin-right: 5px;
+  padding: 12px;
+  box-shadow: 1px 2px 3px black;
 }
 .vas-main-sub-btn {
   border: solid 1px darkgrey;
@@ -88,4 +109,30 @@
     right: 1.4%;
     top: 0.7%;
     z-index: 1;
+}
+.vas-main-cathflow-container {
+
+}
+.vas-buttons-active-header {
+  margin-left: 10px;
+  font-size: 120%;
+}
+.vas-buttons-active-text {
+  margin-top:3px;
+  margin-left: 10px;
+  font-size: 110%;
+}
+.vas-reset-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 7px;
+  background: lightskyblue;
+  border: none;
+  box-shadow: 1px 1px 2px black;
+  color: black;
+  border-radius: 3px;
+}
+.vas-reset-btn:active {
+  box-shadow: none;
 }
