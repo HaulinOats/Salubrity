@@ -1,30 +1,91 @@
 .vas-app-container {
     margin-top:15px;
 }
+.vas-main-header {
+  padding: 2% 1% 1% 1%;
+}
+.vas-main-header p{
+    font-size:150%;
+}
+.vas-main-header b{
+    color:slategrey;
+}
 .vas-home-nav-tabs {
     position: relative;
+    border-bottom: solid 2px lightgrey;
 }
-.vas-home-tabContent{
-    border:solid thin lightgrey;
+.vas-home-nav-item {
+  margin-right:3px;
+  margin-bottom:-2px !important;
+}
+.vas-home-nav-link {
+  border:solid 2px lightgrey;
+}
+.vas-main-tabContent{
+    border:solid 2px lightgrey;
     border-top:none;
 }
 .vas-nav-link {
     cursor:pointer;
+    border:solid 2px lightgrey !important;
 }
 .vas-nav-link[aria-selected="false"]{
     background:whitesmoke;
     border-bottom: solid 1px lightgrey;
 }
-.vas-home-table {
+.vas-nav-link.active {
+  border-bottom: 2px solid white !important;
+}
+/* Main tab/page  */
+.vas-main-header p{
+    font-size:150%;
+}
+.vas-main-header b{
+    color:slategrey;
+}
+.vas-main-inner-container {
+  padding: 10px;
+  border-top: solid 2px cadetblue;
+}
+.vas-main-inner-container-row {
+  margin:10px 0;
+}
+.vas-main-btn-section {
+  margin-right:15px;
+}
+.vas-main-needle-btn {
+  background:#28a745;
+  color:white;
+}
+.vas-main-discontinue-btn {
+  background:darkblue;
+  color:white;
+}
+.vas-main-critical-btn {
+  background-color: darkorange;
+}
+.vas-main-btn {
+  margin:5px;
+}
+.vas-main-sub-btn {
+  border: solid 1px darkgrey;
+}
+.vas-main-btn-active {
+  border:solid 2px #007bff;
+}
+/* queue tab/page */
+.vas-queue-table {
     margin-bottom:0;
 }
-.vas-home-thead {
+.vas-queue-thead {
     background:lightgrey;
 }
-.vas-home-tr {
+.vas-queue-tr {
     cursor:pointer;
 }
-.vas-home-addCall {
+.vas-queue-addCall {
     position: absolute;
-    right:0;
+    right: 1.4%;
+    top: 0.7%;
+    z-index: 1;
 }
