@@ -8,6 +8,7 @@ export default class Modal extends Component {
     this.state = {
       isOpen:true,
       modalTitle:this.props.modalTitle,
+      selectedIds:this.props.selectedIds,
       otherSelected:false,
       comment:"",
       isAddCall:false,
@@ -127,6 +128,11 @@ export default class Modal extends Component {
                     debounceTimeout={300}
                     onChange={e => {this.setState({comment: e.target.value}, this.validateAddCall)}} />
                 </div>
+              }
+              { this.state.selectedIds.length &&
+                this.state.selectedIds.map((el, i)=>{
+                  return <p index={i}>{el}</p>
+                })
               }
             </div>
             {this.state.isAddCall && this.state.inputsValidated &&

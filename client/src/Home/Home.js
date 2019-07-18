@@ -58,7 +58,7 @@ export default class Home extends Component{
         modalIsOpen:true,
         endTaskSliderValue:100
       }, ()=>{
-        setTimeout(()=>{this.setState({modalIsOpen:false, endTaskSliderValue:0})}, 2000);
+        // setTimeout(()=>{this.setState({modalIsOpen:false, endTaskSliderValue:0})}, 2000);
       });
     }
   }
