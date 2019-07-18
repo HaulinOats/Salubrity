@@ -7,7 +7,6 @@ export default class Home extends Component{
     super(props);
     this.toggleHandler = this.toggleHandler.bind(this);
     this.sliderChange = this.sliderChange.bind(this);
-    this.sliderEnd = this.sliderEnd.bind(this);
     this.state = {
       modalIsOpen:false,
       endTaskSliderValue:0,
@@ -79,16 +78,9 @@ export default class Home extends Component{
   }
 
   sliderChange(e){
-    this.setState({
-      endTaskSliderValue:e.target.value
-    })
-  }
-
-  sliderEnd(e){
-    if(this.state.endTaskSliderValue < 100){
+    if(e.target.value < 100){
       this.setState({
-        endTaskSliderValue:0,
-        activeBoxesArr:[]
+        endTaskSliderValue:e.target.value
       })
     } else {
       var activeBoxesArr = [];
@@ -357,7 +349,7 @@ export default class Home extends Component{
                 <header className="vas-main-inner-container-header vas-main-inner-container-final-header">
                   <p>Slide to complete task</p>
                 </header>
-                <input type="range" value={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />
+                <input type="range" min="0" max="100" step="1" value={this.state.endTaskSliderValue} onChange={this.sliderChange} className="pullee" />
               </div>
             </div>
             <div className="tab-pane fade" id="queue" role="tabpanel" aria-labelledby="queue-tab">

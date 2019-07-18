@@ -4,7 +4,6 @@ import './Modal.css';
 export default class Modal extends Component {
   constructor(props){
     super(props);
-    console.log(props);
     this.state = {
       isOpen:true
     }
