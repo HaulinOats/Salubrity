@@ -87,7 +87,7 @@ export default class Home extends Component{
   }
 
   closeModal(){
-    this.setState({modalIsOpen:false});
+    this.setState({modalIsOpen:false, activeBoxesArr:[]});
   }
 
   render(){

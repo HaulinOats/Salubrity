@@ -19,7 +19,7 @@ export default class Modal extends Component {
       inputsValidated:false
     }
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
-  }
+  };
 
   componentWillMount(){
     if(this.state.modalTitle === "Add Call"){
@@ -67,12 +67,12 @@ export default class Modal extends Component {
   render(){
     return(
       <div className="vas-modal-container" data-isOpen={this.state.isOpen}>
-        <div className="vas-modal-clickguard" onClick={this.props.toggleModal}></div>
+        <div className="vas-modal-clickguard" onClick={this.props.closeModal}></div>
         <div className="vas-modal-content">
           <div className="vas-modal-content-inner">
             <header className="vas-modal-content-header">
               <p>{this.state.modalTitle}</p>
-              <div className="vas-modal-content-closeBtn" onClick={this.props.toggleModal}>&#10006;</div>
+              <div className="vas-modal-content-closeBtn" onClick={this.props.closeModal}>&#10006;</div>
             </header>
             <div className="vas-modal-content-main">
               {this.state.saveConfirmed &&
@@ -129,9 +129,9 @@ export default class Modal extends Component {
                     onChange={e => {this.setState({comment: e.target.value}, this.validateAddCall)}} />
                 </div>
               }
-              { this.state.selectedIds.length &&
+              {this.state.selectedIds &&
                 this.state.selectedIds.map((el, i)=>{
-                  return <p index={i}>{el}</p>
+                  return <p key={i}>{el}</p>
                 })
               }
             </div>

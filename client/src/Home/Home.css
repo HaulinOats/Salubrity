@@ -112,10 +112,10 @@
   box-shadow: inset 0px -6px 3px -5px steelblue;
 }
 .vas-queue-addCall {
-    position: absolute;
-    right: 1.4%;
-    top: 0.7%;
-    z-index: 1;
+  position: absolute;
+  right: 15px;
+  top: 4px;
+  z-index: 1;
 }
 .vas-main-cathflow-container {
 
