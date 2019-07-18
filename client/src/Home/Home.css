@@ -2,11 +2,10 @@
     margin-top:15px;
 }
 .vas-main-header {
-  position:relative;
-  padding: 2% 1% 1% 1%;
-  background-color: cadetblue;
-  color: white;
-  box-shadow: inset 0px 10px 5px -8px white;
+  position: relative;
+  padding: 10px 10px;
+  background-color: #5f9ea0;
+  color: #fff;
 }
 .vas-main-header p{
   font-size:150%;
@@ -14,7 +13,7 @@
 }
 .vas-home-nav-tabs {
     position: relative;
-    border-bottom: solid 2px lightgrey;
+    border-bottom:none;
 }
 .vas-home-nav-item {
   margin-right:3px;
@@ -23,20 +22,25 @@
 .vas-home-nav-link {
   border:solid 2px lightgrey;
 }
+.vas-home-nav-link:hover {
+  border:none !important;
+}
 .vas-main-tabContent{
-    border:solid 2px lightgrey;
-    border-top:none;
+    
 }
 .vas-nav-link {
     cursor:pointer;
-    border:solid 2px lightgrey !important;
 }
 .vas-nav-link[aria-selected="false"]{
-    background:whitesmoke;
-    border-bottom: solid 1px lightgrey;
+    background:darkcyan;
+    color: lightgray;
+    box-shadow: inset 0px -3px 8px -5px black;
 }
 .vas-nav-link.active {
-  border-bottom: 2px solid white !important;
+  border-bottom: 2px solid #5f9ea0 !important;
+  background-color: #5f9ea0 !important;
+  color: white !important;
+  border-color: transparent !important;
 }
 /* Main tab/page  */
 .vas-main-inner-container {
@@ -49,7 +53,7 @@
   background-color:bisque;
 }
 .vas-main-inner-container-header {
-  padding: 1%;
+  padding: 10px;
   background-color: darkcyan;
   color: white;
   box-shadow: inset 0px -4px 8px -7px black;
@@ -97,12 +101,15 @@
 /* queue tab/page */
 .vas-queue-table {
     margin-bottom:0;
+    background-color:#c5d5e6;
 }
 .vas-queue-thead {
-    background:lightgrey;
+    background:#5f9ea0;
+    color:whitesmoke;
 }
 .vas-queue-tr {
-    cursor:pointer;
+  cursor:pointer;
+  box-shadow: inset 0px -6px 3px -5px steelblue;
 }
 .vas-queue-addCall {
     position: absolute;
@@ -122,10 +129,9 @@
   margin-left: 10px;
   font-size: 110%;
 }
-.vas-reset-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+.vas-main-header-btn {
+  margin-right: 25px;
+  margin-top: 10px;
   padding: 7px;
   background: lightskyblue;
   border: none;
@@ -135,4 +141,8 @@
 }
 .vas-reset-btn:active {
   box-shadow: none;
+}
+.vas-queue-no-items {
+  text-align: center;
+  margin: 22px 0;
 }

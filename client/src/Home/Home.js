@@ -1,74 +1,38 @@
 import React, {Component} from 'react';
 import Modal from '../Widgets/Modal/Modal';
 import './Home.css';
+import queueData from '../queueData';
+import completedData from '../completedData';
 
 export default class Home extends Component{
   constructor(props){
     super(props);
     this.toggleHandler = this.toggleHandler.bind(this);
     this.sliderChange = this.sliderChange.bind(this);
+    this.sliderEnd = this.sliderEnd.bind(this);
+    this.closeModal = this.closeModal.bind(this);
     this.state = {
       modalIsOpen:false,
       endTaskSliderValue:0,
+      pivSelected:false,
+      labSelected:false,
       portacathCathflowActive:false,
       picclineCathflowActive:false,
       activeBoxesArr:[],
+      modalTitle:"",
       activeRecord:{
         roomNumber:1001
       },
-      queueItems:[
-        {
-          roomNumber:1001,
-          jobRequest:"PIV",
-          contact:1482,
-          callTime:"0900"
-        },
-        {
-          roomNumber:1001,
-          jobRequest:"Dressing Change",
-          contact:1482,
-          callTime:"1400"
-        },
-        {
-          roomNumber:1001,
-          jobRequest:"Lab Draw",
-          contact:1482,
-          callTime:"1900"
-        },
-        {
-          roomNumber:1001,
-          jobRequest:"Port Access",
-          contact:1482,
-          callTime:"1250"
-        }
-      ],
-      completedItems:[
-        {
-          roomNumber:1001,
-          jobRequest:"PIV",
-          contact:1482,
-          callTime:"0900"
-        },
-        {
-          roomNumber:1001,
-          jobRequest:"Dressing Change",
-          contact:1482,
-          callTime:"1400"
-        },
-        {
-          roomNumber:1001,
-          jobRequest:"Lab Draw",
-          contact:1482,
-          callTime:"1900"
-        },
-        {
-          roomNumber:1001,
-          jobRequest:"Port Access",
-          contact:1482,
-          callTime:"1250"
-        }
-      ]
+      queueItems:[],
+      completedItems:[]
     }
+  }
+
+  componentDidMount(){
+    this.setState({
+      queueItems:queueData,
+      completedItems:completedData
+    });
   }
 
   toggleHandler() {
@@ -84,19 +48,26 @@ export default class Home extends Component{
       })
     } else {
       var activeBoxesArr = [];
-      var checkboxes = document.querySelectorAll('input[type=checkbox]:checked');
-      var radio = document.querySelectorAll('input[type=radio]:checked');
-      checkboxes.forEach((el)=>{
-        activeBoxesArr.push(el.id);
-      });
-      radio.forEach((el)=>{
+      var itemButtons = document.querySelectorAll('.vas-main-select-input:checked');
+      itemButtons.forEach((el)=>{
         activeBoxesArr.push(el.id);
       });
       this.setState({
+        modalTitle:"Task Completed",
         activeBoxesArr:activeBoxesArr,
         modalIsOpen:true,
-        endTaskSliderValue:0
+        endTaskSliderValue:100
+      }, ()=>{
+        setTimeout(()=>{this.setState({modalIsOpen:false, endTaskSliderValue:0})}, 2000);
       });
+    }
+  }
+
+  sliderEnd(){
+    if(this.state.endTaskSliderValue < 100){
+      this.setState({endTaskSliderValue:0})
+    } else {
+      this.setState({endTaskSliderValue:100})
     }
   }
 
@@ -107,17 +78,28 @@ export default class Home extends Component{
     });
   }
 
+  pivSelected(){
+    document.getElementById('piv-attempt-1').checked = true;
+  }
+
+  labDrawSelected(){
+    document.getElementById('lab-draw-attempt-1').checked = true;
+  }
+
+  closeModal(){
+    this.setState({modalIsOpen:false});
+  }
+
   render(){
     return(
         <div className="container-fluid vas-app-container">
-          {/* <button type="button" className="btn btn-primary vas-queue-addCall" onClick={()=>{this.setState({modalIsOpen:true})}}>Add Call</button> */}
-          <button type="button" className="btn btn-primary vas-queue-addCall">Add Call</button>
+          <button type="button" className="btn btn-primary vas-queue-addCall" onClick={()=>{this.setState({modalIsOpen:true, modalTitle:"Add Call"})}}>Add Call</button>
           <ul className="nav nav-tabs vas-home-nav-tabs" id="myTab" role="tablist">
             <li className="nav-item vas-home-nav-item">
               <a className="nav-link vas-nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Active/Open</a>
             </li>
             <li className="nav-item vas-home-nav-item">
-              <a className="nav-link vas-nav-link" id="queue-tab" data-toggle="tab" href="#queue" role="tab" aria-controls="queue" aria-selected="true">Queue</a>
+              <a className="nav-link vas-nav-link" id="queue-tab" data-toggle="tab" href="#queue" role="tab" aria-controls="queue" aria-selected="false">Queue</a>
             </li>
             <li className="nav-item vas-home-nav-item">
                 <a className="nav-link vas-nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false">Completed</a>
@@ -127,7 +109,8 @@ export default class Home extends Component{
             <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
               <header className="vas-main-header">
                 <p className="vas-main-header-text">Room: <b>{this.state.activeRecord.roomNumber}</b></p>
-                <button className="vas-reset-btn" onClick={this.resetPage}>Reset Form</button>
+                <button className="vas-main-header-btn" onClick={this.resetPage}>Reset Form</button>
+                <button className="vas-main-header-btn" onClick={this.resetPage}>Return To Queue</button>
               </header>
               <div className="vas-main-inner-container">
                 <header className="vas-main-inner-container-header">
@@ -137,13 +120,13 @@ export default class Home extends Component{
                   <div className="vas-main-inner-container-row">
                     <span className="vas-single-select-group">
                       <input type="radio" className="vas-main-select-input vas-single-select" id="piv-24" name="piv-dose" />
-                      <label className="vas-btn" htmlFor="piv-24">24g</label>
+                      <label className="vas-btn" htmlFor="piv-24" onClick={this.pivSelected}>24g</label>
                       <input type="radio" className="vas-main-select-input vas-single-select" id="piv-22" name="piv-dose"/>
-                      <label className="vas-btn" htmlFor="piv-22">22g</label>
+                      <label className="vas-btn" htmlFor="piv-22" onClick={this.pivSelected}>22g</label>
                       <input type="radio" className="vas-main-select-input vas-single-select" id="piv-20" name="piv-dose"/>
-                      <label className="vas-btn" htmlFor="piv-20">20g</label>
+                      <label className="vas-btn" htmlFor="piv-20" onClick={this.pivSelected}>20g</label>
                       <input type="radio" className="vas-main-select-input vas-single-select" id="piv-18" name="piv-dose"/>
-                      <label className="vas-btn" htmlFor="piv-18">18g</label>
+                      <label className="vas-btn" htmlFor="piv-18" onClick={this.pivSelected}>18g</label>
                     </span>
                     <span className="vas-single-select-group">
                       <p className="d-inline mr-2">Attempts:</p>
@@ -164,9 +147,9 @@ export default class Home extends Component{
                 <div className="vas-main-inner-container-main">
                   <div className="vas-main-inner-container-row">
                     <span className="vas-single-select-group">
-                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-iv" name="lab-draw" />
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-iv" name="lab-draw" onClick={this.labDrawSelected} />
                       <label className="vas-btn" htmlFor="lab-draw-iv">From IV</label>
-                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-labs" name="lab-draw"/>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="lab-draw-labs" name="lab-draw" onClick={this.labDrawSelected}/>
                       <label className="vas-btn" htmlFor="lab-draw-labs">Labs Only</label>
                     </span>
                     <span className="vas-single-select-group">
@@ -349,7 +332,7 @@ export default class Home extends Component{
                 <header className="vas-main-inner-container-header vas-main-inner-container-final-header">
                   <p>Slide to complete task</p>
                 </header>
-                <input type="range" min="0" max="100" step="1" value={this.state.endTaskSliderValue} onChange={this.sliderChange} className="pullee" />
+                <input type="range" min="0" max="100" step="1" value={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />
               </div>
             </div>
             <div className="tab-pane fade" id="queue" role="tabpanel" aria-labelledby="queue-tab">
@@ -357,12 +340,15 @@ export default class Home extends Component{
                 <thead className="vas-queue-thead">
                   <tr>
                     <th scope="col">Room</th>
-                    <th scope="col">Job Requested</th>
+                    <th scope="col">Job</th>
                     <th scope="col">Contact</th>
                     <th scope="col">Call Time</th>
                   </tr>
                 </thead>
                 <tbody>
+                  {!this.state.queueItems.length &&
+                    <tr><td className="vas-queue-no-items">There are no items currently in the queue</td></tr>
+                  }
                   {this.state.queueItems.map((item, index)=>{
                     return(
                       <tr key={index} className="vas-queue-tr">
@@ -387,7 +373,10 @@ export default class Home extends Component{
                   </tr>
                 </thead>
                 <tbody>
-                  {this.state.queueItems.map((item, index)=>{
+                  {!this.state.completedItems.length &&
+                    <tr><td className="vas-queue-no-items">There are no items completed</td></tr>
+                  }
+                  {this.state.completedItems.map((item, index)=>{
                     return(
                       <tr key={index} className="vas-queue-tr">
                         <th scope="row">{item.roomNumber}</th>
@@ -401,7 +390,13 @@ export default class Home extends Component{
               </table>
             </div>
           </div>
-          {this.state.modalIsOpen && <Modal selectedIds={this.state.activeBoxesArr} toggleModal={this.toggleHandler}/>}
+          {this.state.modalIsOpen && 
+            <Modal 
+              closeModal={this.closeModal}
+              modalTitle={this.state.modalTitle} 
+              selectedIds={this.state.activeBoxesArr} 
+              toggleModal={this.toggleHandler}/>
+          }
         </div>
     )
   }
