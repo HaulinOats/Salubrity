@@ -8,12 +8,10 @@ import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
 <Router>
-    <div>
     <Switch>
         <Route path="/admin" component={Admin} />
         <Route path="/" component={Home} />
     </Switch>
-    </div>
 </Router>, document.getElementById('root'));
 
 serviceWorker.unregister();
