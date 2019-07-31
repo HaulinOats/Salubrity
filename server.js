@@ -53,14 +53,6 @@ app.post('/custom-query',(req,res)=>{
 });
 
 ////ROUTES
-app.get('/*', function(req, res) {
-  res.sendFile(path.join(__dirname, 'client/build/index.html'), ()=>{
-    if (err) {
-      res.status(500).send(err)
-    }
-  })
-})
-
 //ADMIN
 
 app.post('/admin-login', (req, res)=>{
@@ -89,6 +81,10 @@ app.get('/get-all-users', (req, res)=>{
     if(err) res.send(err);
     res.send(users);
   });
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
 app.listen(app.get("port"), () => {
