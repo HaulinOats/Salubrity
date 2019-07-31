@@ -17,7 +17,7 @@ export default class Admin extends Component {
     if(this.state.userData){
       //Allow user session access for 30 minutes (1800 seconds)
       //if it's been more than 30 minutes since last login, logout user
-      if(Math.floor(Date.now() / 1000) - this.state.userData.lastLogin > 5){
+      if(Math.floor(Date.now() / 1000) - this.state.userData.lastLogin > 1800){
         this.setState({userData:null}, ()=>{
           localStorage.removeItem('userData');
         });
@@ -47,15 +47,6 @@ export default class Admin extends Component {
       console.log(err);
     })
   }
-
-  // customQuery(){
-  //   axios.post('/custom-query', {})
-  //   .then((resp)=>{
-  //     console.log(resp.data);
-  //   }).catch((err)=>{
-  //     console.log(err);
-  //   })
-  // }
 
   getAllUsers(){
     axios.get('/get-all-users')
@@ -125,8 +116,7 @@ export default class Admin extends Component {
                   onChange={e => {this.setState({password: e.target.value.toLowerCase()})}}
                   onKeyUp={e => {if(e.key === 'Enter'){this.adminLogin()}}} />
                 <button className='vas-admin-login-btn' onClick={e=>{this.adminLogin()}}>Sign in</button>
-                <button onClick={(e)=>{this.addUser()}}>Add User</button>
-                <button onClick={(e)=>{this.getAllUsers()}}>Get All Users</button>
+                {/* <button onClick={(e)=>{this.addUser()}}>Add User</button> */}
               </div>
             </div>
           </div>
@@ -134,6 +124,7 @@ export default class Admin extends Component {
         {this.state.userData &&
           <div className='vas-admin-main-container'>
             <h2>Admin Panel</h2>
+            <button onClick={(e)=>{this.getAllUsers()}}>Get All Users</button>
           </div>
         }
       </div>
