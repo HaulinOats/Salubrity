@@ -52,6 +52,15 @@ app.post('/custom-query',(req,res)=>{
   
 });
 
+////ROUTES
+app.get('/*', function(req, res) {
+  res.sendFile(path.join(__dirname, 'client/build/index.html'), ()=>{
+    if (err) {
+      res.status(500).send(err)
+    }
+  })
+})
+
 //ADMIN
 
 app.post('/admin-login', (req, res)=>{

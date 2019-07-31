@@ -59,6 +59,7 @@ export default class Home extends Component{
         endTaskSliderValue:100
       }, ()=>{
         // setTimeout(()=>{this.setState({modalIsOpen:false, endTaskSliderValue:0})}, 2000);
+        setTimeout(()=>{this.setState({endTaskSliderValue:0})});
       });
     }
   }
@@ -325,6 +326,25 @@ export default class Home extends Component{
                         <label className="vas-btn" htmlFor="dressing-change-dressing-compromised">Dressing Compromised</label>
                       </span>
                     </div>
+                  </div>
+                </div>
+              </div>
+              <div className="vas-main-inner-container">
+                <header className="vas-main-inner-container-header">
+                  <p>Insertion Procedure</p>
+                </header>
+                <div className="vas-main-inner-container-main">
+                  <div className="vas-main-inner-container-row">
+                    <span className="vas-single-select-group">
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="insertion-procedure-midline" name="insertion-procedure" />
+                      <label className="vas-btn" htmlFor="insertion-procedure-midline">Midline</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="insertion-procedure-sl-picc" name="insertion-procedure" />
+                      <label className="vas-btn" htmlFor="insertion-procedure-sl-picc">SL PICC</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="insertion-procedure-dl-picc" name="insertion-procedure" />
+                      <label className="vas-btn" htmlFor="insertion-procedure-dl-picc">DL PICC</label>
+                      <input type="radio" className="vas-main-select-input vas-single-select" id="insertion-procedure-tl-picc" name="insertion-procedure" />
+                      <label className="vas-btn" htmlFor="insertion-procedure-tl-picc">TL PICC</label>
+                    </span>
                   </div>
                 </div>
               </div>
