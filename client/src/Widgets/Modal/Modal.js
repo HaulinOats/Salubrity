@@ -104,6 +104,7 @@ export default class Modal extends Component {
                       <option>DC PICC</option>
                       <option>Place PICC</option>
                       <option>Place Midline</option>
+                      <option>PICC or Midline insertion</option>
                       <option value="other">Other</option>
                     </select>
                     </div>
