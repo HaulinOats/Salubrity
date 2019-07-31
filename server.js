@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
+const path = require('path');
 const LinvoDB = require("linvodb3");
 LinvoDB.dbPath = `${process.cwd()}/vas-db`; 
 
