@@ -65,6 +65,17 @@ label {
       -ms-user-select: none; /* Internet Explorer/Edge */
           user-select: none;
 }
+button {
+  background: cadetblue;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 2px black;
+  color: white;
+}
+button:active {
+  box-shadow:none;
+}
 
 /* Checkbox */
 .vas-main-tabContent input[type="checkbox"] {

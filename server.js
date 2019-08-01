@@ -71,11 +71,12 @@ app.post('/admin-login', (req, res)=>{
 });
 
 app.post('/add-user', (req, res)=>{
+  let newUser = req.body;
   Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
-    newUserData.contactId = users[0].contactId + 1;
-    Users.insert(req.body, (err, user)=>{
+    newUser.contactId = users[0].contactId + 1;
+    Users.insert(newUser, (err, user)=>{
       if(err) res.send(err);
-      res.send(true);
+      res.send(user);
     });
   });
 });

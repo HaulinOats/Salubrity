@@ -17,11 +17,18 @@ export default class Admin extends Component {
       startDate:moment(),
       endDate:moment(),
       isLoading:false,
-      activePage:'date'
+      activePage:'date',
+      addFullName:'',
+      addUserName:'',
+      addPassword:'',
+      addAdminAccess:false,
+      addValidationErrors:[],
+      addedUserData:null
     }
     this.startDateSelected = this.startDateSelected.bind(this);
     this.endDateSelected = this.endDateSelected.bind(this);
     this.submitDateRange = this.submitDateRange.bind(this);
+    this.addUser = this.addUser.bind(this);
     this.logout = this.logout.bind(this);
   }
 
@@ -43,13 +50,43 @@ export default class Admin extends Component {
     }
   }
 
-  addUser(userObj){
-    axios.post('/add-user', userObj)
-    .then((resp)=>{
-      alert('New user added');
-    }).catch((err)=>{
-      console.log(err);
-    })
+  addUser(){
+    let validationErrors = []
+    if(this.state.addFullName.length < 5 || this.state.addUserName.length < 5){
+      validationErrors.push('Full Name & Username must be atleast 5 characters');
+    }
+    if(this.state.addPassword.length < 4){
+      validationErrors.push('Password or PIN must be atleast 4 characters');
+    }
+    if(!validationErrors.length){
+      this.setState({addValidationErrors:[]});
+      axios.post('/add-user', {
+        fullname:this.state.addFullName,
+        username:this.state.addUserName,
+        password:this.state.addPassword,
+        role:this.state.addAdminAccess ? 'admin' : 'user'
+      })
+      .then((resp)=>{
+        if(resp.data.errorType === 'uniqueViolated'){
+          alert(`Error: another user is already assigned ${resp.data.key}`);
+          console.log(resp.data);
+        } else {
+          alert('User Created');
+          console.log(resp.data);
+          this.setState({
+            addFullName:'',
+            addUserName:'',
+            addPassword:'',
+            addAdminAccess:false,
+            addedUserData:resp.data
+          });
+        }
+      }).catch((err)=>{
+        console.log(err);
+      })
+    } else {
+      this.setState({addValidationErrors:validationErrors});
+    }
   }
 
   getAllUsers(){
@@ -185,10 +222,29 @@ export default class Admin extends Component {
                 </div>
               </div>
               <div className='vas-admin-page-container vas-admin-users-container' data-isactive={this.state.activePage === 'users' ? true : false}>
-                <h2>Manage Users</h2>
+                <div className='vas-admin-add-user-container'>
+                  <h3>Add User</h3>
+                  <label>User's Full Name:</label>
+                  <input type='text' placeholder="example: Brett Connolly" onKeyUp={e=>{this.setState({addFullName:e.target.value})}} />
+                  <label>Username:</label>
+                  <input type='text' placeholder="example: kitty453" onKeyUp={e=>{this.setState({addUserName:e.target.value})}}/>
+                  <label>Password or PIN</label>
+                  <input type='text' placeholder="example: hello123 or 1542" onKeyUp={e=>{this.setState({addPassword:e.target.value})}}/>
+                  <label>Allow admin access?</label>
+                  <input type='checkbox' checked={this.state.addAdminAccess} onClick={e=>{this.setState({addAdminAccess:!this.state.addAdminAccess})}}/>
+                  <p className='vas-admin-add-user-notes'>Contact ID will automatically be created once new user is added (auto-incrementing)</p>
+                  <button className='vas-admin-create-user' onClick={this.addUser}>Add User</button>
+                  {this.state.addedUserData &&
+                    <div className='vas-admin-added-user-data'>
+                      {Object.keys(this.state.addedUserData).map((val, idx, arr)=>{
+                        return <p className='vas-admin-added-user-row' key={idx}><b>{val}</b> : {this.state.addedUserData[val]}</p>
+                      })}
+                    </div>
+                  }
+                </div>
               </div>
               <div className='vas-admin-page-container vas-admin-procedures-container' data-isactive={this.state.activePage === 'procedures' ? true : false}>
-                <h2>Manage Procedure Info</h2>
+                <h3>Manage Procedure Info</h3>
               </div>
               <div className='vas-admin-date-query-container'>
                 {this.state.isLoading &&

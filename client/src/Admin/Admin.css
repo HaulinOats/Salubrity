@@ -96,12 +96,23 @@
   padding:0 10px;
   z-index: 10;
 }
-.vas-admin-main-container header h2 {
+.vas-admin-main-container h2 {
   border-right: solid 2px darkgrey;
   padding-right: 10px;
   color:gold;
   font-weight: bold;
   font-size:110%;
+}
+.vas-admin-main-container h3 {
+  color: cadetblue;
+  font-size: 120%;
+  text-shadow: 0px 1px 0px black;
+  margin-bottom: 10px;
+  border-bottom: solid 2px grey;
+  padding-bottom: 5px;
+}
+.vas-admin-main-container h4 {
+  
 }
 .vas-admin-menu {
 
@@ -179,9 +190,40 @@
   background: cadetblue;
   color: white;
 }
-.vas-admin-date-range-submit:active {
-  box-shadow: none;
-}
 .vas-admin-date-query-container {
   margin-top:10px;
+}
+
+/* Users Page */
+.vas-admin-add-user-container label {
+  display:block;
+  margin-top:15px;
+  margin-bottom:5px;
+}
+.vas-admin-add-user-container input[type='text'] {
+  border:solid 2px darkgrey;
+  border-radius: 3px;
+  padding-left:5px;
+  min-width: 300px;
+  height:35px;
+}
+.vas-admin-add-user-container input[type='checkbox']{
+  transform: scale(1.8);
+  margin-left: 4px;
+  margin-top: 5px;
+}
+.vas-admin-create-user {
+  display: block;
+  margin: 15px 0;
+}
+.vas-admin-add-user-notes{
+  margin-top:10px;
+  color:darkgrey;
+  font-style: italic;
+}
+.vas-admin-added-user-row {
+  margin-top:5px;
+}
+.vas-admin-added-user-row b {
+  font-weight:bold;
 }
