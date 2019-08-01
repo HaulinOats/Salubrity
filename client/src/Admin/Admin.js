@@ -159,28 +159,36 @@ export default class Admin extends Component {
             <header>
               <h2>VAS Tracker Admin Panel</h2>
               <ul className='vas-admin-menu'>
-                <li className='vas-admin-menu-item' data-isActive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Date Range</li>
-                <li className='vas-admin-menu-item' data-isActive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Manage Users</li>
-                <li className='vas-admin-menu-item' data-isActive={this.state.activePage === 'procedures' ? true : false} onClick={e=>{this.setState({activePage:'procedures'})}}>Manage Procedure Info</li>
+                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Date Range</li>
+                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Manage Users</li>
+                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'procedures' ? true : false} onClick={e=>{this.setState({activePage:'procedures'})}}>Manage Procedure Info</li>
               </ul>
               <p className='vas-admin-username'>{this.state.userData.fullname}</p>
               <p className='vas-admin-logout' onClick={this.logout}>Logout</p>
             </header>
             <div className='vas-admin-main-content'>
-              <div className='vas-admin-date-range-container'>
-                <div className='vas-admin-date-range-inner'>
-                  <p className='vas-damin-date-label'>From:</p>
-                  <DatePicker className='vas-admin-datepicker' selected={this.state.startDate} onChange={this.startDateSelected} />
-                </div>  
-                <div className='vas-admin-date-range-inner'>
-                  <p className='vas-damin-date-label'>To:</p>
-                  <DatePicker className='vas-admin-datepicker' selected={this.state.endDate} onChange={this.endDateSelected} />
+              <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'date' ? true : false}>
+                <div className='vas-admin-date-range-container'>
+                  <div className='vas-admin-date-range-inner'>
+                    <p className='vas-damin-date-label'>From:</p>
+                    <DatePicker className='vas-admin-datepicker' selected={this.state.startDate} onChange={this.startDateSelected} />
+                  </div>  
+                  <div className='vas-admin-date-range-inner'>
+                    <p className='vas-damin-date-label'>To:</p>
+                    <DatePicker className='vas-admin-datepicker' selected={this.state.endDate} onChange={this.endDateSelected} />
+                  </div>
+                  <div className='vas-admin-date-range-checkboxes'>
+                    <input className='vas-admin-date-range-show-all' type='checkbox' />
+                    <label>Show All Data</label>
+                  </div>
+                  <button className='vas-admin-date-range-submit' onClick={this.submitDateRange}>Submit</button>
                 </div>
-                <div className='vas-admin-date-range-checkboxes'>
-                  <input className='vas-admin-date-range-show-all' type='checkbox' />
-                  <label>Show All Data</label>
-                </div>
-                <button className='vas-admin-date-range-submit' onClick={this.submitDateRange}>Submit</button>
+              </div>
+              <div className='vas-admin-page-container vas-admin-users-container' data-isactive={this.state.activePage === 'users' ? true : false}>
+                <h2>Manage Users</h2>
+              </div>
+              <div className='vas-admin-page-container vas-admin-procedures-container' data-isactive={this.state.activePage === 'procedures' ? true : false}>
+                <h2>Manage Procedure Info</h2>
               </div>
               <div className='vas-admin-date-query-container'>
                 {this.state.isLoading &&

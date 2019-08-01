@@ -140,6 +140,12 @@
   margin-top:35px;
   padding:10px;
 }
+.vas-admin-page-container {
+  display:none;
+}
+.vas-admin-page-container[data-isactive='true'] {
+  display:block;
+}
 .vas-admin-date-range-container {
 
 }
