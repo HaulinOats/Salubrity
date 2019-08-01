@@ -67,7 +67,7 @@ label {
 }
 
 /* Checkbox */
-input[type="checkbox"] {
+.vas-main-tabContent input[type="checkbox"] {
   position: absolute;
   opacity: 0;
   cursor: pointer;

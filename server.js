@@ -14,6 +14,7 @@ let Calls = new LinvoDB("Calls", {
   isOpen:{type:Boolean, default:false},
   jobsCompleted:[Number],
   comments:String,
+  answeredAt:{type:Date, default:new Date()},
   completedBy:{type:Number, default:null},
   completedAt:{type:Date, default:null}
 });
@@ -60,7 +61,9 @@ app.post('/admin-login', (req, res)=>{
   Users.find({username:req.body.username.toLowerCase()}, (err, user)=>{
     if(err) res.send(err);
     if(user[0].password.toLowerCase() === req.body.password){
-      res.send(user[0]);
+      let loggedUser = user[0];
+      delete loggedUser.password;
+      res.send(loggedUser);
     } else {
       res.send(false);
     }
@@ -68,13 +71,13 @@ app.post('/admin-login', (req, res)=>{
 });
 
 app.post('/add-user', (req, res)=>{
-  // Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
-    // newUserData.contactId = users[0].contactId + 1;
+  Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
+    newUserData.contactId = users[0].contactId + 1;
     Users.insert(req.body, (err, user)=>{
       if(err) res.send(err);
-      res.send(user);
+      res.send(true);
     });
-  // });
+  });
 });
 
 app.get('/get-all-users', (req, res)=>{
