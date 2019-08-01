@@ -23,11 +23,12 @@ export default class Admin extends Component {
       addPassword:'',
       addAdminAccess:false,
       addValidationErrors:[],
-      addedUserData:null
+      allUsers:[]
     }
     this.startDateSelected = this.startDateSelected.bind(this);
     this.endDateSelected = this.endDateSelected.bind(this);
     this.submitDateRange = this.submitDateRange.bind(this);
+    this.customQuery = this.customQuery.bind(this);
     this.addUser = this.addUser.bind(this);
     this.logout = this.logout.bind(this);
   }
@@ -48,6 +49,29 @@ export default class Admin extends Component {
         });
       }
     }
+
+    axios.get('/get-all-users')
+    .then((resp)=>{
+      this.setState({allUsers:resp.data});
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
+
+  customQuery(){
+    axios.post('/custom-query', {
+      fullname:'Brett Connolly',
+      username:'brett84cc',
+      password:'lisa8484',
+      role:'super'
+    })
+    .then((resp)=>{
+      console.log('super user added');
+      console.log(resp.data);
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
   }
 
   addUser(){
@@ -73,12 +97,14 @@ export default class Admin extends Component {
         } else {
           alert('User Created');
           console.log(resp.data);
+          let users = this.state.allUsers;
+          users.push(resp.data);
           this.setState({
             addFullName:'',
             addUserName:'',
             addPassword:'',
             addAdminAccess:false,
-            addedUserData:resp.data
+            allUsers:users
           });
         }
       }).catch((err)=>{
@@ -89,10 +115,14 @@ export default class Admin extends Component {
     }
   }
 
-  getAllUsers(){
-    axios.get('/get-all-users')
+  deleteUser(e){
+    let index = e.target.attributes['data-index'].value;
+    axios.post('/delete-user', {_id:e.target.attributes['data-id'].value})
     .then((resp)=>{
-      console.log(resp.data);
+      console.log('user deleted');
+      let users = this.state.allUsers;
+      users.splice(index, 1);
+      this.setState({allUsers:users});
     }).catch((err)=>{
       console.log(err);
     })
@@ -234,13 +264,36 @@ export default class Admin extends Component {
                   <input type='checkbox' checked={this.state.addAdminAccess} onClick={e=>{this.setState({addAdminAccess:!this.state.addAdminAccess})}}/>
                   <p className='vas-admin-add-user-notes'>Contact ID will automatically be created once new user is added (auto-incrementing)</p>
                   <button className='vas-admin-create-user' onClick={this.addUser}>Add User</button>
-                  {this.state.addedUserData &&
-                    <div className='vas-admin-added-user-data'>
-                      {Object.keys(this.state.addedUserData).map((val, idx, arr)=>{
-                        return <p className='vas-admin-added-user-row' key={idx}><b>{val}</b> : {this.state.addedUserData[val]}</p>
-                      })}
-                    </div>
-                  }
+                </div>
+                <div className='vas-admin-remove-user-container'>
+                  <h3>Modify Users</h3>
+                  <table className='vas-admin-remove-user-table'>
+                    <tbody>
+                      <tr>
+                        <th>contactId</th>
+                        <th>fullname</th>
+                        <th>username</th>
+                        <th>password/pin</th>
+                        <th>role</th>
+                        <th className='vas-admin-delete-user'>Delete?</th>
+                      </tr>
+                      {this.state.allUsers.map((val, idx)=>{
+                        return(
+                          <tr key={idx}>
+                            <td>{val.contactId}</td>
+                            <td>{val.fullname}</td>
+                            <td>{val.username}</td>
+                            <td>{val.password}</td>
+                            <td>{val.role}</td>
+                            <td className='vas-admin-delete-user'>
+                              <p data-id={val._id} data-index={idx} onClick={e=>{this.deleteUser(e)}}>&times;</p>
+                            </td>
+                          </tr>
+                        )
+                      })
+                      }
+                    </tbody>
+                  </table>
                 </div>
               </div>
               <div className='vas-admin-page-container vas-admin-procedures-container' data-isactive={this.state.activePage === 'procedures' ? true : false}>
@@ -251,7 +304,7 @@ export default class Admin extends Component {
                   <img className='vas-admin-loading-gif' src={loadingGif} alt='loading'/>
                 }
               </div>
-              {/* <button onClick={(e)=>{this.getAllUsers()}}>Get All Users</button> */}
+              <button onClick={this.customQuery}>Custom Query</button>
             </div>
           </div>
         }

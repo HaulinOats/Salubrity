@@ -227,3 +227,28 @@
 .vas-admin-added-user-row b {
   font-weight:bold;
 }
+.vas-admin-remove-user-table {
+  width:100%;
+  margin-top:10px;
+}
+.vas-admin-remove-user-table th{
+  background: darkgrey;
+  padding: 8px 0px 8px 5px;
+  border: solid 2px grey;
+}
+.vas-admin-remove-user-table tr {
+  border-bottom: solid thin grey;
+}
+.vas-admin-remove-user-table td {
+  padding-top:5px;
+  padding-bottom:5px;
+  padding-left:5px;
+}
+.vas-admin-delete-user {
+  text-align: center;
+}
+.vas-admin-delete-user p {
+  width: fit-content;
+  margin: 0 auto;
+  cursor: pointer;
+}

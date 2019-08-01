@@ -51,7 +51,14 @@ app.get("/home", (req, res) => {
 });
 
 app.post('/custom-query',(req,res)=>{
-  
+  let newUser = req.body;
+  Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
+    newUser.contactId = users[0].contactId + 1;
+    Users.insert(newUser, (err, user)=>{
+      if(err) res.send(err);
+      res.send(user);
+    });
+  });
 });
 
 ////ROUTES
@@ -81,8 +88,19 @@ app.post('/add-user', (req, res)=>{
   });
 });
 
+app.post('/delete-user', (req, res)=>{
+  Users.findOne(req.body, (err, user)=>{
+    if(user.role !== 'super'){
+      Users.remove(req.body, {}, (err1)=>{
+        if(err1) res.send(err1);
+        res.send(true)
+      });
+    }
+  });
+});
+
 app.get('/get-all-users', (req, res)=>{
-  Users.find({}, function (err, users) {
+  Users.find().sort({ contactId: 1 }).exec((err, users)=>{
     if(err) res.send(err);
     res.send(users);
   });
