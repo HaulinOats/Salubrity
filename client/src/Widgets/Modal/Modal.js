@@ -9,7 +9,8 @@ export default class Modal extends Component {
       isOpen:true,
       modalTitle:this.props.modalTitle,
       selectedIds:this.props.selectedIds,
-      otherSelected:false,
+      procedures:this.props.procedures,
+      customSelected:false,
       comment:"",
       isAddCall:false,
       roomNumber:null,
@@ -29,14 +30,14 @@ export default class Modal extends Component {
 
   handleNeedSelect(e){
     if(e.target.value === 'default'){
-      this.setState({need:null, otherSelected:false}, this.validateAddCall);
-    } else if(e.target.value === 'other'){ 
+      this.setState({need:null, customSelected:false}, this.validateAddCall);
+    } else if(e.target.value.toLowerCase() === 'custom'){ 
       this.setState({
         need:e.target.value,
-        otherSelected:true
+        customSelected:true
       }, this.validateAddCall);
     } else {
-      this.setState({need:e.target.value, otherSelected:false, comment:""}, this.validateAddCall);
+      this.setState({need:e.target.value, customSelected:false, comment:""}, this.validateAddCall);
     }
   }
 
@@ -44,7 +45,7 @@ export default class Modal extends Component {
     if(this.state.roomNumber && this.state.roomNumber.length && 
       this.state.need && 
       this.state.contactNumber && this.state.contactNumber.length){
-      if(this.state.otherSelected){
+      if(this.state.customSelected){
         if(this.state.comment.length){
           this.setState({inputsValidated:true});
         } else {
@@ -93,19 +94,11 @@ export default class Modal extends Component {
                     <p>Need</p>
                     <select className="vas-modal-add-call-input" onClick={e => {this.setState({needOpened:true})}} onChange={this.handleNeedSelect}>
                       <option value="default">Select Need</option>
-                      <option>New IV</option>
-                      <option>IV + Labs</option>
-                      <option>Lab Draw</option>
-                      <option>PICC Dressing</option>
-                      <option>Midline Dressing</option>
-                      <option>Port Access</option>
-                      <option>Port Deaccess</option>
-                      <option>Line Not Flushing</option>
-                      <option>DC PICC</option>
-                      <option>Place PICC</option>
-                      <option>Place Midline</option>
-                      <option>PICC or Midline insertion</option>
-                      <option value="other">Other</option>
+                      {
+                        this.state.procedures.map((val, idx)=>{
+                          return <option key={idx} data-procedureid={val.procedureId} dangerouslySetInnerHTML={{ __html: val.name }}></option>
+                        })
+                      }
                     </select>
                     </div>
                     <div className="vas-modal-add-call-row-inner">
@@ -119,7 +112,7 @@ export default class Modal extends Component {
                   </div>
                 </div>
               }
-              {this.state.otherSelected &&
+              {this.state.customSelected &&
                 <div>
                   <p className="vas-modal-comment-text">Comment:</p>
                   <DebounceInput
@@ -139,7 +132,7 @@ export default class Modal extends Component {
             {this.state.isAddCall && this.state.inputsValidated &&
             <div className="vas-modal-content-buttonContainer">
               <button className="btn btn-danger vas-modal-cancel" onClick={this.props.toggleModal}>Cancel</button>
-              <button className="btn btn-success vas-modal-confirm" onClick={()=>{this.setState({isAddCall:false, saveConfirmed:true, otherSelected:false}, this.closeModal)}}>Add To Queue</button>
+              <button className="btn btn-success vas-modal-confirm" onClick={()=>{this.setState({isAddCall:false, saveConfirmed:true, customSelected:false}, this.closeModal)}}>Add To Queue</button>
             </div>
             }
           </div>

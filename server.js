@@ -46,10 +46,9 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 }
 
-app.get("/home", (req, res) => {
-  res.send('server reached');
-});
 
+////ROUTES
+//SUPER
 app.post('/custom-query',(req,res)=>{
   let newUser = req.body;
   Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
@@ -61,13 +60,18 @@ app.post('/custom-query',(req,res)=>{
   });
 });
 
-////ROUTES
-//ADMIN
+app.get('/seed-procedures', (req, res)=>{
+  Procedures.insert(getProcedureSeed(), (err, newDocs) => {
+    if(err) res.send(err);
+    res.send('procedures seeded');
+  });
+})
 
+//ADMIN
 app.post('/admin-login', (req, res)=>{
   Users.find({username:req.body.username.toLowerCase()}, (err, user)=>{
     if(err) res.send(err);
-    if(user[0].password.toLowerCase() === req.body.password){
+    if(user[0].password.toLowerCase() === req.body.password.toLowerCase()){
       let loggedUser = user[0];
       delete loggedUser.password;
       res.send(loggedUser);
@@ -90,19 +94,24 @@ app.post('/add-user', (req, res)=>{
 
 app.post('/delete-user', (req, res)=>{
   Users.findOne(req.body, (err, user)=>{
-    if(user.role !== 'super'){
-      Users.remove(req.body, {}, (err1)=>{
-        if(err1) res.send(err1);
-        res.send(true)
-      });
-    }
+    Users.remove(req.body, {}, (err1)=>{
+      if(err1) res.send(err1);
+      res.send(true)
+    });
   });
 });
 
 app.get('/get-all-users', (req, res)=>{
-  Users.find().sort({ contactId: 1 }).exec((err, users)=>{
+  Users.find({role: {$ne: 'super'}}).sort({ contactId: 1 }).exec((err, users)=>{
     if(err) res.send(err);
     res.send(users);
+  });
+});
+
+app.get('/get-procedures', (req, res)=>{
+  Procedures.find().sort({procedureId:1}).exec((err, procedures)=>{
+    if(err) res.send(err)
+    res.send(procedures);
   });
 });
 
@@ -113,3 +122,131 @@ app.get('*', (req, res) => {
 app.listen(app.get("port"), () => {
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });
+
+function getProcedureSeed(){
+  return [{
+      procedureId:1,
+      name:'Peripheral Site Care',
+      description:''
+    },
+    {
+      procedureId:2,
+      name:'Peripheral Starts',
+      description:''
+    },
+    {
+      procedureId:3,
+      name:'Ultrasound PIV Sticks',
+      description:''
+    },
+    {
+      procedureId:4,
+      name:'Ultrasound Lab Sticks',
+      description:''
+    },
+    {
+      procedureId:5,
+      name:'Lab Draw',
+      description:''
+    },
+    {
+      procedureId:6,
+      name:'PICC DSG &Delta;',
+      description:''
+    },
+    {
+      procedureId:7,
+      name:'CL DSG &Delta;',
+      description:''
+    },
+    {
+      procedureId:8,
+      name:'ML DSG &Delta;',
+      description:''
+    },
+    {
+      procedureId:9,
+      name:'Port DSG &Delta;',
+      description:''
+    },
+    {
+      procedureId:10,
+      name:'PICC Site Check',
+      description:''
+    },
+    {
+      procedureId:11,
+      name:'CL Site Check',
+      description:''
+    },
+    {
+      procedureId:12,
+      name:'ML Site Check',
+      description:''
+    },
+    {
+      procedureId:13,
+      name:'Port Site Check',
+      description:''
+    },
+    {
+      procedureId:14,
+      name:'Port Access',
+      description:''
+    },
+    {
+      procedureId:15,
+      name:'Port De-Access',
+      description:''
+    },
+    {
+      procedureId:16,
+      name:'PICC Placement',
+      description:''
+    },
+    {
+      procedureId:17,
+      name:'ML Placement',
+      description:''
+    },
+    {
+      procedureId:18,
+      name:'PICC Troubleshoot',
+      description:''
+    },
+    {
+      procedureId:19,
+      name:'ML Troubleshoot',
+      description:''
+    },
+    {
+      procedureId:20,
+      name:'CL Troubleshoot',
+      description:''
+    },
+    {
+      procedureId:21,
+      name:'Port Troubleshoot',
+      description:''
+    },
+    {
+      procedureId:22,
+      name:'Cathflow Administration - PICC',
+      description:''
+    },
+    {
+      procedureId:23,
+      name:'Cathflow Administration - Port',
+      description:''
+    },
+    {
+      procedureId:24,
+      name:'Cathflow Administration - Central Line',
+      description:''
+    },
+    {
+      procedureId:25,
+      name:'Custom',
+      description:"Here's a really long description for the custom field so I can test what it looks like when it's line-wrapping (or attempting to) and I guess here's a little more text"
+    }];
+}

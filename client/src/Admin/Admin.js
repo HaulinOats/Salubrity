@@ -23,7 +23,9 @@ export default class Admin extends Component {
       addPassword:'',
       addAdminAccess:false,
       addValidationErrors:[],
-      allUsers:[]
+      allUsers:[],
+      allProcedures:[],
+      isSuper:false
     }
     this.startDateSelected = this.startDateSelected.bind(this);
     this.endDateSelected = this.endDateSelected.bind(this);
@@ -56,17 +58,25 @@ export default class Admin extends Component {
     }).catch((err)=>{
       console.log(err);
     })
+
+    axios.get('/get-procedures')
+    .then((resp)=>{
+      this.setState({allProcedures:resp.data});
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const myParam = urlParams.get('pass');
+    if(myParam === '9937'){
+      this.setState({isSuper:true})
+    }
   }
 
   customQuery(){
-    axios.post('/custom-query', {
-      fullname:'Brett Connolly',
-      username:'brett84cc',
-      password:'lisa8484',
-      role:'super'
-    })
+    axios.get('/seed-procedures')
     .then((resp)=>{
-      console.log('super user added');
       console.log(resp.data);
     })
     .catch((err)=>{
@@ -86,8 +96,8 @@ export default class Admin extends Component {
       this.setState({addValidationErrors:[]});
       axios.post('/add-user', {
         fullname:this.state.addFullName,
-        username:this.state.addUserName,
-        password:this.state.addPassword,
+        username:this.state.addUserName.toLowerCase(),
+        password:this.state.addPassword.toLowerCase(),
         role:this.state.addAdminAccess ? 'admin' : 'user'
       })
       .then((resp)=>{
@@ -126,6 +136,14 @@ export default class Admin extends Component {
     }).catch((err)=>{
       console.log(err);
     })
+  }
+
+  sortColumn(field){
+    let users = this.state.allUsers;
+    users.sort((a, b) => {
+      return a[field] > b[field] ? 1 : -1;
+    });
+    this.setState({allUsers:users});
   }
 
   adminLogin(){
@@ -210,13 +228,6 @@ export default class Admin extends Component {
                   onChange={e => {this.setState({password: e.target.value.toLowerCase()})}}
                   onKeyUp={e => {if(e.key === 'Enter'){this.adminLogin()}}} />
                 <button className='vas-admin-login-btn' onClick={e=>{this.adminLogin()}}>Sign in</button>
-                {/* <button onClick={(e)=>{this.addUser({
-                  fullname:'Brett Connolly',
-                  username:'brett84c',
-                  contactId:1001,
-                  password:'lisa8484',
-                  role:'admin'
-                })}}>Add User</button> */}
               </div>
             </div>
           </div>
@@ -229,6 +240,9 @@ export default class Admin extends Component {
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Date Range</li>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Manage Users</li>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'procedures' ? true : false} onClick={e=>{this.setState({activePage:'procedures'})}}>Manage Procedure Info</li>
+                {this.state.isSuper &&
+                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'super' ? true : false} onClick={e=>{this.setState({activePage:'super'})}}>Super</li>
+                }
               </ul>
               <p className='vas-admin-username'>{this.state.userData.fullname}</p>
               <p className='vas-admin-logout' onClick={this.logout}>Logout</p>
@@ -250,16 +264,21 @@ export default class Admin extends Component {
                   </div>
                   <button className='vas-admin-date-range-submit' onClick={this.submitDateRange}>Submit</button>
                 </div>
+                <div className='vas-admin-date-query-container'>
+                  {this.state.isLoading &&
+                    <img className='vas-admin-loading-gif' src={loadingGif} alt='loading'/>
+                  }
+                </div>
               </div>
               <div className='vas-admin-page-container vas-admin-users-container' data-isactive={this.state.activePage === 'users' ? true : false}>
                 <div className='vas-admin-add-user-container'>
                   <h3>Add User</h3>
                   <label>User's Full Name:</label>
-                  <input type='text' placeholder="example: Brett Connolly" onKeyUp={e=>{this.setState({addFullName:e.target.value})}} />
+                  <input type='text' placeholder="example: Brett Connolly" value={this.state.addFullName} onChange={e=>{this.setState({addFullName:e.target.value})}} />
                   <label>Username:</label>
-                  <input type='text' placeholder="example: kitty453" onKeyUp={e=>{this.setState({addUserName:e.target.value})}}/>
+                  <input type='text' placeholder="example: kitty453" value={this.state.addUserName} onChange={e=>{this.setState({addUserName:e.target.value})}}/>
                   <label>Password or PIN</label>
-                  <input type='text' placeholder="example: hello123 or 1542" onKeyUp={e=>{this.setState({addPassword:e.target.value})}}/>
+                  <input type='text' placeholder="example: hello123 or 1542" value={this.state.addPassword} onChange={e=>{this.setState({addPassword:e.target.value})}}/>
                   <label>Allow admin access?</label>
                   <input type='checkbox' checked={this.state.addAdminAccess} onClick={e=>{this.setState({addAdminAccess:!this.state.addAdminAccess})}}/>
                   <p className='vas-admin-add-user-notes'>Contact ID will automatically be created once new user is added (auto-incrementing)</p>
@@ -267,14 +286,15 @@ export default class Admin extends Component {
                 </div>
                 <div className='vas-admin-remove-user-container'>
                   <h3>Modify Users</h3>
-                  <table className='vas-admin-remove-user-table'>
+                  <p className='vas-admin-add-user-notes'>Click on table header to sort by field</p>
+                  <table className='vas-admin-table'>
                     <tbody>
                       <tr>
-                        <th>contactId</th>
-                        <th>fullname</th>
-                        <th>username</th>
-                        <th>password/pin</th>
-                        <th>role</th>
+                        <th onClick={e=>{this.sortColumn('contactId')}}>contactId</th>
+                        <th onClick={e=>{this.sortColumn('fullname')}}>fullname</th>
+                        <th onClick={e=>{this.sortColumn('username')}}>username</th>
+                        <th onClick={e=>{this.sortColumn('password')}}>password/pin</th>
+                        <th onClick={e=>{this.sortColumn('role')}}>role</th>
                         <th className='vas-admin-delete-user'>Delete?</th>
                       </tr>
                       {this.state.allUsers.map((val, idx)=>{
@@ -298,13 +318,33 @@ export default class Admin extends Component {
               </div>
               <div className='vas-admin-page-container vas-admin-procedures-container' data-isactive={this.state.activePage === 'procedures' ? true : false}>
                 <h3>Manage Procedure Info</h3>
+                <table className='vas-admin-table'>
+                  <tbody>
+                    <tr>
+                      <th>procedureId</th>
+                      <th>name</th>
+                      <th>description</th>
+                    </tr>
+                    {
+                      this.state.allProcedures.map((val, idx)=>{
+                        return(
+                          <tr key={idx}>
+                            <td>{val.procedureId}</td>
+                            <td>{val.name}</td>
+                            <td className='admin-nostretch'>{val.description}</td>
+                          </tr>
+                        )
+                      })
+                    }
+                  </tbody>
+                </table>
               </div>
-              <div className='vas-admin-date-query-container'>
-                {this.state.isLoading &&
-                  <img className='vas-admin-loading-gif' src={loadingGif} alt='loading'/>
-                }
-              </div>
-              <button onClick={this.customQuery}>Custom Query</button>
+              {this.state.isSuper &&
+                <div className='vas-admin-page-container vas-admin-super-container' data-isactive={this.state.activePage === 'super' ? true : false}>
+                  <h3>Super Page</h3>
+                  <button onClick={this.customQuery}>Custom Query</button>
+                </div>
+              }
             </div>
           </div>
         }

@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import Modal from '../Widgets/Modal/Modal';
+import axios from 'axios';
 import './Home.css';
-import queueData from '../queueData';
-import completedData from '../completedData';
 
 export default class Home extends Component{
   constructor(props){
@@ -24,15 +23,19 @@ export default class Home extends Component{
         roomNumber:1001
       },
       queueItems:[],
-      completedItems:[]
+      completedItems:[],
+      procedures:[]
     }
   }
 
   componentDidMount(){
-    this.setState({
-      queueItems:queueData,
-      completedItems:completedData
-    });
+    axios.get('/get-procedures')
+    .then((resp)=>{
+      this.setState({procedures:resp.data});
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
   }
 
   toggleHandler() {
@@ -415,6 +418,7 @@ export default class Home extends Component{
               closeModal={this.closeModal}
               modalTitle={this.state.modalTitle} 
               selectedIds={this.state.activeBoxesArr} 
+              procedures={this.state.procedures}
               toggleModal={this.toggleHandler}/>
           }
         </div>
