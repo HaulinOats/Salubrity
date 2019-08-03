@@ -321,19 +321,21 @@ export default class Admin extends Component {
                 <table className='vas-admin-table'>
                   <tbody>
                     <tr>
-                      <th>procedureId</th>
-                      <th>procedure</th>
-                      <th>field</th>
-                      <th>subField</th>
+                      <th>Procedure ID</th>
+                      <th>Name</th>
+                      <th>Field</th>
+                      <th>Value</th>
+                      <th>Select Type</th>
                     </tr>
                     {
                       this.state.allProcedures.map((val, idx)=>{
                         return(
                           <tr key={idx}>
                             <td>{val.procedureId}</td>
-                            <td>{val.procedure}</td>
+                            <td>{val.name}</td>
                             <td>{val.field}</td>
-                            <td>{val.subField}</td>
+                            <td>{val.value}</td>
+                            <td>{val.selectType}</td>
                           </tr>
                         )
                       })

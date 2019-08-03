@@ -25,6 +25,7 @@ export default class Home extends Component{
       queueItems:[],
       completedItems:[],
       procedures:[],
+      sortedProceduresForDOM:[],
       proceduresDone:[]
     }
   }
@@ -64,6 +65,7 @@ export default class Home extends Component{
         endTaskSliderValue:e.target.value
       })
     } else {
+      // let selectedProcedures = document.querySelectorAll('.vas-main-select-input:checked');
       this.setState({
         modalTitle:"Task Completed",
         modalIsOpen:true,
@@ -88,51 +90,6 @@ export default class Home extends Component{
     checkboxesAndRadioBtns.forEach((el)=>{
       el.checked = false;
     });
-  }
-
-  procedureSelect(field){
-    if(field === 'piv-dose'){
-      
-    }
-    if(field === 'piv-attempt'){
-
-    }
-    if(field === 'lab-draw-type'){
-
-    }
-    if(field === 'lab-draw-attempt'){
-
-    }
-    if(field === 'site-care'){
-
-    }
-    if(field === 'dv-iv'){
-
-    }
-    if(field === 'pac-access'){
-
-    }
-    if(field === 'pac-deaccess'){
-
-    }
-    if(field === 'pac-cathflow'){
-
-    }
-    if(field === 'picc-line-removal'){
-
-    }
-    if(field === 'picc-line-cathflow'){
-
-    }
-    if(field === 'dressing-change-what'){
-
-    }
-    if(field === 'dressing-change-why'){
-
-    }
-    if(field === 'insertion-procedure'){
-
-    }
   }
 
   pivSelected(){
@@ -267,241 +224,55 @@ export default class Home extends Component{
                   <button className="vas-main-header-btn" onClick={this.resetPage}>Reset Form</button>
                   <button className="vas-main-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
                 </header>
-                <div className="vas-main-inner-container">
-                  <header className="vas-main-inner-container-header">
-                    <p>PIV Start</p>
-                  </header>
-                  <div className="vas-main-inner-container-main">
-                    <div className="vas-main-inner-container-row">
-                      <span className="vas-single-select-group">
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PIV Start' data-field='24g' id='piv-24' name="piv-dose"/>
-                        <label className="vas-btn" htmlFor="piv-24" onClick={e=>{this.pivSelected(); this.procedureSelect('piv-dose')}}>24g</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PIV Start' data-field='22g' id='piv-22' name="piv-dose"/>
-                        <label className="vas-btn" htmlFor="piv-22" onClick={e=>{this.pivSelected(); this.procedureSelect('piv-dose')}}>22g</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PIV Start' data-field='20g' id='piv-20' name="piv-dose"/>
-                        <label className="vas-btn" htmlFor="piv-20" onClick={e=>{this.pivSelected(); this.procedureSelect('piv-dose')}}>20g</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PIV Start' data-field='18g' id='piv-18' name="piv-dose"/>
-                        <label className="vas-btn" htmlFor="piv-18" onClick={e=>{this.pivSelected(); this.procedureSelect('piv-dose')}}>18g</label>
-                      </span>
-                      <span className="vas-single-select-group">
-                        <p className="d-inline mr-2">Attempts:</p>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PIV Start' data-subfield='1 Attempt' id="piv-attempt-1" name="piv-attempt" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('piv-attempt')}} htmlFor="piv-attempt-1">1</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PIV Start' data-subfield='2 Attemps' id="piv-attempt-2" name="piv-attempt" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('piv-attempt')}} htmlFor="piv-attempt-2">2</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PIV Start' data-subfield='US Used' id="piv-us" name="piv-attempt" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('piv-attempt')}} htmlFor="piv-us">US Used</label>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="vas-main-inner-container">
-                  <header className="vas-main-inner-container-header">
-                    <p>Lab Draw</p>
-                  </header>
-                  <div className="vas-main-inner-container-main">
-                    <div className="vas-main-inner-container-row">
-                      <span className="vas-single-select-group">
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Lab Draw' data-field='From IV' id="lab-draw-iv" name="lab-draw-type" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('lab-draw-type')}} htmlFor="lab-draw-iv">From IV</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Lab Draw' data-field='Labs Only' id="lab-draw-labs" name="lab-draw-type"/>
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('lab-draw-type')}} htmlFor="lab-draw-labs">Labs Only</label>
-                      </span>
-                      <span className="vas-single-select-group">
-                        <p className="d-inline mr-2">Attempts:</p>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Lab Draw' data-subfield='1 Attempt' id="lab-draw-attempt-1" name="lab-draw-attempt" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('lab-draw-attempt')}} htmlFor="lab-draw-attempt-1">1</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Lab Draw' data-subfield='2 Attempts' id="lab-draw-attempt-2" name="lab-draw-attempt" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('lab-draw-attempt')}} htmlFor="lab-draw-attempt-2">2</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Lab Draw' data-subfield='US Used' id="lab-draw-us" name="lab-draw-attempt" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('lab-draw-attempt')}} htmlFor="lab-draw-us">US Used</label>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="vas-main-inner-container">
-                  <header className="vas-main-inner-container-header">
-                    <p>Site Care</p>
-                  </header>
-                  <div className="vas-main-inner-container-main">
-                    <div className="vas-main-inner-container-row">
-                      <span className="vas-multi-select-group">
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='Site Care' data-field='IV Flushed' id="site-care-iv-flushed" name="site-care" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('site-care')}} htmlFor="site-care-iv-flushed">IV Flushed</label>
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='Site Care' data-field='Saline Locked' id="site-care-saline-locked" name="site-care" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('site-care')}} htmlFor="site-care-saline-locked">Saline Locked</label>
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='Site Care' data-field='Dressing Changed' id="site-care-dressing-changed" name="site-care" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('site-care')}} htmlFor="site-care-dressing-changed">Dressing Changed</label>
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='Site Care' data-field='Dressing Reinforced' id="site-care-dressing-reinforced" name="site-care" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('site-care')}} htmlFor="site-care-dressing-reinforced">Dressing Reinforced</label>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="vas-main-inner-container">
-                  <header className="vas-main-inner-container-header">
-                    <p>DC IV</p>
-                  </header>
-                  <div className="vas-main-inner-container-main">
-                    <div className="vas-main-inner-container-row">
-                      <span className="vas-multi-select-group">
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='DC IV' data-field='Infiltration' id="dc-iv-infiltration" name="dc-iv" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('dc-iv')}} htmlFor="dc-iv-infiltration">Infiltration</label>
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='DC IV' data-field='Phlebitis' id="dc-iv-phlebitis" name="dc-iv" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('dc-iv')}} htmlFor="dc-iv-phlebitis">Phlebitis</label>
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='DC IV' data-field='PT Removed' id="dc-iv-pt-removed" name="dc-iv" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('dc-iv')}} htmlFor="dc-iv-pt-removed">PT Removed</label>
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='DC IV' data-field='Leaking' id="dc-iv-leaking" name="dc-iv" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('dc-iv')}} htmlFor="dc-iv-leaking">Leaking</label>
-                        <input type="checkbox" className="vas-main-select-input vas-multi-select" data-type='multi' data-procedure='DC IV' data-field='Bleeding' id="dc-iv-bleeding" name="dc-iv" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('dc-iv')}} htmlFor="dc-iv-bleeding">Bleeding</label>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="vas-main-inner-container">
-                  <header className="vas-main-inner-container-header">
-                    <p>Port-a-Cath</p>
-                  </header>
-                  <div className="vas-main-inner-container-main">
-                    <div className="vas-main-inner-container-main-sub">
-                      <header className="vas-main-inner-container-sub-header">
-                        <p>Access Attempts:</p>
-                      </header>
+                {this.state.activeRecord.comment &&
+                  <div className="vas-main-inner-container vas-main-inner-container-main-comment">
+                    <header className="vas-main-inner-container-header">
+                      <p>Comments</p>
+                    </header>
+                    <div className="vas-main-inner-container-main">
                       <div className="vas-main-inner-container-row">
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='Access' data-subfield='1 Attempt' id="pac-access-attempt-1" name="pac-access" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('pac-access')}} htmlFor="pac-access-attempt-1">1</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='Access' data-subfield='2 Attempts' id="pac-access-attempt-2" name="pac-access" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('pac-access')}} htmlFor="pac-access-attempt-2">2</label>
-                      </div>
-                    </div>
-                    <div className="vas-main-inner-container-main-sub">
-                      <header className="vas-main-inner-container-sub-header">
-                        <p>Deaccess</p>
-                      </header>
-                      <div className="vas-main-inner-container-row">
-                        <span className="vas-single-select-group">
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='De-Access' data-subfield='Contaminated' id="pac-deaccess-contaminated" name="pac-deaccess" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('pac-deaccess')}} htmlFor="pac-deaccess-contaminated">Contaminated</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='De-Access' data-subfield='Therapy Complete' id="pac-deaccess-therapy-complete" name="pac-deaccess" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('pac-deaccess')}} htmlFor="pac-deaccess-therapy-complete">Therapy Complete</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='De-Access' data-subfield='Needle Change' id="pac-deaccess-needle-change" name="pac-deaccess" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('pac-deaccess')}} htmlFor="pac-deaccess-needle-change">Needle Change</label>
-                        </span>
-                      </div>
-                    </div>
-                    <div className="vas-main-inner-container-row">
-                      <div className="vas-main-cathflow-container">
-                        <button className="btn vas-main-btn vas-main-cathflow-btn" onClick={()=>{this.setState({portacathCathflowActive:!this.state.portacathCathflowActive})}}>Cathflow</button>
-                        {this.state.portacathCathflowActive &&
-                        <span className="vas-main-cathflow-btn-container">
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='Cathflow' data-subfield='Initiated' id="pac-cathflow-initiated" name="pac-cathflow" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('pac-cathflow')}} htmlFor="pac-cathflow-initiated">Initiated</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='Cathflow' data-subfield='Completed' id="pac-cathflow-completed" name="pac-cathflow" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('pac-cathflow')}} htmlFor="pac-cathflow-completed">Completed</label>
-                        </span>
-                        }
+                        <p className='vas-main-comment'>{this.state.activeRecord.comment}</p>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="vas-main-inner-container">
-                  <header className="vas-main-inner-container-header">
-                    <p>PICC Line</p>
-                  </header>
-                  <div className="vas-main-inner-container-main">
-                    <div className="vas-main-inner-container-main-sub">
-                      <header className="vas-main-inner-container-sub-header">
-                        <p>Removal</p>
-                      </header>
-                      <div className="vas-main-inner-container-row">
-                        <span className="vas-single-select-group">
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PICC Line' data-field='Removal' data-subfield='Therapy Complete' id="picc-line-therapy-complete" name="picc-line" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('picc-line-removal')}} htmlFor="picc-line-therapy-complete">Therapy Complete</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PICC Line' data-field='Removal' data-subfield='Discharge' id="picc-line-discharge" name="picc-line" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('picc-line-removal')}} htmlFor="picc-line-discharge">Discharge</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PICC Line' data-field='Removal' data-subfield='Clotted' id="picc-line-clotted" name="picc-line" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('picc-line-removal')}} htmlFor="picc-line-clotted">Clotted</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PICC Line' data-field='Removal' data-subfield='Contaminated' id="picc-line-contaminated" name="picc-line" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('picc-line-removal')}} htmlFor="picc-line-contaminated">Contaminated</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PICC Line' data-field='Removal' data-subfield='PT Removal' id="picc-line-pt-removal" name="picc-line" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('picc-line-removal')}} htmlFor="picc-line-pt-removal">PT Removal</label>
-                        </span>
-                      </div>
-                    </div>
-                    <div className="vas-main-inner-container-row">
-                      <div className="vas-main-cathflow-container">
-                        <button className="btn vas-main-btn vas-main-cathflow-btn" onClick={()=>{this.setState({picclineCathflowActive:!this.state.picclineCathflowActive})}}>Cathflow</button>
-                        {this.state.picclineCathflowActive &&
-                        <span className="vas-main-cathflow-btn-container">
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PICC Line' data-field='Cathflow' data-subfield='Initiated' id="picc-line-cathflow-initiated" name="picc-line-cathflow" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('picc-line-cathflow')}} htmlFor="picc-line-cathflow-initiated">Initiated</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='PICC Line' data-field='Cathflow' data-subfield='Completed' id="picc-line-cathflow-completed" name="picc-line-cathflow" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('picc-line-cathflow')}} htmlFor="picc-line-cathflow-completed">Completed</label>
-                        </span>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="vas-main-inner-container">
-                  <header className="vas-main-inner-container-header">
-                    <p>Dressing Change</p>
-                  </header>
-                  <div className="vas-main-inner-container-main">
-                    <div className="vas-main-inner-container-main-sub">
-                      <header className="vas-main-inner-container-sub-header">
-                        <p>What:</p>
-                      </header>
-                      <div className="vas-main-inner-container-row">
-                        <span className="vas-single-select-group">
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Dressing Change' data-field='What' data-subfield='PICC' id="dressing-change-picc" name="dressing-change-what" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('dressing-change-what')}} htmlFor="dressing-change-picc">PICC</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Dressing Change' data-field='What' data-subfield='Port-A-Cath' id="dressing-change-pac" name="dressing-change-what" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('dressing-change-what')}} htmlFor="dressing-change-pac">Port-A-Cath</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Dressing Change' data-field='What' data-subfield='Central Line' id="dressing-change-central-line" name="dressing-change-what" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('dressing-change-what')}} htmlFor="dressing-change-central-line">Central Line</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Dressing Change' data-field='What' data-subfield='Midline' id="dressing-change-mid-line" name="dressing-change-what" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('dressing-change-what')}} htmlFor="dressing-change-mid-line">Midline</label>
-                        </span>
-                      </div>
-                    </div>
-                    <div className="vas-main-inner-container-main-sub">
-                      <header className="vas-main-inner-container-sub-header">
-                        <p>Why:</p>
-                      </header>
-                      <div className="vas-main-inner-container-row">
-                        <span className="vas-single-select-group">
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='Why' data-subfield='Per Protocol' id="dressing-change-per-protocol" name="dressing-change-why" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('dressing-change-why')}} htmlFor="dressing-change-per-protocol">Per Protocol</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='Why' data-subfield='Bleeding' id="dressing-change-bleeding" name="dressing-change-why" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('dressing-change-why')}} htmlFor="dressing-change-bleeding">Bleeding</label>
-                          <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Port-A-Cath' data-field='Why' data-subfield='Dressing Compromised' id="dressing-change-dressing-compromised" name="dressing-change-why" />
-                          <label className="vas-btn" onClick={e=>{this.procedureSelect('dressing-change-why')}} htmlFor="dressing-change-dressing-compromised">Dressing Compromised</label>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="vas-main-inner-container">
-                  <header className="vas-main-inner-container-header">
-                    <p>Insertion Procedure</p>
-                  </header>
-                  <div className="vas-main-inner-container-main">
-                    <div className="vas-main-inner-container-row">
-                      <span className="vas-single-select-group">
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Insertion Procedure' data-field='Midline' id="insertion-procedure-midline" name="insertion-procedure" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('insertion-procedure')}} htmlFor="insertion-procedure-midline">Midline</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Insertion Procedure' data-field='SL PICC' id="insertion-procedure-sl-picc" name="insertion-procedure" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('insertion-procedure')}} htmlFor="insertion-procedure-sl-picc">SL PICC</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Insertion Procedure' data-field='DL PICC' id="insertion-procedure-dl-picc" name="insertion-procedure" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('insertion-procedure')}} htmlFor="insertion-procedure-dl-picc">DL PICC</label>
-                        <input type="radio" className="vas-main-select-input vas-single-select" data-procedure='Insertion Procedure' data-field='TL PICC' id="insertion-procedure-tl-picc" name="insertion-procedure" />
-                        <label className="vas-btn" onClick={e=>{this.procedureSelect('insertion-procedure')}} htmlFor="insertion-procedure-tl-picc">TL PICC</label>
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                }
+                {
+                  this.state.procedures.map((procedure, idx)=>{
+                    return (
+                      <div className="vas-main-inner-container" key={idx}>
+                        <header className="vas-main-inner-container-header">
+                          <p>{procedure.name}</p>
+                        </header>
+                        <div className="vas-main-inner-container-main">
+                          {
+                            procedure.groups.map((group, idx2)=>{
+                              return(
+                                <span key={idx2}>
+                                  <h3>{group.groupName}</h3>
+                                  <div className="vas-main-inner-container-row">
+                                    <span className={"vas-" + group.selectType + "-select-group"}>
+                                      {
+                                        group.groupOptions.map((option, idx3)=>{
+                                          return(
+                                            <span key={idx3}>
+                                              <input type={group.selectType === 'single' ? 'radio' : 'checkbox'} className={"vas-main-select-input vas-"+ group.selectType +"-select"} id={option.taskId} name={procedure.name +"_"+ group.groupName}/>
+                                              <label className="vas-btn" htmlFor={option.taskId}>{option.value}</label>
+                                            </span>
+                                          )
+                                        })
+                                      }
+                                    </span>
+                                  </div>
+                                </span>
+                              )
+                            })
+                          }
+                          </div>
+                        </div>
+                      
+                    )
+                  })
+                }
                 <div className="vas-main-inner-container vas-main-inner-container-final">
                   <header className="vas-main-inner-container-header vas-main-inner-container-final-header">
                     <p>Slide to complete task</p>

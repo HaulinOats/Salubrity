@@ -28,11 +28,23 @@ let Users = new LinvoDB("Users", {
 Users.ensureIndex({ fieldName: 'username', unique: true });
 Users.ensureIndex({ fieldName: 'contactId', unique: true });
 
-let Procedures = new LinvoDB("Procedures", {
+let Procedures = new LinvoDB("Procedures", { 
   procedureId:Number,
-  procedure:String,
-  field:String,
-  subField:{type:String, default:null}
+  name:String,
+  groups:[
+    {
+      groupName:String,
+      selectType:String,
+      groupOptions:[
+        {
+          value:String,
+          taskId:Number
+        }
+      ]
+    }
+  ],
+  value:String,
+  selectType:String
 });
 Procedures.ensureIndex({ fieldName: 'procedureId', unique: true });
 
@@ -161,302 +173,319 @@ function getProcedureSeed(){
   return [
     {
       procedureId:1,
-      procedure:'PIV Start',
-      field:'24g',
-      subField:'1 Attempt'
+      name:'PIV Start',
+      groups:[
+        {
+          groupName:'Dosage',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'24g',
+              taskId:1
+            },
+            {
+              value:'22g',
+              taskId:2
+            },
+            {
+              value:'20g',
+              taskId:3
+            },
+            {
+              value:'18g',
+              taskId:4
+            }
+          ]
+        },
+        {
+          groupName:'Attempts',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'1 Attempt',
+              taskId:5
+            },
+            {
+              value:'2 Attempts',
+              taskId:6
+            },
+            {
+              value:'US Used',
+              taskId:7
+            }
+          ]
+        }
+      ]
     },
     {
       procedureId:2,
-      procedure:'PIV Start',
-      field:'24g',
-      subField:'2 Attempts'
+      name:'Lab Draw',
+      groups:[
+        {
+          groupName:'Draw Type',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'From IV',
+              taskId:8
+            },
+            {
+              value:'Labs Only',
+              taskId:9
+            }
+          ]
+        },
+        {
+          groupName:'Attempts',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'1 Attempt',
+              taskId:10
+            },
+            {
+              value:'2 Attempts',
+              taskId:11
+            },
+            {
+              value:'US Used',
+              taskId:12
+            }
+          ]
+        }
+      ]
     },
     {
       procedureId:3,
-      procedure:'PIV Start',
-      field:'24g',
-      subField:'US Used'
+      name:'Site Care',
+      groups:[
+        {
+          groupName:'Care Type',
+          selectType:'multi',
+          groupOptions:[
+            {
+              value:'IV Flushed',
+              taskId:13
+            },
+            {
+              value:'Saline Locked',
+              taskId:14
+            },
+            {
+              value:'Dressing Changed',
+              taskId:15
+            },
+            {
+              value:'Dressing Reinforced',
+              taskId:16
+            }
+          ]
+        }
+      ]
     },
     {
       procedureId:4,
-      procedure:'PIV Start',
-      field:'22g',
-      subField:'1 Attempt'
+      name:'DC IV',
+      groups:[
+        {
+          groupName:'Reasons',
+          selectType:'multi',
+          groupOptions:[
+            {
+              value:'Infiltration',
+              taskId:17
+            },
+            {
+              value:'Phlebitis',
+              taskId:18
+            },
+            {
+              value:'PT Removal',
+              taskId:19
+            },
+            {
+              value:'Leaking',
+              taskId:20
+            },
+            {
+              value:'Bleeding',
+              taskId:21
+            }
+          ]
+        }
+      ]
     },
     {
       procedureId:5,
-      procedure:'PIV Start',
-      field:'22g',
-      subField:'2 Attempts'
+      name:'Port-A-Cath',
+      groups:[
+        {
+          groupName:'Access Attempts',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'1 Attempt',
+              taskId:22
+            },
+            {
+              value:'2 Attempts',
+              taskId:23
+            }
+          ]
+        },
+        {
+          groupName:'Deaccess',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'Contaminated',
+              taskId:24
+            },
+            {
+              value:'Therapy Complete',
+              taskId:25
+            },
+            {
+              value:'Needle Change',
+              taskId:26
+            }
+          ]
+        },
+        {
+          groupName:'Cathflow',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'Initiated',
+              taskId:27
+            },
+            {
+              value:'Completed',
+              taskId:28
+            }
+          ]
+        }
+      ]
     },
     {
       procedureId:6,
-      procedure:'PIV Start',
-      field:'22g',
-      subField:'US Used'
+      name:'PICC Line',
+      groups:[
+        {
+          groupName:'Removal',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'Therapy Complete',
+              taskId:29
+            },
+            {
+              value:'Discharge',
+              taskId:30
+            },
+            {
+              value:'Clotted',
+              taskId:31
+            },
+            {
+              value:'Contaminated',
+              taskId:32
+            },
+            {
+              value:'PT Removal',
+              taskId:33
+            }
+          ]
+        },
+        {
+          groupName:'Cathflow',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'Initiated',
+              taskId:34
+            },
+            {
+              value:'Completed',
+              taskId:35
+            }
+          ]
+        }
+      ]
     },
     {
       procedureId:7,
-      procedure:'PIV Start',
-      field:'20g',
-      subField:'1 Attempt'
+      name:'Dressing Change',
+      groups:[
+        {
+          groupName:'What',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'PICC',
+              taskId:36
+            },
+            {
+              value:'Port-A-Cath',
+              taskId:37
+            },
+            {
+              value:'Central Line',
+              taskId:38
+            },
+            {
+              value:'Midline',
+              taskId:3
+            }
+          ]
+        },
+        {
+          groupName:'Why',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'Per Protocol',
+              taskId:40
+            },
+            {
+              value:'Bleeding',
+              taskId:41
+            },
+            {
+              value:'Dressing Compromised',
+              taskId:42
+            }
+          ]
+        }
+      ]
     },
     {
       procedureId:8,
-      procedure:'PIV Start',
-      field:'20g',
-      subField:'2 Attempts'
-    },
-    {
-      procedureId:9,
-      procedure:'PIV Start',
-      field:'20g',
-      subField:'US Used'
-    },
-    {
-      procedureId:10,
-      procedure:'PIV Start',
-      field:'18g',
-      subField:'1 Attempt'
-    },
-    {
-      procedureId:11,
-      procedure:'PIV Start',
-      field:'18g',
-      subField:'2 Attempts'
-    },
-    {
-      procedureId:12,
-      procedure:'PIV Start',
-      field:'18g',
-      subField:'US Used'
-    },
-    {
-      procedureId:13,
-      procedure:'Lab Draw',
-      field:'From IV',
-      subField:'1 Attempt'
-    },
-    {
-      procedureId:14,
-      procedure:'Lab Draw',
-      field:'From IV',
-      subField:'2 Attempts'
-    },
-    {
-      procedureId:15,
-      procedure:'Lab Draw',
-      field:'From IV',
-      subField:'US Used'
-    },
-    {
-      procedureId:16,
-      procedure:'Lab Draw',
-      field:'Labs Only',
-      subField:'1 Attempt'
-    },
-    {
-      procedureId:17,
-      procedure:'Lab Draw',
-      field:'Labs Only',
-      subField:'2 Attempts'
-    },
-    {
-      procedureId:18,
-      procedure:'Lab Draw',
-      field:'Labs Only',
-      subField:'US Used'
-    },
-    {
-      procedureId:19,
-      procedure:'Site Care',
-      field:'IV Flushed'
-    },
-    {
-      procedureId:20,
-      procedure:'Site Care',
-      field:'Saline Locked'
-    },
-    {
-      procedureId:21,
-      procedure:'Site Care',
-      field:'Dressing Changed'
-    },
-    {
-      procedureId:22,
-      procedure:'Site Care',
-      field:'Dressing Reinforced'
-    },
-    {
-      procedureId:23,
-      procedure:'DC IV',
-      field:'Infiltration'
-    },
-    {
-      procedureId:24,
-      procedure:'DC IV',
-      field:'Phlebitis'
-    },
-    {
-      procedureId:25,
-      procedure:'DC IV',
-      field:'PT Removed'
-    },
-    {
-      procedureId:26,
-      procedure:'DC IV',
-      field:'Leaking'
-    },
-    {
-      procedureId:27,
-      procedure:'DC IV',
-      field:'Bleeding'
-    },
-    {
-      procedureId:28,
-      procedure:'Port-A-Cath',
-      field:'Access',
-      subField:'1 Attempt'
-    },
-    {
-      procedureId:29,
-      procedure:'Port-A-Cath',
-      field:'Access',
-      subField:'2 Attempts'
-    },
-    {
-      procedureId:30,
-      procedure:'Port-A-Cath',
-      field:'De-Access',
-      subField:'Contaminated'
-    },
-    {
-      procedureId:31,
-      procedure:'Port-A-Cath',
-      field:'De-Access',
-      subField:'Therapy Complete'
-    },
-    {
-      procedureId:32,
-      procedure:'Port-A-Cath',
-      field:'De-Access',
-      subField:'Needle Change'
-    },
-    {
-      procedureId:33,
-      procedure:'Port-A-Cath',
-      field:'Cathflow',
-      subField:'Initiated'
-    },
-    {
-      procedureId:34,
-      procedure:'Port-A-Cath',
-      field:'Cathflow',
-      subField:'Complete'
-    },
-    {
-      procedureId:35,
-      procedure:'PICC Line',
-      field:'Removal',
-      subField:'Therapy Complete'
-    },
-    {
-      procedureId:36,
-      procedure:'PICC Line',
-      field:'Removal',
-      subField:'Discharge'
-    },
-    {
-      procedureId:37,
-      procedure:'PICC Line',
-      field:'Removal',
-      subField:'Clotted'
-    },
-    {
-      procedureId:38,
-      procedure:'PICC Line',
-      field:'Removal',
-      subField:'Contaminated'
-    },
-    {
-      procedureId:39,
-      procedure:'PICC Line',
-      field:'Removal',
-      subField:'PT Removal'
-    },
-    {
-      procedureId:40,
-      procedure:'PICC Line',
-      field:'Cathflow',
-      subField:'Initiated'
-    },
-    {
-      procedureId:41,
-      procedure:'PICC Line',
-      field:'Cathflow',
-      subField:'Completed'
-    },
-    {
-      procedureId:42,
-      procedure:'Dressing Change',
-      field:'What',
-      subField:'PICC'
-    },
-    {
-      procedureId:43,
-      procedure:'Dressing Change',
-      field:'What',
-      subField:'Port-A-Cath'
-    },
-    {
-      procedureId:44,
-      procedure:'Dressing Change',
-      field:'What',
-      subField:'Central Line'
-    },
-    {
-      procedureId:45,
-      procedure:'Dressing Change',
-      field:'What',
-      subField:'Midline'
-    },
-    {
-      procedureId:46,
-      procedure:'Dressing Change',
-      field:'Why',
-      subField:'Per Protocol'
-    },
-    {
-      procedureId:47,
-      procedure:'Dressing Change',
-      field:'Why',
-      subField:'Bleeding'
-    },
-    {
-      procedureId:48,
-      procedure:'Dressing Change',
-      field:'Why',
-      subField:'Dressing Compromised'
-    },
-    {
-      procedureId:49,
-      procedure:'Insertion Procedure',
-      field:'Midline'
-    },
-    {
-      procedureId:50,
-      procedure:'Insertion Procedure',
-      field:'SL PICC'
-    },
-    {
-      procedureId:51,
-      procedure:'Insertion Procedure',
-      field:'DL PICC'
-    },
-    {
-      procedureId:52,
-      procedure:'Insertion Procedure',
-      field:'TL PICC'
+      name:'Insertion Procedure',
+      groups:[
+        {
+          groupName:'Insertion Type',
+          selectType:'single',
+          groupOptions:[
+            {
+              value:'Midline',
+              taskId:43
+            },
+            {
+              value:'SL PICC',
+              taskId:44
+            },
+            {
+              value:'TL PICC',
+              taskId:45
+            },
+            {
+              value:'DL PICC',
+              taskId:46
+            }
+          ]
+        }
+      ]
     }
-  ]
+  ];
 }

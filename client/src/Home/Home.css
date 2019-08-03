@@ -6,6 +6,7 @@
   padding: 10px 10px;
   background-color: #5f9ea0;
   color: #fff;
+  border-bottom: solid 2px darkseagreen;
 }
 .vas-main-header p{
   font-size:150%;
@@ -45,6 +46,18 @@
 /* Main tab/page  */
 .vas-main-inner-container {
   border-top: solid 2px cadetblue;
+}
+.vas-main-inner-container-main-comment {
+  
+}
+.vas-main-inner-container-main-comment
+.vas-main-inner-container-header {
+  background-color: goldenrod;
+}
+.vas-main-inner-container-main-comment
+.vas-main-inner-container-main {
+  background: moccasin;
+  font-style: italic;
 }
 .vas-main-inner-container-final {
   background:lightblue;
