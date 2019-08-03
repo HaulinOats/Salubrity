@@ -8,13 +8,12 @@ LinvoDB.dbPath = `${process.cwd()}/vas-db`;
 //2nd parameter object defines schema for table
 let Calls = new LinvoDB("Calls", {
   room:String,
-  jobId:Number,
+  job:String,
+  comments:{type:String, default:null},
+  contact:Number,
   createdAt:{type:Date, default:new Date()},
-  createdBy:Number,
   isOpen:{type:Boolean, default:false},
-  jobsCompleted:[Number],
-  comments:String,
-  answeredAt:{type:Date, default:new Date()},
+  proceduresDone:[],
   completedBy:{type:Number, default:null},
   completedAt:{type:Date, default:null}
 });
@@ -22,7 +21,7 @@ let Users = new LinvoDB("Users", {
   fullname:String,
   username:String,
   contactId:Number,
-  password:'lisa8484',
+  password:String,
   role:{type:String, default:'user'},
   createdAt:{type:Date, default:new Date()},
 });
@@ -31,8 +30,9 @@ Users.ensureIndex({ fieldName: 'contactId', unique: true });
 
 let Procedures = new LinvoDB("Procedures", {
   procedureId:Number,
-  name:String,
-  description:String
+  procedure:String,
+  field:String,
+  subField:{type:String, default:null}
 });
 Procedures.ensureIndex({ fieldName: 'procedureId', unique: true });
 
@@ -46,26 +46,41 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 }
 
-
 ////ROUTES
-//SUPER
-app.post('/custom-query',(req,res)=>{
-  let newUser = req.body;
-  Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
-    newUser.contactId = users[0].contactId + 1;
-    Users.insert(newUser, (err, user)=>{
-      if(err) res.send(err);
-      res.send(user);
-    });
+//APP
+app.post('/add-call', (req, res)=>{
+  Calls.insert(req.body, (err, call)=>{
+    if(err) res.send(err);
+    res.send(call);
   });
 });
 
-app.get('/seed-procedures', (req, res)=>{
-  Procedures.insert(getProcedureSeed(), (err, newDocs) => {
-    if(err) res.send(err);
-    res.send('procedures seeded');
+app.get('/get-active-calls', (req, res)=>{
+  Calls.find({completedAt:{$exists:false}}, (err, calls)=>{
+    if(err) res.send(err)
+    res.send(calls);
+  })
+});
+
+app.post('/set-call-as-open', (req, res)=>{
+  Calls.findOne(req.body, (err, call)=>{
+    call.isOpen = true;
+    call.save((err)=>{
+      if(err) res.send(err);
+      res.send(true);
+    })
   });
-})
+});
+
+app.post('/set-call-as-unopen', (req, res)=>{
+  Calls.findOne(req.body, (err, call)=>{
+    call.isOpen = false;
+    call.save((err)=>{
+      if(err) res.send(err);
+      res.send(true);
+    })
+  });
+});
 
 //ADMIN
 app.post('/admin-login', (req, res)=>{
@@ -115,6 +130,25 @@ app.get('/get-procedures', (req, res)=>{
   });
 });
 
+//SUPER
+app.post('/custom-query',(req,res)=>{
+  let newUser = req.body;
+  Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
+    newUser.contactId = users[0].contactId + 1;
+    Users.insert(newUser, (err, user)=>{
+      if(err) res.send(err);
+      res.send(user);
+    });
+  });
+});
+
+app.get('/seed-procedures', (req, res)=>{
+  Procedures.insert(getProcedureSeed(), (err, newDocs) => {
+    if(err) res.send(err);
+    res.send('procedures seeded');
+  });
+})
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
@@ -124,129 +158,305 @@ app.listen(app.get("port"), () => {
 });
 
 function getProcedureSeed(){
-  return [{
+  return [
+    {
       procedureId:1,
-      name:'Peripheral Site Care',
-      description:''
+      procedure:'PIV Start',
+      field:'24g',
+      subField:'1 Attempt'
     },
     {
       procedureId:2,
-      name:'Peripheral Starts',
-      description:''
+      procedure:'PIV Start',
+      field:'24g',
+      subField:'2 Attempts'
     },
     {
       procedureId:3,
-      name:'Ultrasound PIV Sticks',
-      description:''
+      procedure:'PIV Start',
+      field:'24g',
+      subField:'US Used'
     },
     {
       procedureId:4,
-      name:'Ultrasound Lab Sticks',
-      description:''
+      procedure:'PIV Start',
+      field:'22g',
+      subField:'1 Attempt'
     },
     {
       procedureId:5,
-      name:'Lab Draw',
-      description:''
+      procedure:'PIV Start',
+      field:'22g',
+      subField:'2 Attempts'
     },
     {
       procedureId:6,
-      name:'PICC DSG &Delta;',
-      description:''
+      procedure:'PIV Start',
+      field:'22g',
+      subField:'US Used'
     },
     {
       procedureId:7,
-      name:'CL DSG &Delta;',
-      description:''
+      procedure:'PIV Start',
+      field:'20g',
+      subField:'1 Attempt'
     },
     {
       procedureId:8,
-      name:'ML DSG &Delta;',
-      description:''
+      procedure:'PIV Start',
+      field:'20g',
+      subField:'2 Attempts'
     },
     {
       procedureId:9,
-      name:'Port DSG &Delta;',
-      description:''
+      procedure:'PIV Start',
+      field:'20g',
+      subField:'US Used'
     },
     {
       procedureId:10,
-      name:'PICC Site Check',
-      description:''
+      procedure:'PIV Start',
+      field:'18g',
+      subField:'1 Attempt'
     },
     {
       procedureId:11,
-      name:'CL Site Check',
-      description:''
+      procedure:'PIV Start',
+      field:'18g',
+      subField:'2 Attempts'
     },
     {
       procedureId:12,
-      name:'ML Site Check',
-      description:''
+      procedure:'PIV Start',
+      field:'18g',
+      subField:'US Used'
     },
     {
       procedureId:13,
-      name:'Port Site Check',
-      description:''
+      procedure:'Lab Draw',
+      field:'From IV',
+      subField:'1 Attempt'
     },
     {
       procedureId:14,
-      name:'Port Access',
-      description:''
+      procedure:'Lab Draw',
+      field:'From IV',
+      subField:'2 Attempts'
     },
     {
       procedureId:15,
-      name:'Port De-Access',
-      description:''
+      procedure:'Lab Draw',
+      field:'From IV',
+      subField:'US Used'
     },
     {
       procedureId:16,
-      name:'PICC Placement',
-      description:''
+      procedure:'Lab Draw',
+      field:'Labs Only',
+      subField:'1 Attempt'
     },
     {
       procedureId:17,
-      name:'ML Placement',
-      description:''
+      procedure:'Lab Draw',
+      field:'Labs Only',
+      subField:'2 Attempts'
     },
     {
       procedureId:18,
-      name:'PICC Troubleshoot',
-      description:''
+      procedure:'Lab Draw',
+      field:'Labs Only',
+      subField:'US Used'
     },
     {
       procedureId:19,
-      name:'ML Troubleshoot',
-      description:''
+      procedure:'Site Care',
+      field:'IV Flushed'
     },
     {
       procedureId:20,
-      name:'CL Troubleshoot',
-      description:''
+      procedure:'Site Care',
+      field:'Saline Locked'
     },
     {
       procedureId:21,
-      name:'Port Troubleshoot',
-      description:''
+      procedure:'Site Care',
+      field:'Dressing Changed'
     },
     {
       procedureId:22,
-      name:'Cathflow Administration - PICC',
-      description:''
+      procedure:'Site Care',
+      field:'Dressing Reinforced'
     },
     {
       procedureId:23,
-      name:'Cathflow Administration - Port',
-      description:''
+      procedure:'DC IV',
+      field:'Infiltration'
     },
     {
       procedureId:24,
-      name:'Cathflow Administration - Central Line',
-      description:''
+      procedure:'DC IV',
+      field:'Phlebitis'
     },
     {
       procedureId:25,
-      name:'Custom',
-      description:"Here's a really long description for the custom field so I can test what it looks like when it's line-wrapping (or attempting to) and I guess here's a little more text"
-    }];
+      procedure:'DC IV',
+      field:'PT Removed'
+    },
+    {
+      procedureId:26,
+      procedure:'DC IV',
+      field:'Leaking'
+    },
+    {
+      procedureId:27,
+      procedure:'DC IV',
+      field:'Bleeding'
+    },
+    {
+      procedureId:28,
+      procedure:'Port-A-Cath',
+      field:'Access',
+      subField:'1 Attempt'
+    },
+    {
+      procedureId:29,
+      procedure:'Port-A-Cath',
+      field:'Access',
+      subField:'2 Attempts'
+    },
+    {
+      procedureId:30,
+      procedure:'Port-A-Cath',
+      field:'De-Access',
+      subField:'Contaminated'
+    },
+    {
+      procedureId:31,
+      procedure:'Port-A-Cath',
+      field:'De-Access',
+      subField:'Therapy Complete'
+    },
+    {
+      procedureId:32,
+      procedure:'Port-A-Cath',
+      field:'De-Access',
+      subField:'Needle Change'
+    },
+    {
+      procedureId:33,
+      procedure:'Port-A-Cath',
+      field:'Cathflow',
+      subField:'Initiated'
+    },
+    {
+      procedureId:34,
+      procedure:'Port-A-Cath',
+      field:'Cathflow',
+      subField:'Complete'
+    },
+    {
+      procedureId:35,
+      procedure:'PICC Line',
+      field:'Removal',
+      subField:'Therapy Complete'
+    },
+    {
+      procedureId:36,
+      procedure:'PICC Line',
+      field:'Removal',
+      subField:'Discharge'
+    },
+    {
+      procedureId:37,
+      procedure:'PICC Line',
+      field:'Removal',
+      subField:'Clotted'
+    },
+    {
+      procedureId:38,
+      procedure:'PICC Line',
+      field:'Removal',
+      subField:'Contaminated'
+    },
+    {
+      procedureId:39,
+      procedure:'PICC Line',
+      field:'Removal',
+      subField:'PT Removal'
+    },
+    {
+      procedureId:40,
+      procedure:'PICC Line',
+      field:'Cathflow',
+      subField:'Initiated'
+    },
+    {
+      procedureId:41,
+      procedure:'PICC Line',
+      field:'Cathflow',
+      subField:'Completed'
+    },
+    {
+      procedureId:42,
+      procedure:'Dressing Change',
+      field:'What',
+      subField:'PICC'
+    },
+    {
+      procedureId:43,
+      procedure:'Dressing Change',
+      field:'What',
+      subField:'Port-A-Cath'
+    },
+    {
+      procedureId:44,
+      procedure:'Dressing Change',
+      field:'What',
+      subField:'Central Line'
+    },
+    {
+      procedureId:45,
+      procedure:'Dressing Change',
+      field:'What',
+      subField:'Midline'
+    },
+    {
+      procedureId:46,
+      procedure:'Dressing Change',
+      field:'Why',
+      subField:'Per Protocol'
+    },
+    {
+      procedureId:47,
+      procedure:'Dressing Change',
+      field:'Why',
+      subField:'Bleeding'
+    },
+    {
+      procedureId:48,
+      procedure:'Dressing Change',
+      field:'Why',
+      subField:'Dressing Compromised'
+    },
+    {
+      procedureId:49,
+      procedure:'Insertion Procedure',
+      field:'Midline'
+    },
+    {
+      procedureId:50,
+      procedure:'Insertion Procedure',
+      field:'SL PICC'
+    },
+    {
+      procedureId:51,
+      procedure:'Insertion Procedure',
+      field:'DL PICC'
+    },
+    {
+      procedureId:52,
+      procedure:'Insertion Procedure',
+      field:'TL PICC'
+    }
+  ]
 }

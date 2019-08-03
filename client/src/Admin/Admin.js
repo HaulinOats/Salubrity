@@ -322,16 +322,18 @@ export default class Admin extends Component {
                   <tbody>
                     <tr>
                       <th>procedureId</th>
-                      <th>name</th>
-                      <th>description</th>
+                      <th>procedure</th>
+                      <th>field</th>
+                      <th>subField</th>
                     </tr>
                     {
                       this.state.allProcedures.map((val, idx)=>{
                         return(
                           <tr key={idx}>
                             <td>{val.procedureId}</td>
-                            <td>{val.name}</td>
-                            <td className='admin-nostretch'>{val.description}</td>
+                            <td>{val.procedure}</td>
+                            <td>{val.field}</td>
+                            <td>{val.subField}</td>
                           </tr>
                         )
                       })

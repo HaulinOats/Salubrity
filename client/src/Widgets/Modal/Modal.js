@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import './Modal.css';
+import axios from 'axios';
 import {DebounceInput} from 'react-debounce-input';
 
 export default class Modal extends Component {
@@ -9,15 +10,15 @@ export default class Modal extends Component {
       isOpen:true,
       modalTitle:this.props.modalTitle,
       selectedIds:this.props.selectedIds,
-      procedures:this.props.procedures,
       customSelected:false,
-      comment:"",
+      comment:'',
       isAddCall:false,
       roomNumber:null,
       need:null,
       needOpened:false,
       contactNumber:null,
-      inputsValidated:false
+      inputsValidated:false,
+      addedCall:null
     }
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
   };
@@ -59,8 +60,36 @@ export default class Modal extends Component {
     }
   }
 
+  addCall(){
+    let addQuery = {
+      room:this.state.roomNumber,
+      job:this.state.need,
+      contact:this.state.contactNumber,
+      createdAt:new Date(),
+      comment:this.state.comment
+    };
+
+    if(this.state.comment.length < 1){
+      delete addQuery.comment;
+    }
+
+    axios.post('/add-call', addQuery)
+    .then((resp)=>{
+      this.setState({
+        isAddCall:false,
+        saveConfirmed:true,
+        customSelected:false,
+        addedCall:resp.data
+      }, this.closeModal);
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+  }
+
   closeModal(){
     setTimeout(()=>{
+      this.props.getAddedCall(this.state.addedCall);
       this.props.closeModal()
     }, 2000);
   }
@@ -94,11 +123,15 @@ export default class Modal extends Component {
                     <p>Need</p>
                     <select className="vas-modal-add-call-input" onClick={e => {this.setState({needOpened:true})}} onChange={this.handleNeedSelect}>
                       <option value="default">Select Need</option>
-                      {
-                        this.state.procedures.map((val, idx)=>{
-                          return <option key={idx} data-procedureid={val.procedureId} dangerouslySetInnerHTML={{ __html: val.name }}></option>
-                        })
-                      }
+                      <option>Lab Draw</option>
+                      <option>New IV</option>
+                      <option>PICC Line</option>
+                      <option>Midline</option>
+                      <option>Port Access</option>
+                      <option>Port De-Access</option>
+                      <option>Central Line Troubleshoot</option>
+                      <option>Dressing Change</option>
+                      <option>Custom</option>
                     </select>
                     </div>
                     <div className="vas-modal-add-call-row-inner">
@@ -132,7 +165,7 @@ export default class Modal extends Component {
             {this.state.isAddCall && this.state.inputsValidated &&
             <div className="vas-modal-content-buttonContainer">
               <button className="btn btn-danger vas-modal-cancel" onClick={this.props.toggleModal}>Cancel</button>
-              <button className="btn btn-success vas-modal-confirm" onClick={()=>{this.setState({isAddCall:false, saveConfirmed:true, customSelected:false}, this.closeModal)}}>Add To Queue</button>
+              <button className="btn btn-success vas-modal-confirm" onClick={()=>{this.addCall()}}>Add To Queue</button>
             </div>
             }
           </div>
