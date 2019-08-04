@@ -101,7 +101,7 @@ export default class Modal extends Component {
         <div className="vas-modal-content">
           <div className="vas-modal-content-inner">
             <header className="vas-modal-content-header">
-              <p>{this.state.modalTitle}</p>
+              <p className='vas-modal-header-text'>{this.state.modalTitle}</p>
               <div className="vas-modal-content-closeBtn" onClick={this.props.closeModal}>&#10006;</div>
             </header>
             <div className="vas-modal-content-main">

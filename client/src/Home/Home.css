@@ -105,6 +105,9 @@
   padding: 12px;
   box-shadow: 1px 2px 3px black;
 }
+.vas-main-important-hide {
+  display:none;
+}
 .vas-main-sub-btn {
   border: solid 1px darkgrey;
 }
@@ -158,4 +161,15 @@
 .vas-queue-no-items {
   text-align: center;
   margin: 22px 0;
+}
+.vas-main-final-container {
+  padding: 22px 10px 25px 20px;
+}
+.vas-main-contact-id {
+  display: block;
+  border: solid thin grey;
+  padding-left: 5px;
+  height: 30px;
+  border-radius: 5px;
+  margin: 10px 0px 25px;
 }

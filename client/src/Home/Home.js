@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Modal from '../Widgets/Modal/Modal';
 import axios from 'axios';
+import {DebounceInput} from 'react-debounce-input';
 import Moment from 'react-moment';
 import './Home.css';
 
@@ -17,24 +18,31 @@ export default class Home extends Component{
       endTaskSliderValue:0,
       pivSelected:false,
       labSelected:false,
-      portacathCathflowActive:false,
-      picclineCathflowActive:false,
       activeBoxesArr:[],
-      modalTitle:"",
+      contactId:'',
+      modalTitle:'',
       activeRecord:localStorage.getItem('activeRecord') !== 'undefined' ? JSON.parse(localStorage.getItem('activeRecord')) : null,
       queueItems:[],
       completedItems:[],
       procedures:[],
-      sortedProceduresForDOM:[],
       proceduresDone:[]
     }
   }
 
   componentWillMount(){
     this.getActiveCalls();
+
     axios.get('/get-procedures')
     .then((resp)=>{
       this.setState({procedures:resp.data});
+      console.log(resp.data);
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+
+    axios.get('/get-completed-calls')
+    .then((resp)=>{
       console.log(resp.data);
     })
     .catch((err)=>{
@@ -65,23 +73,36 @@ export default class Home extends Component{
         endTaskSliderValue:e.target.value
       })
     } else {
-      // let selectedProcedures = document.querySelectorAll('.vas-main-select-input:checked');
+      let selectedTasks = document.querySelectorAll('.vas-main-select-input:checked');
+      let proceduresDone = [];
+      selectedTasks.forEach((el)=>{
+        proceduresDone.push(Number(el.id));
+      });
       this.setState({
         modalTitle:"Task Completed",
         modalIsOpen:true,
         endTaskSliderValue:0
       }, ()=>{
-        // setTimeout(()=>{this.setState({modalIsOpen:false, endTaskSliderValue:0})}, 2000);
-        setTimeout(()=>{this.setState({endTaskSliderValue:0})});
+        setTimeout(()=>{this.setState({modalIsOpen:false, endTaskSliderValue:0})}, 2000);
+        axios.post('/procedure-completed', {
+          id:this.state.activeRecord._id,
+          proceduresDone,
+          completedBy:this.state.contactId
+        })
+        .then((resp)=>{
+          console.log(resp.data);
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
       });
     }
   }
 
-  sliderEnd(){
+  sliderEnd(e){
     if(this.state.endTaskSliderValue < 100){
       this.setState({endTaskSliderValue:0})
-    } else {
-      this.setState({endTaskSliderValue:100})
+      e.target.value = 0;
     }
   }
 
@@ -114,19 +135,26 @@ export default class Home extends Component{
   }
 
   selectJob(job){
-    axios.post('/set-call-as-open', {_id:job._id})
-    .then((resp)=>{
-      console.log(resp.data);
-      this.setState({activeRecord:job}, ()=>{
-        localStorage.setItem('activeRecord', JSON.stringify(this.state.activeRecord));
-      });
-      setTimeout(()=>{
-        document.getElementById('open-tab').click();
-      }, 0);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+    if(!this.state.activeRecord){
+      axios.post('/set-call-as-open', {_id:job._id})
+      .then((resp)=>{
+        console.log(resp.data);
+        this.setState({activeRecord:job}, ()=>{
+          localStorage.setItem('activeRecord', JSON.stringify(this.state.activeRecord));
+        });
+        setTimeout(()=>{
+          document.getElementById('open-tab').click();
+        }, 0);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+    } else {
+      this.setState({
+        modalIsOpen:true,
+        modalTitle:'Please complete open task or return it to the queue'
+      })
+    }
   }
 
   returnToQueue(){
@@ -141,6 +169,20 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
     })
+  }
+
+  showHiddenButtons(procedureName, groupName, elClass){
+    let className = `.vas-main-${procedureName}-${groupName}`;
+    let container = document.querySelector(className);
+    if(container.classList.contains(elClass)){
+      container.classList.remove(elClass);
+      let containerInputs = document.querySelectorAll(`${className} input`);
+      containerInputs.forEach((el)=>{
+        el.checked = false;
+      });
+    } else {
+      container.classList.add(elClass)
+    }
   }
 
   render(){
@@ -248,20 +290,23 @@ export default class Home extends Component{
                             procedure.groups.map((group, idx2)=>{
                               return(
                                 <span key={idx2}>
-                                  <h3>{group.groupName}</h3>
-                                  <div className="vas-main-inner-container-row">
-                                    <span className={"vas-" + group.selectType + "-select-group"}>
-                                      {
-                                        group.groupOptions.map((option, idx3)=>{
-                                          return(
-                                            <span key={idx3}>
-                                              <input type={group.selectType === 'single' ? 'radio' : 'checkbox'} className={"vas-main-select-input vas-"+ group.selectType +"-select"} id={option.taskId} name={procedure.name +"_"+ group.groupName}/>
-                                              <label className="vas-btn" htmlFor={option.taskId}>{option.value}</label>
-                                            </span>
-                                          )
-                                        })
-                                      }
-                                    </span>
+                                  {group.groupName === 'Cathflow' &&
+                                    <button className='vas-main-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-main-important-hide')}}>{group.groupName}</button>
+                                  }
+                                  {group.groupName !== 'Cathflow' &&
+                                    <h3>{group.groupName}</h3>
+                                  }
+                                  <div className={group.groupName === 'Cathflow' ? 'vas-main-inner-container-row vas-main-important-hide vas-main-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : 'vas-main-inner-container-row'}>
+                                    {
+                                      group.groupOptions.map((option, idx3)=>{
+                                        return(
+                                          <span key={idx3}>
+                                            <input type={group.selectType === 'single' ? 'radio' : 'checkbox'} className={"vas-main-select-input vas-"+ group.selectType +"-select"} id={option.taskId} name={procedure.name +"_"+ group.groupName}/>
+                                            <label className="vas-btn" htmlFor={option.taskId}>{option.value}</label>
+                                          </span>
+                                        )
+                                      })
+                                    }
                                   </div>
                                 </span>
                               )
@@ -275,9 +320,23 @@ export default class Home extends Component{
                 }
                 <div className="vas-main-inner-container vas-main-inner-container-final">
                   <header className="vas-main-inner-container-header vas-main-inner-container-final-header">
-                    <p>Slide to complete task</p>
+                    <p>Complete Task</p>
                   </header>
-                  <input type="range" min="0" max="100" step="1" value={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />
+                  <div className='vas-main-final-container'>
+                    <label>Please enter your contact ID:</label>
+                    <DebounceInput
+                      className="vas-main-contact-id"
+                      type="text"
+                      minLength={4}
+                      debounceTimeout={200}
+                      onChange={e => {this.setState({contactId: e.target.value})}}/>
+                    {this.state.contactId > 3 &&
+                      <div>
+                        <p>Slide To Submit Task</p>
+                        <input type="range" min="0" max="100" step="1" defaultValue={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />
+                      </div>
+                    }
+                  </div>
                 </div>
               </div>
 

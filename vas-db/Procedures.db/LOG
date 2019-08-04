@@ -1,5 +1,3 @@
-2019/08/03-19:11:02.416 3cc8 Recovering log #3
-2019/08/03-19:11:02.419 3cc8 Level-0 table #5: started
-2019/08/03-19:11:02.432 3cc8 Level-0 table #5: 1322 bytes OK
-2019/08/03-19:11:02.438 3cc8 Delete type=0 #3
-2019/08/03-19:11:02.439 3cc8 Delete type=3 #2
+2019/08/04-00:48:32.533 3bdc Recovering log #28
+2019/08/04-00:48:32.541 3bdc Delete type=0 #28
+2019/08/04-00:48:32.541 3bdc Delete type=3 #27

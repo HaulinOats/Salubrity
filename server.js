@@ -74,6 +74,10 @@ app.get('/get-active-calls', (req, res)=>{
   })
 });
 
+app.get('/get-completed-calls', (req, res)=>{
+  // Calls.find({})
+});
+
 app.post('/set-call-as-open', (req, res)=>{
   Calls.findOne(req.body, (err, call)=>{
     call.isOpen = true;
@@ -92,6 +96,20 @@ app.post('/set-call-as-unopen', (req, res)=>{
       res.send(true);
     })
   });
+});
+
+app.post('/procedure-completed', (req, res)=>{
+  Calls.findOne({_id:req.body.id}, (err, call)=>{
+    if(err) res.send(err);
+    call.proceduresDone = req.body.proceduresDone;
+    call.isOpen = false;
+    call.completedBy = req.body.contactId;
+    call.completedAt = new Date();
+    call.save((err2)=>{
+      if(err2) res.send(err2);
+      res.send(true);
+    })
+  })
 });
 
 //ADMIN

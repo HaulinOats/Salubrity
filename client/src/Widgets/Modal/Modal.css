@@ -41,6 +41,9 @@
   font-size: 130%;
   box-shadow: inset 0px -5px 6px -6px black;
 }
+.vas-modal-header-text {
+  width:93%;
+}
 .vas-modal-content-main {
   width:fit-content;
 }
@@ -49,7 +52,7 @@
   font-size: 125%;
   top: 0;
   right: 0;
-  margin: 1% 2% 1% 4%;
+  margin: 10px 10px 0% 0%;
   cursor: pointer;
 }
 .vas-modal-content-inner {
