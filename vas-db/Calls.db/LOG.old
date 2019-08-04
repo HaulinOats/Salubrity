@@ -1,5 +1,5 @@
-2019/08/04-00:47:03.278 2fd0 Recovering log #71
-2019/08/04-00:47:03.278 2fd0 Level-0 table #73: started
-2019/08/04-00:47:03.291 2fd0 Level-0 table #73: 450 bytes OK
-2019/08/04-00:47:03.298 2fd0 Delete type=0 #71
-2019/08/04-00:47:03.298 2fd0 Delete type=3 #70
+2019/08/04-15:20:44.476 32a8 Recovering log #6
+2019/08/04-15:20:44.476 32a8 Level-0 table #8: started
+2019/08/04-15:20:44.494 32a8 Level-0 table #8: 401 bytes OK
+2019/08/04-15:20:44.500 32a8 Delete type=0 #6
+2019/08/04-15:20:44.501 32a8 Delete type=3 #4

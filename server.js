@@ -68,23 +68,36 @@ app.post('/add-call', (req, res)=>{
 });
 
 app.get('/get-active-calls', (req, res)=>{
-  Calls.find({completedAt:{$exists:false}}, (err, calls)=>{
+  Calls.find({completedAt:{$exists:false}, isOpen:false}, (err, calls)=>{
     if(err) res.send(err)
     res.send(calls);
   })
 });
 
 app.get('/get-completed-calls', (req, res)=>{
-  // Calls.find({})
+  var start = new Date();
+  start.setHours(0,0,0,0);
+  
+  var end = new Date();
+  end.setHours(23,59,59,999);
+
+  Calls.find({completedAt: {$gte: start, $lt: end}}, (err, calls)=>{
+    if(err) res.send(err)
+    res.send(calls);
+  });
 });
 
 app.post('/set-call-as-open', (req, res)=>{
   Calls.findOne(req.body, (err, call)=>{
-    call.isOpen = true;
-    call.save((err)=>{
-      if(err) res.send(err);
-      res.send(true);
-    })
+    if(call.isOpen) {
+     res.send(false) 
+    } else {
+      call.isOpen = true;
+      call.save((err)=>{
+        if(err) res.send(err);
+        res.send(true);
+      })
+    }
   });
 });
 
@@ -107,7 +120,7 @@ app.post('/procedure-completed', (req, res)=>{
     call.completedAt = new Date();
     call.save((err2)=>{
       if(err2) res.send(err2);
-      res.send(true);
+      res.send(call);
     })
   })
 });

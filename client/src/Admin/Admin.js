@@ -46,7 +46,7 @@ export default class Admin extends Component {
         let userData = {...this.state.userData}
         userData.lastLogin = Math.floor(Date.now() / 1000);
         this.setState({userData}, ()=>{
-          localStorage.setItem('userData', JSON.stringify(this.state.userData));
+          this.setStorageItem(false, 'userData', this.state.userData);
           console.log(userData);
         });
       }
@@ -71,6 +71,14 @@ export default class Admin extends Component {
     const myParam = urlParams.get('pass');
     if(myParam === '9937'){
       this.setState({isSuper:true})
+    }
+  }
+
+  setStorageItem(isRemove, name, data){
+    if(isRemove){
+      localStorage.setItem(name, JSON.stringify(data));
+    } else {
+      localStorage.removeItem(name)
     }
   }
 
@@ -158,7 +166,7 @@ export default class Admin extends Component {
           let userData = resp.data;
           userData.lastLogin = Math.floor(Date.now() / 1000);
           this.setState({userData}, ()=>{
-            localStorage.setItem('userData', JSON.stringify(this.state.userData));
+            this.setStorageItem(false, 'userData', this.state.userData);
             console.log(userData);
           });
         } else {
@@ -175,7 +183,7 @@ export default class Admin extends Component {
 
   logout(){
     this.setState({userData:null}, ()=>{
-      localStorage.removeItem('userData');
+      this.setStorageItem(true, 'userData');
     });
   }
 

@@ -23,7 +23,7 @@ export default class Home extends Component{
       modalTitle:'',
       activeRecord:localStorage.getItem('activeRecord') !== 'undefined' ? JSON.parse(localStorage.getItem('activeRecord')) : null,
       queueItems:[],
-      completedItems:[],
+      completedCalls:[],
       procedures:[],
       proceduresDone:[]
     }
@@ -44,6 +44,7 @@ export default class Home extends Component{
     axios.get('/get-completed-calls')
     .then((resp)=>{
       console.log(resp.data);
+      this.setState({completedCalls:resp.data});
     })
     .catch((err)=>{
       console.log(err);
@@ -90,7 +91,16 @@ export default class Home extends Component{
           completedBy:this.state.contactId
         })
         .then((resp)=>{
-          console.log(resp.data);
+          let completedCalls = this.state.completedCalls;
+          completedCalls.push(resp.data);
+          document.getElementById('queue-tab').click();
+          this.setState({
+            activeRecord:null,
+            completedCalls
+          }, ()=>{
+            this.setStorageItem(true, 'activeRecord');
+            document.getElementById('queue-tab').click();
+          });
         })
         .catch((err)=>{
           console.log(err);
@@ -138,13 +148,19 @@ export default class Home extends Component{
     if(!this.state.activeRecord){
       axios.post('/set-call-as-open', {_id:job._id})
       .then((resp)=>{
-        console.log(resp.data);
-        this.setState({activeRecord:job}, ()=>{
-          localStorage.setItem('activeRecord', JSON.stringify(this.state.activeRecord));
-        });
-        setTimeout(()=>{
-          document.getElementById('open-tab').click();
-        }, 0);
+        if(resp.data === 'already open'){
+          this.setState({
+            modalIsOpen:true,
+            modalTitle:'Record is currently open by someone else. Please select another queue item. Refreshing queue...'
+          }, this.getActiveCalls);
+        } else {
+          this.setState({activeRecord:job}, ()=>{
+            this.setStorageItem(false, 'activeRecord', this.state.activeRecord);
+          });
+          setTimeout(()=>{
+            document.getElementById('open-tab').click();
+          }, 0);
+        }
       })
       .catch((err)=>{
         console.log(err);
@@ -157,12 +173,20 @@ export default class Home extends Component{
     }
   }
 
+  setStorageItem(isRemove, name, data){
+    if(isRemove){
+      localStorage.removeItem(name)
+    } else {
+      localStorage.setItem(name, JSON.stringify(data));
+    }
+  }
+
   returnToQueue(){
     axios.post('/set-call-as-unopen', {_id:this.state.activeRecord._id})
     .then((resp)=>{
       console.log(resp.data);
       this.setState({activeRecord:null}, ()=>{
-        localStorage.removeItem('activeRecord');
+        this.setStorageItem(true, 'activeRecord');
         document.getElementById('queue-tab').click();
       });
     })
@@ -239,20 +263,22 @@ export default class Home extends Component{
                     <th scope="col">Room</th>
                     <th scope="col">Job Requested</th>
                     <th scope="col">Contact</th>
-                    <th scope="col">Call Time</th>
+                    <th scope="col">Call Start</th>
+                    <th scope="col">Call End</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {!this.state.completedItems.length &&
+                  {!this.state.completedCalls.length &&
                     <tr><td className="vas-queue-no-items">There are no items completed</td></tr>
                   }
-                  {this.state.completedItems.map((item, index)=>{
+                  {this.state.completedCalls.map((item, index)=>{
                     return(
                       <tr key={index} className="vas-queue-tr">
-                        <th scope="row">{item.roomNumber}</th>
-                        <td>{item.jobRequest}</td>
-                        <td>{item.contact}</td>
-                        <td>{item.callTime}</td>
+                        <th scope="row">{item.room}</th>
+                        <td>{item.job}</td>
+                        <td>{item.completedBy}</td>
+                        <td><Moment format='HH:mm'>{item.createdAt}</Moment></td>
+                        <td><Moment format='HH:mm'>{item.completedAt}</Moment></td>
                       </tr>
                     )
                   })}

@@ -66,7 +66,8 @@ export default class Modal extends Component {
       job:this.state.need,
       contact:this.state.contactNumber,
       createdAt:new Date(),
-      comment:this.state.comment
+      comment:this.state.comment,
+      isOpen:false
     };
 
     if(this.state.comment.length < 1){
@@ -140,6 +141,7 @@ export default class Modal extends Component {
                         className="vas-modal-add-call-input"
                         minLength={1}
                         debounceTimeout={300}
+                        onKeyUp={e => {if(e.key === 'Enter' && this.state.inputsValidated){this.addCall()}}}
                         onChange={e => {this.setState({contactNumber: e.target.value}, this.validateAddCall)}} />
                     </div>
                   </div>
