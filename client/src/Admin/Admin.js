@@ -65,18 +65,6 @@ export default class Admin extends Component {
         console.log(err);
       })
     }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const seedAd = urlParams.get('seedAd');
-    if(seedAd === 'true'){
-      axios.get('/custom-query')
-      .then(resp=>{
-        console.log(resp.data);
-      })
-      .catch(err=>{
-        console.log(err)
-      })
-    }
   }
 
   setStorageItem(isRemove, name, data){
@@ -223,6 +211,16 @@ export default class Admin extends Component {
     console.log('end date: ', this.state.endDate);
   }
 
+  seedSuper(){
+    axios.get('/seed-super')
+    .then(resp=>{
+      console.log(resp.data);
+    })
+    .catch(err=>{
+      console.log(err)
+    })
+  }
+
   render(){
     return(
       <div className='vas-admin-container'>
@@ -257,6 +255,7 @@ export default class Admin extends Component {
                 <button className='vas-admin-login-btn' onClick={e=>{this.adminLogin()}}>Sign in</button>
               </div>
             </div>
+            <button style={{display:'none'}} onClick={e=>{this.seedSuper()}}>Seed Super</button>
           </div>
         }
         {this.state.userData &&

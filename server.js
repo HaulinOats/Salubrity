@@ -178,7 +178,7 @@ app.get('/get-procedures', (req, res)=>{
 });
 
 //SUPER
-app.get('/custom-query',(req,res)=>{
+app.get('/seed-super',(req,res)=>{
   Users.insert({
     fullname:'Brett Connolly',
     username:'brett84c',
