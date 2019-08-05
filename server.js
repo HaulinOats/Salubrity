@@ -184,8 +184,7 @@ app.get('/seed-super',(req,res)=>{
     username:'brett84c',
     userId:1001,
     password:'lisa8484',
-    role:'super',
-    createdAt:new Date()
+    role:'super'
   }, (err, newUser)=>{
     if(err) res.send(err);
     res.send(newUser);
