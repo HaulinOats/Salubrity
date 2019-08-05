@@ -20,13 +20,13 @@ let Calls = new LinvoDB("Calls", {
 let Users = new LinvoDB("Users", {
   fullname:String,
   username:String,
-  contactId:Number,
+  userId:Number,
   password:String,
   role:{type:String, default:'user'},
   createdAt:{type:Date, default:new Date()},
 });
 Users.ensureIndex({ fieldName: 'username', unique: true });
-Users.ensureIndex({ fieldName: 'contactId', unique: true });
+Users.ensureIndex({ fieldName: 'userId', unique: true });
 
 let Procedures = new LinvoDB("Procedures", { 
   procedureId:Number,
@@ -138,15 +138,15 @@ app.post('/admin-login', (req, res)=>{
         res.send(false);
       }
     } else {
-      res.send('Could not find admin user');
+      res.send(false);
     }
   })
 });
 
 app.post('/add-user', (req, res)=>{
   let newUser = req.body;
-  Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
-    newUser.contactId = users[0].contactId + 1;
+  Users.find({}).sort({ userId: -1 }).limit(1).exec((err, users)=>{
+    newUser.userId = users[0].userId + 1;
     Users.insert(newUser, (err, user)=>{
       if(err) res.send(err);
       res.send(user);
@@ -164,7 +164,7 @@ app.post('/delete-user', (req, res)=>{
 });
 
 app.get('/get-all-users', (req, res)=>{
-  Users.find({role: {$ne: 'super'}}).sort({ contactId: 1 }).exec((err, users)=>{
+  Users.find({role: {$ne: 'super'}}).sort({ userId: 1 }).exec((err, users)=>{
     if(err) res.send(err);
     res.send(users);
   });
@@ -182,7 +182,7 @@ app.get('/seed-super',(req,res)=>{
   Users.insert({
     fullname:'Brett Connolly',
     username:'brett84c',
-    contactId:1001,
+    userId:1001,
     password:'lisa8484',
     role:'super',
     createdAt:new Date()

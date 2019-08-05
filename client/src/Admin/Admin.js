@@ -29,12 +29,26 @@ export default class Admin extends Component {
     this.startDateSelected = this.startDateSelected.bind(this);
     this.endDateSelected = this.endDateSelected.bind(this);
     this.submitDateRange = this.submitDateRange.bind(this);
-    this.customQuery = this.customQuery.bind(this);
+    this.seedProcedures = this.seedProcedures.bind(this);
+    this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.addUser = this.addUser.bind(this);
     this.logout = this.logout.bind(this);
   }
 
   componentWillMount(){
+    const storageUserData = localStorage.getItem('userData');
+    if(this.isValidStorageItem(storageUserData)){
+      this.setState({userData:JSON.parse(storageUserData)}, this.handleAdminSessionData);
+    } else {
+      this.handleAdminSessionData();
+    }
+  }
+
+  isValidStorageItem(storageItem){
+    return storageItem !== 'undefined' && storageItem !== undefined && storageItem !== null && storageItem !== 'null'
+  }
+
+  handleAdminSessionData(){
     if(this.state.userData){
       //Allow user session access for 30 minutes (1800 seconds)
       //if it's been more than 30 minutes since last login, logout user
@@ -45,11 +59,10 @@ export default class Admin extends Component {
         let userData = {...this.state.userData}
         userData.lastLogin = Math.floor(Date.now() / 1000);
         this.setState({userData}, ()=>{
-          this.setStorageItem(false, 'userData', this.state.userData);
           console.log(userData);
+          this.stateLoadCalls();
         });
       }
-      this.stateLoadCalls();
     }
   }
 
@@ -71,15 +84,20 @@ export default class Admin extends Component {
     })
   }
 
-  setStorageItem(isRemove, name, data){
-    if(isRemove){
-      localStorage.removeItem(name)
-    } else {
-      localStorage.setItem(name, JSON.stringify(data));
-    }
+  componentDidMount() {
+    window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
   }
 
-  customQuery(){
+  componentWillUnmount() {
+    window.removeEventListener("beforeunload", this.handleWindowBeforeUnload);
+  }
+
+  handleWindowBeforeUnload(){
+    localStorage.setItem('userData', JSON.stringify(this.state.userData));
+  }
+
+
+  seedProcedures(){
     axios.get('/seed-procedures')
     .then((resp)=>{
       console.log(resp.data);
@@ -163,11 +181,9 @@ export default class Admin extends Component {
           let userData = resp.data;
           userData.lastLogin = Math.floor(Date.now() / 1000);
           this.setState({userData}, ()=>{
-            this.setStorageItem(false, 'userData', this.state.userData);
             this.stateLoadCalls();
           });
         } else {
-          alert('Incorrect password');
           console.log(resp.data);
         }
       })
@@ -179,9 +195,7 @@ export default class Admin extends Component {
   }
 
   logout(){
-    this.setState({userData:null}, ()=>{
-      this.setStorageItem(true, 'userData');
-    });
+    this.setState({userData:null});
   }
 
   startDateSelected(date){
@@ -362,7 +376,7 @@ export default class Admin extends Component {
               {this.state.userData.role === 'super' &&
                 <div className='vas-admin-page-container vas-admin-super-container' data-isactive={this.state.activePage === 'super' ? true : false}>
                   <h3>Super Page</h3>
-                  <button onClick={this.customQuery}>Custom Query</button>
+                  <button onClick={this.seedProcedures}>Custom Query</button>
                 </div>
               }
             </div>

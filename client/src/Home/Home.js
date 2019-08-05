@@ -19,7 +19,7 @@ export default class Home extends Component{
       pivSelected:false,
       labSelected:false,
       activeBoxesArr:[],
-      contactId:'',
+      userId:'',
       modalTitle:'',
       activeRecord:null,
       queueItems:[],
@@ -30,12 +30,19 @@ export default class Home extends Component{
   }
 
   componentWillMount(){
-    const storageState = localStorage.getItem('homeState');
-    if(storageState !== 'undefined'){
-      this.setState(JSON.parse(storageState), this.stateLoadCalls);
-    } else {
-      this.stateLoadCalls();
+    const storageActiveRecord = localStorage.getItem('activeRecord');
+    const storageUserId = localStorage.getItem('userId');
+    if(this.isValidStorageItem(storageActiveRecord)){
+      this.setState({'activeRecord': JSON.parse(storageActiveRecord)});
+    } 
+    if(this.isValidStorageItem(storageUserId)){
+      this.setState({userId: JSON.parse(storageUserId)});
     }
+    this.stateLoadCalls();
+  }
+
+  isValidStorageItem(storageItem){
+    return storageItem !== 'undefined' && storageItem !== undefined && storageItem !== null && storageItem !== 'null'
   }
 
   stateLoadCalls(){
@@ -62,6 +69,9 @@ export default class Home extends Component{
 
   componentDidMount() {
     window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
+    if(this.state.activeRecord){
+      document.getElementById('active-tab').click();
+    }
   }
 
   componentWillUnmount() {
@@ -69,7 +79,8 @@ export default class Home extends Component{
   }
 
   handleWindowBeforeUnload(){
-    localStorage.setItem('homeState', JSON.stringify(this.state));
+    localStorage.setItem('activeRecord', JSON.stringify(this.state.activeRecord));
+    localStorage.setItem('userId', JSON.stringify(this.state.userId));
   }
 
   getActiveCalls(){
@@ -109,12 +120,11 @@ export default class Home extends Component{
         axios.post('/procedure-completed', {
           id:this.state.activeRecord._id,
           proceduresDone,
-          completedBy:this.state.contactId
+          completedBy:this.state.userId
         })
         .then((resp)=>{
           let completedCalls = this.state.completedCalls;
           completedCalls.push(resp.data);
-          document.getElementById('queue-tab').click();
           this.setState({
             activeRecord:null,
             completedCalls
@@ -179,7 +189,7 @@ export default class Home extends Component{
             this.setStorageItem(false, 'activeRecord', this.state.activeRecord);
           });
           setTimeout(()=>{
-            document.getElementById('open-tab').click();
+            document.getElementById('active-tab').click();
           }, 0);
         }
       })
@@ -260,7 +270,7 @@ export default class Home extends Component{
             </li>
             {this.state.activeRecord &&
               <li className="nav-item vas-home-nav-item">
-                <a className="nav-link vas-nav-link" id="open-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Active Record</a>
+                <a className="nav-link vas-nav-link" id="active-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Active Record</a>
               </li>
             }
           </ul>
@@ -326,7 +336,7 @@ export default class Home extends Component{
               </table>
             </div>
             {this.state.activeRecord &&
-              <div className="tab-pane fade show" id="home" role="tabpanel" aria-labelledby="open-tab">
+              <div className="tab-pane fade show" id="home" role="tabpanel" aria-labelledby="active-tab">
                 <header className="vas-main-header">
                   <p className="vas-main-header-text">Room: <b>{this.state.activeRecord.room}</b></p>
                   <button className="vas-main-header-btn" onClick={this.resetPage}>Reset Form</button>
@@ -390,8 +400,8 @@ export default class Home extends Component{
                   </header>
                   <div className='vas-main-final-container'>
                     <label>Please enter your contact ID:</label>
-                    <input type="text" className="vas-main-contact-id" value={this.state.contactId} onChange={e => {this.setState({contactId: e.target.value}, ()=>{window.scrollTo(0,document.body.scrollHeight);})}}/>
-                    {this.state.contactId.length > 3 &&
+                    <input type="number" className="vas-main-contact-id" value={this.state.userId} onChange={e => {this.setState({userId: e.target.value}, ()=>{window.scrollTo(0,document.body.scrollHeight);})}}/>
+                    {this.state.userId.length > 3 &&
                       <div>
                         <p>Slide To Submit Task</p>
                         <input type="range" min="0" max="100" step="1" defaultValue={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />
