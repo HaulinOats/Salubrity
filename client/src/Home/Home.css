@@ -1,14 +1,14 @@
-.vas-main-container {
+.vas-home-container {
   padding-top:15px;
 }
-.vas-main-header {
+.vas-home-header {
   position: relative;
   padding: 10px 10px;
   background-color: #5f9ea0;
   color: #fff;
   border-bottom: solid 2px darkseagreen;
 }
-.vas-main-header p{
+.vas-home-header p{
   font-size:150%;
   text-shadow: 1px 2px 1px black;
 }
@@ -27,7 +27,7 @@
 .vas-home-nav-link:hover {
   border:none !important;
 }
-.vas-main-tabContent{
+.vas-home-tabContent{
     
 }
 .vas-nav-link {
@@ -45,86 +45,95 @@
   border-color: transparent !important;
 }
 /* Main tab/page  */
-.vas-main-inner-container {
+.vas-home-inner-container {
   border-top: solid 2px cadetblue;
 }
-.vas-main-inner-container-main-comment {
+.vas-home-inner-container-main-comment {
   
 }
-.vas-main-inner-container-main-comment
-.vas-main-inner-container-header {
+.vas-home-inner-container-main-comment
+.vas-home-inner-container-header {
   background-color: goldenrod;
 }
-.vas-main-inner-container-main-comment
-.vas-main-inner-container-main {
+.vas-home-inner-container-main-comment
+.vas-home-inner-container-main {
   background: moccasin;
   font-style: italic;
 }
-.vas-main-inner-container-final {
+.vas-home-inner-container-final {
   background:lightblue;
 }
-.vas-main-inner-container-final {
+.vas-home-inner-container-final {
   background-color:bisque;
 }
-.vas-main-inner-container-header {
+.vas-home-inner-container-header {
   padding: 10px;
   background-color: darkcyan;
   color: white;
   box-shadow: inset 0px -4px 8px -7px black;
 }
-.vas-main-inner-container-final-header {
+.vas-home-inner-container-final-header {
   background-color:darkorange;
   box-shadow: none;
 }
-.vas-main-inner-container-main {
+.vas-home-inner-container-main {
   padding:10px;
   background: #c5d5e6;
 }
-.vas-main-inner-container-row {
+.vas-home-inner-container-row {
   position: relative;
   margin:10px 0;
 }
-.vas-main-btn-section {
+.vas-home-btn-section {
   margin-right:15px;
 }
-.vas-main-btn {
+.vas-home-btn {
   background-color:white;
   margin:5px;
 }
-.vas-main-needle-btn {
+.vas-home-needle-btn {
   background:#28a745;
   color:white;
 }
-.vas-main-discontinue-btn {
+.vas-home-discontinue-btn {
   background:darkblue;
   color:white;
 }
-.vas-main-cathflow-btn {
+.vas-home-cathflow-btn {
   background-color: darkorange;
   margin-left: auto;
   margin-right: 5px;
   padding: 12px;
   box-shadow: 1px 2px 3px black;
 }
-.vas-main-important-hide {
+.vas-home-important-hide {
   display:none;
 }
-.vas-main-sub-btn {
+.vas-home-sub-btn {
   border: solid 1px darkgrey;
 }
-.vas-main-btn-active {
+.vas-home-btn-active {
   border:solid 2px #007bff;
 }
 /* queue tab/page */
-.vas-queue-table {
-    margin-bottom:0;
-    background-color:#c5d5e6;
+.vas-home-table {
+  margin-bottom:0;
+  background-color:#c5d5e6;
+  
+}
+.vas-table-job-name {
+  font-weight: bold;
+  color: #4C7E80;
+  font-size: 110%;
 }
 .vas-queue-thead {
     background:#5f9ea0;
     color:whitesmoke;
 }
-.vas-queue-tr {
+.vas-queue-table-job-column {
+  max-width: 30%;
+}
+.vas-home-table-tr {
   cursor:pointer;
   box-shadow: inset 0px -6px 3px -5px steelblue;
 }
@@ -134,7 +143,7 @@
   top: 4px;
   z-index: 1;
 }
-.vas-main-cathflow-container {
+.vas-home-cathflow-container {
 
 }
 .vas-buttons-active-header {
@@ -146,7 +155,7 @@
   margin-left: 10px;
   font-size: 110%;
 }
-.vas-main-header-btn {
+.vas-home-header-btn {
   margin-right: 25px;
   margin-top: 10px;
   padding: 7px;
@@ -163,10 +172,10 @@
   text-align: center;
   margin: 22px 0;
 }
-.vas-main-final-container {
+.vas-home-final-container {
   padding: 22px 10px 25px 20px;
 }
-.vas-main-contact-id {
+.vas-home-contact-id {
   display: block;
   border: solid thin grey;
   padding-left: 5px;

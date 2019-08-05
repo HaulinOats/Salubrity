@@ -106,7 +106,7 @@ export default class Home extends Component{
         endTaskSliderValue:e.target.value
       })
     } else {
-      let selectedTasks = document.querySelectorAll('.vas-main-select-input:checked');
+      let selectedTasks = document.querySelectorAll('.vas-home-select-input:checked');
       let proceduresDone = [];
       selectedTasks.forEach((el)=>{
         proceduresDone.push(Number(el.id));
@@ -227,7 +227,7 @@ export default class Home extends Component{
   }
 
   showHiddenButtons(procedureName, groupName, elClass){
-    let className = `.vas-main-${procedureName}-${groupName}`;
+    let className = `.vas-home-${procedureName}-${groupName}`;
     let container = document.querySelector(className);
     if(container.classList.contains(elClass)){
       container.classList.remove(elClass);
@@ -252,14 +252,14 @@ export default class Home extends Component{
       }
     }
     function selectFirstButtonNextGroup(){
-      let nextGroupContainer = e.target.closest('.vas-main-inner-span').nextSibling;
-      nextGroupContainer.querySelector('.vas-main-select-input').checked = true;
+      let nextGroupContainer = e.target.closest('.vas-home-inner-span').nextSibling;
+      nextGroupContainer.querySelector('.vas-home-select-input').checked = true;
     }
   }
 
   render(){
     return(
-        <div className="container-fluid vas-main-container">
+        <div className="container-fluid vas-home-container">
           <button type="button" className="btn btn-primary vas-queue-addCall" onClick={()=>{this.setState({modalIsOpen:true, modalTitle:"Add Call"})}}>Add Call</button>
           <ul className="nav nav-tabs vas-home-nav-tabs" id="myTab" role="tablist">
             <li className="nav-item vas-home-nav-item">
@@ -274,14 +274,20 @@ export default class Home extends Component{
               </li>
             }
           </ul>
-          <div className="tab-content vas-main-tabContent" id="myTabContent">
+          <div className="tab-content vas-home-tabContent" id="myTabContent">
             <div className="tab-pane fade show active" id="queue" role="tabpanel" aria-labelledby="queue-tab">
-              <table className="table vas-queue-table">
+              <table className="vas-home-table table">
+              <colgroup>
+                <col span="1" style={{width: '15%'}}></col>
+                <col span="1" style={{width: '55%'}}></col>
+                <col span="1" style={{width: '15%'}}></col>
+                <col span="1" style={{width: '15%'}}></col>
+              </colgroup>
                 <thead className="vas-queue-thead">
                   <tr>
                     <th>Room</th>
                     <th>Job</th>
-                    <th>Contact #</th>
+                    <th>Contact</th>
                     <th>Call Time</th>
                   </tr>
                 </thead>
@@ -292,9 +298,9 @@ export default class Home extends Component{
                   {this.state.queueItems.map((item, index)=>{
                     return(
                       !item.isOpen ?
-                        <tr key={index} className="vas-queue-tr" onClick={(e)=>{this.selectJob(item)}}>
+                        <tr key={index} className="vas-home-table-tr" onClick={(e)=>{this.selectJob(item)}}>
                           <th>{item.room}</th>
-                          <td>{item.job}</td>
+                          <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
                           <td>{item.contact}</td>
                           <td><Moment format='HH:mm'>{item.createdAt}</Moment></td>
                         </tr>
@@ -305,12 +311,12 @@ export default class Home extends Component{
               </table>
             </div>
             <div className="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
-              <table className="table vas-queue-table">
+              <table className="vas-home-table vas-queue-table table">
                 <thead className="vas-queue-thead">
                   <tr>
                     <th>Room</th>
                     <th>Job Requested</th>
-                    <th>Contact #</th>
+                    <th>Contact</th>
                     <th>Call Start</th>
                     <th>Call End</th>
                     <th>Completed By</th>
@@ -322,9 +328,9 @@ export default class Home extends Component{
                   }
                   {this.state.completedCalls.map((item, index)=>{
                     return(
-                      <tr key={index} className="vas-queue-tr">
+                      <tr key={index} className="vas-home-table-tr">
                         <th scope="row">{item.room}</th>
-                        <td>{item.job}</td>
+                        <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
                         <td>{item.contact}</td>
                         <td><Moment format='HH:mm'>{item.createdAt}</Moment></td>
                         <td><Moment format='HH:mm'>{item.completedAt}</Moment></td>
@@ -337,19 +343,19 @@ export default class Home extends Component{
             </div>
             {this.state.activeRecord &&
               <div className="tab-pane fade show" id="home" role="tabpanel" aria-labelledby="active-tab">
-                <header className="vas-main-header">
-                  <p className="vas-main-header-text">Room: <b>{this.state.activeRecord.room}</b></p>
-                  <button className="vas-main-header-btn" onClick={this.resetPage}>Reset Form</button>
-                  <button className="vas-main-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
+                <header className="vas-home-header">
+                  <p className="vas-home-header-text">Room: <b>{this.state.activeRecord.room}</b></p>
+                  <button className="vas-home-header-btn" onClick={this.resetPage}>Reset Form</button>
+                  <button className="vas-home-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
                 </header>
                 {this.state.activeRecord.comment &&
-                  <div className="vas-main-inner-container vas-main-inner-container-main-comment">
-                    <header className="vas-main-inner-container-header">
+                  <div className="vas-home-inner-container vas-home-inner-container-main-comment">
+                    <header className="vas-home-inner-container-header">
                       <p>Comments</p>
                     </header>
-                    <div className="vas-main-inner-container-main">
-                      <div className="vas-main-inner-container-row">
-                        <p className='vas-main-comment'>{this.state.activeRecord.comment}</p>
+                    <div className="vas-home-inner-container-main">
+                      <div className="vas-home-inner-container-row">
+                        <p className='vas-home-comment'>{this.state.activeRecord.comment}</p>
                       </div>
                     </div>
                   </div>
@@ -357,27 +363,27 @@ export default class Home extends Component{
                 {
                   this.state.procedures.map((procedure, idx)=>{
                     return (
-                      <div className="vas-main-inner-container" key={idx}>
-                        <header className="vas-main-inner-container-header">
+                      <div className="vas-home-inner-container" key={idx}>
+                        <header className="vas-home-inner-container-header">
                           <p>{procedure.name}</p>
                         </header>
-                        <div className="vas-main-inner-container-main">
+                        <div className="vas-home-inner-container-main">
                           {
                             procedure.groups.map((group, idx2)=>{
                               return(
-                                <span className='vas-main-inner-span' key={idx2}>
+                                <span className='vas-home-inner-span' key={idx2}>
                                   {group.groupName === 'Cathflow' &&
-                                    <button className='vas-main-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-main-important-hide')}}>{group.groupName}</button>
+                                    <button className='vas-home-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-home-important-hide')}}>{group.groupName}</button>
                                   }
                                   {group.groupName !== 'Cathflow' &&
                                     <h3>{group.groupName}</h3>
                                   }
-                                  <div className={group.groupName === 'Cathflow' ? 'vas-main-inner-container-row vas-main-important-hide vas-main-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : 'vas-main-inner-container-row'}>
+                                  <div className={group.groupName === 'Cathflow' ? 'vas-home-inner-container-row vas-home-important-hide vas-home-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : 'vas-home-inner-container-row'}>
                                     {
                                       group.groupOptions.map((option, idx3)=>{
                                         return(
                                           <span key={idx3}>
-                                            <input type={group.selectType === 'single' ? 'radio' : 'checkbox'} className={"vas-main-select-input vas-"+ group.selectType +"-select"} id={option.taskId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
+                                            <input type={group.selectType === 'single' ? 'radio' : 'checkbox'} className={"vas-home-select-input vas-"+ group.selectType +"-select"} id={option.taskId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
                                             <label className="vas-btn" htmlFor={option.taskId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName)}}>{option.value}</label>
                                           </span>
                                         )
@@ -394,13 +400,13 @@ export default class Home extends Component{
                     )
                   })
                 }
-                <div className="vas-main-inner-container vas-main-inner-container-final">
-                  <header className="vas-main-inner-container-header vas-main-inner-container-final-header">
+                <div className="vas-home-inner-container vas-home-inner-container-final">
+                  <header className="vas-home-inner-container-header vas-home-inner-container-final-header">
                     <p>Complete Task</p>
                   </header>
-                  <div className='vas-main-final-container'>
+                  <div className='vas-home-final-container'>
                     <label>Please enter your contact ID:</label>
-                    <input type="number" className="vas-main-contact-id" value={this.state.userId} onChange={e => {this.setState({userId: e.target.value}, ()=>{window.scrollTo(0,document.body.scrollHeight);})}}/>
+                    <input type="number" className="vas-home-contact-id" value={this.state.userId} onChange={e => {this.setState({userId: e.target.value}, ()=>{window.scrollTo(0,document.body.scrollHeight);})}}/>
                     {this.state.userId.length > 3 &&
                       <div>
                         <p>Slide To Submit Task</p>
