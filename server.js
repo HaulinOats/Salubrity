@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const path = require('path');
 const LinvoDB = require("linvodb3");
-LinvoDB.dbPath = `${process.cwd()}/vas-db`; 
+LinvoDB.dbPath = `./vas-db`; 
 
 //2nd parameter object defines schema for table
 let Calls = new LinvoDB("Calls", {
@@ -129,12 +129,16 @@ app.post('/procedure-completed', (req, res)=>{
 app.post('/admin-login', (req, res)=>{
   Users.findOne({username:req.body.username.toLowerCase()}, (err, user)=>{
     if(err) res.send(err);
-    if(user.password.toLowerCase() === req.body.password.toLowerCase()){
-      let loggedUser = user;
-      delete loggedUser.password;
-      res.send(loggedUser);
+    if(user){
+      if(user.password.toLowerCase() === req.body.password.toLowerCase()){
+        let loggedUser = user;
+        delete loggedUser.password;
+        res.send(loggedUser);
+      } else {
+        res.send(false);
+      }
     } else {
-      res.send(false);
+      res.send('Could not find admin user');
     }
   })
 });
