@@ -89,12 +89,13 @@ app.get('/get-completed-calls', (req, res)=>{
 
 app.post('/set-call-as-open', (req, res)=>{
   Calls.findOne(req.body, (err, call)=>{
+    if(err) send.send(err);
     if(call.isOpen) {
      res.send('open'); 
     } else {
       call.isOpen = true;
-      call.save((err)=>{
-        if(err) res.send(err);
+      call.save((err2)=>{
+        if(err2) res.send(err);
         res.send(true);
       })
     }
@@ -103,9 +104,10 @@ app.post('/set-call-as-open', (req, res)=>{
 
 app.post('/set-call-as-unopen', (req, res)=>{
   Calls.findOne(req.body, (err, call)=>{
+    if(err) res.send(err);
     call.isOpen = false;
-    call.save((err)=>{
-      if(err) res.send(err);
+    call.save((err2)=>{
+      if(err2) res.send(err2);
       res.send(true);
     })
   });
