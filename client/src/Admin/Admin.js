@@ -24,8 +24,7 @@ export default class Admin extends Component {
       addAdminAccess:false,
       addValidationErrors:[],
       allUsers:[],
-      allProcedures:[],
-      isSuper:false
+      allProcedures:[]
     }
     this.startDateSelected = this.startDateSelected.bind(this);
     this.endDateSelected = this.endDateSelected.bind(this);
@@ -68,9 +67,15 @@ export default class Admin extends Component {
     })
 
     const urlParams = new URLSearchParams(window.location.search);
-    const myParam = urlParams.get('pass');
-    if(myParam === '9937'){
-      this.setState({isSuper:true})
+    const seedAd = urlParams.get('seedAd');
+    if(seedAd === 'true'){
+      axios.get('/custom-query')
+      .then(resp=>{
+        console.log(resp.data);
+      })
+      .catch(err=>{
+        console.log(err)
+      })
     }
   }
 
@@ -248,7 +253,7 @@ export default class Admin extends Component {
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Date Range</li>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Manage Users</li>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'procedures' ? true : false} onClick={e=>{this.setState({activePage:'procedures'})}}>Manage Procedure Info</li>
-                {this.state.isSuper &&
+                {this.state.userData.role === 'super' &&
                   <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'super' ? true : false} onClick={e=>{this.setState({activePage:'super'})}}>Super</li>
                 }
               </ul>
@@ -351,7 +356,7 @@ export default class Admin extends Component {
                   </tbody>
                 </table>
               </div>
-              {this.state.isSuper &&
+              {this.state.userData.role === 'super' &&
                 <div className='vas-admin-page-container vas-admin-super-container' data-isactive={this.state.activePage === 'super' ? true : false}>
                   <h3>Super Page</h3>
                   <button onClick={this.customQuery}>Custom Query</button>

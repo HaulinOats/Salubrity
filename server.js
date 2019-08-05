@@ -127,10 +127,10 @@ app.post('/procedure-completed', (req, res)=>{
 
 //ADMIN
 app.post('/admin-login', (req, res)=>{
-  Users.find({username:req.body.username.toLowerCase()}, (err, user)=>{
+  Users.findOne({username:req.body.username.toLowerCase()}, (err, user)=>{
     if(err) res.send(err);
-    if(user[0].password.toLowerCase() === req.body.password.toLowerCase()){
-      let loggedUser = user[0];
+    if(user.password.toLowerCase() === req.body.password.toLowerCase()){
+      let loggedUser = user;
       delete loggedUser.password;
       res.send(loggedUser);
     } else {
@@ -174,15 +174,18 @@ app.get('/get-procedures', (req, res)=>{
 });
 
 //SUPER
-app.post('/custom-query',(req,res)=>{
-  let newUser = req.body;
-  Users.find({}).sort({ contactId: -1 }).limit(1).exec((err, users)=>{
-    newUser.contactId = users[0].contactId + 1;
-    Users.insert(newUser, (err, user)=>{
-      if(err) res.send(err);
-      res.send(user);
-    });
-  });
+app.get('/custom-query',(req,res)=>{
+  Users.insert({
+    fullname:'Brett Connolly',
+    username:'brett84c',
+    contactId:'1001',
+    password:'lisa8484',
+    role:'super',
+    createdAt:new Date()
+  }, (err, newUser)=>{
+    if(err) res.send(err);
+    res.send(newUser);
+  })
 });
 
 app.get('/seed-procedures', (req, res)=>{
