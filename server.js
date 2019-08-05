@@ -14,13 +14,13 @@ let Calls = new LinvoDB("Calls", {
   createdAt:{type:Date, default:new Date()},
   isOpen:{type:Boolean, default:false},
   proceduresDone:[],
-  completedBy:{type:Number, default:null},
+  completedBy:{type:String, default:null},
   completedAt:{type:Date, default:null}
 });
 let Users = new LinvoDB("Users", {
   fullname:String,
   username:String,
-  contactId:Number,
+  contactId:String,
   password:String,
   role:{type:String, default:'user'},
   createdAt:{type:Date, default:new Date()},
@@ -90,7 +90,7 @@ app.get('/get-completed-calls', (req, res)=>{
 app.post('/set-call-as-open', (req, res)=>{
   Calls.findOne(req.body, (err, call)=>{
     if(call.isOpen) {
-     res.send(false) 
+     res.send('open'); 
     } else {
       call.isOpen = true;
       call.save((err)=>{
@@ -116,7 +116,7 @@ app.post('/procedure-completed', (req, res)=>{
     if(err) res.send(err);
     call.proceduresDone = req.body.proceduresDone;
     call.isOpen = false;
-    call.completedBy = req.body.contactId;
+    call.completedBy = req.body.completedBy;
     call.completedAt = new Date();
     call.save((err2)=>{
       if(err2) res.send(err2);

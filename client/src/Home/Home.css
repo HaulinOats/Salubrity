@@ -1,5 +1,5 @@
-.vas-app-container {
-    margin-top:15px;
+.vas-main-container {
+  padding-top:15px;
 }
 .vas-main-header {
   position: relative;
@@ -13,8 +13,9 @@
   text-shadow: 1px 2px 1px black;
 }
 .vas-home-nav-tabs {
-    position: relative;
-    border-bottom:none;
+  background:none;
+  position: relative;
+  border-bottom:none;
 }
 .vas-home-nav-item {
   margin-right:3px;

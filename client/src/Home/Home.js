@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Modal from '../Widgets/Modal/Modal';
 import axios from 'axios';
-import {DebounceInput} from 'react-debounce-input';
 import Moment from 'react-moment';
 import './Home.css';
 
@@ -13,6 +12,7 @@ export default class Home extends Component{
     this.sliderEnd = this.sliderEnd.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.getAddedCall = this.getAddedCall.bind(this);
+    this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.state = {
       modalIsOpen:false,
       endTaskSliderValue:0,
@@ -21,7 +21,7 @@ export default class Home extends Component{
       activeBoxesArr:[],
       contactId:'',
       modalTitle:'',
-      activeRecord:localStorage.getItem('activeRecord') !== 'undefined' ? JSON.parse(localStorage.getItem('activeRecord')) : null,
+      activeRecord:null,
       queueItems:[],
       completedCalls:[],
       procedures:[],
@@ -30,8 +30,17 @@ export default class Home extends Component{
   }
 
   componentWillMount(){
-    this.getActiveCalls();
+    const storageState = localStorage.getItem('homeState');
+    if(storageState !== 'undefined'){
+      this.setState(JSON.parse(storageState), this.stateLoadCalls);
+    } else {
+      this.stateLoadCalls();
+    }
+  }
 
+  stateLoadCalls(){
+    this.getActiveCalls();
+    
     axios.get('/get-procedures')
     .then((resp)=>{
       this.setState({procedures:resp.data});
@@ -49,6 +58,18 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
     })
+  }
+
+  componentDidMount() {
+    window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("beforeunload", this.handleWindowBeforeUnload);
+  }
+
+  handleWindowBeforeUnload(){
+    localStorage.setItem('homeState', JSON.stringify(this.state));
   }
 
   getActiveCalls(){
@@ -148,10 +169,10 @@ export default class Home extends Component{
     if(!this.state.activeRecord){
       axios.post('/set-call-as-open', {_id:job._id})
       .then((resp)=>{
-        if(resp.data === 'already open'){
+        if(resp.data === 'open'){
           this.setState({
             modalIsOpen:true,
-            modalTitle:'Record is currently open by someone else. Please select another queue item. Refreshing queue...'
+            modalTitle:'Record was recently opened by someone else. Please select another queue item. Refreshing queue...'
           }, this.getActiveCalls);
         } else {
           this.setState({activeRecord:job}, ()=>{
@@ -209,9 +230,26 @@ export default class Home extends Component{
     }
   }
 
+  selectButton(e, procedureName, groupName){
+    if(procedureName === 'PIV Start'){
+      if(groupName === 'Dosage'){
+        selectFirstButtonNextGroup();
+      }
+    }
+    if(procedureName === 'Lab Draw'){
+      if(groupName === 'Draw Type'){
+        selectFirstButtonNextGroup();
+      }
+    }
+    function selectFirstButtonNextGroup(){
+      let nextGroupContainer = e.target.closest('.vas-main-inner-span').nextSibling;
+      nextGroupContainer.querySelector('.vas-main-select-input').checked = true;
+    }
+  }
+
   render(){
     return(
-        <div className="container-fluid vas-app-container">
+        <div className="container-fluid vas-main-container">
           <button type="button" className="btn btn-primary vas-queue-addCall" onClick={()=>{this.setState({modalIsOpen:true, modalTitle:"Add Call"})}}>Add Call</button>
           <ul className="nav nav-tabs vas-home-nav-tabs" id="myTab" role="tablist">
             <li className="nav-item vas-home-nav-item">
@@ -231,10 +269,10 @@ export default class Home extends Component{
               <table className="table vas-queue-table">
                 <thead className="vas-queue-thead">
                   <tr>
-                    <th scope="col">Room</th>
-                    <th scope="col">Job</th>
-                    <th scope="col">Contact</th>
-                    <th scope="col">Call Time</th>
+                    <th>Room</th>
+                    <th>Job</th>
+                    <th>Contact #</th>
+                    <th>Call Time</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,7 +283,7 @@ export default class Home extends Component{
                     return(
                       !item.isOpen ?
                         <tr key={index} className="vas-queue-tr" onClick={(e)=>{this.selectJob(item)}}>
-                          <th scope="row">{item.room}</th>
+                          <th>{item.room}</th>
                           <td>{item.job}</td>
                           <td>{item.contact}</td>
                           <td><Moment format='HH:mm'>{item.createdAt}</Moment></td>
@@ -260,11 +298,12 @@ export default class Home extends Component{
               <table className="table vas-queue-table">
                 <thead className="vas-queue-thead">
                   <tr>
-                    <th scope="col">Room</th>
-                    <th scope="col">Job Requested</th>
-                    <th scope="col">Contact</th>
-                    <th scope="col">Call Start</th>
-                    <th scope="col">Call End</th>
+                    <th>Room</th>
+                    <th>Job Requested</th>
+                    <th>Contact #</th>
+                    <th>Call Start</th>
+                    <th>Call End</th>
+                    <th>Completed By</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -276,9 +315,10 @@ export default class Home extends Component{
                       <tr key={index} className="vas-queue-tr">
                         <th scope="row">{item.room}</th>
                         <td>{item.job}</td>
-                        <td>{item.completedBy}</td>
+                        <td>{item.contact}</td>
                         <td><Moment format='HH:mm'>{item.createdAt}</Moment></td>
                         <td><Moment format='HH:mm'>{item.completedAt}</Moment></td>
+                        <td>{item.completedBy}</td>
                       </tr>
                     )
                   })}
@@ -315,7 +355,7 @@ export default class Home extends Component{
                           {
                             procedure.groups.map((group, idx2)=>{
                               return(
-                                <span key={idx2}>
+                                <span className='vas-main-inner-span' key={idx2}>
                                   {group.groupName === 'Cathflow' &&
                                     <button className='vas-main-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-main-important-hide')}}>{group.groupName}</button>
                                   }
@@ -327,8 +367,8 @@ export default class Home extends Component{
                                       group.groupOptions.map((option, idx3)=>{
                                         return(
                                           <span key={idx3}>
-                                            <input type={group.selectType === 'single' ? 'radio' : 'checkbox'} className={"vas-main-select-input vas-"+ group.selectType +"-select"} id={option.taskId} name={procedure.name +"_"+ group.groupName}/>
-                                            <label className="vas-btn" htmlFor={option.taskId}>{option.value}</label>
+                                            <input type={group.selectType === 'single' ? 'radio' : 'checkbox'} className={"vas-main-select-input vas-"+ group.selectType +"-select"} id={option.taskId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
+                                            <label className="vas-btn" htmlFor={option.taskId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName)}}>{option.value}</label>
                                           </span>
                                         )
                                       })
@@ -350,13 +390,8 @@ export default class Home extends Component{
                   </header>
                   <div className='vas-main-final-container'>
                     <label>Please enter your contact ID:</label>
-                    <DebounceInput
-                      className="vas-main-contact-id"
-                      type="text"
-                      minLength={4}
-                      debounceTimeout={200}
-                      onChange={e => {this.setState({contactId: e.target.value})}}/>
-                    {this.state.contactId > 3 &&
+                    <input type="text" className="vas-main-contact-id" value={this.state.contactId} onChange={e => {this.setState({contactId: e.target.value}, ()=>{window.scrollTo(0,document.body.scrollHeight);})}}/>
+                    {this.state.contactId.length > 3 &&
                       <div>
                         <p>Slide To Submit Task</p>
                         <input type="range" min="0" max="100" step="1" defaultValue={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />

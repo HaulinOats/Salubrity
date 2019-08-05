@@ -76,9 +76,9 @@ export default class Admin extends Component {
 
   setStorageItem(isRemove, name, data){
     if(isRemove){
-      localStorage.setItem(name, JSON.stringify(data));
-    } else {
       localStorage.removeItem(name)
+    } else {
+      localStorage.setItem(name, JSON.stringify(data));
     }
   }
 
