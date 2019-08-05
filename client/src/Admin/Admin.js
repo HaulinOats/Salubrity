@@ -49,22 +49,26 @@ export default class Admin extends Component {
           console.log(userData);
         });
       }
-
-      axios.get('/get-all-users')
-      .then((resp)=>{
-        this.setState({allUsers:resp.data});
-      }).catch((err)=>{
-        console.log(err);
-      })
-  
-      axios.get('/get-procedures')
-      .then((resp)=>{
-        this.setState({allProcedures:resp.data});
-      })
-      .catch((err)=>{
-        console.log(err);
-      })
+      this.stateLoadCalls();
     }
+  }
+
+  stateLoadCalls(){
+    axios.get('/get-all-users')
+    .then((resp)=>{
+      this.setState({allUsers:resp.data});
+      console.log(resp.data);
+    }).catch((err)=>{
+      console.log(err);
+    })
+
+    axios.get('/get-procedures')
+    .then((resp)=>{
+      this.setState({allProcedures:resp.data});
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
   }
 
   setStorageItem(isRemove, name, data){
@@ -159,22 +163,8 @@ export default class Admin extends Component {
           let userData = resp.data;
           userData.lastLogin = Math.floor(Date.now() / 1000);
           this.setState({userData}, ()=>{
-            axios.get('/get-all-users')
-            .then((resp)=>{
-              this.setState({allUsers:resp.data});
-            }).catch((err)=>{
-              console.log(err);
-            })
-        
-            axios.get('/get-procedures')
-            .then((resp)=>{
-              this.setState({allProcedures:resp.data});
-            })
-            .catch((err)=>{
-              console.log(err);
-            })
             this.setStorageItem(false, 'userData', this.state.userData);
-            console.log(userData);
+            this.stateLoadCalls();
           });
         } else {
           alert('Incorrect password');

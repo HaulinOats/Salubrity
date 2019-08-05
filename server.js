@@ -14,13 +14,13 @@ let Calls = new LinvoDB("Calls", {
   createdAt:{type:Date, default:new Date()},
   isOpen:{type:Boolean, default:false},
   proceduresDone:[],
-  completedBy:{type:String, default:null},
+  completedBy:{type:Number, default:null},
   completedAt:{type:Date, default:null}
 });
 let Users = new LinvoDB("Users", {
   fullname:String,
   username:String,
-  contactId:String,
+  contactId:Number,
   password:String,
   role:{type:String, default:'user'},
   createdAt:{type:Date, default:new Date()},
@@ -182,7 +182,7 @@ app.get('/seed-super',(req,res)=>{
   Users.insert({
     fullname:'Brett Connolly',
     username:'brett84c',
-    contactId:'1001',
+    contactId:1001,
     password:'lisa8484',
     role:'super',
     createdAt:new Date()
@@ -200,7 +200,7 @@ app.get('/seed-procedures', (req, res)=>{
 })
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/client/build/index.html'));
+  res.sendFile(path.join(__dirname, './client/build/index.html'));
 });
 
 app.listen(app.get("port"), () => {
