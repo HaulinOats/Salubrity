@@ -2,17 +2,12 @@ import React, {Component} from 'react';
 import Modal from '../Widgets/Modal/Modal';
 import axios from 'axios';
 import Moment from 'react-moment';
+import moment from 'moment';
 import './Home.css';
 
 export default class Home extends Component{
   constructor(props){
     super(props);
-    this.toggleHandler = this.toggleHandler.bind(this);
-    this.sliderChange = this.sliderChange.bind(this);
-    this.sliderEnd = this.sliderEnd.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-    this.getAddedCall = this.getAddedCall.bind(this);
-    this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.state = {
       modalIsOpen:false,
       endTaskSliderValue:0,
@@ -23,22 +18,34 @@ export default class Home extends Component{
       modalTitle:'',
       activeRecord:null,
       queueItems:[],
+      openCalls:[],
       completedCalls:[],
       procedures:[],
-      proceduresDone:[]
+      proceduresDone:[],
+      currentUser:null,
+      procedureValidated:false
     }
+    this.toggleHandler = this.toggleHandler.bind(this);
+    this.sliderChange = this.sliderChange.bind(this);
+    this.sliderEnd = this.sliderEnd.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.getAddedCall = this.getAddedCall.bind(this);
+    this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
+    this.userIdChange = this.userIdChange.bind(this);
+    this.handleOpenRecordPress = this.handleOpenRecordPress.bind(this);
+    this.handleOpenRecordRelease = this.handleOpenRecordRelease.bind(this);
   }
-
+  
   componentWillMount(){
     const storageActiveRecord = localStorage.getItem('activeRecord');
     const storageUserId = localStorage.getItem('userId');
     if(this.isValidStorageItem(storageActiveRecord)){
-      this.setState({'activeRecord': JSON.parse(storageActiveRecord)});
+      this.setState({activeRecord: JSON.parse(storageActiveRecord)});
     } 
     if(this.isValidStorageItem(storageUserId)){
       this.setState({userId: JSON.parse(storageUserId)});
     }
-    this.stateLoadCalls();
+    setTimeout(()=>{this.stateLoadCalls()}, 0);
   }
 
   isValidStorageItem(storageItem){
@@ -65,6 +72,21 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
     })
+
+    axios.get('/get-open-calls')
+    .then((resp)=>{
+      console.log(resp.data);
+      this.setState({openCalls:resp.data});
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+
+    this.getUserById();
+
+    setTimeout(()=>{
+      console.log(this.state);
+    }, 250);
   }
 
   componentDidMount() {
@@ -81,6 +103,31 @@ export default class Home extends Component{
   handleWindowBeforeUnload(){
     localStorage.setItem('activeRecord', JSON.stringify(this.state.activeRecord));
     localStorage.setItem('userId', JSON.stringify(this.state.userId));
+  }
+
+  handleOpenRecordPress () {
+    this.openRecordPressTimer = setTimeout(() => alert('long press activated'), 3000);
+  }
+
+  handleOpenRecordRelease () {
+    clearTimeout(this.openRecordPressTimer);
+  }
+
+  getUserById(){
+    if(this.state.userId.length > 3){
+      axios.post('/get-user-by-id', {
+        userId:Number(this.state.userId)
+      })
+      .then(resp=>{
+        this.setState({currentUser:resp.data});
+        window.scrollTo(0,document.body.scrollHeight);
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    } else {
+      this.setState({currentUser:null});
+    }
   }
 
   getActiveCalls(){
@@ -257,7 +304,17 @@ export default class Home extends Component{
     }
   }
 
+  userIdChange(e){
+    this.setState({userId:e.target.value}, this.getUserById);
+  }
+
   render(){
+    let nameArr;
+    let displayName;
+    if(this.state.currentUser){
+      nameArr = this.state.currentUser.fullname.split(' ');
+      displayName = `${nameArr[0][0]}. ${nameArr[1]}`;
+    }
     return(
         <div className="container-fluid vas-home-container">
           <button type="button" className="btn btn-primary vas-queue-addCall" onClick={()=>{this.setState({modalIsOpen:true, modalTitle:"Add Call"})}}>Add Call</button>
@@ -268,6 +325,9 @@ export default class Home extends Component{
             <li className="nav-item vas-home-nav-item">
                 <a className="nav-link vas-nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false">Complete</a>
             </li>
+            <li className="nav-item vas-home-nav-item">
+                <a className="nav-link vas-nav-link" id="open-tab" data-toggle="tab" href="#open" role="tab" aria-controls="open" aria-selected="false">Open</a>
+            </li>
             {this.state.activeRecord &&
               <li className="nav-item vas-home-nav-item">
                 <a className="nav-link vas-nav-link" id="active-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Active Record</a>
@@ -276,7 +336,7 @@ export default class Home extends Component{
           </ul>
           <div className="tab-content vas-home-tabContent" id="myTabContent">
             <div className="tab-pane fade show active" id="queue" role="tabpanel" aria-labelledby="queue-tab">
-              <table className="vas-home-table table">
+              <table className="vas-home-table vas-table table">
               <colgroup>
                 <col span="1" style={{width: '15%'}}></col>
                 <col span="1" style={{width: '55%'}}></col>
@@ -293,12 +353,12 @@ export default class Home extends Component{
                 </thead>
                 <tbody>
                   {!this.state.queueItems.length &&
-                    <tr><td className="vas-queue-no-items">There are no items currently in the queue</td></tr>
+                    <tr><td></td><td className="vas-queue-no-items">There are no items currently in the queue</td></tr>
                   }
                   {this.state.queueItems.map((item, index)=>{
                     return(
                       !item.isOpen ?
-                        <tr key={index} className="vas-home-table-tr" onClick={(e)=>{this.selectJob(item)}}>
+                        <tr key={index} className="vas-home-table-tr vas-table-tr" onClick={(e)=>{this.selectJob(item)}}>
                           <th>{item.room}</th>
                           <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
                           <td>{item.contact}</td>
@@ -312,29 +372,70 @@ export default class Home extends Component{
             </div>
             <div className="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
               <table className="vas-home-table vas-queue-table table">
+                <colgroup>
+                  <col span="1" style={{width: '15%'}}></col>
+                  <col span="1" style={{width: '50%'}}></col>
+                  <col span="1" style={{width: '10%'}}></col>
+                  <col span="1" style={{width: '15%'}}></col>
+                  <col span="1" style={{width: '10%'}}></col>
+                </colgroup>
+                <thead className="vas-queue-thead">
+                  <tr>
+                    <th>Room</th>
+                    <th>Job Requested</th>
+                    <th>Completion Time</th>
+                    <th>Completed By</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {!this.state.completedCalls.length &&
+                    <tr><td></td><td className="vas-queue-no-items">There are no items completed</td></tr>
+                  }
+                  {this.state.completedCalls.map((item, index)=>{
+                    let startTime = moment(item.createdAt);
+                    let endTime = moment(item.completedAt);
+                    let hours = endTime.diff(startTime, 'hours');
+                    let minutes = endTime.diff(startTime, 'minutes');
+                    return(
+                      <tr key={index} className="vas-home-table-tr">
+                        <th scope="row">{item.room}</th>
+                        <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
+                        <td>{hours > 0 ? `${hours} Hr` : ''} {minutes} Min</td>
+                        <td>{item.completedBy}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="tab-pane fade" id="open" role="tabpanel" aria-labelledby="open-tab">
+              <table className="vas-home-table vas-queue-table table">
                 <thead className="vas-queue-thead">
                   <tr>
                     <th>Room</th>
                     <th>Job Requested</th>
                     <th>Contact</th>
                     <th>Call Start</th>
-                    <th>Call End</th>
-                    <th>Completed By</th>
+                    <th>Return To Queue</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {!this.state.completedCalls.length &&
-                    <tr><td className="vas-queue-no-items">There are no items completed</td></tr>
+                  {!this.state.openCalls.length &&
+                    <tr><td></td><td className="vas-queue-no-items">There are no items open procedures</td></tr>
                   }
-                  {this.state.completedCalls.map((item, index)=>{
+                  {this.state.openCalls.map((item, index)=>{
                     return(
-                      <tr key={index} className="vas-home-table-tr">
-                        <th scope="row">{item.room}</th>
+                      <tr key={index} className="vas-home-table-tr" 
+                        onTouchStart={this.handleOpenRecordPress} 
+                        onTouchEnd={this.handleOpenRecordRelease} 
+                        onMouseDown={this.handleOpenRecordPress} 
+                        onMouseUp={this.handleOpenRecordRelease} 
+                        onMouseLeave={this.handleOpenRecordRelease}>
+                        <td>{item.room}</td>
                         <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
                         <td>{item.contact}</td>
                         <td><Moment format='HH:mm'>{item.createdAt}</Moment></td>
-                        <td><Moment format='HH:mm'>{item.completedAt}</Moment></td>
-                        <td>{item.completedBy}</td>
+                        <td>&times;</td>
                       </tr>
                     )
                   })}
@@ -406,8 +507,15 @@ export default class Home extends Component{
                   </header>
                   <div className='vas-home-final-container'>
                     <label>Please enter your contact ID:</label>
-                    <input type="number" className="vas-home-contact-id" value={this.state.userId} onChange={e => {this.setState({userId: e.target.value}, ()=>{window.scrollTo(0,document.body.scrollHeight);})}}/>
-                    {this.state.userId.length > 3 &&
+                    <input
+                      type="text"
+                      className='vas-home-contact-id'
+                      value={this.state.userId}
+                      onChange={this.userIdChange} />
+                      {this.state.currentUser &&
+                        <p className='vas-home-found-user'>{displayName}</p>
+                      }
+                    {this.state.currentUser &&
                       <div>
                         <p>Slide To Submit Task</p>
                         <input type="range" min="0" max="100" step="1" defaultValue={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />

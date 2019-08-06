@@ -87,6 +87,19 @@ app.get('/get-completed-calls', (req, res)=>{
   });
 });
 
+app.get('/get-open-calls', (req, res)=>{
+  var start = new Date();
+  start.setHours(0,0,0,0);
+  
+  var end = new Date();
+  end.setHours(23,59,59,999);
+
+  Calls.find({isOpen:true}, (err, calls)=>{
+    if(err) res.send(err)
+    res.send(calls);
+  });
+});
+
 app.post('/set-call-as-open', (req, res)=>{
   Calls.findOne(req.body, (err, call)=>{
     if(err) send.send(err);
@@ -118,7 +131,7 @@ app.post('/procedure-completed', (req, res)=>{
     if(err) res.send(err);
     call.proceduresDone = req.body.proceduresDone;
     call.isOpen = false;
-    call.completedBy = req.body.completedBy;
+    call.completedBy = Number(req.body.completedBy);
     call.completedAt = new Date();
     call.save((err2)=>{
       if(err2) res.send(err2);
@@ -126,6 +139,13 @@ app.post('/procedure-completed', (req, res)=>{
     })
   })
 });
+
+app.post('/get-user-by-id', (req, res)=>{
+  Users.findOne(req.body, (err, user)=>{
+    if(err) res.send(err);
+    res.send(user);
+  })
+})
 
 //ADMIN
 app.post('/admin-login', (req, res)=>{
@@ -147,10 +167,11 @@ app.post('/admin-login', (req, res)=>{
 
 app.post('/add-user', (req, res)=>{
   let newUser = req.body;
-  Users.find({}).sort({ userId: -1 }).limit(1).exec((err, users)=>{
+  Users.find().sort({ userId: -1 }).limit(1).exec((err, users)=>{
+    if(err) res.send(err);
     newUser.userId = users[0].userId + 1;
-    Users.insert(newUser, (err, user)=>{
-      if(err) res.send(err);
+    Users.insert(newUser, (err2, user)=>{
+      if(err2) res.send(err2);
       res.send(user);
     });
   });
@@ -180,6 +201,21 @@ app.get('/get-procedures', (req, res)=>{
 });
 
 //SUPER
+app.post('/get-calls-date-range', (req, res) =>{
+  Calls.find({createdAt: {
+    $gte: new Date(req.body.startDate),
+    $lt: new Date(req.body.endDate)
+  }}).exec((err, calls)=>{
+    if(err) res.send(err);
+    res.send(calls);
+  });
+
+  // Calls.find({}, (err, calls)=>{
+  //   if(err) res.send(err);
+  //   res.send(calls);
+  // });
+});
+
 app.get('/seed-super',(req,res)=>{
   Users.insert({
     fullname:'Brett Connolly',

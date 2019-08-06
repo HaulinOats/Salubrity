@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import './Admin.css';
 import axios from 'axios';
-import {DebounceInput} from 'react-debounce-input';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
 import moment from 'moment';
+import {DebounceInput} from 'react-debounce-input';
 import loadingGif from '../../public/loading.gif';
 
 export default class Admin extends Component {
@@ -13,9 +11,9 @@ export default class Admin extends Component {
     this.state = {
       username:'',
       password:'',
-      userData:localStorage.getItem('userData') !== 'undefined' ? JSON.parse(localStorage.getItem('userData')) : null,
-      startDate:moment(),
-      endDate:moment(),
+      userData:null,
+      startDate:moment().local().format('YYYY-MM-DD'),
+      endDate:moment().local().format('YYYY-MM-DD'),
       isLoading:false,
       activePage:'date',
       addFullName:'',
@@ -24,7 +22,8 @@ export default class Admin extends Component {
       addAdminAccess:false,
       addValidationErrors:[],
       allUsers:[],
-      allProcedures:[]
+      allProcedures:[],
+      queriedCalls:[]
     }
     this.startDateSelected = this.startDateSelected.bind(this);
     this.endDateSelected = this.endDateSelected.bind(this);
@@ -82,6 +81,10 @@ export default class Admin extends Component {
     .catch((err)=>{
       console.log(err);
     })
+
+    setTimeout(()=>{
+      console.log(this.state);
+    }, 0);
   }
 
   componentDidMount() {
@@ -199,20 +202,35 @@ export default class Admin extends Component {
   }
 
   startDateSelected(date){
+    console.log(date.target.value);
     this.setState({
-      startDate: date
+      startDate: date.target.value
     });
   }
   
   endDateSelected(date){
+    console.log(date.target.value);
     this.setState({
-      endDate: date
+      endDate: date.target.value
     });
   }
 
   submitDateRange(){
-    console.log('start date: ', this.state.startDate);
-    console.log('end date: ', this.state.endDate);
+    console.log(moment(this.state.startDate).startOf('day'));
+    console.log(moment(this.state.endDate).endOf('day'));
+    // console.log(this.state.startDate.utc().startOf('day').toISOString());
+    // console.log(this.state.endDate.utc().endOf('day').toISOString());
+    axios.post('/get-calls-date-range', {
+      startDate:moment(this.state.startDate).startOf('day').toISOString(),
+      endDate:moment(this.state.endDate).endOf('day').toISOString()
+    })
+    .then(resp=>{
+      console.log(resp.data);
+      this.setState({queriedCalls:resp.data});
+    })
+    .catch(err=>{
+      console.log(err);
+    })
   }
 
   seedSuper(){
@@ -267,7 +285,7 @@ export default class Admin extends Component {
             <header>
               <h2>VAS Tracker Admin Panel</h2>
               <ul className='vas-admin-menu'>
-                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Date Range</li>
+                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Query Database</li>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Manage Users</li>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'procedures' ? true : false} onClick={e=>{this.setState({activePage:'procedures'})}}>Manage Procedure Info</li>
                 {this.state.userData.role === 'super' &&
@@ -282,19 +300,44 @@ export default class Admin extends Component {
                 <div className='vas-admin-date-range-container'>
                   <div className='vas-admin-date-range-inner'>
                     <p className='vas-damin-date-label'>From:</p>
-                    <DatePicker className='vas-admin-datepicker' selected={this.state.startDate} onChange={this.startDateSelected} />
+                    <input type='date' value={this.state.startDate} onChange={this.startDateSelected} />
                   </div>  
                   <div className='vas-admin-date-range-inner'>
                     <p className='vas-damin-date-label'>To:</p>
-                    <DatePicker className='vas-admin-datepicker' selected={this.state.endDate} onChange={this.endDateSelected} />
-                  </div>
-                  <div className='vas-admin-date-range-checkboxes'>
-                    <input className='vas-admin-date-range-show-all' type='checkbox' />
-                    <label>Show All Data</label>
+                    <input type='date' value={this.state.endDate} onChange={this.endDateSelected}/>
                   </div>
                   <button className='vas-admin-date-range-submit' onClick={this.submitDateRange}>Submit</button>
                 </div>
                 <div className='vas-admin-date-query-container'>
+                  <table className='vas-table vas-admin-table'>
+                    <tbody>
+                      <tr>
+                        <th>Job</th>
+                        <th>Comments</th>
+                        <th>Procedures Done</th>
+                        <th>Created At</th>
+                        <th>Completed At</th>
+                        <th>Completed By</th>
+                      </tr>
+                      {/* {this.state.queriedCalls.map((call, idx)=>{
+                        return(
+                          <tr className='vas-table-tr' key={idx}>
+                            <td>{call.job}</td>
+                            <td>{call.comment}</td>
+                            <td>
+                              {call.proceduresDone.map((procedure, idx2)=>{
+                                return <span key={idx2}>{procedure}, </span>
+                              })}
+                            </td>
+                            <td>{call.createdAt}</td>
+                            <td>{call.completedAt}</td>
+                            <td>{call.completedBy}</td>
+                          </tr>
+                        )
+                      })
+                      } */}
+                    </tbody>
+                  </table>
                   {this.state.isLoading &&
                     <img className='vas-admin-loading-gif' src={loadingGif} alt='loading'/>
                   }
@@ -320,7 +363,7 @@ export default class Admin extends Component {
                   <table className='vas-admin-table'>
                     <tbody>
                       <tr>
-                        <th onClick={e=>{this.sortColumn('contactId')}}>contactId</th>
+                        <th onClick={e=>{this.sortColumn('userId')}}>userId</th>
                         <th onClick={e=>{this.sortColumn('fullname')}}>fullname</th>
                         <th onClick={e=>{this.sortColumn('username')}}>username</th>
                         <th onClick={e=>{this.sortColumn('password')}}>password/pin</th>
@@ -330,7 +373,7 @@ export default class Admin extends Component {
                       {this.state.allUsers.map((val, idx)=>{
                         return(
                           <tr key={idx}>
-                            <td>{val.contactId}</td>
+                            <td>{val.userId}</td>
                             <td>{val.fullname}</td>
                             <td>{val.username}</td>
                             <td>{val.password}</td>

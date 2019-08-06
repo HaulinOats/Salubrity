@@ -1,5 +1,3 @@
-2019/08/05-16:20:40.684 2dac Recovering log #3
-2019/08/05-16:20:40.684 2dac Level-0 table #5: started
-2019/08/05-16:20:40.698 2dac Level-0 table #5: 1303 bytes OK
-2019/08/05-16:20:40.705 2dac Delete type=0 #3
-2019/08/05-16:20:40.706 2dac Delete type=3 #2
+2019/08/06-00:20:59.239 3ec8 Recovering log #58
+2019/08/06-00:20:59.267 3ec8 Delete type=0 #58
+2019/08/06-00:20:59.267 3ec8 Delete type=3 #57
