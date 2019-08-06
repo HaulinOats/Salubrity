@@ -129,14 +129,18 @@ app.post('/set-call-as-unopen', (req, res)=>{
 app.post('/procedure-completed', (req, res)=>{
   Calls.findOne({_id:req.body.id}, (err, call)=>{
     if(err) res.send(err);
-    call.proceduresDone = req.body.proceduresDone;
-    call.isOpen = false;
-    call.completedBy = Number(req.body.completedBy);
-    call.completedAt = new Date();
-    call.save((err2)=>{
-      if(err2) res.send(err2);
-      res.send(call);
-    })
+    if(call){
+      call.proceduresDone = req.body.proceduresDone;
+      call.isOpen = false;
+      call.completedBy = Number(req.body.completedBy);
+      call.completedAt = new Date();
+      call.save((err2)=>{
+        if(err2) res.send(err2);
+        res.send(call);
+      })
+    } else {
+      res.send(false);
+    }
   })
 });
 
