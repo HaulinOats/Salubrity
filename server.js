@@ -62,15 +62,19 @@ if (process.env.NODE_ENV === "production") {
 //APP
 app.post('/add-call', (req, res)=>{
   Calls.insert(req.body, (err, call)=>{
-    if(err) res.send(err);
+    if(err) return err;
     res.send(call);
   });
 });
 
 app.get('/get-active-calls', (req, res)=>{
   Calls.find({completedAt:{$exists:false}, isOpen:false}, (err, calls)=>{
-    if(err) res.send(err)
-    res.send(calls);
+    if(err) return err;
+    if(calls.length){
+      res.send(calls);
+    } else {
+      res.send({'error':'there are no calls to return'});
+    }
   })
 });
 
@@ -82,7 +86,7 @@ app.get('/get-completed-calls', (req, res)=>{
   end.setHours(23,59,59,999);
 
   Calls.find({completedAt: {$gte: start, $lt: end}}, (err, calls)=>{
-    if(err) res.send(err)
+    if(err) return err;
     res.send(calls);
   });
 });
@@ -95,76 +99,88 @@ app.get('/get-open-calls', (req, res)=>{
   end.setHours(23,59,59,999);
 
   Calls.find({isOpen:true}, (err, calls)=>{
-    if(err) res.send(err)
+    if(err) return err;
     res.send(calls);
   });
 });
 
 app.post('/set-call-as-open', (req, res)=>{
   Calls.findOne(req.body, (err, call)=>{
-    if(err) send.send(err);
-    if(call.isOpen) {
-     res.send('open'); 
+    if(err) return err;
+    if(call){
+      if(call.isOpen) {
+        res.send({'error':'call is already open'});
+      } else {
+        call.isOpen = true;
+        call.save((err2)=>{
+          if(err2) return err2;
+          res.send(true);
+        })
+      }
     } else {
-      call.isOpen = true;
-      call.save((err2)=>{
-        if(err2) res.send(err);
-        res.send(true);
-      })
+      res.send({'error':'could not find call to set as open'});
     }
   });
 });
 
 app.post('/set-call-as-unopen', (req, res)=>{
   Calls.findOne(req.body, (err, call)=>{
-    if(err) res.send(err);
-    call.isOpen = false;
-    call.save((err2)=>{
-      if(err2) res.send(err2);
-      res.send(true);
-    })
+    if(err) return err;
+    if(call){
+      call.isOpen = false;
+      call.save((err2)=>{
+        if(err2) return err2;
+        res.send(true);
+      })
+    } else {
+      res.send({'error':'could not find call to set as unopen'});
+    }
   });
 });
 
 app.post('/procedure-completed', (req, res)=>{
   Calls.findOne({_id:req.body.id}, (err, call)=>{
-    if(err) res.send(err);
+    if(err) return err;
     if(call){
       call.proceduresDone = req.body.proceduresDone;
       call.isOpen = false;
       call.completedBy = Number(req.body.completedBy);
       call.completedAt = new Date();
       call.save((err2)=>{
-        if(err2) res.send(err2);
+        if(err2) return err2;
         res.send(call);
       })
     } else {
-      res.send(false);
+      res.send({'error':'could not find procedure to mark as complete'});
     }
   })
 });
 
 app.post('/get-user-by-id', (req, res)=>{
   Users.findOne(req.body, (err, user)=>{
-    if(err) res.send(err);
-    res.send(user);
+    if(err) return err;
+    if(user){
+      res.send(user);
+    } else {
+      res.send({'error':'could not find user from id: ' + req.body._id});
+    }
   })
 })
 
 //ADMIN
 app.post('/admin-login', (req, res)=>{
   Users.findOne({username:req.body.username.toLowerCase()}, (err, user)=>{
-    if(err) res.send(err);
+    if(err) return err;
     if(user){
       if(user.password.toLowerCase() === req.body.password.toLowerCase()){
         let loggedUser = user;
         delete loggedUser.password;
         res.send(loggedUser);
       } else {
-        res.send(false);
+        res.send({'error':'incorrect password'});
       }
     } else {
-      res.send(false);
+      res.send({'error':"user doesn't exist"});
     }
   })
 });
@@ -172,52 +188,63 @@ app.post('/admin-login', (req, res)=>{
 app.post('/add-user', (req, res)=>{
   let newUser = req.body;
   Users.find().sort({ userId: -1 }).limit(1).exec((err, users)=>{
-    if(err) res.send(err);
-    newUser.userId = users[0].userId + 1;
-    Users.insert(newUser, (err2, user)=>{
-      if(err2) res.send(err2);
-      res.send(user);
-    });
+    if(err) return err;
+    if(users.length){
+      newUser.userId = users[0].userId + 1;
+      Users.insert(newUser, (err2, user)=>{
+        if(err2) return err2;
+        res.send(user);
+      });
+    } else {
+      res.send({'error':'error adding new user'})
+    }
   });
 });
 
 app.post('/delete-user', (req, res)=>{
   Users.findOne(req.body, (err, user)=>{
-    Users.remove(req.body, {}, (err1)=>{
-      if(err1) res.send(err1);
-      res.send(true)
-    });
+    if(err) return err;
+    if(user){
+      Users.remove(req.body, {}, (err2)=>{
+        if(err2) return err2;
+        res.send(true);
+      });
+    } else {
+      res.send({'error':'could not find user to delete'});
+    }
   });
 });
 
 app.get('/get-all-users', (req, res)=>{
   Users.find({role: {$ne: 'super'}}).sort({ userId: 1 }).exec((err, users)=>{
-    if(err) res.send(err);
+    if(err) return err;
     res.send(users);
   });
 });
 
 app.get('/get-procedures', (req, res)=>{
   Procedures.find().sort({procedureId:1}).exec((err, procedures)=>{
-    if(err) res.send(err)
+    if(err) return err;
     res.send(procedures);
   });
 });
 
 //SUPER
 app.post('/get-calls-date-range', (req, res) =>{
-  Calls.find({createdAt: {
-    $gte: new Date(req.body.startDate),
-    $lt: new Date(req.body.endDate)
-  }}).exec((err, calls)=>{
-    if(err) res.send(err);
-    res.send(calls);
-  });
-
-  // Calls.find({}, (err, calls)=>{
-  //   if(err) res.send(err);
+  console.log(new Date(req.body.startDate));
+  console.log(new Date(req.body.endDate));
+  // Calls.find({completedAt: {
+  //   $gte: new Date(req.body.startDate),
+  //   $lt: new Date(req.body.endDate)
+  // }}, (err, calls)=>{
+  //   if(err) return err;
   //   res.send(calls);
   // });
+
+  Calls.find({completedAt:{$exists:true}}, (err, calls)=>{
+    if(err) return err;
+    res.send(calls);
+  });
 });
 
 app.get('/seed-super',(req,res)=>{
@@ -228,14 +255,14 @@ app.get('/seed-super',(req,res)=>{
     password:'lisa8484',
     role:'super'
   }, (err, newUser)=>{
-    if(err) res.send(err);
+    if(err) return err;
     res.send(newUser);
   })
 });
 
 app.get('/seed-procedures', (req, res)=>{
   Procedures.insert(getProcedureSeed(), (err, newDocs) => {
-    if(err) res.send(err);
+    if(err) return err;
     res.send('procedures seeded');
   });
 })

@@ -54,34 +54,9 @@ export default class Home extends Component{
 
   stateLoadCalls(){
     this.getActiveCalls();
-    
-    axios.get('/get-procedures')
-    .then((resp)=>{
-      this.setState({procedures:resp.data});
-      console.log(resp.data);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-
-    axios.get('/get-completed-calls')
-    .then((resp)=>{
-      console.log(resp.data);
-      this.setState({completedCalls:resp.data});
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-
-    axios.get('/get-open-calls')
-    .then((resp)=>{
-      console.log(resp.data);
-      this.setState({openCalls:resp.data});
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-
+    this.getCompletedCalls();
+    this.getProcedureData();
+    this.getOpenCalls();
     this.getUserById();
 
     setTimeout(()=>{
@@ -119,8 +94,12 @@ export default class Home extends Component{
         userId:Number(this.state.userId)
       })
       .then(resp=>{
-        this.setState({currentUser:resp.data});
-        window.scrollTo(0,document.body.scrollHeight);
+        if(resp.data.error){
+          console.log(resp.data.error);
+        } else {
+          this.setState({currentUser:resp.data});
+          window.scrollTo(0,document.body.scrollHeight);
+        }
       })
       .catch(err=>{
         console.log(err);
@@ -130,11 +109,59 @@ export default class Home extends Component{
     }
   }
 
+  getOpenCalls(){
+    axios.get('/get-open-calls')
+    .then((resp)=>{
+      this.setState({openCalls:resp.data});
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+  }
+
+  getProcedureData(){
+    axios.get('/get-procedures')
+    .then((resp)=>{
+      this.setState({procedures:resp.data});
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+  }
+
+  getCompletedCalls(){
+    axios.get('/get-completed-calls')
+    .then((resp)=>{
+      console.log(resp.data);
+      this.setState({completedCalls:resp.data});
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+  }
+
   getActiveCalls(){
     axios.get('/get-active-calls')
     .then((resp)=>{
-      console.log(resp.data);
-      this.setState({queueItems:resp.data});
+      if(resp.data.error){
+        console.log(resp.data.error);
+      } else {
+        this.setState({queueItems:resp.data}, ()=>{
+          //check if already opened call exists as an active call
+          if(this.state.activeRecord){
+            let activeRecordExists = false;
+            for(let i = 0; i < this.state.queueItems.length; i++){
+              if(this.state.queueItems[i]._id === this.state.activeRecord._id){
+                activeRecordExists = true;
+                break;
+              }
+            }
+            if(!activeRecordExists){
+              this.setState({activeRecord:null});
+            }
+          }
+        });
+      }
     })
     .catch((err)=>{
       console.log(err);
@@ -169,16 +196,20 @@ export default class Home extends Component{
           proceduresDone,
           completedBy:this.state.userId
         })
-        .then((resp)=>{
-          let completedCalls = this.state.completedCalls;
-          completedCalls.push(resp.data);
-          this.setState({
-            activeRecord:null,
-            completedCalls
-          }, ()=>{
-            this.setStorageItem(true, 'activeRecord');
-            document.getElementById('queue-tab').click();
-          });
+        .then(resp=>{
+          if(resp.data.error){
+            console.log(resp.data.error);
+          } else {
+            let completedCalls = this.state.completedCalls;
+            completedCalls.push(resp.data);
+            this.setState({
+              activeRecord:null,
+              completedCalls
+            }, ()=>{
+              this.setStorageItem(true, 'activeRecord');
+              document.getElementById('queue-tab').click();
+            });
+          }
         })
         .catch((err)=>{
           console.log(err);
@@ -323,10 +354,10 @@ export default class Home extends Component{
               <a className="nav-link vas-nav-link active" id="queue-tab" data-toggle="tab" href="#queue" role="tab" aria-controls="queue" aria-selected="true" onClick={e=>{this.getActiveCalls()}}>Queue</a>
             </li>
             <li className="nav-item vas-home-nav-item">
-                <a className="nav-link vas-nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false">Complete</a>
+                <a className="nav-link vas-nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false" onClick={e=>{this.getCompletedCalls()}}>Complete</a>
             </li>
             <li className="nav-item vas-home-nav-item">
-                <a className="nav-link vas-nav-link" id="open-tab" data-toggle="tab" href="#open" role="tab" aria-controls="open" aria-selected="false">Open</a>
+                <a className="nav-link vas-nav-link" id="open-tab" data-toggle="tab" href="#open" role="tab" aria-controls="open" aria-selected="false" onClick={e=>{this.getOpenCalls()}}>Open</a>
             </li>
             {this.state.activeRecord &&
               <li className="nav-item vas-home-nav-item">

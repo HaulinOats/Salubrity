@@ -65,7 +65,7 @@ export default class Modal extends Component {
       room:this.state.roomNumber,
       job:this.state.need,
       contact:this.state.contactNumber,
-      createdAt:new Date(),
+      createdAt:new Date().toISOString(),
       comment:this.state.comment,
       isOpen:false
     };

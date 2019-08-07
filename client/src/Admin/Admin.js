@@ -319,7 +319,7 @@ export default class Admin extends Component {
                         <th>Completed At</th>
                         <th>Completed By</th>
                       </tr>
-                      {/* {this.state.queriedCalls.map((call, idx)=>{
+                      {this.state.queriedCalls.map((call, idx)=>{
                         return(
                           <tr className='vas-table-tr' key={idx}>
                             <td>{call.job}</td>
@@ -335,7 +335,7 @@ export default class Admin extends Component {
                           </tr>
                         )
                       })
-                      } */}
+                      }
                     </tbody>
                   </table>
                   {this.state.isLoading &&
