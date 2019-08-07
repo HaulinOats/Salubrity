@@ -73,7 +73,7 @@ app.get('/get-active-calls', (req, res)=>{
     if(calls.length){
       res.send(calls);
     } else {
-      res.send({'error':'there are no calls to return'});
+      res.send({'error':'there are no calls to return', 'placeholderData':[]});
     }
   })
 });
@@ -114,7 +114,7 @@ app.post('/set-call-as-open', (req, res)=>{
         call.isOpen = true;
         call.save((err2)=>{
           if(err2) return err2;
-          res.send(true);
+          res.send(call);
         })
       }
     } else {

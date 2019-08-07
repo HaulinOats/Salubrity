@@ -145,22 +145,11 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error){
         console.log(resp.data.error);
+        if(resp.data.placeholderData){
+          this.setState({queueItems:resp.data.placeholderData});
+        }
       } else {
-        this.setState({queueItems:resp.data}, ()=>{
-          //check if already opened call exists as an active call
-          if(this.state.activeRecord){
-            let activeRecordExists = false;
-            for(let i = 0; i < this.state.queueItems.length; i++){
-              if(this.state.queueItems[i]._id === this.state.activeRecord._id){
-                activeRecordExists = true;
-                break;
-              }
-            }
-            if(!activeRecordExists){
-              this.setState({activeRecord:null});
-            }
-          }
-        });
+        this.setState({queueItems:resp.data});
       }
     })
     .catch((err)=>{
@@ -206,7 +195,6 @@ export default class Home extends Component{
               activeRecord:null,
               completedCalls
             }, ()=>{
-              this.setStorageItem(true, 'activeRecord');
               document.getElementById('queue-tab').click();
             });
           }
@@ -257,14 +245,19 @@ export default class Home extends Component{
     if(!this.state.activeRecord){
       axios.post('/set-call-as-open', {_id:job._id})
       .then((resp)=>{
-        if(resp.data === 'open'){
-          this.setState({
-            modalIsOpen:true,
-            modalTitle:'Record was recently opened by someone else. Please select another queue item. Refreshing queue...'
-          }, this.getActiveCalls);
+        if(resp.data.error){
+          console.log(resp.data.error);
         } else {
-          this.setState({activeRecord:job}, ()=>{
-            this.setStorageItem(false, 'activeRecord', this.state.activeRecord);
+          this.setState({activeRecord:resp.data}, ()=>{
+            let queueArr = this.state.queueItems;
+            for(let i = queueArr.length - 1; i >= 0; --i){
+              console.log(queueArr[i]._id);
+              console.log(this.state.activeRecord._id);
+              if(queueArr[i] === this.state.activeRecord._id){
+                queueArr.splice(i, 1);
+              }
+            }
+            this.setState({queueItems:queueArr});
           });
           setTimeout(()=>{
             document.getElementById('active-tab').click();
@@ -282,20 +275,11 @@ export default class Home extends Component{
     }
   }
 
-  setStorageItem(isRemove, name, data){
-    if(isRemove){
-      localStorage.removeItem(name)
-    } else {
-      localStorage.setItem(name, JSON.stringify(data));
-    }
-  }
-
   returnToQueue(){
     axios.post('/set-call-as-unopen', {_id:this.state.activeRecord._id})
     .then((resp)=>{
-      console.log(resp.data);
+      console.log('call was returned to queue');
       this.setState({activeRecord:null}, ()=>{
-        this.setStorageItem(true, 'activeRecord');
         document.getElementById('queue-tab').click();
       });
     })
