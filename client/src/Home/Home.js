@@ -44,7 +44,6 @@ export default class Home extends Component{
     if(this.isValidStorageItem(storagecurrentUser)){
       this.setState({currentUser:JSON.parse(storagecurrentUser)});
     }
-
     setTimeout(()=>{this.stateLoadCalls()}, 0);
   }
 
@@ -166,7 +165,9 @@ export default class Home extends Component{
       } else {
         this.setState({queueItems:resp.data}, ()=>{
           for(let i = 0; i < this.state.queueItems.length; i++){
-            if(this.state.queueItems.openBy && this.state.queueItems.openBy === this.state.currentUser.userId){
+            console.log('openBy: ', this.state.queueItems.openBy);
+            console.log(this.state.currentUser.userId);
+            if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
               this.setState({activeRecord:this.state.queueItems[i]});
               break;
             }
