@@ -107,7 +107,11 @@ export default class Admin extends Component {
   seedProcedures(){
     axios.get('/seed-procedures')
     .then((resp)=>{
-      console.log(resp.data);
+      if(resp.data.error){
+        console.log(resp.data.error);
+      } else {
+        this.setState({allProcedures:resp.data});
+      }
     })
     .catch((err)=>{
       console.log(err);

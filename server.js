@@ -7,6 +7,7 @@ LinvoDB.dbPath = `./vas-db/vas.db`;
 
 //2nd parameter object defines schema for table
 let Calls = new LinvoDB("Calls", {
+  hospital:String,
   room:String,
   job:String,
   comments:{type:String, default:null},
@@ -16,7 +17,7 @@ let Calls = new LinvoDB("Calls", {
   isOpen:{type:Boolean, default:false},
   openBy:{type:Number, default:null},
   proceduresDone:[],
-  mdn:{type:String, default:null},
+  mrn:{type:String, default:null},
   completedAt:{type:Date, default:null},
   completedBy:{type:Number, default:null}
 });
@@ -276,9 +277,13 @@ app.get('/seed-super',(req,res)=>{
 });
 
 app.get('/seed-procedures', (req, res)=>{
-  Procedures.insert(getProcedureSeed(), (err, newDocs) => {
+  Procedures.insert(getProcedureSeed(), (err, procedures) => {
     if(err) return err;
-    res.send('procedures seeded');
+    if(procedures){
+      res.send(procedures);
+    } else {
+      res.send({'error':'no procedures exist'})
+    }
   });
 })
 

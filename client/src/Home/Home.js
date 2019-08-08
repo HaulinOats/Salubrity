@@ -394,8 +394,8 @@ export default class Home extends Component{
                   <col span="1" style={{width: '15%'}}></col>
                   <col span="1" style={{width: '15%'}}></col>
                 </colgroup>
-                  <thead className="vas-queue-thead">
-                    <tr>
+                  <thead>
+                    <tr className='vas-table-thead-row'>
                       <th>Room</th>
                       <th>Job</th>
                       <th>Contact</th>
@@ -409,7 +409,7 @@ export default class Home extends Component{
                     }
                     {this.state.queueItems.map((item, index)=>{
                       return(
-                        <tr key={index} className={'vas-home-table-tr vas-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
+                        <tr key={index} className={'vas-home-table-tr vas-table-tr vas-table-tbody-row ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
                           <th>{item.room}</th>
                           <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
                           <td>{item.contact}</td>
@@ -431,7 +431,7 @@ export default class Home extends Component{
                     <col span="1" style={{width: '10%'}}></col>
                   </colgroup>
                   <thead className="vas-queue-thead">
-                    <tr>
+                    <tr className='vas-table-thead-row'>
                       <th>Room</th>
                       <th>Job Requested</th>
                       <th>Completion Time</th>
@@ -448,7 +448,7 @@ export default class Home extends Component{
                       let hours = endTime.diff(startTime, 'hours');
                       let minutes = endTime.diff(startTime, 'minutes');
                       return(
-                        <tr key={index} className="vas-home-table-tr">
+                        <tr key={index} className='vas-table-tbody-row'>
                           <th scope="row">{item.room}</th>
                           <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
                           <td>{hours > 0 ? `${hours} Hr` : ''} {minutes} Min</td>
