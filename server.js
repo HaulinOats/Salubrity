@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const path = require('path');
 const LinvoDB = require("linvodb3");
-LinvoDB.dbPath = `./vas-db`; 
+LinvoDB.dbPath = `./vas-db/vas.db`; 
 
 //2nd parameter object defines schema for table
 let Calls = new LinvoDB("Calls", {
@@ -177,8 +177,6 @@ app.post('/login', (req, res)=>{
   Users.findOne({username:req.body.username.toLowerCase()}, (err, user)=>{
     if(err) return err;
     if(user){
-      console.log(user);
-      console.log(req.body);
       if(user.password.toLowerCase() === req.body.password.toLowerCase()){
         if(req.body.loginType === 'user'){
           let loggedUser = user;

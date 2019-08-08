@@ -54,6 +54,16 @@ export default class Login extends Component {
     }
   }
 
+  seedSuper(){
+    axios.get('/seed-super')
+    .then(resp => {
+      console.log(resp.data);
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+  }
+
   render(){
     return(
       <div className='vas-login-container p-3'>
@@ -87,6 +97,7 @@ export default class Login extends Component {
             {this.state.loginType === 'user' &&
               <button className='vas-login-btn' onClick={e=>{this.login(true)}}>Test Login</button>
             }
+            <button style={{'display':'none'}}onClick={e=>{this.seedSuper()}}>Seed Super</button>
           </div>
         </div>
       </div>
