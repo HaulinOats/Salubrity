@@ -40,13 +40,9 @@ export default class Home extends Component{
   }
   
   componentWillMount(){
-    const storageActiveRecord = localStorage.getItem('activeRecord');
     const storagecurrentUser = localStorage.getItem('currentUser');
     if(this.isValidStorageItem(storagecurrentUser)){
       this.setState({currentUser:JSON.parse(storagecurrentUser)});
-    }
-    if(this.isValidStorageItem(storageActiveRecord)){
-      this.setState({activeRecord: JSON.parse(storageActiveRecord)});
     }
 
     setTimeout(()=>{this.stateLoadCalls()}, 0);
@@ -92,7 +88,7 @@ export default class Home extends Component{
   }
 
   logout(){
-    this.setState({currentUser:null});
+    this.setState({currentUser:null, activeRecord:null});
   }
 
   stateLoadCalls(){
@@ -110,7 +106,6 @@ export default class Home extends Component{
 
 
   handleWindowBeforeUnload(){
-    localStorage.setItem('activeRecord', JSON.stringify(this.state.activeRecord));
     localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
   }
 
