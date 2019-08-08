@@ -2,11 +2,31 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const path = require('path');
-const LinvoDB = require("linvodb3");
-LinvoDB.dbPath = `./vas-db/vas.db`; 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnvv7pg3', {
+  useNewUrlParser:true,
+  autoIndex:false
+}, (err)=>{
+  if(err) return err;
+});
+const Schema = mongoose.Schema;
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('db connected');
+});
 
-//2nd parameter object defines schema for table
-let Calls = new LinvoDB("Calls", {
+let userSchema = new Schema({
+  fullname:String,
+  username:String,
+  userId:Number,
+  password:String,
+  role:{type:String, default:'user'},
+  createdAt:{type:Date, default:new Date()},
+});
+let User = mongoose.model('User', userSchema);
+
+let callSchema = new Schema({
   hospital:String,
   room:String,
   job:String,
@@ -20,19 +40,12 @@ let Calls = new LinvoDB("Calls", {
   mrn:{type:String, default:null},
   completedAt:{type:Date, default:null},
   completedBy:{type:Number, default:null}
-});
-let Users = new LinvoDB("Users", {
-  fullname:String,
-  username:String,
-  userId:Number,
-  password:String,
-  role:{type:String, default:'user'},
-  createdAt:{type:Date, default:new Date()},
-});
-Users.ensureIndex({ fieldName: 'username', unique: true });
-Users.ensureIndex({ fieldName: 'userId', unique: true });
+})
+let Call = mongoose.model('Call', callSchema);
+// User.ensureIndex({ fieldName: 'username', unique: true });
+// User.ensureIndex({ fieldName: 'userId', unique: true });
 
-let Procedures = new LinvoDB("Procedures", { 
+let procedureSchema = new Schema({ 
   procedureId:Number,
   name:String,
   groups:[
@@ -50,7 +63,8 @@ let Procedures = new LinvoDB("Procedures", {
   value:String,
   selectType:String
 });
-Procedures.ensureIndex({ fieldName: 'procedureId', unique: true });
+let Procedure = mongoose.model('Procedure', procedureSchema);
+// Procedure.ensureIndex({ fieldName: 'procedureId', unique: true });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -65,7 +79,7 @@ if (process.env.NODE_ENV === "production") {
 ////ROUTES
 //APP
 app.post('/add-call', (req, res)=>{
-  Calls.insert(req.body, (err, call)=>{
+  Calls.create(req.body, (err, call)=>{
     if(err) return err;
     res.send(call);
   });
@@ -163,7 +177,7 @@ app.post('/procedure-completed', (req, res)=>{
 });
 
 app.post('/get-user-by-id', (req, res)=>{
-  Users.findOne(req.body, (err, user)=>{
+  User.findOne(req.body, (err, user)=>{
     if(err) return err;
     if(user){
       res.send(user);
@@ -175,7 +189,7 @@ app.post('/get-user-by-id', (req, res)=>{
 
 //ADMIN
 app.post('/login', (req, res)=>{
-  Users.findOne({username:req.body.username.toLowerCase()}, (err, user)=>{
+  User.findOne({username:req.body.username.toLowerCase()}, (err, user)=>{
     if(err) return err;
     if(user){
       if(user.password.toLowerCase() === req.body.password.toLowerCase()){
@@ -203,11 +217,11 @@ app.post('/login', (req, res)=>{
 
 app.post('/add-user', (req, res)=>{
   let newUser = req.body;
-  Users.find().sort({ userId: -1 }).limit(1).exec((err, users)=>{
+  User.find().sort({ userId: -1 }).limit(1).exec((err, users)=>{
     if(err) return err;
-    if(users.length){
+    if(User.length){
       newUser.userId = users[0].userId + 1;
-      Users.insert(newUser, (err2, user)=>{
+      User.create(newUser, (err2, user)=>{
         if(err2) return err2;
         res.send(user);
       });
@@ -218,10 +232,10 @@ app.post('/add-user', (req, res)=>{
 });
 
 app.post('/delete-user', (req, res)=>{
-  Users.findOne(req.body, (err, user)=>{
+  User.findOne(req.body, (err, user)=>{
     if(err) return err;
     if(user){
-      Users.remove(req.body, {}, (err2)=>{
+      User.remove(req.body, {}, (err2)=>{
         if(err2) return err2;
         res.send(true);
       });
@@ -232,14 +246,14 @@ app.post('/delete-user', (req, res)=>{
 });
 
 app.get('/get-all-users', (req, res)=>{
-  Users.find({role: {$ne: 'super'}}).sort({ userId: 1 }).exec((err, users)=>{
+  User.find({role: {$ne: 'super'}}).sort({ userId: 1 }).exec((err, users)=>{
     if(err) return err;
     res.send(users);
   });
 });
 
 app.get('/get-procedures', (req, res)=>{
-  Procedures.find().sort({procedureId:1}).exec((err, procedures)=>{
+  Procedure.find().sort({procedureId:1}).exec((err, procedures)=>{
     if(err) return err;
     res.send(procedures);
   });
@@ -264,7 +278,7 @@ app.post('/get-calls-date-range', (req, res) =>{
 });
 
 app.get('/seed-super',(req,res)=>{
-  Users.insert({
+  User.create({
     fullname:'Brett Connolly',
     username:'brett84c',
     userId:1001,
@@ -277,7 +291,7 @@ app.get('/seed-super',(req,res)=>{
 });
 
 app.get('/seed-procedures', (req, res)=>{
-  Procedures.insert(getProcedureSeed(), (err, procedures) => {
+  Procedure.create(getProcedureSeed(), (err, procedures) => {
     if(err) return err;
     if(procedures){
       res.send(procedures);

@@ -372,7 +372,7 @@ export default class Admin extends Component {
               {this.state.currentUser.role === 'super' &&
                 <div className='vas-admin-page-container vas-admin-super-container' data-isactive={this.state.activePage === 'super' ? true : false}>
                   <h3>Super Page</h3>
-                  <button onClick={this.seedProcedures}>Custom Query</button>
+                  <button onClick={this.seedProcedures}>Seed Procedures</button>
                 </div>
               }
             </div>
