@@ -12,10 +12,13 @@ let Calls = new LinvoDB("Calls", {
   comments:{type:String, default:null},
   contact:Number,
   createdAt:{type:Date, default:new Date()},
+  createdBy:{type:Number, default:null},
   isOpen:{type:Boolean, default:false},
+  openBy:{type:Number, default:null},
   proceduresDone:[],
-  completedBy:{type:Number, default:null},
-  completedAt:{type:Date, default:null}
+  mdn:{type:String, default:null},
+  completedAt:{type:Date, default:null},
+  completedBy:{type:Number, default:null}
 });
 let Users = new LinvoDB("Users", {
   fullname:String,
@@ -68,7 +71,7 @@ app.post('/add-call', (req, res)=>{
 });
 
 app.get('/get-active-calls', (req, res)=>{
-  Calls.find({completedAt:{$exists:false}, isOpen:false}, (err, calls)=>{
+  Calls.find({completedAt:{$exists:false}}, (err, calls)=>{
     if(err) return err;
     if(calls.length){
       res.send(calls);
@@ -105,13 +108,14 @@ app.get('/get-open-calls', (req, res)=>{
 });
 
 app.post('/set-call-as-open', (req, res)=>{
-  Calls.findOne(req.body, (err, call)=>{
+  Calls.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return err;
     if(call){
       if(call.isOpen) {
         res.send({'error':'call is already open'});
       } else {
         call.isOpen = true;
+        call.openBy = req.body.userId;
         call.save((err2)=>{
           if(err2) return err2;
           res.send(call);
@@ -128,9 +132,10 @@ app.post('/set-call-as-unopen', (req, res)=>{
     if(err) return err;
     if(call){
       call.isOpen = false;
+      call.openBy = null;
       call.save((err2)=>{
         if(err2) return err2;
-        res.send(true);
+        res.send(call);
       })
     } else {
       res.send({'error':'could not find call to set as unopen'});
@@ -168,14 +173,26 @@ app.post('/get-user-by-id', (req, res)=>{
 })
 
 //ADMIN
-app.post('/admin-login', (req, res)=>{
+app.post('/login', (req, res)=>{
   Users.findOne({username:req.body.username.toLowerCase()}, (err, user)=>{
     if(err) return err;
     if(user){
+      console.log(user);
+      console.log(req.body);
       if(user.password.toLowerCase() === req.body.password.toLowerCase()){
-        let loggedUser = user;
-        delete loggedUser.password;
-        res.send(loggedUser);
+        if(req.body.loginType === 'user'){
+          let loggedUser = user;
+          delete loggedUser.password;
+          res.send(loggedUser);
+        } else {
+          if(user.role === 'admin' || user.role === 'super'){
+            let loggedUser = user;
+            delete loggedUser.password;
+            res.send(loggedUser);
+          } else {
+            res.send({'error':'regular users cannot login to admin'});
+          }
+        }
       } else {
         res.send({'error':'incorrect password'});
       }

@@ -1,14 +1,62 @@
 .vas-home-container {
-  padding-top:15px;
+  padding-top:60px;
 }
-.vas-home-header {
+.vas-home-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background: darkslategrey;
+  color: white;
+  width: 100%;
+  padding: 0 15px;
+}
+.vas-home-header-title {
+  font-size: 150%;
+  color: bisque;
+  margin-right:40px;
+}
+.vas-home-header-option {
+  padding: 5px 10px;
+  border-right: solid 1px white;
+  cursor:pointer;
+}
+.vas-home-main-header-left li{
+  display:inline;
+}
+.vas-home-main-header-left li:last-child {
+  border:none;
+}
+.vas-home-header-ul li {
+  cursor:pointer;
+  display:inline;
+}
+.vas-home-main-header-user{
+  margin-right:10px;
+  padding-right:10px;
+  border-right:solid 1px white;
+}
+.vas-home-main-header-logout {
+  background: darkcyan;
+  padding: 5px;
+  border-radius: 3px;
+  box-shadow: 1px 1px 2px black;
+}
+.vas-home-main-header-logout:active {
+  border:none;
+}
+.vas-home-record-header {
   position: relative;
   padding: 10px 10px;
   background-color: #5f9ea0;
   color: #fff;
   border-bottom: solid 2px darkseagreen;
 }
-.vas-home-header p{
+.vas-home-record-header p{
   font-size:150%;
   text-shadow: 1px 2px 1px black;
 }
@@ -143,6 +191,14 @@
   top: 4px;
   z-index: 1;
 }
+.vas-home-table-row-is-open {
+  background-color: #9DAAB8;
+  color:white;
+}
+.vas-home-table-row-is-open
+.vas-table-job-name {
+  color:white;
+}
 .vas-home-cathflow-container {
 
 }
@@ -155,7 +211,7 @@
   margin-left: 10px;
   font-size: 110%;
 }
-.vas-home-header-btn {
+.vas-home-record-header-btn {
   margin-right: 25px;
   margin-top: 10px;
   padding: 7px;

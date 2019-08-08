@@ -1,17 +1,15 @@
 import React, {Component} from 'react';
+import Login from '../Widgets/Login/Login';
 import './Admin.css';
 import axios from 'axios';
 import moment from 'moment';
-import {DebounceInput} from 'react-debounce-input';
 import loadingGif from '../../public/loading.gif';
 
 export default class Admin extends Component {
   constructor(props){
     super(props);
     this.state = {
-      username:'',
-      password:'',
-      userData:null,
+      currentUser:null,
       startDate:moment().local().format('YYYY-MM-DD'),
       endDate:moment().local().format('YYYY-MM-DD'),
       isLoading:false,
@@ -32,14 +30,15 @@ export default class Admin extends Component {
     this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.addUser = this.addUser.bind(this);
     this.logout = this.logout.bind(this);
+    this.loginCallback = this.loginCallback.bind(this);
   }
 
   componentWillMount(){
-    const storageUserData = localStorage.getItem('userData');
-    if(this.isValidStorageItem(storageUserData)){
-      this.setState({userData:JSON.parse(storageUserData)}, this.handleAdminSessionData);
+    const storagecurrentUser = localStorage.getItem('currentUser');
+    if(this.isValidStorageItem(storagecurrentUser)){
+      this.setState({currentUser:JSON.parse(storagecurrentUser)}, this.handleUserSessionData);
     } else {
-      this.handleAdminSessionData();
+      this.handleUserSessionData();
     }
   }
 
@@ -47,18 +46,24 @@ export default class Admin extends Component {
     return storageItem !== 'undefined' && storageItem !== undefined && storageItem !== null && storageItem !== 'null'
   }
 
-  handleAdminSessionData(){
-    if(this.state.userData){
+  loginCallback(user){
+    let currentUser = user;
+    currentUser.lastLogin = Math.floor(Date.now() / 1000);
+    this.setState({currentUser:user}, this.stateLoadCalls);
+  }
+
+  handleUserSessionData(){
+    if(this.state.currentUser){
       //Allow user session access for 30 minutes (1800 seconds)
       //if it's been more than 30 minutes since last login, logout user
-      if(Math.floor(Date.now() / 1000) - this.state.userData.lastLogin > 1800){
+      if(Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin > 1800){
         this.logout();
       } else {
         //if user has refreshed at any point and it's been less than 30 minutes, refresh session
-        let userData = {...this.state.userData}
-        userData.lastLogin = Math.floor(Date.now() / 1000);
-        this.setState({userData}, ()=>{
-          console.log(userData);
+        let currentUser = {...this.state.currentUser}
+        currentUser.lastLogin = Math.floor(Date.now() / 1000);
+        this.setState({currentUser}, ()=>{
+          console.log(currentUser);
           this.stateLoadCalls();
         });
       }
@@ -96,9 +101,8 @@ export default class Admin extends Component {
   }
 
   handleWindowBeforeUnload(){
-    localStorage.setItem('userData', JSON.stringify(this.state.userData));
+    localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
   }
-
 
   seedProcedures(){
     axios.get('/seed-procedures')
@@ -112,9 +116,6 @@ export default class Admin extends Component {
 
   addUser(){
     let validationErrors = []
-    if(this.state.addFullName.length < 5 || this.state.addUserName.length < 5){
-      validationErrors.push('Full Name & Username must be atleast 5 characters');
-    }
     if(this.state.addPassword.length < 4){
       validationErrors.push('Password or PIN must be atleast 4 characters');
     }
@@ -172,33 +173,8 @@ export default class Admin extends Component {
     this.setState({allUsers:users});
   }
 
-  adminLogin(){
-    if(!this.state.userData){
-      axios.post('/admin-login', {
-        username:this.state.username,
-        password:this.state.password
-      })
-      .then((resp)=>{
-        if(resp.data){
-          console.log('login successful');
-          let userData = resp.data;
-          userData.lastLogin = Math.floor(Date.now() / 1000);
-          this.setState({userData}, ()=>{
-            this.stateLoadCalls();
-          });
-        } else {
-          console.log(resp.data);
-        }
-      })
-      .catch((err)=>{
-        alert('Username or password do not match.');
-        console.log(err);
-      })
-    }
-  }
-
   logout(){
-    this.setState({userData:null});
+    this.setState({currentUser:null});
   }
 
   startDateSelected(date){
@@ -244,43 +220,16 @@ export default class Admin extends Component {
   }
 
   render(){
+    let isAdmin = false;
+    if(this.state.currentUser){
+      isAdmin = (this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super') ? true : false;
+    }
     return(
       <div className='vas-admin-container'>
-        {!this.state.userData &&
-          <div className='vas-admin-login-container p-3'>
-            <div className="vas-admin-login-wrap">
-              <div className='vas-admin-color-border'>
-                <div className='vas-admin-color-border-block vas-admin-color-border-block-1'></div>
-                <div className='vas-admin-color-border-block vas-admin-color-border-block-2'></div>
-                <div className='vas-admin-color-border-block vas-admin-color-border-block-3'></div>
-                <div className='vas-admin-color-border-block vas-admin-color-border-block-4'></div>
-                <div className='vas-admin-color-border-block vas-admin-color-border-block-5'></div>
-              </div>
-              <h2>VAS Tracker</h2>
-              <h3>Admin Login</h3>
-              <div className="vas-admin-login-form">
-                <DebounceInput
-                  className="vas-admin-username-field"
-                  placeholder="Username"
-                  type="text"
-                  minLength={4}
-                  debounceTimeout={100}
-                  onChange={e => {this.setState({username: e.target.value.toLowerCase()})}} />
-                <DebounceInput
-                  className="vas-admin-pw-field"
-                  placeholder="Password"
-                  type="password"
-                  minLength={5}
-                  debounceTimeout={100}
-                  onChange={e => {this.setState({password: e.target.value.toLowerCase()})}}
-                  onKeyUp={e => {if(e.key === 'Enter'){this.adminLogin()}}} />
-                <button className='vas-admin-login-btn' onClick={e=>{this.adminLogin()}}>Sign in</button>
-              </div>
-            </div>
-            <button style={{display:'none'}} onClick={e=>{this.seedSuper()}}>Seed Super</button>
-          </div>
+        {!isAdmin &&
+          <Login loginType={'admin'} loginCallback={this.loginCallback} />
         }
-        {this.state.userData &&
+        {this.state.currentUser && isAdmin &&
           <div className='vas-admin-main-container'>
             <header>
               <h2>VAS Tracker Admin Panel</h2>
@@ -288,11 +237,11 @@ export default class Admin extends Component {
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Query Database</li>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Manage Users</li>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'procedures' ? true : false} onClick={e=>{this.setState({activePage:'procedures'})}}>Manage Procedure Info</li>
-                {this.state.userData.role === 'super' &&
+                {this.state.currentUser.role === 'super' &&
                   <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'super' ? true : false} onClick={e=>{this.setState({activePage:'super'})}}>Super</li>
                 }
               </ul>
-              <p className='vas-admin-username'>{this.state.userData.fullname}</p>
+              <p className='vas-admin-username'>{this.state.currentUser.fullname}</p>
               <p className='vas-admin-logout' onClick={this.logout}>Logout</p>
             </header>
             <div className='vas-admin-main-content'>
@@ -416,7 +365,7 @@ export default class Admin extends Component {
                   </tbody>
                 </table>
               </div>
-              {this.state.userData.role === 'super' &&
+              {this.state.currentUser.role === 'super' &&
                 <div className='vas-admin-page-container vas-admin-super-container' data-isactive={this.state.activePage === 'super' ? true : false}>
                   <h3>Super Page</h3>
                   <button onClick={this.seedProcedures}>Custom Query</button>

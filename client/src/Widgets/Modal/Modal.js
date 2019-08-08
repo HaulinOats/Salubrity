@@ -16,7 +16,7 @@ export default class Modal extends Component {
       roomNumber:null,
       need:null,
       needOpened:false,
-      contactNumber:null,
+      contactNumber:'',
       inputsValidated:false,
       addedCall:null
     }
@@ -44,8 +44,7 @@ export default class Modal extends Component {
 
   validateAddCall(){
     if(this.state.roomNumber && this.state.roomNumber.length && 
-      this.state.need && 
-      this.state.contactNumber && this.state.contactNumber.length){
+      this.state.need){
       if(this.state.customSelected){
         if(this.state.comment.length){
           this.setState({inputsValidated:true});
@@ -137,12 +136,7 @@ export default class Modal extends Component {
                     </div>
                     <div className="vas-modal-add-call-row-inner">
                       <p>Contact Number</p>
-                      <DebounceInput
-                        className="vas-modal-add-call-input"
-                        minLength={1}
-                        debounceTimeout={300}
-                        onKeyUp={e => {if(e.key === 'Enter' && this.state.inputsValidated){this.addCall()}}}
-                        onChange={e => {this.setState({contactNumber: e.target.value}, this.validateAddCall)}} />
+                      <input type='text' className='vas-modal-add-call-input' value={this.state.contactNumber} onChange={e => {this.setState({contactNumber: e.target.value}, this.validateAddCall)}} />
                     </div>
                   </div>
                 </div>

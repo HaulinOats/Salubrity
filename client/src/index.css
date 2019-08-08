@@ -49,6 +49,23 @@ table {
 
 /* font-family: 'Roboto', sans-serif;
 font-family: 'Rubik', sans-serif; */
+textarea:active, 
+input:active, 
+button:active,
+.btn:active,
+.btn.active
+{
+  outline:0px !important;
+  -webkit-appearance:none;
+  box-shadow: none !important;
+}
+textarea:focus, 
+input:focus,
+button:focus,
+label:focus{
+  outline:0px !important;
+  -webkit-appearance: none;
+}
 html {
   height:100%;
 }
