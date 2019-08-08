@@ -3,13 +3,13 @@ const bodyParser = require("body-parser");
 const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnvv7pg3', {
   useNewUrlParser:true,
   autoIndex:false
 }, (err)=>{
   if(err) return err;
 });
-const Schema = mongoose.Schema;
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -79,14 +79,14 @@ if (process.env.NODE_ENV === "production") {
 ////ROUTES
 //APP
 app.post('/add-call', (req, res)=>{
-  Calls.create(req.body, (err, call)=>{
+  Call.create(req.body, (err, call)=>{
     if(err) return err;
     res.send(call);
   });
 });
 
 app.get('/get-active-calls', (req, res)=>{
-  Calls.find({completedAt:{$exists:false}}, (err, calls)=>{
+  Call.find({completedAt:null}, (err, calls)=>{
     if(err) return err;
     if(calls.length){
       res.send(calls);
@@ -103,7 +103,7 @@ app.get('/get-completed-calls', (req, res)=>{
   var end = new Date();
   end.setHours(23,59,59,999);
 
-  Calls.find({completedAt: {$gte: start, $lt: end}}, (err, calls)=>{
+  Call.find({completedAt: {$gte: start, $lt: end}}, (err, calls)=>{
     if(err) return err;
     res.send(calls);
   });
@@ -116,14 +116,14 @@ app.get('/get-open-calls', (req, res)=>{
   var end = new Date();
   end.setHours(23,59,59,999);
 
-  Calls.find({isOpen:true}, (err, calls)=>{
+  Call.find({isOpen:true}, (err, calls)=>{
     if(err) return err;
     res.send(calls);
   });
 });
 
 app.post('/set-call-as-open', (req, res)=>{
-  Calls.findOne({_id:req.body._id}, (err, call)=>{
+  Call.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return err;
     if(call){
       if(call.isOpen) {
@@ -143,7 +143,7 @@ app.post('/set-call-as-open', (req, res)=>{
 });
 
 app.post('/set-call-as-unopen', (req, res)=>{
-  Calls.findOne(req.body, (err, call)=>{
+  Call.findOne(req.body, (err, call)=>{
     if(err) return err;
     if(call){
       call.isOpen = false;
@@ -159,7 +159,7 @@ app.post('/set-call-as-unopen', (req, res)=>{
 });
 
 app.post('/procedure-completed', (req, res)=>{
-  Calls.findOne({_id:req.body.id}, (err, call)=>{
+  Call.findOne({_id:req.body.id}, (err, call)=>{
     if(err) return err;
     if(call){
       call.proceduresDone = req.body.proceduresDone;
@@ -271,7 +271,7 @@ app.post('/get-calls-date-range', (req, res) =>{
   //   res.send(calls);
   // });
 
-  Calls.find({completedAt:{$exists:true}}, (err, calls)=>{
+  Call.find({completedAt:{$ne:null}}, (err, calls)=>{
     if(err) return err;
     res.send(calls);
   });

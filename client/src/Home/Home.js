@@ -534,6 +534,7 @@ export default class Home extends Component{
             </div>
             {this.state.modalIsOpen && 
               <Modal 
+                currentUser={this.state.currentUser}
                 getAddedCall={this.getAddedCall}
                 closeModal={this.closeModal}
                 modalTitle={this.state.modalTitle} 

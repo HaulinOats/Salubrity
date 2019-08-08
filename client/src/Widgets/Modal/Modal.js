@@ -10,6 +10,7 @@ export default class Modal extends Component {
       isOpen:true,
       modalTitle:this.props.modalTitle,
       selectedIds:this.props.selectedIds,
+      currentUser:this.props.currentUser,
       customSelected:false,
       comment:'',
       isAddCall:false,
@@ -65,6 +66,7 @@ export default class Modal extends Component {
       job:this.state.need,
       contact:this.state.contactNumber,
       createdAt:new Date().toISOString(),
+      createdBy:this.state.currentUser.userId,
       comment:this.state.comment,
       isOpen:false
     };
