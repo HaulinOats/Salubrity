@@ -75,13 +75,7 @@ export default class Admin extends Component {
   }
 
   stateLoadCalls(){
-    axios.get('/get-all-users')
-    .then((resp)=>{
-      this.setState({allUsers:resp.data});
-      console.log(resp.data);
-    }).catch((err)=>{
-      console.log(err);
-    })
+    this.getAllUsers();
 
     axios.get('/get-procedures')
     .then((resp)=>{
@@ -122,6 +116,16 @@ export default class Admin extends Component {
 
   handleWindowBeforeUnload(){
     localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
+  }
+
+  getAllUsers(){
+    axios.get('/get-all-users')
+    .then((resp)=>{
+      this.setState({allUsers:resp.data});
+      console.log(resp.data);
+    }).catch((err)=>{
+      console.log(err);
+    })
   }
 
   seedProcedures(){
@@ -192,14 +196,15 @@ export default class Admin extends Component {
     }
   }
 
-  deleteUser(e){
-    let index = e.target.attributes['data-index'].value;
-    axios.post('/delete-user', {_id:e.target.attributes['data-id'].value})
+  deleteUser(id){
+    axios.post('/delete-user', {_id:id})
     .then((resp)=>{
       console.log('user deleted');
-      let users = this.state.allUsers;
-      users.splice(index, 1);
-      this.setState({allUsers:users});
+      if(resp.data.error){
+        console.log(resp.data.error)
+      } else {
+        this.getAllUsers();
+      }
     }).catch((err)=>{
       console.log(err);
     })
@@ -368,7 +373,7 @@ export default class Admin extends Component {
                             <td>{val.password}</td>
                             <td>{val.role}</td>
                             <td className='vas-admin-delete-user'>
-                              <p data-id={val._id} data-index={idx} onClick={e=>{this.deleteUser(e)}}>&times;</p>
+                              <p data-id={val._id} data-index={idx} onClick={e=>{this.deleteUser(val._id)}}>&times;</p>
                             </td>
                           </tr>
                         )
