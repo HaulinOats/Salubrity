@@ -9,8 +9,9 @@ export default class Modal extends Component {
     this.state = {
       isOpen:true,
       modalTitle:this.props.modalTitle,
-      selectedIds:this.props.selectedIds,
+      modalMessage:this.props.modalMessage,
       currentUser:this.props.currentUser,
+      isConfirmation:this.props.isConfirmation,
       customSelected:false,
       comment:'',
       isAddCall:false,
@@ -28,6 +29,10 @@ export default class Modal extends Component {
     if(this.state.modalTitle === "Add Call"){
       this.setState({isAddCall:true});
     }
+  }
+
+  componentDidMount(){
+    console.log(this.state);
   }
 
   handleNeedSelect(e){
@@ -67,7 +72,7 @@ export default class Modal extends Component {
       contact:this.state.contactNumber,
       createdAt:new Date().toISOString(),
       createdBy:this.state.currentUser.userId,
-      comment:this.state.comment,
+      preComments:this.state.comment.length ? this.state.comment : null,
       isOpen:false
     };
 
@@ -96,6 +101,11 @@ export default class Modal extends Component {
     }, 2000);
   }
 
+  getConfirmation(isConfirmed){
+    this.props.getConfirmation(isConfirmed);
+    this.props.closeModal();
+  }
+
   render(){
     return(
       <div className="vas-modal-container" data-isOpen={this.state.isOpen}>
@@ -109,6 +119,15 @@ export default class Modal extends Component {
             <div className="vas-modal-content-main">
               {this.state.saveConfirmed &&
                 <p className="vas-modal-saved-msg">Item added to queue!</p>
+              }
+              {this.state.modalMessage &&
+                <p className='vas-modal-message'>{this.state.modalMessage}</p>
+              }
+              {this.state.isConfirmation && 
+                <div className='vas-modal-confirmation-btn-container'>
+                  <button className='vas-btn-confirm vas-btn-no' onClick={e=>{this.getConfirmation(false)}}>Cancel</button>
+                  <button className='vas-btn-confirm vas-btn-yes' onClick={e=>{this.getConfirmation(true)}}>OK</button>
+                </div>
               }
               {this.state.isAddCall &&
               <div>
@@ -133,6 +152,7 @@ export default class Modal extends Component {
                       <option>Port De-Access</option>
                       <option>Central Line Troubleshoot</option>
                       <option>Dressing Change</option>
+                      <option>Labs + IV</option>
                       <option>Custom</option>
                     </select>
                     </div>
@@ -153,11 +173,6 @@ export default class Modal extends Component {
                     debounceTimeout={300}
                     onChange={e => {this.setState({comment: e.target.value}, this.validateAddCall)}} />
                 </div>
-              }
-              {this.state.selectedIds &&
-                this.state.selectedIds.map((el, i)=>{
-                  return <p key={i}>{el}</p>
-                })
               }
             </div>
             {this.state.isAddCall && this.state.inputsValidated &&

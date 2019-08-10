@@ -14,27 +14,35 @@ export default class Home extends Component{
       endTaskSliderValue:0,
       pivSelected:false,
       labSelected:false,
-      activeBoxesArr:[],
       userId:'',
       modalTitle:'',
+      modalMessage:'',
+      modalConfirmation:false,
       activeRecord:null,
       queueItems:[],
       openCalls:[],
       completedCalls:[],
       procedures:[],
+      allOptions:[],
       proceduresDone:[],
       currentUser:null,
-      procedureValidated:false
+      procedureVerified:false,
+      postComments:'',
+      hospital:''
     }
     this.toggleHandler = this.toggleHandler.bind(this);
     this.sliderChange = this.sliderChange.bind(this);
     this.sliderEnd = this.sliderEnd.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.getConfirmation = this.getConfirmation.bind(this);
     this.getAddedCall = this.getAddedCall.bind(this);
-    this.addCall = this.addCall.bind(this);
+    this.takePicture = this.takePicture.bind(this);
     this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.handleOpenRecordPress = this.handleOpenRecordPress.bind(this);
     this.handleOpenRecordRelease = this.handleOpenRecordRelease.bind(this);
+    this.getDateFromObjectId = this.getDateFromObjectId.bind(this);
+    this.addCall = this.addCall.bind(this);
+    this.deleteCall = this.deleteCall.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
     this.logout = this.logout.bind(this);
   }
@@ -95,14 +103,17 @@ export default class Home extends Component{
       this.getActiveCalls();
       this.getCompletedCalls();
       this.getProcedureData();
+      this.getOptionsData();
       this.getOpenCalls();
-
       setTimeout(()=>{
         console.log(this.state);
       }, 250);
     }
   }
 
+  getDateFromObjectId(objId){
+    return new Date(parseInt(objId.substring(0, 8), 16) * 1000);
+  }
 
   handleWindowBeforeUnload(){
     localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
@@ -121,6 +132,29 @@ export default class Home extends Component{
       modalTitle:'Add Call',
       modalIsOpen:true
     })
+  }
+
+  takePicture(){
+    var video = document.getElementById('vas-home-label-video');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('muted', '');
+    video.style.width = '350px';
+    video.style.height = '200px';
+    
+    /* Setting up the constraint */
+    var facingMode = "environment"; //user for user facing camera
+    var constraints = {
+      audio: false,
+      video: {
+       facingMode: facingMode
+      }
+    };
+    
+    /* Stream it to video element */
+    navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
+      video.srcObject = stream;
+    });
   }
 
   getOpenCalls(){
@@ -143,11 +177,25 @@ export default class Home extends Component{
     })
   }
 
+  getOptionsData(){
+    axios.get('/get-options')
+    .then((resp)=>{
+      this.setState({allOptions:resp.data});
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+  }
+
   getCompletedCalls(){
     axios.get('/get-completed-calls')
     .then((resp)=>{
       console.log(resp.data);
-      this.setState({completedCalls:resp.data});
+      if(resp.data.error){
+        console.log(resp.data.error);
+      } else {
+        this.setState({completedCalls:resp.data});
+      }
     })
     .catch((err)=>{
       console.log(err);
@@ -165,8 +213,6 @@ export default class Home extends Component{
       } else {
         this.setState({queueItems:resp.data}, ()=>{
           for(let i = 0; i < this.state.queueItems.length; i++){
-            console.log('openBy: ', this.state.queueItems.openBy);
-            console.log(this.state.currentUser.userId);
             if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
               this.setState({activeRecord:this.state.queueItems[i]});
               break;
@@ -187,6 +233,7 @@ export default class Home extends Component{
   }
 
   sliderChange(e){
+    console.log(e.target.value);
     if(e.target.value < 100){
       this.setState({
         endTaskSliderValue:e.target.value
@@ -197,41 +244,60 @@ export default class Home extends Component{
       selectedTasks.forEach((el)=>{
         proceduresDone.push(Number(el.id));
       });
-      if(proceduresDone.length){
-        this.setState({
-          modalTitle:"Task Completed",
-          modalIsOpen:true,
-          endTaskSliderValue:0
-        }, ()=>{
-          setTimeout(()=>{this.setState({modalIsOpen:false, endTaskSliderValue:0})}, 2000);
-          axios.post('/procedure-completed', {
-            id:this.state.activeRecord._id,
-            proceduresDone,
-            completedBy:this.state.currentUser._id
-          })
-          .then(resp=>{
-            if(resp.data.error){
-              console.log(resp.data.error);
-            } else {
-              let completedCalls = this.state.completedCalls;
-              completedCalls.push(resp.data);
-              this.setState({
-                activeRecord:null,
-                completedCalls
-              }, ()=>{
-                document.getElementById('queue-tab').click();
-              });
-            }
-          })
-          .catch((err)=>{
-            console.log(err);
-          })
-        });
-      } else {
-        this.setState({modalIsOpen:true, modalTitle:'Cannot submit until at least one procedure has been selected'});
-        this.setState({endTaskSliderValue:0});
+      if(this.procedureVerified(proceduresDone)){
+        axios.post('/procedure-completed', {
+          _id:this.state.activeRecord._id,
+          proceduresDone,
+          completedBy:Number(this.state.currentUser.userId),
+          postComments:this.state.postComments.length ? this.state.postComments : null,
+          hospital:Number(this.state.hospital)
+        })
+        .then(resp=>{
+          if(resp.data.error){
+            console.log(resp.data.error);
+          } else {
+            this.setState({
+              activeRecord:null,
+              modalTitle:'Task Complete',
+              modalMessage:'Procedure was completed. Returning to queue.',
+              modalIsOpen:true,
+            }, ()=>{
+              document.getElementById('queue-tab').click();
+              setTimeout(()=>{
+                this.setState({
+                modalIsOpen:false,
+                modalTitle:'',
+                modalMessage:'',
+                endTaskSliderValue:0
+              })}, 2000);
+            });
+          }
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
       }
     }
+  }
+
+  procedureVerified(proceduresList){
+    let errors = '';
+    if(!proceduresList.length){
+      errors += '- You must select atleast 1 procedure\n';
+    }
+    if(!this.state.hospital.length || this.state.hospital === 'default'){
+      errors += '- You must select a hospital\n';
+    }
+    if(errors.length){
+      this.setState({
+        modalIsOpen:true, 
+        modalTitle:'Cannot Submit Procedure',
+        modalMessage:errors,
+        endTaskSliderValue:0
+      });
+      return false;
+    }
+    return true;
   }
 
   sliderEnd(e){
@@ -258,9 +324,30 @@ export default class Home extends Component{
 
   closeModal(){
     this.setState({
-      modalIsOpen:false, 
-      activeBoxesArr:[]
+      modalIsOpen:false,
+      modalMessage:'',
+      modalTitle:'',
+      modalConfirmation:false
     });
+  }
+
+  getConfirmation(isConfirmed){
+    if(isConfirmed){
+      axios.post('/delete-call', {
+        _id:this.state.activeRecord._id
+      })
+      .then(resp=>{
+        if(resp.data){
+          this.setState({activeRecord:null}, ()=>{
+            document.getElementById('queue-tab').click();
+          });
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+        alert('error deleting record');
+      })
+    }
   }
 
   getAddedCall(addedCall){
@@ -291,7 +378,8 @@ export default class Home extends Component{
     } else {
       this.setState({
         modalIsOpen:true,
-        modalTitle:'Please complete open task or return it to the queue'
+        modalTitle:'Record Already Open',
+        modalMessage:'Please complete open task or return it to the queue'
       })
     }
   }
@@ -347,6 +435,24 @@ export default class Home extends Component{
     }
   }
 
+  deleteCall(){
+    this.setState({
+      modalTitle:'Delete Active Record?',
+      modalMessage:'Are you sure you want to delete the currently active record?',
+      modalIsOpen:true,
+      modalConfirmation:true
+    });
+  }
+
+  hospitalChange(e){
+    if(e.target.value !== 'default'){
+      this.setState({hospital:e.target.value});
+      console.log(this.state);
+    } else {
+      this.setState({hospital:null});
+    }
+  }
+
   render(){
     return(
       <div>
@@ -359,6 +465,7 @@ export default class Home extends Component{
               <ul className='vas-home-main-header-left'>
                 <li className='vas-home-header-title'>VAS Tracker</li>
                 <li className='vas-home-header-option'><button onClick={this.addCall}>Add Call</button></li>
+                {/* <li className='vas-home-header-option'><button onClick={this.takePicture}>Take Picture</button></li> */}
               </ul>
               <span>
                 <ul className='vas-home-header-ul'>
@@ -396,7 +503,7 @@ export default class Home extends Component{
                       <th>Job</th>
                       <th>Contact</th>
                       <th>Call Time</th>
-                      <th>Is Open By</th>
+                      <th>Open By</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -407,7 +514,7 @@ export default class Home extends Component{
                       return(
                         <tr key={index} className={'vas-home-table-tr vas-table-tr vas-table-tbody-row ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
                           <th>{item.room}</th>
-                          <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
+                          <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.preComments}</td>
                           <td>{item.contact}</td>
                           <td><Moment format='HH:mm'>{item.createdAt}</Moment></td>
                           <td>{item.openBy ? item.openBy : ''}</td>
@@ -419,19 +526,15 @@ export default class Home extends Component{
               </div>
               <div className="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
                 <table className="vas-home-table vas-queue-table table">
-                  <colgroup>
-                    <col span="1" style={{width: '15%'}}></col>
-                    <col span="1" style={{width: '50%'}}></col>
-                    <col span="1" style={{width: '10%'}}></col>
-                    <col span="1" style={{width: '15%'}}></col>
-                    <col span="1" style={{width: '10%'}}></col>
-                  </colgroup>
                   <thead className="vas-queue-thead">
                     <tr className='vas-table-thead-row'>
-                      <th>Room</th>
-                      <th>Job Requested</th>
-                      <th>Completion Time</th>
-                      <th>Completed By</th>
+                      <th className='w-10'>Room</th>
+                      <th className='w-30'>Job Requested</th>
+                      <th className='w-10'>Done By</th>
+                      <th className='w-10'>Call Time</th>
+                      <th className='w-10'>Start Time</th>
+                      <th className='w-15'>End Time</th>
+                      <th className='w-15'>Response Time</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -439,16 +542,22 @@ export default class Home extends Component{
                       <tr><td></td><td className="vas-queue-no-items">There are no items completed</td></tr>
                     }
                     {this.state.completedCalls.map((item, index)=>{
-                      let startTime = moment(item.createdAt);
-                      let endTime = moment(item.completedAt);
-                      let hours = endTime.diff(startTime, 'hours');
-                      let minutes = endTime.diff(startTime, 'minutes');
+                      let startTime = moment(this.getDateFromObjectId(item._id));
+                      let responseTime = moment(item.startTime);
+                      let responseHours = responseTime.diff(startTime, 'hours');
+                      let responseMinutes = responseTime.diff(startTime, 'minutes');
+                      // let completionTime = moment(item.completedAt);
+                      // let completionHours = completionTime.diff(startTime, 'hours');
+                      // let completedMinutes = completionTime.diff(startTime, 'minutes');
                       return(
                         <tr key={index} className='vas-table-tbody-row'>
-                          <th scope="row">{item.room}</th>
-                          <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.comment}</td>
-                          <td>{hours > 0 ? `${hours} Hr` : ''} {minutes} Min</td>
+                          <td>{item.room}</td>
+                          <td><i className='vas-table-job-name'>{item.job}</i></td>
                           <td>{item.completedBy}</td>
+                          <td><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></td>
+                          <td><Moment format='HH:mm'>{item.startTime}</Moment></td>
+                          <td><Moment format='HH:mm'>{item.completedAt}</Moment></td>
+                          <td>{responseHours > 0 ? `${responseHours} Hr` : ''} {responseMinutes} Min</td>
                         </tr>
                       )
                     })}
@@ -458,18 +567,37 @@ export default class Home extends Component{
               {this.state.activeRecord &&
                 <div className="tab-pane fade show" id="home" role="tabpanel" aria-labelledby="active-tab">
                   <header className="vas-home-record-header">
-                    <p className="vas-home-record-header-text">Room: <b>{this.state.activeRecord.room}</b></p>
+                    <p className="vas-home-record-header-text"><b>{this.state.activeRecord.job}</b></p>
+                    <p className="vas-home-record-header-subtext">Room: <b>{this.state.activeRecord.room}</b></p>
                     <button className="vas-home-record-header-btn" onClick={this.resetPage}>Reset Form</button>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
+                    <button className='vas-home-record-header-btn vas-warn-btn' onClick={this.deleteCall}>Delete Call</button>
+                    <div className='vas-home-options-container'>
+                      {this.state.allOptions.map((option, idx)=>{
+                        return(
+                          <div className='vas-home-option-inner' key={idx}>
+                            <label>{option.name}:</label>
+                            {option.inputType === 'dropdown' &&
+                              <select value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
+                                <option value='default'>Select A Hospital</option>
+                                {option.options.map((subOption, idx2)=>{
+                                  return <option key={idx2} value={subOption.value}>{subOption.text}</option>
+                                })}
+                              </select>
+                            }
+                          </div>
+                        )})
+                      }  
+                    </div>
                   </header>
-                  {this.state.activeRecord.comment &&
+                  {this.state.activeRecord.preComments &&
                     <div className="vas-home-inner-container vas-home-inner-container-main-comment">
                       <header className="vas-home-inner-container-header">
-                        <p>Comments</p>
+                        <p>Procedure Comments</p>
                       </header>
                       <div className="vas-home-inner-container-main">
                         <div className="vas-home-inner-container-row">
-                          <p className='vas-home-comment'>{this.state.activeRecord.comment}</p>
+                          <p className='vas-home-comment'>{this.state.activeRecord.preComments}</p>
                         </div>
                       </div>
                     </div>
@@ -497,8 +625,10 @@ export default class Home extends Component{
                                         group.groupOptions.map((option, idx3)=>{
                                           return(
                                             <span key={idx3}>
-                                              <input type={group.selectType === 'single' ? 'radio' : 'checkbox'} className={"vas-home-select-input vas-"+ group.selectType +"-select"} id={option.taskId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
-                                              <label className="vas-btn" htmlFor={option.taskId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName)}}>{option.value}</label>
+                                              <input type={group.inputType} className={"vas-home-select-input vas-"+ group.inputType +"-select"} id={option.taskId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
+                                              {group.inputType !== 'number' &&
+                                                <label className="vas-btn" htmlFor={option.taskId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName)}}>{option.value}</label>
+                                              }
                                             </span>
                                           )
                                         })
@@ -514,6 +644,22 @@ export default class Home extends Component{
                       )
                     })
                   }
+                  <div className='vas-home-inner-container'>
+                    <header className='vas-home-inner-container-header'>
+                      <p>Additional Comments</p>
+                    </header>
+                    <div className='vas-home-inner-container-main'>
+                      <textarea className='vas-home-post-comments' value={this.state.postComments} onChange={e=>{this.setState({postComments:e.target.value})}}></textarea>
+                    </div>
+                  </div>
+                  {/* <div className='vas-home-inner-container'>
+                    <header className='vas-home-inner-container-header'>
+                      <p>Snapshot Label</p>
+                    </header>
+                    <div className='vas-home-inner-container-main'>
+                      <video id='vas-home-label-video' />
+                    </div>
+                  </div> */}
                   <div className="vas-home-inner-container vas-home-inner-container-final">
                     <header className="vas-home-inner-container-header vas-home-inner-container-final-header">
                       <p>Complete Task</p>
@@ -530,11 +676,13 @@ export default class Home extends Component{
             </div>
             {this.state.modalIsOpen && 
               <Modal 
+                isConfirmation={this.state.modalConfirmation}
                 currentUser={this.state.currentUser}
                 getAddedCall={this.getAddedCall}
+                getConfirmation={this.getConfirmation}
                 closeModal={this.closeModal}
                 modalTitle={this.state.modalTitle} 
-                selectedIds={this.state.activeBoxesArr} 
+                modalMessage={this.state.modalMessage}
                 toggleModal={this.toggleHandler}/>
             }
           </div>

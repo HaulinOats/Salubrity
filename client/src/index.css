@@ -108,6 +108,17 @@ button:active {
   height: 0;
   width: 0;
 }
+.vas-btn-confirm {
+  margin: 0 15px;
+  min-width: 70px;
+  padding: 10px 10px;
+}
+.vas-btn-no {
+  background-color:red;
+}
+.vas-btn-yes {
+  background-color:green;
+}
 
 /* Slide to Unlock Slider */
 .pullee {
@@ -243,14 +254,14 @@ button:active {
   align-items: center;
   justify-content: center;
 }
-.vas-single-select,
-.vas-multi-select {
+.vas-radio-select,
+.vas-checkbox-select {
   display:none;
 }
-.vas-single-select:checked + label,
-.vas-single-select:checked + label:active,
-.vas-multi-select:checked + label,
-.vas-multi-select:checked + label:active {
+.vas-radio-select:checked + label,
+.vas-radio-select:checked + label:active,
+.vas-checkbox-select:checked + label,
+.vas-checkbox-select:checked + label:active {
   background: #7d91a9;
   border-color: #708191 #6d8295 #7b8c9e;
   background-image: -webkit-linear-gradient(top, #7d91a9, #92a7bc);
@@ -262,6 +273,13 @@ button:active {
   color: white;
   text-shadow: 1px 1px 1px black;
 }
+.vas-number-select {
+  height: 40px;
+  border-radius: 3px;
+  border: none;
+  padding-left: 10px;
+  box-shadow: inset 1px 1px 2px black;
+}
 
 .vas-table {
   margin-bottom:0;
@@ -270,4 +288,8 @@ button:active {
 .vas-table-tr {
   cursor:pointer;
   box-shadow: inset 0px -6px 3px -5px steelblue;
+}
+.vas-warn-btn {
+  background:red;
+  color:white;
 }

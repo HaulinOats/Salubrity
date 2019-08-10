@@ -56,9 +56,13 @@
   color: #fff;
   border-bottom: solid 2px darkseagreen;
 }
-.vas-home-record-header p{
-  font-size:150%;
-  text-shadow: 1px 2px 1px black;
+.vas-home-record-header-text{
+  font-size:160%;
+  margin-bottom:10px;
+}
+.vas-home-record-header-subtext {
+  font-size:135%;
+  margin-bottom:10px;
 }
 .vas-home-nav-tabs {
   background:none;
@@ -130,7 +134,8 @@
 }
 .vas-home-inner-container-row {
   position: relative;
-  margin:10px 0;
+  margin-bottom: 15px;
+  margin-top: 5px;
 }
 .vas-home-btn-section {
   margin-right:15px;
@@ -258,4 +263,23 @@
   font-weight: bold;
   font-size: 140%;
   margin-bottom: 25px;
+}
+.vas-home-post-comments {
+  width: 100%;
+  min-height: 110px;
+  border-radius:4px;
+}
+.vas-home-options-container {
+  margin-top:20px;
+}
+.vas-home-option-inner {
+  font-size:120%;
+}
+.vas-home-option-inner select{
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.vas-home-option-inner label {
+  margin-right:15px;
 }

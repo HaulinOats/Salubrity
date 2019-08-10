@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 const Schema = mongoose.Schema;
 mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnvv7pg3', {
   useNewUrlParser:true,
@@ -12,59 +13,83 @@ mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnv
 });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log('db connected');
-});
+db.once('open', function() {console.log('db connected');});
 
 let userSchema = new Schema({
   fullname:String,
-  username:String,
-  userId:Number,
-  password:String,
+  username:{type:String, lowercase:true, unique:true},
+  userId:{type:Number, index:true, unique:true},
+  password:{type:String, lowercase:true},
   role:{type:String, default:'user'},
-  createdAt:{type:Date, default:new Date()},
 });
+userSchema.plugin(uniqueValidator);
 let User = mongoose.model('User', userSchema);
 
 let callSchema = new Schema({
-  hospital:String,
-  room:String,
+  hospital:{type:Number, default:null},
+  room:{type:String, default:null},
   job:String,
-  comments:{type:String, default:null},
+  preComments:{type:String, default:null},
+  postComments:{type:String, default:null},
   contact:Number,
-  createdAt:{type:Date, default:new Date()},
   createdBy:{type:Number, default:null},
+  startTime:{type:Date, default:null},
   isOpen:{type:Boolean, default:false},
   openBy:{type:Number, default:null},
   proceduresDone:[],
   mrn:{type:String, default:null},
-  completedAt:{type:Date, default:null},
+  completedAt:{type:Date, default:null, index:true},
   completedBy:{type:Number, default:null}
 })
+callSchema.plugin(uniqueValidator);
 let Call = mongoose.model('Call', callSchema);
-// User.ensureIndex({ fieldName: 'username', unique: true });
-// User.ensureIndex({ fieldName: 'userId', unique: true });
 
 let procedureSchema = new Schema({ 
-  procedureId:Number,
+  procedureId:{type:Number, index:true, unique:true},
   name:String,
+  value:String,
   groups:[
     {
       groupName:String,
-      selectType:String,
+      inputType:String,
       groupOptions:[
         {
           value:String,
-          taskId:Number
+          taskId:{type:Number, index:true, unique:true}
         }
       ]
     }
-  ],
-  value:String,
-  selectType:String
+  ]
 });
+procedureSchema.plugin(uniqueValidator);
 let Procedure = mongoose.model('Procedure', procedureSchema);
-// Procedure.ensureIndex({ fieldName: 'procedureId', unique: true });
+
+let optionSchema = new Schema({ 
+  name:String,
+  inputType:String,
+  callFieldName:{type:String, index:true, unique:true},
+  options:[
+    {
+      text:String,
+      value:{type:Number, index:true}
+    }
+  ]
+});
+optionSchema.plugin(uniqueValidator);
+let Option = mongoose.model('Option', optionSchema);
+
+User.on('index', function (error) {
+  console.log(jp);
+  jp.save(function(err){
+    console.log(err);
+    var jp2 = new Model({ phone: "123456"});
+    console.log(jp2);
+    jp2.save(function(err){
+      console.log(err);
+      process.exit();
+    });
+  })
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -82,6 +107,13 @@ app.post('/add-call', (req, res)=>{
   Call.create(req.body, (err, call)=>{
     if(err) return err;
     res.send(call);
+  });
+});
+
+app.post('/delete-call', (req, res)=>{
+  Call.deleteOne(req.body, (err)=>{
+    if (err) return err;
+    res.send(true);
   });
 });
 
@@ -105,7 +137,11 @@ app.get('/get-completed-calls', (req, res)=>{
 
   Call.find({completedAt: {$gte: start, $lt: end}}, (err, calls)=>{
     if(err) return err;
-    res.send(calls);
+    if(calls.length){
+      res.send(calls);
+    } else {
+      res.send({'error':'no calls were found with that query'});
+    }
   });
 });
 
@@ -131,6 +167,7 @@ app.post('/set-call-as-open', (req, res)=>{
       } else {
         call.isOpen = true;
         call.openBy = req.body.userId;
+        call.startTime = new Date();
         call.save((err2)=>{
           if(err2) return err2;
           res.send(call);
@@ -148,6 +185,7 @@ app.post('/set-call-as-unopen', (req, res)=>{
     if(call){
       call.isOpen = false;
       call.openBy = null;
+      call.startTime = null;
       call.save((err2)=>{
         if(err2) return err2;
         res.send(call);
@@ -159,10 +197,11 @@ app.post('/set-call-as-unopen', (req, res)=>{
 });
 
 app.post('/procedure-completed', (req, res)=>{
-  Call.findOne({_id:req.body.id}, (err, call)=>{
+  Call.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return err;
     if(call){
       call.proceduresDone = req.body.proceduresDone;
+      call.postComments = req.body.postComments;
       call.isOpen = false;
       call.completedBy = Number(req.body.completedBy);
       call.completedAt = new Date();
@@ -219,7 +258,7 @@ app.post('/add-user', (req, res)=>{
   let newUser = req.body;
   User.find().sort({ userId: -1 }).limit(1).exec((err, users)=>{
     if(err) return err;
-    if(User.length){
+    if(users.length){
       newUser.userId = users[0].userId + 1;
       User.create(newUser, (err2, user)=>{
         if(err2) return err2;
@@ -255,7 +294,22 @@ app.get('/get-all-users', (req, res)=>{
 app.get('/get-procedures', (req, res)=>{
   Procedure.find().sort({procedureId:1}).exec((err, procedures)=>{
     if(err) return err;
-    res.send(procedures);
+    if(procedures.length){
+      res.send(procedures);
+    } else {
+      res.send({'error':'there were no procedures to return'});
+    }
+  });
+});
+
+app.get('/get-options', (req, res)=>{
+  Option.find().exec((err, options)=>{
+    if(err) return err;
+    if(options.length){
+      res.send(options);
+    } else {
+      res.send({'error':'there were no options to return'});
+    }
   });
 });
 
@@ -291,12 +345,23 @@ app.get('/seed-super',(req,res)=>{
 });
 
 app.get('/seed-procedures', (req, res)=>{
-  Procedure.create(getProcedureSeed(), (err, procedures) => {
+  Procedure.insertMany(getProcedureSeed(), (err, procedures) => {
     if(err) return err;
     if(procedures){
       res.send(procedures);
     } else {
       res.send({'error':'no procedures exist'})
+    }
+  });
+})
+
+app.get('/seed-options', (req, res)=>{
+  Option.create(getOptionsSeed(), (err, options) => {
+    if(err) return err;
+    if(options){
+      res.send(options);
+    } else {
+      res.send({'error':'no options exist'})
     }
   });
 })
@@ -309,6 +374,40 @@ app.listen(app.get("port"), () => {
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });
 
+function getOptionsSeed(){
+  return {
+    name:'Hospital',
+    inputType:'dropdown',
+    callFieldName:'hospital',
+    options:[
+      {
+        text:'Erlanger Main',
+        value:1
+      },
+      {
+        text:'Erlanger East',
+        value:2
+      },
+      {
+        text:'Erlanger North',
+        value:3
+      },
+      {
+        text:"Erlanger Children's",
+        value:4
+      },
+      {
+        text:"Erlanger Bledsoe",
+        value:5
+      },
+      {
+        text:"Siskin",
+        value:6
+      }
+    ]
+  }
+}
+
 function getProcedureSeed(){
   return [
     {
@@ -317,7 +416,7 @@ function getProcedureSeed(){
       groups:[
         {
           groupName:'Dosage',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'24g',
@@ -339,7 +438,7 @@ function getProcedureSeed(){
         },
         {
           groupName:'Attempts',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'1 Attempt',
@@ -363,7 +462,7 @@ function getProcedureSeed(){
       groups:[
         {
           groupName:'Draw Type',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'From IV',
@@ -377,7 +476,7 @@ function getProcedureSeed(){
         },
         {
           groupName:'Attempts',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'1 Attempt',
@@ -401,7 +500,7 @@ function getProcedureSeed(){
       groups:[
         {
           groupName:'Care Type',
-          selectType:'multi',
+          inputType:'checkbox',
           groupOptions:[
             {
               value:'IV Flushed',
@@ -429,7 +528,7 @@ function getProcedureSeed(){
       groups:[
         {
           groupName:'Reasons',
-          selectType:'multi',
+          inputType:'checkbox',
           groupOptions:[
             {
               value:'Infiltration',
@@ -461,7 +560,7 @@ function getProcedureSeed(){
       groups:[
         {
           groupName:'Access Attempts',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'1 Attempt',
@@ -475,7 +574,7 @@ function getProcedureSeed(){
         },
         {
           groupName:'Deaccess',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'Contaminated',
@@ -493,7 +592,7 @@ function getProcedureSeed(){
         },
         {
           groupName:'Cathflow',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'Initiated',
@@ -513,7 +612,7 @@ function getProcedureSeed(){
       groups:[
         {
           groupName:'Removal',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'Therapy Complete',
@@ -539,7 +638,7 @@ function getProcedureSeed(){
         },
         {
           groupName:'Cathflow',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'Initiated',
@@ -559,7 +658,7 @@ function getProcedureSeed(){
       groups:[
         {
           groupName:'What',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'PICC',
@@ -581,7 +680,7 @@ function getProcedureSeed(){
         },
         {
           groupName:'Why',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'Per Protocol',
@@ -605,7 +704,7 @@ function getProcedureSeed(){
       groups:[
         {
           groupName:'Insertion Type',
-          selectType:'single',
+          inputType:'radio',
           groupOptions:[
             {
               value:'Midline',
@@ -622,6 +721,62 @@ function getProcedureSeed(){
             {
               value:'DL PICC',
               taskId:46
+            }
+          ]
+        },
+        {
+          groupName:'Vessel',
+          inputType:'radio',
+          groupOptions:[
+            {
+              value:'Basilic',
+              taskId:47
+            },
+            {
+              value:'Brachial',
+              taskId:48
+            },
+            {
+              value:'Cephalic',
+              taskId:49
+            },
+            {
+              value:'Internal Jugular',
+              taskId:50
+            }
+          ]
+        },
+        {
+          groupName:'Laterality',
+          inputType:'radio',
+          groupOptions:[
+            {
+              value:'Left',
+              taskId:51
+            },
+            {
+              value:'Right',
+              taskId:52
+            }
+          ]
+        },
+        {
+          groupName:'Insertion Length (in cm)',
+          inputType:'number',
+          groupOptions:[
+            {
+              value:'',
+              taskId:53
+            }
+          ]
+        },
+        {
+          groupName:'Circumference (in cm)',
+          inputType:'number',
+          groupOptions:[
+            {
+              value:'',
+              taskId:54
             }
           ]
         }

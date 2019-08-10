@@ -4,14 +4,16 @@ import './Admin.css';
 import axios from 'axios';
 import moment from 'moment';
 import loadingGif from '../../public/loading.gif';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default class Admin extends Component {
   constructor(props){
     super(props);
     this.state = {
       currentUser:null,
-      startDate:moment().local().format('YYYY-MM-DD'),
-      endDate:moment().local().format('YYYY-MM-DD'),
+      startDate:moment(),
+      endDate:moment(),
       isLoading:false,
       activePage:'date',
       addFullName:'',
@@ -21,16 +23,18 @@ export default class Admin extends Component {
       addValidationErrors:[],
       allUsers:[],
       allProcedures:[],
+      allOptions:[],
       queriedCalls:[]
     }
-    this.startDateSelected = this.startDateSelected.bind(this);
-    this.endDateSelected = this.endDateSelected.bind(this);
     this.submitDateRange = this.submitDateRange.bind(this);
     this.seedProcedures = this.seedProcedures.bind(this);
+    this.seedOptions = this.seedOptions.bind(this);
     this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.addUser = this.addUser.bind(this);
     this.logout = this.logout.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
+    this.startDateChange = this.startDateChange.bind(this);
+    this.endDateChange = this.endDateChange.bind(this);
   }
 
   componentWillMount(){
@@ -81,7 +85,23 @@ export default class Admin extends Component {
 
     axios.get('/get-procedures')
     .then((resp)=>{
-      this.setState({allProcedures:resp.data});
+      if(resp.data.error){
+        console.log(resp.data.error);
+      } else {
+        this.setState({allProcedures:resp.data});
+      }
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+
+    axios.get('/get-options')
+    .then((resp)=>{
+      if(resp.data.error){
+        console.log(resp.data.error);
+      } else {
+        this.setState({allOptions:resp.data});
+      }
     })
     .catch((err)=>{
       console.log(err);
@@ -107,6 +127,7 @@ export default class Admin extends Component {
   seedProcedures(){
     axios.get('/seed-procedures')
     .then((resp)=>{
+      console.log(resp.data);
       if(resp.data.error){
         console.log(resp.data.error);
       } else {
@@ -114,6 +135,21 @@ export default class Admin extends Component {
       }
     })
     .catch((err)=>{
+      console.log(err);
+    })
+  }
+  
+  seedOptions(){
+    axios.get('/seed-options')
+    .then(resp=>{
+      console.log(resp.data);
+      if(resp.data.error){
+        console.log(resp.data.error);
+      } else {
+        this.setState({allOptions:resp.data});
+      }
+    })
+    .catch(err=>{
       console.log(err);
     })
   }
@@ -181,17 +217,17 @@ export default class Admin extends Component {
     this.setState({currentUser:null});
   }
 
-  startDateSelected(date){
+  startDateChange(date){
     console.log(date.target.value);
     this.setState({
-      startDate: date.target.value
+      startDate: date
     });
   }
   
-  endDateSelected(date){
+  endDateChange(date){
     console.log(date.target.value);
     this.setState({
-      endDate: date.target.value
+      endDate: date
     });
   }
 
@@ -253,11 +289,11 @@ export default class Admin extends Component {
                 <div className='vas-admin-date-range-container'>
                   <div className='vas-admin-date-range-inner'>
                     <p className='vas-damin-date-label'>From:</p>
-                    <input type='date' value={this.state.startDate} onChange={this.startDateSelected} />
+                    <DatePicker selected={this.state.startDate} onChange={this.startDateChange} />
                   </div>  
                   <div className='vas-admin-date-range-inner'>
                     <p className='vas-damin-date-label'>To:</p>
-                    <input type='date' value={this.state.endDate} onChange={this.endDateSelected}/>
+                    <DatePicker selected={this.state.endDate} onChange={this.endDateChange} />
                   </div>
                   <button className='vas-admin-date-range-submit' onClick={this.submitDateRange}>Submit</button>
                 </div>
@@ -373,6 +409,7 @@ export default class Admin extends Component {
                 <div className='vas-admin-page-container vas-admin-super-container' data-isactive={this.state.activePage === 'super' ? true : false}>
                   <h3>Super Page</h3>
                   <button onClick={this.seedProcedures}>Seed Procedures</button>
+                  <button onClick={this.seedOptions}>Seed Options</button>
                 </div>
               }
             </div>

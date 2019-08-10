@@ -45,7 +45,14 @@
   width:93%;
 }
 .vas-modal-content-main {
-  width:fit-content;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  white-space: pre-line;
+}
+.vas-modal-message {
+  line-height: 140%;
+  font-size: 120%;
 }
 .vas-modal-content-closeBtn {
   position: absolute;
@@ -108,4 +115,13 @@
 .vas-modal-comment-text{
   margin-left: 10%;
   margin-top:10px;
+}
+.vas-modal-confirmation-container {
+  padding: 10px;
+  display: flex;
+  flex-flow: column;
+}
+.vas-modal-confirmation-btn-container {
+  margin: 0 auto;
+  margin-top: 20px;
 }
