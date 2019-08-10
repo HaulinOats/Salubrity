@@ -258,16 +258,9 @@ app.post('/add-user', (req, res)=>{
 });
 
 app.post('/delete-user', (req, res)=>{
-  User.findOne(req.body, (err, user)=>{
+  User.remove(req.body, (err)=>{
     if(err) return err;
-    if(user){
-      User.remove(req.body, {}, (err2)=>{
-        if(err2) return err2;
-        res.send(true);
-      });
-    } else {
-      res.send({'error':'could not find user to delete'});
-    }
+    res.send(true);
   });
 });
 
