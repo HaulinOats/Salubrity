@@ -78,19 +78,6 @@ let optionSchema = new Schema({
 optionSchema.plugin(uniqueValidator);
 let Option = mongoose.model('Option', optionSchema);
 
-User.on('index', function (error) {
-  console.log(jp);
-  jp.save(function(err){
-    console.log(err);
-    var jp2 = new Model({ phone: "123456"});
-    console.log(jp2);
-    jp2.save(function(err){
-      console.log(err);
-      process.exit();
-    });
-  })
-});
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
