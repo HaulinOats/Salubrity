@@ -22,15 +22,15 @@ let userSchema = new Schema({
   password:{type:String, lowercase:true},
   role:{type:String, default:'user'},
 });
-userSchema.plugin(uniqueValidator);
+userSchema.plugin(uniqueValidator, {message: `Could not insert user based on unique constraint: {PATH} {VALUE} {TYPE}`})
 let User = mongoose.model('User', userSchema);
 
 let callSchema = new Schema({
   hospital:{type:Number, default:null},
   room:{type:String, default:null},
   job:String,
-  preComments:{type:String, default:null},
-  postComments:{type:String, default:null},
+  jobComments:{type:String, default:null},
+  addComments:{type:String, default:null},
   contact:Number,
   createdBy:{type:Number, default:null},
   startTime:{type:Date, default:null},
@@ -41,7 +41,7 @@ let callSchema = new Schema({
   completedAt:{type:Date, default:null, index:true},
   completedBy:{type:Number, default:null}
 })
-callSchema.plugin(uniqueValidator);
+callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
 
 let procedureSchema = new Schema({ 
@@ -61,7 +61,7 @@ let procedureSchema = new Schema({
     }
   ]
 });
-procedureSchema.plugin(uniqueValidator);
+procedureSchema.plugin(uniqueValidator, {message: `Could not insert procedure based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Procedure = mongoose.model('Procedure', procedureSchema);
 
 let optionSchema = new Schema({ 
@@ -75,7 +75,7 @@ let optionSchema = new Schema({
     }
   ]
 });
-optionSchema.plugin(uniqueValidator);
+optionSchema.plugin(uniqueValidator, {message: `Could not insert option based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Option = mongoose.model('Option', optionSchema);
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -192,6 +192,10 @@ app.post('/procedure-completed', (req, res)=>{
       call.isOpen = false;
       call.completedBy = Number(req.body.completedBy);
       call.completedAt = new Date();
+      call.hospital = req.body.hospital;
+      delete call.isOpen;
+      delete call.openBy;
+      delete call.contact;
       call.save((err2)=>{
         if(err2) return err2;
         res.send(call);
@@ -654,7 +658,7 @@ function getProcedureSeed(){
             },
             {
               value:'Midline',
-              taskId:3
+              taskId:39
             }
           ]
         },
@@ -723,6 +727,10 @@ function getProcedureSeed(){
             {
               value:'Internal Jugular',
               taskId:50
+            },
+            {
+              value:'Femoral',
+              taskId:51
             }
           ]
         },
@@ -732,11 +740,11 @@ function getProcedureSeed(){
           groupOptions:[
             {
               value:'Left',
-              taskId:51
+              taskId:52
             },
             {
               value:'Right',
-              taskId:52
+              taskId:53
             }
           ]
         },
@@ -746,7 +754,7 @@ function getProcedureSeed(){
           groupOptions:[
             {
               value:'',
-              taskId:53
+              taskId:54
             }
           ]
         },
@@ -756,7 +764,7 @@ function getProcedureSeed(){
           groupOptions:[
             {
               value:'',
-              taskId:54
+              taskId:55
             }
           ]
         }

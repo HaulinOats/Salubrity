@@ -72,7 +72,7 @@ export default class Modal extends Component {
       contact:this.state.contactNumber,
       createdAt:new Date().toISOString(),
       createdBy:this.state.currentUser.userId,
-      preComments:this.state.comment.length ? this.state.comment : null,
+      jobComments:this.state.comment.length ? this.state.comment : null,
       isOpen:false
     };
 

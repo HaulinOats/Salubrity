@@ -283,3 +283,9 @@
 .vas-home-option-inner label {
   margin-right:15px;
 }
+.vas-home-inner-span[data-procedure="InsertionProcedure"]{
+  display:none;
+}
+.vas-home-inner-span[data-procedure="InsertionProcedure"][data-idx='0']{
+  display:inline;
+}

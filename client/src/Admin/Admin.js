@@ -269,6 +269,10 @@ export default class Admin extends Component {
     if(this.state.currentUser){
       isAdmin = (this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super') ? true : false;
     }
+    let callKeys = [];
+    if(this.state.queriedCalls[0]){
+      callKeys = Object.keys(this.state.queriedCalls[0])
+    }
     return(
       <div className='vas-admin-container'>
         {!isAdmin &&
@@ -306,28 +310,35 @@ export default class Admin extends Component {
                   <table className='vas-table vas-admin-table'>
                     <tbody>
                       <tr>
-                        <th>Job</th>
-                        <th>Comments</th>
-                        <th>Procedures Done</th>
-                        <th>Created At</th>
-                        <th>Completed At</th>
-                        <th>Completed By</th>
+                        {this.state.queriedCalls[0] &&
+                          callKeys.map((itemKey, idx)=>{
+                            return<th key={idx} className={`vas-admin-query-key-${itemKey}`}>{itemKey}</th>
+                          })
+                        }
                       </tr>
                       {this.state.queriedCalls.map((call, idx)=>{
                         return(
-                          <tr className='vas-table-tr' key={idx}>
-                            <td>{call.job}</td>
-                            <td>{call.comment}</td>
-                            <td>
-                              {call.proceduresDone.map((procedure, idx2)=>{
-                                return <span key={idx2}>{procedure}, </span>
-                              })}
-                            </td>
-                            <td>{call.createdAt}</td>
-                            <td>{call.completedAt}</td>
-                            <td>{call.completedBy}</td>
+                          <tr key={idx}>
+                            {callKeys.forEach((key, idx2)=>{
+                              console.log(call);
+                              console.log(key);
+                              console.log(call[key]);
+                              return <td key={idx2} className={`vas-admin-query-key-${key}`}>{call[key]}</td>
+                            })}
                           </tr>
                         )
+                        // <tr className='vas-table-tr' key={idx}>
+                        //   <td>{call.job}</td>
+                        //   <td>{call.comment}</td>
+                        //   <td>
+                        //     {call.proceduresDone.map((procedure, idx2)=>{
+                        //       return <span key={idx2}>{procedure}, </span>
+                        //     })}
+                        //   </td>
+                        //   <td>{call.createdAt}</td>
+                        //   <td>{call.completedAt}</td>
+                        //   <td>{call.completedBy}</td>
+                        // </tr>
                       })
                       }
                     </tbody>

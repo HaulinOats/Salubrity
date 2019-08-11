@@ -12,8 +12,6 @@ export default class Home extends Component{
     this.state = {
       modalIsOpen:false,
       endTaskSliderValue:0,
-      pivSelected:false,
-      labSelected:false,
       userId:'',
       modalTitle:'',
       modalMessage:'',
@@ -27,8 +25,11 @@ export default class Home extends Component{
       proceduresDone:[],
       currentUser:null,
       procedureVerified:false,
-      postComments:'',
-      hospital:''
+      addComments:'',
+      hospital:'',
+      insertionTypeSelected:false,
+      insertionLength:'',
+      circumference:''
     }
     this.toggleHandler = this.toggleHandler.bind(this);
     this.sliderChange = this.sliderChange.bind(this);
@@ -36,7 +37,7 @@ export default class Home extends Component{
     this.closeModal = this.closeModal.bind(this);
     this.getConfirmation = this.getConfirmation.bind(this);
     this.getAddedCall = this.getAddedCall.bind(this);
-    this.takePicture = this.takePicture.bind(this);
+    // this.takePicture = this.takePicture.bind(this);
     this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.handleOpenRecordPress = this.handleOpenRecordPress.bind(this);
     this.handleOpenRecordRelease = this.handleOpenRecordRelease.bind(this);
@@ -134,28 +135,28 @@ export default class Home extends Component{
     })
   }
 
-  takePicture(){
-    var video = document.getElementById('vas-home-label-video');
-    video.setAttribute('playsinline', '');
-    video.setAttribute('autoplay', '');
-    video.setAttribute('muted', '');
-    video.style.width = '350px';
-    video.style.height = '200px';
+  // takePicture(){
+  //   var video = document.getElementById('vas-home-label-video');
+  //   video.setAttribute('playsinline', '');
+  //   video.setAttribute('autoplay', '');
+  //   video.setAttribute('muted', '');
+  //   video.style.width = '350px';
+  //   video.style.height = '200px';
     
-    /* Setting up the constraint */
-    var facingMode = "environment"; //user for user facing camera
-    var constraints = {
-      audio: false,
-      video: {
-       facingMode: facingMode
-      }
-    };
+  //   /* Setting up the constraint */
+  //   var facingMode = "environment"; //user for user facing camera
+  //   var constraints = {
+  //     audio: false,
+  //     video: {
+  //      facingMode: facingMode
+  //     }
+  //   };
     
-    /* Stream it to video element */
-    navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
-      video.srcObject = stream;
-    });
-  }
+  //   /* Stream it to video element */
+  //   navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
+  //     video.srcObject = stream;
+  //   });
+  // }
 
   getOpenCalls(){
     axios.get('/get-open-calls')
@@ -214,7 +215,9 @@ export default class Home extends Component{
         this.setState({queueItems:resp.data}, ()=>{
           for(let i = 0; i < this.state.queueItems.length; i++){
             if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
-              this.setState({activeRecord:this.state.queueItems[i]});
+              this.setState({activeRecord:this.state.queueItems[i]}, ()=>{
+                document.getElementById('active-tab').click();
+              });
               break;
             }
           }
@@ -245,11 +248,12 @@ export default class Home extends Component{
         proceduresDone.push(Number(el.id));
       });
       if(this.procedureVerified(proceduresDone)){
+        console.log(this.state.hospital);
         axios.post('/procedure-completed', {
           _id:this.state.activeRecord._id,
           proceduresDone,
           completedBy:Number(this.state.currentUser.userId),
-          postComments:this.state.postComments.length ? this.state.postComments : null,
+          addComments:this.state.addComments.length ? this.state.addComments : null,
           hospital:Number(this.state.hospital)
         })
         .then(resp=>{
@@ -288,6 +292,9 @@ export default class Home extends Component{
     if(!this.state.hospital.length || this.state.hospital === 'default'){
       errors += '- You must select a hospital\n';
     }
+    if(this.state.insertionTypeSelected && (!this.state.insertionLength.length || !this.state.circumference.length)){
+      errors += '- You must enter values for Insertion Length and Circumference\n'
+    }
     if(errors.length){
       this.setState({
         modalIsOpen:true, 
@@ -305,21 +312,6 @@ export default class Home extends Component{
       this.setState({endTaskSliderValue:0})
       e.target.value = 0;
     }
-  }
-
-  resetPage(){
-    var checkboxesAndRadioBtns = document.querySelectorAll('input:checked');
-    checkboxesAndRadioBtns.forEach((el)=>{
-      el.checked = false;
-    });
-  }
-
-  pivSelected(){
-    document.getElementById('piv-attempt-1').checked = true;
-  }
-
-  labDrawSelected(){
-    document.getElementById('lab-draw-attempt-1').checked = true;
   }
 
   closeModal(){
@@ -421,17 +413,35 @@ export default class Home extends Component{
   selectButton(e, procedureName, groupName){
     if(procedureName === 'PIV Start'){
       if(groupName === 'Dosage'){
-        selectFirstButtonNextGroup();
+        checkSiblings();
       }
     }
     if(procedureName === 'Lab Draw'){
       if(groupName === 'Draw Type'){
-        selectFirstButtonNextGroup();
+        checkSiblings();
       }
     }
-    function selectFirstButtonNextGroup(){
-      let nextGroupContainer = e.target.closest('.vas-home-inner-span').nextSibling;
-      nextGroupContainer.querySelector('.vas-home-select-input').checked = true;
+    if(procedureName === 'Dressing Change'){
+      if(groupName === 'What'){
+        checkSiblings();
+      }
+    }
+    if(procedureName === 'Insertion Procedure'){
+      if(groupName === 'Insertion Type'){
+        this.setState({insertionTypeSelected:true});
+        document.querySelectorAll('.vas-home-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
+          el.style.display = 'inline';
+        })
+        checkSiblings();
+      }
+    }
+
+    function checkSiblings(){
+      let groupContainer = e.target.closest('.vas-home-inner-span');
+      while(groupContainer.nextSibling){
+        groupContainer.nextSibling.querySelector('.vas-home-select-input').checked = true;
+        groupContainer = groupContainer.nextSibling;
+      }
     }
   }
 
@@ -514,9 +524,9 @@ export default class Home extends Component{
                       return(
                         <tr key={index} className={'vas-home-table-tr vas-table-tr vas-table-tbody-row ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
                           <th>{item.room}</th>
-                          <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.preComments}</td>
+                          <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.jobComments}</td>
                           <td>{item.contact}</td>
-                          <td><Moment format='HH:mm'>{item.createdAt}</Moment></td>
+                          <td><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></td>
                           <td>{item.openBy ? item.openBy : ''}</td>
                         </tr>
                       )
@@ -545,7 +555,7 @@ export default class Home extends Component{
                       let startTime = moment(this.getDateFromObjectId(item._id));
                       let responseTime = moment(item.startTime);
                       let responseHours = responseTime.diff(startTime, 'hours');
-                      let responseMinutes = responseTime.diff(startTime, 'minutes');
+                      let responseMinutes = responseTime.diff(startTime, 'minutes') % 60;
                       // let completionTime = moment(item.completedAt);
                       // let completionHours = completionTime.diff(startTime, 'hours');
                       // let completedMinutes = completionTime.diff(startTime, 'minutes');
@@ -569,7 +579,7 @@ export default class Home extends Component{
                   <header className="vas-home-record-header">
                     <p className="vas-home-record-header-text"><b>{this.state.activeRecord.job}</b></p>
                     <p className="vas-home-record-header-subtext">Room: <b>{this.state.activeRecord.room}</b></p>
-                    <button className="vas-home-record-header-btn" onClick={this.resetPage}>Reset Form</button>
+                    <button className="vas-home-record-header-btn" onClick={e=>{window.location.reload()}}>Reset Form</button>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
                     <button className='vas-home-record-header-btn vas-warn-btn' onClick={this.deleteCall}>Delete Call</button>
                     <div className='vas-home-options-container'>
@@ -590,14 +600,14 @@ export default class Home extends Component{
                       }  
                     </div>
                   </header>
-                  {this.state.activeRecord.preComments &&
+                  {this.state.activeRecord.jobComments &&
                     <div className="vas-home-inner-container vas-home-inner-container-main-comment">
                       <header className="vas-home-inner-container-header">
                         <p>Procedure Comments</p>
                       </header>
                       <div className="vas-home-inner-container-main">
                         <div className="vas-home-inner-container-row">
-                          <p className='vas-home-comment'>{this.state.activeRecord.preComments}</p>
+                          <p className='vas-home-comment'>{this.state.activeRecord.jobComments}</p>
                         </div>
                       </div>
                     </div>
@@ -613,7 +623,7 @@ export default class Home extends Component{
                             {
                               procedure.groups.map((group, idx2)=>{
                                 return(
-                                  <span className='vas-home-inner-span' key={idx2}>
+                                  <span className='vas-home-inner-span' data-procedure={procedure.name.replace(/\s+/g, '')} data-idx={idx2} key={idx2}>
                                     {group.groupName === 'Cathflow' &&
                                       <button className='vas-home-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-home-important-hide')}}>{group.groupName}</button>
                                     }
@@ -649,7 +659,7 @@ export default class Home extends Component{
                       <p>Additional Comments</p>
                     </header>
                     <div className='vas-home-inner-container-main'>
-                      <textarea className='vas-home-post-comments' value={this.state.postComments} onChange={e=>{this.setState({postComments:e.target.value})}}></textarea>
+                      <textarea className='vas-home-post-comments' value={this.state.addComments} onChange={e=>{this.setState({addComments:e.target.value})}}></textarea>
                     </div>
                   </div>
                   {/* <div className='vas-home-inner-container'>
