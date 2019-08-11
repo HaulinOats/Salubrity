@@ -70,8 +70,19 @@
   border-bottom:none;
 }
 .vas-home-nav-item {
-  margin-right:3px;
-  margin-bottom:-2px !important;
+  display: inline;
+  background: darkcyan;
+  padding: 5px 10px 6px 10px;
+  margin-right: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  color: lightgrey;
+  cursor: pointer;
+  line-height: 30px;
+}
+.vas-home-nav-item[data-isactive='true']{
+  background:cadetblue;
+  color:white;
 }
 .vas-home-nav-link {
   border:solid 2px lightgrey;
@@ -81,6 +92,12 @@
 }
 .vas-home-tabContent{
     
+}
+.vas-home-page-container {
+  display:none;
+}
+.vas-home-page-container[data-isactive='true']{
+  display:block;
 }
 .vas-nav-link {
     cursor:pointer;

@@ -10,6 +10,7 @@ export default class Home extends Component{
   constructor(props){
     super(props);
     this.state = {
+      activeHomeTab:'queue',
       modalIsOpen:false,
       endTaskSliderValue:0,
       userId:'',
@@ -50,21 +51,27 @@ export default class Home extends Component{
   
   componentWillMount(){
     const storagecurrentUser = localStorage.getItem('currentUser');
+    const storageActiveTab = localStorage.getItem('activeHomeTab');
     if(this.isValidStorageItem(storagecurrentUser)){
       this.setState({currentUser:JSON.parse(storagecurrentUser)});
+    }
+    if(this.isValidStorageItem(storageActiveTab)){
+      this.setState({activeHomeTab:JSON.parse(storageActiveTab)});
     }
     setTimeout(()=>{this.stateLoadCalls()}, 0);
   }
 
   componentDidMount() {
     window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
-    if(this.state.activeRecord){
-      document.getElementById('active-tab').click();
-    }
   }
 
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.handleWindowBeforeUnload);
+  }
+
+  handleWindowBeforeUnload(){
+    localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
+    localStorage.setItem('activeHomeTab', JSON.stringify(this.state.activeHomeTab));
   }
 
   isValidStorageItem(storageItem){
@@ -114,10 +121,6 @@ export default class Home extends Component{
 
   getDateFromObjectId(objId){
     return new Date(parseInt(objId.substring(0, 8), 16) * 1000);
-  }
-
-  handleWindowBeforeUnload(){
-    localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
   }
 
   handleOpenRecordPress () {
@@ -206,18 +209,14 @@ export default class Home extends Component{
   getActiveCalls(){
     axios.get('/get-active-calls')
     .then((resp)=>{
+      console.log(resp.data);
       if(resp.data.error){
         console.log(resp.data.error);
-        if(resp.data.placeholderData){
-          this.setState({queueItems:resp.data.placeholderData, activeRecord:null});
-        }
       } else {
         this.setState({queueItems:resp.data}, ()=>{
           for(let i = 0; i < this.state.queueItems.length; i++){
             if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
-              this.setState({activeRecord:this.state.queueItems[i]}, ()=>{
-                document.getElementById('active-tab').click();
-              });
+              this.setState({activeRecord:this.state.queueItems[i]});
               break;
             }
           }
@@ -266,13 +265,13 @@ export default class Home extends Component{
               modalMessage:'Procedure was completed. Returning to queue.',
               modalIsOpen:true,
             }, ()=>{
-              document.getElementById('queue-tab').click();
               setTimeout(()=>{
                 this.setState({
                 modalIsOpen:false,
                 modalTitle:'',
                 modalMessage:'',
-                endTaskSliderValue:0
+                endTaskSliderValue:0,
+                activeHomeTab:'queue'
               })}, 2000);
             });
           }
@@ -330,9 +329,7 @@ export default class Home extends Component{
       })
       .then(resp=>{
         if(resp.data){
-          this.setState({activeRecord:null}, ()=>{
-            document.getElementById('queue-tab').click();
-          });
+          this.setState({activeRecord:null, activeHomeTab:'queue'});
         }
       })
       .catch(err=>{
@@ -358,10 +355,7 @@ export default class Home extends Component{
         if(resp.data.error){
           console.log(resp.data.error);
         } else {
-          this.setState({activeRecord:resp.data});
-          setTimeout(()=>{
-            document.getElementById('active-tab').click();
-          }, 0);
+          this.setState({activeRecord:resp.data, activeHomeTab:'active'});
         }
       })
       .catch((err)=>{
@@ -386,9 +380,7 @@ export default class Home extends Component{
       } else {
         console.log(resp.data);
         console.log('call was returned to queue');
-        this.setState({activeRecord:null}, ()=>{
-          document.getElementById('queue-tab').click();
-        });
+        this.setState({activeRecord:null, activeHomeTab:'queue'});
       }
     })
     .catch((err)=>{
@@ -484,21 +476,15 @@ export default class Home extends Component{
                 </ul>
               </span>
             </header>
-            <ul className="nav nav-tabs vas-home-nav-tabs" id="myTab" role="tablist">
-              <li className="nav-item vas-home-nav-item">
-                <a className="nav-link vas-nav-link active" id="queue-tab" data-toggle="tab" href="#queue" role="tab" aria-controls="queue" aria-selected="true" onClick={e=>{this.getActiveCalls()}}>Queue</a>
-              </li>
-              <li className="nav-item vas-home-nav-item">
-                  <a className="nav-link vas-nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false" onClick={e=>{this.getCompletedCalls()}}>Complete</a>
-              </li>
+            <ul className='vas-home-nav-tabs'>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setState({activeHomeTab:'queue'})}}>Queue</li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setState({activeHomeTab:'complete'})}}>Completed</li>
               {this.state.activeRecord &&
-                <li className="nav-item vas-home-nav-item">
-                  <a className="nav-link vas-nav-link" id="active-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Active Record</a>
-                </li>
+                <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setState({activeHomeTab:'active'})}}>Active/Open</li>
               }
             </ul>
-            <div className="tab-content vas-home-tabContent" id="myTabContent">
-              <div className="tab-pane fade show active" id="queue" role="tabpanel" aria-labelledby="queue-tab">
+            <div className="vas-home-tabContent">
+              <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'queue' ? true : false}>
                 <table className="vas-home-table vas-table table">
                 <colgroup>
                   <col span="1" style={{width: '10%'}}></col>
@@ -534,7 +520,7 @@ export default class Home extends Component{
                   </tbody>
                 </table>
               </div>
-              <div className="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+              <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'complete' ? true : false}>
                 <table className="vas-home-table vas-queue-table table">
                   <thead className="vas-queue-thead">
                     <tr className='vas-table-thead-row'>
@@ -575,7 +561,7 @@ export default class Home extends Component{
                 </table>
               </div>
               {this.state.activeRecord &&
-                <div className="tab-pane fade show" id="home" role="tabpanel" aria-labelledby="active-tab">
+                <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                   <header className="vas-home-record-header">
                     <p className="vas-home-record-header-text"><b>{this.state.activeRecord.job}</b></p>
                     <p className="vas-home-record-header-subtext">Room: <b>{this.state.activeRecord.room}</b></p>
