@@ -96,6 +96,7 @@
   transform: scale(1.7);
 }
 .vas-admin-date-range-submit {
+  display:block;
   border: none;
   padding: 9px;
   border-radius: 5px;
@@ -170,4 +171,106 @@
   width: fit-content;
   margin: 0 auto;
   cursor: pointer;
+}
+.vas-admin-query-procedure-names {
+  white-space: nowrap;
+}
+
+.vas-admin-custom-table {
+  width:100%;
+}
+.vas-admin-custom-table-header {
+
+}
+.vas-admin-custom-table-item {
+  display:flex;
+  border-top:solid 2px black;
+  background:lightblue;
+  font-size:85%;
+}
+.vas-admin-custom-table-td {
+  
+}
+.vas-admin-custom-table-item-column {
+  display:inline-block;
+  padding:1%;
+}
+.vas-admin-custom-table-item-column-1 {
+  width:10%;
+}
+.vas-admin-custom-table-item-column-2 {
+  width:25%;
+}
+.vas-admin-custom-table-item-column-2
+.vas-admin-custom-table-td {
+  border-bottom: dotted 1px black;
+  padding-bottom: 2px;
+}
+.vas-admin-custom-table-item-column-2
+.vas-admin-custom-table-td:last-child {
+  border:none;
+}
+.vas-admin-custom-table-item-column-3 {
+  display:inline-block;
+  width:40%;
+}
+.vas-admin-custom-table-item-column-4 {
+  display:inline-block;
+  width:25%;
+}
+.vas-admin-custom-table-item-column-4
+.vas-admin-left-column {
+  display:inline-block;
+  font-size:90%;
+}
+.vas-admin-custom-table-item-column-4
+.vas-admin-right-column {
+  float:right;
+}
+.vas-admin-custom-table-item-column-4
+.vas-admin-custom-table-td {
+  border-bottom:dotted 1px black;
+  padding:1px 0;
+}
+.vas-admin-custom-table-item-column-4
+.vas-admin-custom-table-td:last-child {
+  border:none;
+}
+.vas-admin-custom-item-subfield,
+.vas-admin-custom-item-subvalue {
+  display:inline-block;
+}
+.vas-admin-custom-item-subfield {
+  font-weight: bold;
+  font-size: 90%;
+  color: midnightblue;
+}
+.vas-admin-custom-item-subvalue {
+  float:right;
+  text-transform: capitalize;
+}
+.vas-admin-col-3-header {
+  font-size: 85%;
+  color: midnightblue;
+  font-weight: bold;
+}
+.vas-admin-query-procedure-names {
+  font-size: 80%;
+  border-bottom: dotted 1px black;
+  width: 95%;
+  font-weight: bold;
+}
+.vas-admin-query-procedure-container {
+  width:33%;
+  display: inline-table;
+}
+.vas-admin-custom-table-date {
+
+}
+.vas-admin-query-item-container {
+  font-size:80%;
+}
+.vas-admin-filter-container {
+  display:inline-block;
+  margin-right:15px;
 }

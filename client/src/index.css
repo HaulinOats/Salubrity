@@ -293,3 +293,10 @@ button:active {
   background:red;
   color:white;
 }
+.vas-custom-input {
+  border:none;
+  border-radius:4px;
+  height:40px;
+  padding-left:5px;
+  box-shadow: inset 1px 1px 1px black;
+}

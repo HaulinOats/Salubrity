@@ -54,7 +54,6 @@
   padding: 10px 10px;
   background-color: #5f9ea0;
   color: #fff;
-  border-bottom: solid 2px darkseagreen;
 }
 .vas-home-record-header-text{
   font-size:160%;
@@ -287,10 +286,14 @@
   border-radius:4px;
 }
 .vas-home-options-container {
-  margin-top:20px;
+  padding:10px;
+  background:skyblue;
 }
 .vas-home-option-inner {
-  font-size:120%;
+  font-size: 115%;
+  padding: 10px 0px;
+  display: inline-block;
+  margin-right: 15px;
 }
 .vas-home-option-inner select{
   height: 40px;
@@ -298,11 +301,31 @@
   cursor: pointer;
 }
 .vas-home-option-inner label {
-  margin-right:15px;
+  margin-right:10px;
 }
 .vas-home-inner-span[data-procedure="InsertionProcedure"]{
   display:none;
 }
 .vas-home-inner-span[data-procedure="InsertionProcedure"][data-idx='0']{
   display:inline;
+}
+.vas-home-refresh {
+  position: relative;
+  top: 2px;
+  width: 15px;
+  margin-left: 10px;
+  transform: rotate(0);
+}
+.vas-refresh-animate {
+  animation-duration: 2s;
+  animation-name:refreshAnimate;
+}
+
+@keyframes refreshAnimate {
+  from {
+    transform: rotate(0deg)
+  }
+  to {
+    transform:rotate(360deg)
+  }
 }
