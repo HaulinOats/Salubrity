@@ -337,5 +337,5 @@
   margin-top:10px;
 }
 .vas-admin-query-dropdown-2 option {
-  text-decoration: capitalize;
+  text-transform: capitalize;
 }
