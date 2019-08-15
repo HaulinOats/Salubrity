@@ -613,7 +613,7 @@ function getItemsSeed(){
     {
       itemId:12,
       procedureName:'Lab Draw',
-      groupName:'Attempts',
+      groupName:'Ultrasound',
       value:'US Used',
       isCustom:false
     },
@@ -956,7 +956,12 @@ function getProcedureSeed(){
         {
           groupName:'Attempts',
           inputType:'radio',
-          groupItems:[10,11,12]
+          groupItems:[10,11]
+        },
+        {
+          groupName:'Ultrasound',
+          inputType:'radio',
+          groupItems:[12]
         }
       ]
     },

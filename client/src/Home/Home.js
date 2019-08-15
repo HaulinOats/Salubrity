@@ -552,8 +552,11 @@ export default class Home extends Component{
     function checkSiblings(){
       let groupContainer = e.target.closest('.vas-home-inner-span');
       while(groupContainer.nextSibling){
-        if(groupContainer.nextSibling.querySelector('.vas-home-select-input').id !== '7'){
-          groupContainer.nextSibling.querySelector('.vas-home-select-input').checked = true;
+        let nextSib =  groupContainer.nextSibling.querySelector('.vas-home-select-input');
+        if(nextSib.id === '7' || nextSib.id === '12'){
+          nextSib.checked = false;
+        } else {
+          nextSib.checked = true;
         }
         groupContainer = groupContainer.nextSibling;
       }
