@@ -808,7 +808,7 @@ export default class Admin extends Component {
                     <option value='false'>No</option>
                     <option value='true'>Yes</option>
                   </select>
-                  <p className='vas-admin-add-user-notes'>Contact ID will automatically be created once new user is added (auto-incrementing)</p>
+                  <p className='vas-admin-add-user-notes'>User ID will automatically be created once new user is added (auto-incrementing)</p>
                   <button className='vas-admin-create-user' onClick={this.addUser}>Add User</button>
                 </div>
                 <div className='vas-admin-remove-user-container'>
