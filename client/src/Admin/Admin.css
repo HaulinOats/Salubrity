@@ -187,14 +187,11 @@
   width:100%;
 }
 .vas-admin-custom-table-header {
-  display: flex;
-  place-content: flex-end;
-  align-items: center;
   height: 35px;
   background: cadetblue;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  padding: 0 5px;
+  padding: 5px;
   color: white;
 }
 .vas-admin-no-calls-container {
