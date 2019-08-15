@@ -4,9 +4,9 @@ import './Admin.css';
 import axios from 'axios';
 import moment from 'moment';
 import Moment from 'react-moment';
-import loadingGif from '../../public/loading.gif';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import loadingGif from '../../public/loading.gif';
 
 export default class Admin extends Component {
   constructor(props){
@@ -34,6 +34,7 @@ export default class Admin extends Component {
       firstFilterValue:'',
       secondFilterValue:'',
       secondDropdownArr:[],
+      addHospitalName:''
     }
     this.submitDateRange = this.submitDateRange.bind(this);
     this.seedProcedures = this.seedProcedures.bind(this);
@@ -45,6 +46,9 @@ export default class Admin extends Component {
     this.loginCallback = this.loginCallback.bind(this);
     this.startDateChange = this.startDateChange.bind(this);
     this.endDateChange = this.endDateChange.bind(this);
+    this.sortByOnChange = this.sortByOnChange.bind(this);
+    this.hospitalInputChange = this.hospitalInputChange.bind(this);
+    this.addHospital = this.addHospital.bind(this);
   }
 
   componentWillMount(){
@@ -85,8 +89,8 @@ export default class Admin extends Component {
   }
 
   stateLoadCalls(){
+    this.setState({isLoading:true});
     this.getAllUsers();
-
     axios.get('/get-procedures')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
@@ -104,6 +108,9 @@ export default class Admin extends Component {
     })
     .catch((err)=>{
       console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
     })
 
     axios.get('/get-options')
@@ -124,6 +131,9 @@ export default class Admin extends Component {
     .catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
 
     axios.get('/get-items')
     .then((resp)=>{
@@ -137,14 +147,14 @@ export default class Admin extends Component {
         this.setState({
           allItems:resp.data,
           itemsById:items
-        }, ()=>{
-          console.log(this.state.allItems);
-          console.log(this.state.itemsById);
         });
       }
     })
     .catch((err)=>{
       console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
     })
 
     setTimeout(()=>{
@@ -178,9 +188,13 @@ export default class Admin extends Component {
     }).catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   seedProcedures(){
+    this.setState({isLoading:true});
     axios.get('/seed-procedures')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
@@ -192,9 +206,13 @@ export default class Admin extends Component {
     .catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
   
   seedOptions(){
+    this.setState({isLoading:true});
     axios.get('/seed-options')
     .then(resp=>{
       console.log(resp.data);
@@ -207,9 +225,13 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   seedItems(){
+    this.setState({isLoading:true});
     axios.get('/seed-items')
     .then(resp=>{
       console.log(resp.data);
@@ -222,6 +244,9 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   addUser(){
@@ -231,6 +256,7 @@ export default class Admin extends Component {
     }
     if(!validationErrors.length){
       this.setState({addValidationErrors:[]});
+      this.setState({isLoading:true});
       axios.post('/add-user', {
         fullname:this.state.addFullName,
         username:this.state.addUserName.toLowerCase(),
@@ -251,8 +277,12 @@ export default class Admin extends Component {
             allUsers:users
           });
         }
-      }).catch((err)=>{
+      })
+      .catch((err)=>{
         console.log(err);
+      })
+      .finally(()=>{
+        this.setState({isLoading:false});
       })
     } else {
       this.setState({addValidationErrors:validationErrors});
@@ -260,6 +290,7 @@ export default class Admin extends Component {
   }
 
   deleteUser(id){
+    this.setState({isLoading:true});
     axios.post('/delete-user', {_id:id})
     .then((resp)=>{
       console.log('user deleted');
@@ -268,9 +299,22 @@ export default class Admin extends Component {
       } else {
         this.getAllUsers();
       }
-    }).catch((err)=>{
+    })
+    .catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
+  }
+
+  togglePassword(e, shouldShow){
+    e.target.style.display = 'none';
+    if(shouldShow){
+      e.target.nextSibling.style.display = 'block'
+    } else {
+      e.target.previousSibling.style.display = 'block'
+    }
   }
 
   sortColumn(field){
@@ -302,6 +346,7 @@ export default class Admin extends Component {
   }
 
   submitDateRange(){
+    this.setState({isLoading:true});
     axios.post('/get-calls-date-range', {
       startDate:moment(this.state.startDate).startOf('day').toISOString(),
       endDate:moment(this.state.endDate).endOf('day').toISOString()
@@ -313,9 +358,13 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   seedSuper(){
+    this.setState({isLoading:true});
     axios.get('/seed-super')
     .then(resp=>{
       console.log(resp.data);
@@ -323,33 +372,56 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err)
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   filterDropdown(e, whichDropdown){
+    document.querySelector('.vas-admin-custom-table-header-sortby').selectedIndex = 0;
     if(whichDropdown === 1){
-      let filterArr = [];
-      if(e.target.value === 'completedBy'){
-        filterArr = this.state.allUsers;
+      if(e.target.value !== 'default'){
+        let filterArr = [];
+        if(e.target.value === 'completedBy'){
+          filterArr = this.state.allUsers;
+        }
+        if(e.target.value === 'procedureId'){
+          filterArr = this.state.allProcedures;
+        }
+        if(e.target.value === 'hospital'){
+          filterArr = this.state.allOptions[0].options;
+        }
+        this.setState({
+          firstFilterValue:e.target.value,
+          secondFilterValue:'',
+          secondDropdownArr:filterArr,
+          sortBy:'default'
+        });
+      } else {
+        this.resetFilters();
       }
-      if(e.target.value === 'procedureId'){
-        filterArr = this.state.allProcedures;
-      }
-      if(e.target.value === 'hospital'){
-        filterArr = this.state.allOptions[0].options;
-      }
-      this.setState({
-        firstFilterValue:e.target.value,
-        secondFilterValue:'',
-        secondDropdownArr:filterArr
-      });
     }
     if(whichDropdown === 2){
-      this.setState({secondFilterValue:Number(e.target.value)});
+      if(e.target.value !== 'default'){
+        this.setState({secondFilterValue:Number(e.target.value)});
+      } else {
+        this.setState({
+          secondFilterValue:''
+        });
+      }
     }
   }
 
+  resetFilters(){
+    this.setState({
+      firstFilterValue:'',
+      secondFilterValue:'',
+      secondDropdownArr:''
+    });
+  }
+
   queryCallsByProcedure(){
-    console.log('here');
+    this.setState({isLoading:true});
     axios.post('/calls-by-procedure-id', {
       procedureId:Number(this.state.secondFilterValue),
       dateQuery:{
@@ -368,9 +440,41 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
+  }
+
+  queryCallsByString(){
+    this.setState({isLoading:true});
+    axios.post('/calls-containing-value', {
+      query:{
+        key:this.state.firstFilterValue,
+        value:this.state.secondFilterValue
+      },
+      dateQuery:{
+        startDate:moment(this.state.startDate).startOf('day').toISOString(),
+        endDate:moment(this.state.endDate).endOf('day').toISOString()
+      }
+    })
+    .then(resp=>{
+      console.log(resp.data);
+      if(resp.data.error || resp.data._message){
+        this.setState({queriedCalls:[]});
+      } else {
+        this.setState({queriedCalls:resp.data});
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   queryCalls(){
+    document.querySelector('.vas-admin-custom-table-header-sortby').selectedIndex = 0;
     let query = {
       query: {
         key:this.state.firstFilterValue,
@@ -390,7 +494,12 @@ export default class Admin extends Component {
       return this.queryCallsByProcedure();
     }
 
+    if(this.state.firstFilterValue === 'provider'){
+      return this.queryCallsByString();
+    }
+
     console.log(query);
+    this.setState({isLoading:true});
     axios.post('/calls-by-single-criteria', query)
     .then(resp=>{
       console.log(resp.data);
@@ -403,10 +512,14 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   sortQuery(){
-    axios.post('/sort-by-field', {'responseTime':1})
+    this.setState({isLoading:true});
+    axios.post('/sort-by-field', {[this.state.firstFilterValue]:1})
     .then(resp=>{
       console.log(resp.data);
       if(resp.data.error || resp.data._message){
@@ -418,6 +531,9 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   toggleSort(){
@@ -426,11 +542,59 @@ export default class Admin extends Component {
     this.setState({queriedCalls:sortArr});
   }
 
+  customInputKeyUp(e){
+    if(e.which === 13){//Enter
+      if(this.state.secondFilterValue.length){
+        document.querySelector('.vas-admin-search-submit').click();
+      }
+    }
+  }
+
+  sortByOnChange(e){
+    if(e.target.value !== 'default'){
+      let sortArr = this.state.queriedCalls;
+      sortArr.sort((a,b)=>{
+        if(a[e.target.value] < b[e.target.value]) return -1;
+        if(a[e.target.value] > b[e.target.value]) return 1;
+        return 0;
+      })
+      this.setState({queriedCalls:sortArr});
+    }
+  }
+
+  hospitalInputChange(e){
+    this.setState({addHospitalName:e.target.value});
+  }
+
+  addHospital(){
+    this.setState({isLoading:true});
+    axios.post('/add-hospital', {
+      hospitalName:this.state.addHospitalName
+    })
+    .then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        let options = this.state.allOptions;
+        options[0] = resp.data;
+        this.setState({allOptions:options});
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
+  }
+
   render(){
     let isAdmin = false;
     if(this.state.currentUser){
       isAdmin = (this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super') ? true : false;
     }
+    let isSortable = this.state.firstFilterValue === 'responseTime' || this.state.firstFilterValue === 'procedureTime';
+    let isCustomSearch = this.state.firstFilterValue === 'mrn' || this.state.firstFilterValue === 'provider' || this.state.firstFilterValue === 'room';
     return(
       <div className='vas-admin-container'>
         {!isAdmin &&
@@ -442,7 +606,8 @@ export default class Admin extends Component {
               <h2>VAS Tracker Admin Panel</h2>
               <ul className='vas-admin-menu'>
                 <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Query Database</li>
-                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Manage Users</li>
+                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Users</li>
+                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'options' ? true : false} onClick={e=>{this.setState({activePage:'options'})}}>Options</li>
                 {this.state.currentUser.role === 'super' &&
                   <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'super' ? true : false} onClick={e=>{this.setState({activePage:'super'})}}>Super</li>
                 }
@@ -463,12 +628,13 @@ export default class Admin extends Component {
                   </div>
                   <div className='vas-admin-filter-container'>
                     <p>Filters:</p>
-                    <select className='vas-admin-query-dropdown-1' value={this.state.firstFilterValue} onChange={e=>{this.filterDropdown(e, 1)}}>
-                      <option value="">No Filter</option>
+                    <select className='vas-select vas-admin-query-dropdown-1' value={this.state.firstFilterValue} onChange={e=>{this.filterDropdown(e, 1)}}>
+                      <option value="default">No Filter</option>
                       <option value="completedBy">Nurse</option>
                       <option value="hospital">Hospital</option>
                       <option value="mrn">MRN</option>
                       <option value='provider'>Provider</option>
+                      <option value='room'>Room</option>
                       <option value='procedureId'>Procedure</option>
                       <option value='responseTime'>Response Time</option>
                       <option value='procedureTime'>Procedure Time</option>
@@ -477,8 +643,8 @@ export default class Admin extends Component {
                   {this.state.firstFilterValue === 'completedBy' &&
                     <div className='vas-admin-filter-container'>
                       <p>Nurse Name:</p>
-                      <select className='vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
-                        <option value=''>Select User</option>
+                      <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
+                        <option value='default'>Select User</option>
                         {this.state.secondDropdownArr.map((user, idx)=>{
                           return <option key={idx} value={user.userId}>{user.fullname}</option>
                         })}
@@ -488,31 +654,25 @@ export default class Admin extends Component {
                   {this.state.firstFilterValue === 'hospital' &&
                     <div className='vas-admin-filter-container'>
                       <p>Name:</p>
-                      <select className='vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
-                        <option value=''>Select Hospital</option>
+                      <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
+                        <option value='default'>Select Hospital</option>
                         {this.state.secondDropdownArr.map((hospital, idx)=>{
                           return <option key={idx} value={hospital.id}>{hospital.name}</option>
                         })}
                       </select>
                     </div>
                   }
-                  {this.state.firstFilterValue === 'provider' &&
+                  {isCustomSearch &&
                     <div className='vas-admin-filter-container'>
-                      <p>Provider Name:</p>
-                      <input type='text' value={this.state.secondFilterValue} onChange={e=>{this.setState({secondFilterValue:e.target.value})}}/>
-                    </div>
-                  }
-                  {this.state.firstFilterValue === 'mrn' &&
-                    <div className='vas-admin-filter-container'>
-                      <p>Medical Record Number:</p>
-                      <input type='text' value={this.state.secondFilterValue} onChange={e=>{this.setState({secondFilterValue:e.target.value})}}/>
+                      <p>Search:</p>
+                      <input type='text' value={this.state.secondFilterValue} onKeyUp={e=>{this.customInputKeyUp(e)}} onChange={e=>{this.setState({secondFilterValue:e.target.value})}}/>
                     </div>
                   }
                   {this.state.firstFilterValue === 'procedureId' &&
                     <div className='vas-admin-filter-container'>
                       <p>Procedure:</p>
-                      <select value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
-                        <option value=''>Select Procedure</option>
+                      <select className='vas-select' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
+                        <option value='default'>Select Procedure</option>
                         {this.state.secondDropdownArr.map((procedure, idx)=>{
                           return <option key={idx} value={procedure.procedureId}>{procedure.name}</option>
                         })
@@ -520,94 +680,118 @@ export default class Admin extends Component {
                       </select>
                     </div>
                   }
-                  {this.state.firstFilterValue === 'responseTime' &&
+                  {isSortable &&
                     <button onClick={e=>{this.sortQuery()}}>Submit</button>
                   }
                   {this.state.secondFilterValue.length !== 0 &&
-                    <button onClick={e=>{this.queryCalls()}}>Submit</button>
+                    <button className='vas-admin-search-submit' onClick={e=>{this.queryCalls()}}>Submit</button>
                   }
                   {!this.state.firstFilterValue &&
                     <button className='vas-admin-date-range-submit d-inline' onClick={this.submitDateRange}>Submit</button>
                   }
-                  <button className='d-inline' onClick={e=>{this.toggleSort()}}>Reverse Sort</button>
                 </div>
                 <div className='vas-admin-date-query-container'>
                   <div className='vas-admin-custom-table'>
                     <div className='vas-admin-custom-table-body'>
+                      <div className='vas-admin-custom-table-header'>
+                        <p className='d-inline'>Sort By:</p>
+                        <select className='vas-select vas-admin-custom-table-header-sortby' onChange={this.sortByOnChange}>
+                          <option value='default'>Select A Field</option>
+                          <option value='userId'>User</option>
+                          <option value='hospital'>Hospital</option>
+                          <option value='mrn'>MRN</option>
+                          <option value='provider'>Provider</option>
+                          <option value='responseTime'>Response Time</option>
+                          <option value='procedureTime'>Procedure Time</option>
+                        </select>
+                        <button className='vas-admin-reverse-sort-btn float-right' onClick={e=>{this.toggleSort()}}>Reverse Sort</button>
+                      </div>
+                      {!this.state.queriedCalls.length &&
+                        <div className='vas-admin-no-calls-container'>
+                          <p>No calls returned with that query</p>
+                        </div>
+                      }
                       {this.state.queriedCalls.map((call, idx)=>{
-                        let callTime = moment(this.getDateFromObjectId(call._id));
-                        let responseTime = moment(call.startTime);
-                        let responseHours = responseTime.diff(callTime, 'hours');
-                        let responseMinutes = responseTime.diff(callTime, 'minutes') % 60;
-                        let completionTime = moment(call.completedAt);
-                        let completionHours = completionTime.diff(responseTime, 'hours');
-                        let completionMinutes = completionTime.diff(responseTime, 'minutes');
+                        let isComments = call.jobComments || call.addComments;
+                        let responseTimeHr = Math.floor(call.responseTime/3600000) % 24;
+                        let responseTimeMin = Math.floor(call.responseTime/60000) % 60;
+                        let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
+                        let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
                         return(
-                          <div key={idx} className='vas-admin-custom-table-item'>
-                            <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-1'>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
-                            </div>
-                            <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2'>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
-                                <p className='vas-admin-custom-item-subfield'>Hospital:</p>
-                                <p className='vas-admin-custom-item-subvalue'>{this.state.hospitalsById[call.hospital].name}</p>
+                          <div key={idx} className='vas-admin-custom-table-item-outer'>
+                            <div key={idx} className='vas-admin-custom-table-item'>
+                              <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-1'>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
                               </div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
-                                <p className='vas-admin-custom-item-subfield'>Nurse:</p>
-                                <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Default'}</p>
+                              <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2'>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
+                                  <p className='vas-admin-custom-item-subfield'>Hospital:</p>
+                                  <p className='vas-admin-custom-item-subvalue'>{this.state.hospitalsById[call.hospital].name}</p>
+                                </div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
+                                  <p className='vas-admin-custom-item-subfield'>Nurse:</p>
+                                  <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Default'}</p>
+                                </div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
+                                  <p className='vas-admin-custom-item-subfield'>MRN:</p>
+                                  <p className='vas-admin-custom-item-subvalue'>{call.mrn}</p>
+                                </div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
+                                  <p className='vas-admin-custom-item-subfield'>Room:</p>
+                                  <p className='vas-admin-custom-item-subvalue'>{call.room}</p>
+                                </div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
+                                  <p className='vas-admin-custom-item-subfield'>Provider:</p>
+                                  <p className='vas-admin-custom-item-subvalue'>{call.provider}</p>
+                                </div>
                               </div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
-                                <p className='vas-admin-custom-item-subfield'>MRN:</p>
-                                <p className='vas-admin-custom-item-subvalue'>{call.mrn}</p>
-                              </div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
-                                <p className='vas-admin-custom-item-subfield'>Room:</p>
-                                <p className='vas-admin-custom-item-subvalue'>{call.room}</p>
-                              </div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
-                                <p className='vas-admin-custom-item-subfield'>Provider:</p>
-                                <p className='vas-admin-custom-item-subvalue'>{call.provider}</p>
-                              </div>
-                            </div>
-                            <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-3'>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
-                                {call.proceduresDone.map((procedure, idx2)=>{
-                                  return (
-                                    <div className='vas-admin-query-procedure-container' key={idx2}>
-                                      <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
-                                      <div className='vas-admin-query-item-container'>
-                                      {procedure.itemIds && procedure.itemIds.length &&
-                                        procedure.itemIds.map((id, idx3)=>{
-                                          let isCustom = this.state.itemsById[id].isCustom;
-                                          return (
-                                            <p key={idx3} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].groupName + ":" + procedure.customValues[id]}</p>
-                                          )
-                                        })
-                                      }
+                              <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-3'>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
+                                  {call.proceduresDone.map((procedure, idx2)=>{
+                                    return (
+                                      <div className='vas-admin-query-procedure-container' key={idx2}>
+                                        <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
+                                        <div className='vas-admin-query-item-container'>
+                                        {procedure.itemIds && procedure.itemIds.length &&
+                                          procedure.itemIds.map((id, idx3)=>{
+                                            let isCustom = this.state.itemsById[id].isCustom;
+                                            return (
+                                              <p key={idx3} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].groupName + ":" + procedure.customValues[id]}</p>
+                                            )
+                                          })
+                                        }
+                                        </div>
                                       </div>
-                                    </div>
-                                  )
-                                })}
+                                    )
+                                  })}
+                                </div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-jobComment'></div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-addComments'></div>
                               </div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-jobComment'></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-addComments'></div>
+                              <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-4'>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-callTime'><p className='vas-admin-left-column'>Call Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p></div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-startTime'><p className='vas-admin-left-column'>Start Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.startTime}</Moment></p></div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-endTime'><p className='vas-admin-left-column'>End Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.completedAt}</Moment></p></div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Response Time:</p><p className='vas-admin-right-column'>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</p></div>
+                                <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Procedure Time:</p><p className='vas-admin-right-column'>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}{procedureTimeMin + ' Min'}</p></div>
+                              </div>
                             </div>
-                            <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-4'>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-callTime'><p className='vas-admin-left-column'>Call Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-startTime'><p className='vas-admin-left-column'>Start Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.startTime}</Moment></p></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-endTime'><p className='vas-admin-left-column'>End Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.completedAt}</Moment></p></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Response Time:</p><p className='vas-admin-right-column'>{responseHours > 0 ? `${responseHours} Hr` : ''} {responseMinutes} Min</p></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Procedure Time:</p><p className='vas-admin-right-column'>{completionHours > 0 ? `${completionHours} Hr` : ''} {completionMinutes} Min</p></div>
-                            </div>
-                          </div>
+                            {isComments &&
+                              <div className='vas-admin-custom-table-item-comments'>
+                                {call.jobComments && 
+                                  <p className='vas-admin-job-comments'><b>Job Comments:</b> {call.jobComments}</p>
+                                }
+                                {call.addComments &&
+                                  <p className='vas-admin-add-comments'><b>Add'l Comments:</b> {call.addComments}</p>
+                                }
+                              </div>
+                            }
+                          </div>    
                         )
                       })
                       }
                     </div>
                   </div>
-                  {this.state.isLoading &&
-                    <img className='vas-admin-loading-gif' src={loadingGif} alt='loading'/>
-                  }
                 </div>
               </div>
               <div className='vas-admin-page-container vas-admin-users-container' data-isactive={this.state.activePage === 'users' ? true : false}>
@@ -620,7 +804,10 @@ export default class Admin extends Component {
                   <label>Password or PIN</label>
                   <input type='text' placeholder="example: hello123 or 1542" value={this.state.addPassword} onChange={e=>{this.setState({addPassword:e.target.value})}}/>
                   <label>Allow admin access?</label>
-                  <input type='checkbox' checked={this.state.addAdminAccess} onClick={e=>{this.setState({addAdminAccess:!this.state.addAdminAccess})}}/>
+                  <select className='vas-admin-allow-admin-access-dropdown' value={this.state.addAdminAccess} onChange={e=>{this.setState({addAdminAccess:Boolean(e.target.value)})}}>
+                    <option value='false'>No</option>
+                    <option value='true'>Yes</option>
+                  </select>
                   <p className='vas-admin-add-user-notes'>Contact ID will automatically be created once new user is added (auto-incrementing)</p>
                   <button className='vas-admin-create-user' onClick={this.addUser}>Add User</button>
                 </div>
@@ -641,17 +828,53 @@ export default class Admin extends Component {
                         return(
                           <tr key={idx}>
                             <td>{val.userId}</td>
-                            <td>{val.fullname}</td>
+                            <td className='text-capitalize'>{val.fullname}</td>
                             <td>{val.username}</td>
-                            <td>{val.password}</td>
+                            <td>
+                              {val.role !== 'admin' &&
+                                <span className='vas-admin-manage-users-pw'>
+                                  <p onClick={e=>{this.togglePassword(e, true)}}>********</p>
+                                  <p style={{'display':'none'}} onClick={e=>{this.togglePassword(e, false)}}>{val.password}</p>
+                                </span>
+                              }
+                            </td>
                             <td>{val.role}</td>
                             <td className='vas-admin-delete-user'>
-                              <p data-id={val._id} data-index={idx} onClick={e=>{this.deleteUser(val._id)}}>&times;</p>
+                              {val.role !== 'admin' &&
+                                <p data-id={val._id} data-index={idx} onClick={e=>{this.deleteUser(val._id)}}>&times;</p>
+                              }
                             </td>
                           </tr>
                         )
                       })
                       }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className='vas-admin-page-container vas-admin-options-container' data-isactive={this.state.activePage === 'options' ? true : false}>
+                <h3>Modify Options</h3>
+                <div className='vas-admin-options-hospitals-container'>
+                  <h4>Manage Hospital Names</h4>
+                  <div className='vas-admin-hospital-input-container'>
+                    <input className='d-block' type="text" value={this.state.addHospitalName} onChange={this.hospitalInputChange} />
+                    <button className='vas-admin-hospital-input-submit' onClick={this.addHospital}>Add Hospital</button>
+                  </div>
+                  <table className='vas-admin-hospitals-list'>
+                    <tbody>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                      </tr>
+                      {this.state.allOptions && this.state.allOptions[0] &&
+                        this.state.allOptions[0].options.map((option, idx)=>{
+                        return(
+                          <tr key={idx}>
+                            <td>{option.id}</td>
+                            <td>{option.name}</td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -665,6 +888,12 @@ export default class Admin extends Component {
                 </div>
               }
             </div>
+          </div>
+        }
+        {this.state.isLoading && 
+          <div className='vas-loading-container'>
+            <img className='vas-loading-img' src={loadingGif} alt='loading'/>
+            <p className='vas-loading-text'>Loading...</p>
           </div>
         }
       </div>

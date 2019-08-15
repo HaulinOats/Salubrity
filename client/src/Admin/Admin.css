@@ -27,7 +27,10 @@
   padding-bottom: 5px;
 }
 .vas-admin-main-container h4 {
-  
+  font-size: 110%;
+  font-weight: bold;
+  color: midnightblue;
+  margin-bottom: 10px;
 }
 .vas-admin-menu {
 
@@ -172,6 +175,10 @@
   margin: 0 auto;
   cursor: pointer;
 }
+.vas-admin-manage-users-pw {
+  cursor:pointer;
+  user-select: none;
+}
 .vas-admin-query-procedure-names {
   white-space: nowrap;
 }
@@ -180,13 +187,32 @@
   width:100%;
 }
 .vas-admin-custom-table-header {
-
+  display: flex;
+  place-content: flex-end;
+  align-items: center;
+  height: 35px;
+  background: cadetblue;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 0 5px;
+  color: white;
+}
+.vas-admin-no-calls-container {
+  background:lightblue;
+  padding:5px;
+}
+.vas-admin-reverse-sort-btn {
+  padding: 5px 4px;
+  background: lightseagreen;
+  margin-left: 10px;
+}
+.vas-admin-custom-table-item-outer {
+  background:lightblue;
+  border-top:solid 2px black;
+  font-size:85%;
 }
 .vas-admin-custom-table-item {
   display:flex;
-  border-top:solid 2px black;
-  background:lightblue;
-  font-size:85%;
 }
 .vas-admin-custom-table-td {
   
@@ -249,6 +275,18 @@
   float:right;
   text-transform: capitalize;
 }
+.vas-admin-custom-table-item-comments {
+  padding: 5px;
+  font-size: 90%;
+  border-top: solid 1px darkgrey;
+}
+.vas-admin-custom-table-item-comments p{
+  width:50%;
+  display:inline-block;
+}
+.vas-admin-custom-table-item-comments b{
+  font-weight: bold;
+}
 .vas-admin-col-3-header {
   font-size: 85%;
   color: midnightblue;
@@ -273,4 +311,28 @@
 .vas-admin-filter-container {
   display:inline-block;
   margin-right:15px;
+}
+.vas-admin-hospitals-list {
+  background:white;
+  border-top:solid 1px black;
+  border-right:solid 1px black;
+}
+.vas-admin-hospitals-list tr{
+  border-bottom:solid 1px black;
+}
+.vas-admin-hospitals-list th {
+  background:cadetblue;
+  color:white;
+  padding:5px;
+  border-left:solid 1px black;
+}
+.vas-admin-hospitals-list td {
+  border-left:solid 1px black;
+  padding:5px;
+}
+.vas-admin-hospital-input-container {
+  margin-bottom:10px;
+}
+.vas-admin-hospital-input-submit {
+  margin-top:10px;
 }

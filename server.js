@@ -213,6 +213,7 @@ app.post('/procedure-completed', (req, res)=>{
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
       call.mrn = req.body.mrn;
+      call.job = undefined;
       call.isOpen = undefined;
       call.openBy = undefined;
       call.contact = undefined;
@@ -329,10 +330,9 @@ app.get('/get-items', (req, res)=>{
   });
 });
 
-//SUPER
 app.post('/get-calls-date-range', (req, res) =>{
-  console.log(new Date(req.body.startDate));
-  console.log(new Date(req.body.endDate));
+  // console.log(new Date(req.body.startDate));
+  // console.log(new Date(req.body.endDate));
   Call.find({completedAt: {
     $gte: new Date(req.body.startDate),
     $lt: new Date(req.body.endDate)
@@ -347,8 +347,26 @@ app.post('/get-calls-date-range', (req, res) =>{
   // });
 });
 
+app.post('/calls-containing-value', (req, res)=>{
+  Call.find({
+    completedAt: {
+      $gte: new Date(req.body.dateQuery.startDate),
+      $lt: new Date(req.body.dateQuery.endDate)
+    },
+    [req.body.query.key]:{
+      $regex:req.body.query.value
+    }
+  }, (err, calls)=>{
+    if(err) res.send(err);
+    if(calls.length){
+      res.send(calls);
+    } else {
+      res.send({'error':`no calls returned for query`});
+    }
+  })
+})
+
 app.post('/calls-by-procedure-id', (req, res)=>{
-  console.log(req.body);
   Call.find({
     completedAt: {
       $gte: new Date(req.body.dateQuery.startDate),
@@ -368,7 +386,6 @@ app.post('/calls-by-procedure-id', (req, res)=>{
 });
 
 app.post('/calls-by-single-criteria', (req, res)=>{
-  console.log(req.body);
   Call.find({
     completedAt: {
       $gte: new Date(req.body.dateQuery.startDate),
@@ -386,7 +403,6 @@ app.post('/calls-by-single-criteria', (req, res)=>{
 });
 
 app.post('/sort-by-field', (req, res)=>{
-
   Call.find().sort(req.body).exec((err, calls)=>{
     if(err) res.send(err);
     if(calls){
@@ -397,6 +413,25 @@ app.post('/sort-by-field', (req, res)=>{
   })
 });
 
+app.post('/add-hospital', (req, res)=>{
+  Option.findOne({callFieldName:'hospital'}, (err, hospitals)=>{
+    if(err) res.send(err);
+    if(hospitals){
+      hospitals.options.push({
+        id:hospitals.options.length + 1,
+        name:req.body.hospitalName
+      })
+      hospitals.save(err2=>{
+        if(err2) res.send(err2);
+        res.send(hospitals);
+      })
+    } else {
+      res.send({'error':'error getting hospital data'});
+    }
+  })
+})
+
+//SUPER
 app.get('/seed-super',(req,res)=>{
   User.create({
     fullname:'Brett Connolly',

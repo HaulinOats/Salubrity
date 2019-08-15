@@ -5,6 +5,7 @@ import axios from 'axios';
 import Moment from 'react-moment';
 import moment from 'moment';
 import './Home.css';
+import loadingGif from '../../public/loading.gif';
 import refreshImg from '../../public/refresh.png';
 
 export default class Home extends Component{
@@ -12,6 +13,7 @@ export default class Home extends Component{
     super(props);
     this.state = {
       activeHomeTab:'queue',
+      isLoading:false,
       modalIsOpen:false,
       endTaskSliderValue:0,
       userId:'',
@@ -147,6 +149,7 @@ export default class Home extends Component{
   }
 
   getOpenCalls(){
+    this.setState({isLoading:true});
     axios.get('/get-open-calls')
     .then((resp)=>{
       console.log(resp.data);
@@ -159,9 +162,13 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   getProcedureData(){
+    this.setState({isLoading:true});
     axios.get('/get-procedures')
     .then((resp)=>{
       console.log(resp.data);
@@ -174,9 +181,13 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   getOptionsData(){
+    this.setState({isLoading:true});
     axios.get('/get-options')
     .then((resp)=>{
       console.log(resp.data);
@@ -189,9 +200,13 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   getItemsData(){
+    this.setState({isLoading:true});
     axios.get('/get-items')
     .then((resp)=>{
       console.log(resp.data);
@@ -208,9 +223,13 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   getCompletedCalls(){
+    this.setState({isLoading:true});
     axios.get('/get-completed-calls')
     .then((resp)=>{
       console.log(resp.data);
@@ -223,9 +242,13 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
     })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   getActiveCalls(){
+    this.setState({isLoading:true});
     axios.get('/get-active-calls')
     .then((resp)=>{
       console.log(resp.data);
@@ -250,6 +273,9 @@ export default class Home extends Component{
     })
     .catch((err)=>{
       console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
     })
   }
 
@@ -285,6 +311,7 @@ export default class Home extends Component{
         let callTime = this.getDateFromObjectId(this.state.activeRecord._id);
         let startTime = new Date(this.state.activeRecord.startTime);
 
+        this.setState({isLoading:true});
         axios.post('/procedure-completed', {
           _id:this.state.activeRecord._id,
           proceduresDone:proceduresArr,
@@ -316,6 +343,9 @@ export default class Home extends Component{
         })
         .catch((err)=>{
           console.log(err);
+        })
+        .finally(()=>{
+          this.setState({isLoading:false});
         })
       }
     }
@@ -400,6 +430,7 @@ export default class Home extends Component{
     if(isConfirmed){
       if(this.state.confirmationType){
         if(this.state.confirmationType === 'delete-call'){
+          this.setState({isLoading:true});
           axios.post('/delete-call', {
             _id:this.state.activeRecord._id
           })
@@ -413,6 +444,9 @@ export default class Home extends Component{
           .catch(err=>{
             console.log(err);
             alert('error deleting record');
+          })
+          .finally(()=>{
+            this.setState({isLoading:false});
           })
         }
         if(this.state.confirmationType === 'reset-page'){
@@ -430,6 +464,7 @@ export default class Home extends Component{
 
   selectJob(job){
     if(!this.state.activeRecord){
+      this.setState({isLoading:true});
       axios.post('/set-call-as-open', {
         _id:job._id,
         userId:this.state.currentUser.userId
@@ -444,6 +479,9 @@ export default class Home extends Component{
       .catch((err)=>{
         console.log(err);
       })
+      .finally(()=>{
+        this.setState({isLoading:false});
+      })
     } else {
       this.setState({
         modalIsOpen:true,
@@ -454,6 +492,7 @@ export default class Home extends Component{
   }
 
   returnToQueue(){
+    this.setState({isLoading:true});
     axios.post('/set-call-as-unopen', {
       _id:this.state.activeRecord._id
     })
@@ -466,6 +505,9 @@ export default class Home extends Component{
     })
     .catch((err)=>{
       console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
     })
   }
 
@@ -787,6 +829,12 @@ export default class Home extends Component{
                 modalMessage={this.state.modalMessage}
                 toggleModal={this.toggleHandler}/>
             }
+          </div>
+        }
+        {this.state.isLoading && 
+          <div className='vas-loading-container'>
+            <img className='vas-loading-img' src={loadingGif} alt='loading'/>
+            <p className='vas-loading-text'>Loading...</p>
           </div>
         }
       </div>

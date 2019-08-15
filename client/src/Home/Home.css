@@ -36,6 +36,7 @@
   display:inline;
 }
 .vas-home-main-header-user{
+  text-transform: capitalize;
   margin-right:10px;
   padding-right:10px;
   border-right:solid 1px white;
@@ -69,6 +70,7 @@
   border-bottom:none;
 }
 .vas-home-nav-item {
+  user-select: none;
   display: inline;
   background: darkcyan;
   padding: 5px 10px 6px 10px;
