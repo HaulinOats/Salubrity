@@ -336,3 +336,6 @@
 .vas-admin-hospital-input-submit {
   margin-top:10px;
 }
+.vas-admin-query-dropdown-2 option {
+  text-decoration: capitalize;
+}
