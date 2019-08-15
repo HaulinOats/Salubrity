@@ -713,6 +713,7 @@ export default class Admin extends Component {
                       }
                       {this.state.queriedCalls.map((call, idx)=>{
                         let isComments = call.jobComments || call.addComments;
+                        let isHospital = call.hospital;
                         let responseTimeHr = Math.floor(call.responseTime/3600000) % 24;
                         let responseTimeMin = Math.floor(call.responseTime/60000) % 60;
                         let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
@@ -726,7 +727,7 @@ export default class Admin extends Component {
                               <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2'>
                                 <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
                                   <p className='vas-admin-custom-item-subfield'>Hospital:</p>
-                                  <p className='vas-admin-custom-item-subvalue'>{this.state.hospitalsById[call.hospital].name}</p>
+                                  <p className='vas-admin-custom-item-subvalue'>{isHospital ? this.state.hospitalsById[call.hospital].name : 'N/A'}</p>
                                 </div>
                                 <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
                                   <p className='vas-admin-custom-item-subfield'>Nurse:</p>
@@ -734,7 +735,7 @@ export default class Admin extends Component {
                                 </div>
                                 <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
                                   <p className='vas-admin-custom-item-subfield'>MRN:</p>
-                                  <p className='vas-admin-custom-item-subvalue'>{call.mrn}</p>
+                                  <p className='vas-admin-custom-item-subvalue'>{call.mrn ? call.mrn : 'N/A'}</p>
                                 </div>
                                 <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
                                   <p className='vas-admin-custom-item-subfield'>Room:</p>
@@ -742,7 +743,7 @@ export default class Admin extends Component {
                                 </div>
                                 <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
                                   <p className='vas-admin-custom-item-subfield'>Provider:</p>
-                                  <p className='vas-admin-custom-item-subvalue'>{call.provider}</p>
+                                  <p className='vas-admin-custom-item-subvalue'>{call.provider ? call.provider : 'N/A'}</p>
                                 </div>
                               </div>
                               <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-3'>
