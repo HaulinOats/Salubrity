@@ -213,7 +213,6 @@ app.post('/procedure-completed', (req, res)=>{
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
       call.mrn = req.body.mrn;
-      call.job = undefined;
       call.isOpen = undefined;
       call.openBy = undefined;
       call.contact = undefined;
