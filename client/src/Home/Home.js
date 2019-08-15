@@ -3,7 +3,6 @@ import Modal from '../Widgets/Modal/Modal';
 import Login from '../Widgets/Login/Login';
 import axios from 'axios';
 import Moment from 'react-moment';
-import moment from 'moment';
 import './Home.css';
 import loadingGif from '../../public/loading.gif';
 import refreshImg from '../../public/refresh.png';
@@ -48,7 +47,6 @@ export default class Home extends Component{
     this.getConfirmation = this.getConfirmation.bind(this);
     this.getAddedCall = this.getAddedCall.bind(this);
     this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
-    this.handleOpenRecordPress = this.handleOpenRecordPress.bind(this);
     this.handleOpenRecordRelease = this.handleOpenRecordRelease.bind(this);
     this.getDateFromObjectId = this.getDateFromObjectId.bind(this);
     this.addCall = this.addCall.bind(this);
@@ -131,10 +129,6 @@ export default class Home extends Component{
     if(objId){
       return new Date(parseInt(objId.substring(0, 8), 16) * 1000);
     }
-  }
-
-  handleOpenRecordPress () {
-    this.openRecordPressTimer = setTimeout(() => alert('long press activated'), 3000);
   }
 
   handleOpenRecordRelease () {
@@ -380,18 +374,22 @@ export default class Home extends Component{
     if(!proceduresList.length){
       errors += '- You must select at least 1 procedure\n';
     }
-    if(!this.state.hospital.length || this.state.hospital === 'default'){
-      errors += '- You must select a hospital\n';
+
+    if(this.state.insertionTypeSelected){
+      if(!this.state.insertionLength.length || !this.state.circumference.length){
+        errors += '- You must enter values for Insertion Length and Circumference\n';
+      }
+      if(!this.state.hospital.length || this.state.hospital === 'default'){
+        errors += '- You must select a hospital\n';
+      }
+      if(this.state.mrn.length !== 7){
+        errors += '- Medical Record Number must be 7 digits long\n';
+      }
+      if(!this.state.provider.length){
+        errors += '- You must enter a provider name\n';
+      }
     }
-    if(this.state.insertionTypeSelected && (!this.state.insertionLength.length || !this.state.circumference.length)){
-      errors += '- You must enter values for Insertion Length and Circumference\n';
-    }
-    if(this.state.mrn.length !== 7){
-      errors += '- Medical Record Number must be 7 digits long\n';
-    }
-    if(!this.state.provider.length){
-      errors += '- You must enter a provider name\n';
-    }
+
     if(errors.length){
       this.setState({
         modalIsOpen:true, 
@@ -554,7 +552,9 @@ export default class Home extends Component{
     function checkSiblings(){
       let groupContainer = e.target.closest('.vas-home-inner-span');
       while(groupContainer.nextSibling){
-        groupContainer.nextSibling.querySelector('.vas-home-select-input').checked = true;
+        if(groupContainer.nextSibling.querySelector('.vas-home-select-input').id !== '7'){
+          groupContainer.nextSibling.querySelector('.vas-home-select-input').checked = true;
+        }
         groupContainer = groupContainer.nextSibling;
       }
     }
@@ -674,8 +674,9 @@ export default class Home extends Component{
                       <th className='w-10'>Done By</th>
                       <th className='w-10'>Call Time</th>
                       <th className='w-10'>Start Time</th>
-                      <th className='w-15'>End Time</th>
-                      <th className='w-15'>Response Time</th>
+                      <th className='w-10'>End Time</th>
+                      <th className='w-10'>Response Time</th>
+                      <th className='w-10'>Procedure Time</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -683,13 +684,10 @@ export default class Home extends Component{
                       <tr><td></td><td className="vas-queue-no-items">There are no items completed</td></tr>
                     }
                     {this.state.completedCalls.map((item, index)=>{
-                      let startTime = moment(this.getDateFromObjectId(item._id));
-                      let responseTime = moment(item.startTime);
-                      let responseHours = responseTime.diff(startTime, 'hours');
-                      let responseMinutes = responseTime.diff(startTime, 'minutes') % 60;
-                      // let completionTime = moment(item.completedAt);
-                      // let completionHours = completionTime.diff(startTime, 'hours');
-                      // let completedMinutes = completionTime.diff(startTime, 'minutes');
+                      let responseTimeHr = Math.floor(item.responseTime/3600000) % 24;
+                      let responseTimeMin = Math.floor(item.responseTime/60000) % 60;
+                      let procedureTimeHr = Math.floor(item.procedureTime/3600000) % 24;
+                      let procedureTimeMin = Math.floor(item.procedureTime/60000) % 60;
                       return(
                         <tr key={index} className='vas-table-tbody-row'>
                           <td>{item.room}</td>
@@ -698,7 +696,8 @@ export default class Home extends Component{
                           <td><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></td>
                           <td><Moment format='HH:mm'>{item.startTime}</Moment></td>
                           <td><Moment format='HH:mm'>{item.completedAt}</Moment></td>
-                          <td>{responseHours > 0 ? `${responseHours} Hr` : ''} {responseMinutes} Min</td>
+                          <td>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</td>
+                          <td>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}{procedureTimeMin + ' Min'}</td>
                         </tr>
                       )
                     })}
@@ -714,27 +713,6 @@ export default class Home extends Component{
                     <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
                     <button className='vas-home-record-header-btn vas-warn-btn' onClick={e=>{this.deleteCall()}}>Delete Call</button>
                   </header>
-                  <div className='vas-home-options-container'>
-                    {this.state.allOptions.map((option, idx)=>{
-                      let isCustomInput = (option.inputType === 'number' || option.inputType === 'text') ? true : false;
-                      return(
-                        <div className='vas-home-option-inner' key={idx}>
-                          <label>{option.name}:</label>
-                          {option.callFieldName === 'hospital' &&
-                            <select value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
-                              <option value='default'>Select A Hospital</option>
-                              {option.options.map((subOption, idx2)=>{
-                                return <option key={idx2}value={subOption.id}>{subOption.name}</option>
-                              })}
-                            </select>
-                          }
-                          {isCustomInput &&
-                            <input className='vas-custom-input' type={option.inputType} value={this.state[option.callFieldName]} onChange={e=>{this.procedureOptionCustomChange(e, option.callFieldName)}} />
-                          }
-                        </div>
-                      )})
-                    }  
-                  </div>
                   {this.state.activeRecord.jobComments &&
                     <div className="vas-home-inner-container vas-home-inner-container-main-comment">
                       <header className="vas-home-inner-container-header">
@@ -747,54 +725,73 @@ export default class Home extends Component{
                       </div>
                     </div>
                   }
-                  {
-                    this.state.procedures.map((procedure, idx)=>{
+                  {this.state.procedures.map((procedure, idx)=>{
                       return (
                         <div className="vas-home-inner-container" key={idx}>
                           <header className="vas-home-inner-container-header">
                             <p>{procedure.name}</p>
                           </header>
                           <div className="vas-home-inner-container-main">
-                            {
-                              procedure.groups.map((group, idx2)=>{
-                                return(
-                                  <span className='vas-home-inner-span' data-procedure={procedure.name.replace(/\s+/g, '')} data-idx={idx2} key={idx2}>
-                                    {group.groupName === 'Cathflow' &&
-                                      <button className='vas-home-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-home-important-hide')}}>{group.groupName}</button>
+                            {procedure.groups.map((group, idx2)=>{
+                              return(
+                                <span className='vas-home-inner-span' data-procedure={procedure.name.replace(/\s+/g, '')} data-idx={idx2} key={idx2}>
+                                  {group.groupName === 'Cathflow' &&
+                                    <button className='vas-home-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-home-important-hide')}}>{group.groupName}</button>
+                                  }
+                                  {group.groupName !== 'Cathflow' &&
+                                    <h3>{group.groupName}</h3>
+                                  }
+                                  <div className={group.groupName === 'Cathflow' ? 'vas-home-inner-container-row vas-home-important-hide vas-home-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : 'vas-home-inner-container-row'}>
+                                    {group.groupItems.map((itemId, idx3)=>{
+                                        let customInput = (group.inputType === 'number' || group.inputType === 'text') ? true : false;
+                                        return(
+                                          <span key={idx3}>
+                                            {!customInput &&
+                                              <span>
+                                                <input type={group.inputType} className={"vas-home-select-input vas-"+ group.inputType +"-select"} data-procedureid={procedure.procedureId} data-procedurename={procedure.name} data-groupname={group.groupName} data-value={this.state.allItems[itemId].value} id={itemId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
+                                                <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName)}}>{this.state.allItems[itemId].value}</label>
+                                              </span>
+                                            }
+                                            {customInput &&
+                                              <span>
+                                                <input type={group.inputType} onChange={e=>{this.changeCustomInput(e, group.fieldName)}} placeholder={this.state.allItems[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} />
+                                              </span>
+                                            }
+                                          </span>
+                                        )
+                                      })
                                     }
-                                    {group.groupName !== 'Cathflow' &&
-                                      <h3>{group.groupName}</h3>
-                                    }
-                                    <div className={group.groupName === 'Cathflow' ? 'vas-home-inner-container-row vas-home-important-hide vas-home-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : 'vas-home-inner-container-row'}>
-                                      {group.groupItems.map((itemId, idx3)=>{
-                                          let customInput = (group.inputType === 'number' || group.inputType === 'text') ? true : false;
-                                          return(
-                                            <span key={idx3}>
-                                              {!customInput &&
-                                                <span>
-                                                  <input type={group.inputType} className={"vas-home-select-input vas-"+ group.inputType +"-select"} data-procedureid={procedure.procedureId} data-procedurename={procedure.name} data-groupname={group.groupName} data-value={this.state.allItems[itemId].value} id={itemId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
-                                                  <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName)}}>{this.state.allItems[itemId].value}</label>
-                                                </span>
-                                              }
-                                              {customInput &&
-                                                <span>
-                                                  <input type={group.inputType} onChange={e=>{this.changeCustomInput(e, group.fieldName)}} placeholder={this.state.allItems[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} />
-                                                </span>
-                                              }
-                                            </span>
-                                          )
-                                        })
-                                      }
-                                    </div>
-                                  </span>
-                                )
-                              })
+                                  </div>
+                                </span>
+                              )})
                             }
                             </div>
-                          </div>
-                        
+                        </div>
                       )
                     })
+                  }
+                  {this.state.insertionTypeSelected &&
+                    <div className='vas-home-options-container'>
+                      {this.state.allOptions.map((option, idx)=>{
+                        let isCustomInput = (option.inputType === 'number' || option.inputType === 'text') ? true : false;
+                        return(
+                          <div className='vas-home-option-inner' key={idx}>
+                            <label>{option.name}:</label>
+                            {option.callFieldName === 'hospital' &&
+                              <select value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
+                                <option value='default'>Select A Hospital</option>
+                                {option.options.map((subOption, idx2)=>{
+                                  return <option key={idx2}value={subOption.id}>{subOption.name}</option>
+                                })}
+                              </select>
+                            }
+                            {isCustomInput &&
+                              <input className='vas-custom-input' type={option.inputType} value={this.state[option.callFieldName]} onChange={e=>{this.procedureOptionCustomChange(e, option.callFieldName)}} />
+                            }
+                          </div>
+                        )})
+                      }  
+                    </div>
                   }
                   <div className='vas-home-inner-container'>
                     <header className='vas-home-inner-container-header'>

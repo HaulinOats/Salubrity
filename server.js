@@ -578,7 +578,7 @@ function getItemsSeed(){
     {
       itemId:7,
       procedureName:'PIV Start',
-      groupName:'Attempts',
+      groupName:'Ultrasound',
       value:'US Used',
       isCustom:false
     },
@@ -935,7 +935,12 @@ function getProcedureSeed(){
         {
           groupName:'Attempts',
           inputType:'radio',
-          groupItems:[5,6,7]
+          groupItems:[5,6]
+        },
+        {
+          groupName:'Ultrasound',
+          inputType:'radio',
+          groupItems:[7]
         }
       ]
     },
