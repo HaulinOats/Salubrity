@@ -334,6 +334,9 @@ export default class Admin extends Component {
       if(e.target.value === 'procedureId'){
         filterArr = this.state.allProcedures;
       }
+      if(e.target.value === 'hospital'){
+        filterArr = this.state.allOptions[0].options;
+      }
       this.setState({
         firstFilterValue:e.target.value,
         secondFilterValue:'',
@@ -379,7 +382,7 @@ export default class Admin extends Component {
       }
     }
     //modify query based on selection
-    if(this.state.firstFilterValue === 'completedBy'){
+    if(this.state.firstFilterValue === 'completedBy' || this.state.firstFilterValue === 'mrn'){
       query.query.value = Number(query.query.value);
     }
 
@@ -387,6 +390,7 @@ export default class Admin extends Component {
       return this.queryCallsByProcedure();
     }
 
+    console.log(query);
     axios.post('/calls-by-single-criteria', query)
     .then(resp=>{
       console.log(resp.data);
@@ -399,6 +403,27 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
+  }
+
+  sortQuery(){
+    axios.post('/sort-by-field', {'responseTime':1})
+    .then(resp=>{
+      console.log(resp.data);
+      if(resp.data.error || resp.data._message){
+        this.setState({queriedCalls:[]});
+      } else {
+        this.setState({queriedCalls:resp.data});
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+  }
+
+  toggleSort(){
+    let sortArr = this.state.queriedCalls;
+    sortArr.reverse();
+    this.setState({queriedCalls:sortArr});
   }
 
   render(){
@@ -465,13 +490,21 @@ export default class Admin extends Component {
                       <p>Name:</p>
                       <select className='vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
                         <option value=''>Select Hospital</option>
-
+                        {this.state.secondDropdownArr.map((hospital, idx)=>{
+                          return <option key={idx} value={hospital.id}>{hospital.name}</option>
+                        })}
                       </select>
                     </div>
                   }
                   {this.state.firstFilterValue === 'provider' &&
                     <div className='vas-admin-filter-container'>
                       <p>Provider Name:</p>
+                      <input type='text' value={this.state.secondFilterValue} onChange={e=>{this.setState({secondFilterValue:e.target.value})}}/>
+                    </div>
+                  }
+                  {this.state.firstFilterValue === 'mrn' &&
+                    <div className='vas-admin-filter-container'>
+                      <p>Medical Record Number:</p>
                       <input type='text' value={this.state.secondFilterValue} onChange={e=>{this.setState({secondFilterValue:e.target.value})}}/>
                     </div>
                   }
@@ -488,16 +521,15 @@ export default class Admin extends Component {
                     </div>
                   }
                   {this.state.firstFilterValue === 'responseTime' &&
-                    <div className='vas-admin-filter-container'>
-                      
-                    </div>
+                    <button onClick={e=>{this.sortQuery()}}>Submit</button>
                   }
                   {this.state.secondFilterValue.length !== 0 &&
                     <button onClick={e=>{this.queryCalls()}}>Submit</button>
                   }
                   {!this.state.firstFilterValue &&
-                    <button className='vas-admin-date-range-submit' onClick={this.submitDateRange}>Submit</button>
+                    <button className='vas-admin-date-range-submit d-inline' onClick={this.submitDateRange}>Submit</button>
                   }
+                  <button className='d-inline' onClick={e=>{this.toggleSort()}}>Reverse Sort</button>
                 </div>
                 <div className='vas-admin-date-query-container'>
                   <div className='vas-admin-custom-table'>
@@ -516,11 +548,26 @@ export default class Admin extends Component {
                               <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
                             </div>
                             <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2'>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'><p className='vas-admin-custom-item-subfield'>Hospital:</p><p className='vas-admin-custom-item-subvalue'>{this.state.hospitalsById[call.hospital].name}</p></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'><p className='vas-admin-custom-item-subfield'>Nurse:</p><p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Default'}</p></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'><p className='vas-admin-custom-item-subfield'>MRN:</p><p className='vas-admin-custom-item-subvalue'>{call.mrn}</p></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-room'><p className='vas-admin-custom-item-subfield'>Room:</p><p className='vas-admin-custom-item-subvalue'>{call.room}</p></div>
-                              <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'><p className='vas-admin-custom-item-subfield'>Provider:</p><p className='vas-admin-custom-item-subvalue'>{call.provider}</p></div>
+                              <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
+                                <p className='vas-admin-custom-item-subfield'>Hospital:</p>
+                                <p className='vas-admin-custom-item-subvalue'>{this.state.hospitalsById[call.hospital].name}</p>
+                              </div>
+                              <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
+                                <p className='vas-admin-custom-item-subfield'>Nurse:</p>
+                                <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Default'}</p>
+                              </div>
+                              <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
+                                <p className='vas-admin-custom-item-subfield'>MRN:</p>
+                                <p className='vas-admin-custom-item-subvalue'>{call.mrn}</p>
+                              </div>
+                              <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
+                                <p className='vas-admin-custom-item-subfield'>Room:</p>
+                                <p className='vas-admin-custom-item-subvalue'>{call.room}</p>
+                              </div>
+                              <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
+                                <p className='vas-admin-custom-item-subfield'>Provider:</p>
+                                <p className='vas-admin-custom-item-subvalue'>{call.provider}</p>
+                              </div>
                             </div>
                             <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-3'>
                               <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>

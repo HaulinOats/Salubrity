@@ -38,7 +38,7 @@ let callSchema = new Schema({
   isOpen:{type:Boolean, default:false},
   openBy:{type:Number, default:null},
   proceduresDone:[Object],
-  mrn:{type:String, default:null},
+  mrn:{type:Number, default:null},
   completedAt:{type:Date, default:null, index:true},
   responseTime:Number,
   procedureTime:Number,
@@ -381,6 +381,18 @@ app.post('/calls-by-single-criteria', (req, res)=>{
       res.send(calls);
     } else {
       res.send({'error':`no calls returned for query`});
+    }
+  })
+});
+
+app.post('/sort-by-field', (req, res)=>{
+
+  Call.find().sort(req.body).exec((err, calls)=>{
+    if(err) res.send(err);
+    if(calls){
+      res.send(calls);
+    } else {
+      res.send({'error':'not calls match that criteria'});
     }
   })
 });
