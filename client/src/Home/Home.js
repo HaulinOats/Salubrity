@@ -504,7 +504,7 @@ export default class Home extends Component{
 
   selectButton(e, procedureName, groupName){
     if(procedureName === 'PIV Start'){
-      if(groupName === 'Length'){
+      if(groupName === 'Size'){
         checkSiblings();
       }
     }

@@ -526,28 +526,28 @@ function getItemsSeed(){
     {
       itemId:1,
       procedureName:'PIV Start',
-      groupName:'Length',
+      groupName:'Size',
       value:'24g',
       isCustom:false
     },
     {
       itemId:2,
       procedureName:'PIV Start',
-      groupName:'Length',
+      groupName:'Size',
       value:'22g',
       isCustom:false
     },
     {
       itemId:3,
       procedureName:'PIV Start',
-      groupName:'Length',
+      groupName:'Size',
       value:'20g',
       isCustom:false
     },
     {
       itemId:4,
       procedureName:'PIV Start',
-      groupName:'Length',
+      groupName:'Size',
       value:'18g',
       isCustom:false
     },
@@ -918,7 +918,7 @@ function getProcedureSeed(){
       name:'PIV Start',
       groups:[
         {
-          groupName:'Length',
+          groupName:'Size',
           inputType:'radio',
           groupItems:[1,2,3,4]
         },
