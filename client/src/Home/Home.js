@@ -22,7 +22,6 @@ export default class Home extends Component{
       confirmationType:null,
       activeRecord:null,
       queueItems:[],
-      openCalls:[],
       completedCalls:[],
       procedures:[],
       allOptions:[],
@@ -118,7 +117,6 @@ export default class Home extends Component{
       this.getProcedureData();
       this.getOptionsData();
       this.getItemsData();
-      this.getOpenCalls();
       setTimeout(()=>{
         console.log(this.state);
       }, 250);
@@ -139,25 +137,6 @@ export default class Home extends Component{
     this.setState({
       modalTitle:'Add Call',
       modalIsOpen:true
-    })
-  }
-
-  getOpenCalls(){
-    this.setState({isLoading:true});
-    axios.get('/get-open-calls')
-    .then((resp)=>{
-      console.log(resp.data);
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        this.setState({openCalls:resp.data});
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
     })
   }
 
@@ -525,7 +504,7 @@ export default class Home extends Component{
 
   selectButton(e, procedureName, groupName){
     if(procedureName === 'PIV Start'){
-      if(groupName === 'Dosage'){
+      if(groupName === 'Length'){
         checkSiblings();
       }
     }
@@ -553,6 +532,7 @@ export default class Home extends Component{
       let groupContainer = e.target.closest('.vas-home-inner-span');
       while(groupContainer.nextSibling){
         let nextSib =  groupContainer.nextSibling.querySelector('.vas-home-select-input');
+        console.log(nextSib.id);
         if(nextSib.id === '7' || nextSib.id === '12'){
           nextSib.checked = false;
         } else {
@@ -654,9 +634,9 @@ export default class Home extends Component{
                     {!this.state.queueItems.length &&
                       <tr><td></td><td className="vas-queue-no-items">There are no items currently in the queue</td></tr>
                     }
-                    {this.state.queueItems.map((item, index)=>{
+                    {this.state.queueItems.map((item, idx)=>{
                       return(
-                        <tr key={index} className={'vas-home-table-tr vas-table-tr vas-table-tbody-row ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
+                        <tr key={item._id} className={'vas-home-table-tr vas-table-tr vas-table-tbody-row ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
                           <th>{item.room}</th>
                           <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.jobComments}</td>
                           <td>{item.contact}</td>
@@ -686,13 +666,13 @@ export default class Home extends Component{
                     {!this.state.completedCalls.length &&
                       <tr><td></td><td className="vas-queue-no-items">There are no items completed</td></tr>
                     }
-                    {this.state.completedCalls.map((item, index)=>{
+                    {this.state.completedCalls.map((item, idx)=>{
                       let responseTimeHr = Math.floor(item.responseTime/3600000) % 24;
                       let responseTimeMin = Math.floor(item.responseTime/60000) % 60;
                       let procedureTimeHr = Math.floor(item.procedureTime/3600000) % 24;
                       let procedureTimeMin = Math.floor(item.procedureTime/60000) % 60;
                       return(
-                        <tr key={index} className='vas-table-tbody-row'>
+                        <tr key={item._id} className='vas-table-tbody-row'>
                           <td>{item.room}</td>
                           <td><i className='vas-table-job-name'>{item.job}</i></td>
                           <td>{item.completedBy}</td>
@@ -730,14 +710,14 @@ export default class Home extends Component{
                   }
                   {this.state.procedures.map((procedure, idx)=>{
                       return (
-                        <div className="vas-home-inner-container" key={idx}>
+                        <div className="vas-home-inner-container" key={procedure._id}>
                           <header className="vas-home-inner-container-header">
                             <p>{procedure.name}</p>
                           </header>
                           <div className="vas-home-inner-container-main">
                             {procedure.groups.map((group, idx2)=>{
                               return(
-                                <span className='vas-home-inner-span' data-procedure={procedure.name.replace(/\s+/g, '')} data-idx={idx2} key={idx2}>
+                                <span className='vas-home-inner-span' data-procedure={procedure.name.replace(/\s+/g, '')} data-idx={idx2} key={idx+group.groupName}>
                                   {group.groupName === 'Cathflow' &&
                                     <button className='vas-home-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-home-important-hide')}}>{group.groupName}</button>
                                   }
@@ -748,7 +728,7 @@ export default class Home extends Component{
                                     {group.groupItems.map((itemId, idx3)=>{
                                         let customInput = (group.inputType === 'number' || group.inputType === 'text') ? true : false;
                                         return(
-                                          <span key={idx3}>
+                                          <span key={itemId}>
                                             {!customInput &&
                                               <span>
                                                 <input type={group.inputType} className={"vas-home-select-input vas-"+ group.inputType +"-select"} data-procedureid={procedure.procedureId} data-procedurename={procedure.name} data-groupname={group.groupName} data-value={this.state.allItems[itemId].value} id={itemId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
@@ -778,13 +758,13 @@ export default class Home extends Component{
                       {this.state.allOptions.map((option, idx)=>{
                         let isCustomInput = (option.inputType === 'number' || option.inputType === 'text') ? true : false;
                         return(
-                          <div className='vas-home-option-inner' key={idx}>
+                          <div className='vas-home-option-inner' key={option._id}>
                             <label>{option.name}:</label>
                             {option.callFieldName === 'hospital' &&
                               <select value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
                                 <option value='default'>Select A Hospital</option>
                                 {option.options.map((subOption, idx2)=>{
-                                  return <option key={idx2}value={subOption.id}>{subOption.name}</option>
+                                  return <option key={subOption.id}value={subOption.id}>{subOption.name}</option>
                                 })}
                               </select>
                             }

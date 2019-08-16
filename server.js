@@ -128,6 +128,9 @@ app.get('/get-completed-calls', (req, res)=>{
   var end = new Date();
   end.setHours(23,59,59,999);
 
+  console.log('start: ', start);
+  console.log('end  : ', end);
+
   Call.find({completedAt: {$gte: start, $lt: end}}, (err, calls)=>{
     if(err) return res.send(err);
     if(calls.length){
@@ -135,19 +138,6 @@ app.get('/get-completed-calls', (req, res)=>{
     } else {
       res.send({'error':'no calls were found with that query'});
     }
-  });
-});
-
-app.get('/get-open-calls', (req, res)=>{
-  var start = new Date();
-  start.setHours(0,0,0,0);
-  
-  var end = new Date();
-  end.setHours(23,59,59,999);
-
-  Call.find({isOpen:true}, (err, calls)=>{
-    if(err) return res.send(err);
-    res.send(calls);
   });
 });
 
@@ -536,28 +526,28 @@ function getItemsSeed(){
     {
       itemId:1,
       procedureName:'PIV Start',
-      groupName:'Dosage',
+      groupName:'Length',
       value:'24g',
       isCustom:false
     },
     {
       itemId:2,
       procedureName:'PIV Start',
-      groupName:'Dosage',
+      groupName:'Length',
       value:'22g',
       isCustom:false
     },
     {
       itemId:3,
       procedureName:'PIV Start',
-      groupName:'Dosage',
+      groupName:'Length',
       value:'20g',
       isCustom:false
     },
     {
       itemId:4,
       procedureName:'PIV Start',
-      groupName:'Dosage',
+      groupName:'Length',
       value:'18g',
       isCustom:false
     },
@@ -928,7 +918,7 @@ function getProcedureSeed(){
       name:'PIV Start',
       groups:[
         {
-          groupName:'Dosage',
+          groupName:'Length',
           inputType:'radio',
           groupItems:[1,2,3,4]
         },

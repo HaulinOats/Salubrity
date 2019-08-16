@@ -646,7 +646,7 @@ export default class Admin extends Component {
                       <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
                         <option value='default'>Select User</option>
                         {this.state.secondDropdownArr.map((user, idx)=>{
-                          return <option key={idx} value={user.userId}>{user.fullname}</option>
+                          return <option key={user._id} value={user.userId}>{user.fullname}</option>
                         })}
                       </select>
                     </div>
@@ -657,7 +657,7 @@ export default class Admin extends Component {
                       <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
                         <option value='default'>Select Hospital</option>
                         {this.state.secondDropdownArr.map((hospital, idx)=>{
-                          return <option key={idx} value={hospital.id}>{hospital.name}</option>
+                          return <option key={hospital.id} value={hospital.id}>{hospital.name}</option>
                         })}
                       </select>
                     </div>
@@ -674,7 +674,7 @@ export default class Admin extends Component {
                       <select className='vas-select' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
                         <option value='default'>Select Procedure</option>
                         {this.state.secondDropdownArr.map((procedure, idx)=>{
-                          return <option key={idx} value={procedure.procedureId}>{procedure.name}</option>
+                          return <option key={procedure.procedureId} value={procedure.procedureId}>{procedure.name}</option>
                         })
                         }
                       </select>
@@ -719,8 +719,8 @@ export default class Admin extends Component {
                         let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
                         let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
                         return(
-                          <div key={idx} className='vas-admin-custom-table-item-outer'>
-                            <div key={idx} className='vas-admin-custom-table-item'>
+                          <div key={call._id} className='vas-admin-custom-table-item-outer'>
+                            <div className='vas-admin-custom-table-item'>
                               <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-1'>
                                 <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
                               </div>
@@ -750,14 +750,14 @@ export default class Admin extends Component {
                                 <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
                                   {call.proceduresDone.map((procedure, idx2)=>{
                                     return (
-                                      <div className='vas-admin-query-procedure-container' key={idx2}>
+                                      <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
                                         <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
                                         <div className='vas-admin-query-item-container'>
                                         {procedure.itemIds && procedure.itemIds.length &&
                                           procedure.itemIds.map((id, idx3)=>{
                                             let isCustom = this.state.itemsById[id].isCustom;
                                             return (
-                                              <p key={idx3} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].groupName + ":" + procedure.customValues[id]}</p>
+                                              <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].groupName + ":" + procedure.customValues[id]}</p>
                                             )
                                           })
                                         }
@@ -825,24 +825,24 @@ export default class Admin extends Component {
                         <th onClick={e=>{this.sortColumn('role')}}>role</th>
                         <th className='vas-admin-delete-user'>Delete?</th>
                       </tr>
-                      {this.state.allUsers.map((val, idx)=>{
+                      {this.state.allUsers.map((user, idx)=>{
                         return(
-                          <tr key={idx}>
-                            <td>{val.userId}</td>
-                            <td className='text-capitalize'>{val.fullname}</td>
-                            <td>{val.username}</td>
+                          <tr key={user._id}>
+                            <td>{user.userId}</td>
+                            <td className='text-capitalize'>{user.fullname}</td>
+                            <td>{user.username}</td>
                             <td>
-                              {val.role !== 'admin' &&
+                              {user.role !== 'admin' &&
                                 <span className='vas-admin-manage-users-pw'>
                                   <p onClick={e=>{this.togglePassword(e, true)}}>********</p>
-                                  <p style={{'display':'none'}} onClick={e=>{this.togglePassword(e, false)}}>{val.password}</p>
+                                  <p style={{'display':'none'}} onClick={e=>{this.togglePassword(e, false)}}>{user.password}</p>
                                 </span>
                               }
                             </td>
-                            <td>{val.role}</td>
+                            <td>{user.role}</td>
                             <td className='vas-admin-delete-user'>
-                              {val.role !== 'admin' &&
-                                <p data-id={val._id} data-index={idx} onClick={e=>{this.deleteUser(val._id)}}>&times;</p>
+                              {user.role !== 'admin' &&
+                                <p data-id={user._id} data-index={idx} onClick={e=>{this.deleteUser(user._id)}}>&times;</p>
                               }
                             </td>
                           </tr>
@@ -870,7 +870,7 @@ export default class Admin extends Component {
                       {this.state.allOptions && this.state.allOptions[0] &&
                         this.state.allOptions[0].options.map((option, idx)=>{
                         return(
-                          <tr key={idx}>
+                          <tr key={option.id}>
                             <td>{option.id}</td>
                             <td>{option.name}</td>
                           </tr>
