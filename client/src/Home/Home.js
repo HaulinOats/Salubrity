@@ -49,6 +49,7 @@ export default class Home extends Component{
     this.getDateFromObjectId = this.getDateFromObjectId.bind(this);
     this.addCall = this.addCall.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
+    this.handleUserSessionData = this.handleUserSessionData.bind(this);
     this.logout = this.logout.bind(this);
   }
   
@@ -56,12 +57,14 @@ export default class Home extends Component{
     const storagecurrentUser = localStorage.getItem('currentUser');
     const storageActiveTab = localStorage.getItem('activeHomeTab');
     if(this.isValidStorageItem(storagecurrentUser)){
-      this.setState({currentUser:JSON.parse(storagecurrentUser)});
+      this.setState({currentUser:JSON.parse(storagecurrentUser)}, this.handleUserSessionData);
+    } else {
+      this.handleUserSessionData();
     }
     if(this.isValidStorageItem(storageActiveTab)){
       this.setState({activeHomeTab:JSON.parse(storageActiveTab)});
     }
-    setTimeout(()=>{this.stateLoadCalls()}, 0);
+    setTimeout(()=>{this.stateLoadCalls()}, 100);
   }
 
   componentDidMount() {
@@ -609,40 +612,31 @@ export default class Home extends Component{
             </ul>
             <div className="vas-home-tabContent">
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'queue' ? true : false}>
-                <table className="vas-home-table vas-table table">
-                <colgroup>
-                  <col span="1" style={{width: '10%'}}></col>
-                  <col span="1" style={{width: '50%'}}></col>
-                  <col span="1" style={{width: '10%'}}></col>
-                  <col span="1" style={{width: '15%'}}></col>
-                  <col span="1" style={{width: '15%'}}></col>
-                </colgroup>
-                  <thead>
-                    <tr className='vas-table-thead-row'>
-                      <th>Room</th>
-                      <th>Job</th>
-                      <th>Contact</th>
-                      <th>Call Time</th>
-                      <th>Open By</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {!this.state.queueItems.length &&
-                      <tr><td></td><td className="vas-queue-no-items">There are no items currently in the queue</td></tr>
-                    }
-                    {this.state.queueItems.map((item, idx)=>{
+                <div className="vas-home-table vas-table table">
+                  <div className='vas-table-thead-row'>
+                    <div className='vas-width-10'>Room</div>
+                    <div className='vas-width-40'>Job</div>
+                    <div className='vas-width-15'>Contact</div>
+                    <div className='vas-width-15'>Open By</div>
+                    <div className='vas-width-20'>Call Time</div>
+                  </div>
+                  <div className='vas-home-table-body'>
+                    {this.state.queueItems.length > 0 && this.state.queueItems.map((item, idx)=>{
                       return(
-                        <tr key={item._id} className={'vas-home-table-tr vas-table-tr vas-table-tbody-row ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
-                          <th>{item.room}</th>
-                          <td><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.jobComments}</td>
-                          <td>{item.contact}</td>
-                          <td><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></td>
-                          <td>{item.openBy ? item.openBy : ''}</td>
-                        </tr>
+                        <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
+                          <div className='vas-width-10'>{item.room}</div>
+                          <div className='vas-width-40'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.jobComments}</div>
+                          <div className='vas-width-15'>{item.contact}</div>
+                          <div className='vas-width-15'>{item.openBy ? item.openBy : ''}</div>
+                          <div className='vas-width-20'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
+                        </div>
                       )
                     })}
-                  </tbody>
-                </table>
+                    {this.state.queueItems.length < 1 &&
+                      <div><p className='vas-queue-no-items'>There are no items currently in the queue</p></div>
+                    }
+                  </div>
+                </div>
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'complete' ? true : false}>
                 <table className="vas-home-table vas-queue-table table">
@@ -659,7 +653,7 @@ export default class Home extends Component{
                     </tr>
                   </thead>
                   <tbody>
-                    {!this.state.completedCalls.length &&
+                    {this.state.completedCalls.length < 0 &&
                       <tr><td></td><td className="vas-queue-no-items">There are no items completed</td></tr>
                     }
                     {this.state.completedCalls.map((item, idx)=>{

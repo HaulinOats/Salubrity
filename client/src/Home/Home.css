@@ -204,23 +204,24 @@
 .vas-queue-table-job-column {
   max-width: 30%;
 }
-.vas-home-table tr{
-  cursor:pointer;
-  box-shadow: inset 0px -6px 3px -5px steelblue;
-}
-.vas-table-thead-row th{
+.vas-table-thead-row {
   background: cadetblue;
+}
+.vas-table-thead-row div{
   color: white;
   border-bottom: 3px solid darkslategrey !important;
+  display:inline-block;
+  padding:10px 0 10px 5px;
 }
-.vas-table-tbody-row {
-
+.vas-home-table-tr {
+  padding:10px 0;
+  width:100%;
+  border-top: 1px solid #dee2e6;
+  cursor:pointer;
 }
-.vas-home-table tr:nth-child(even) {
-  /* background: red; */
-}
-.vas-home-table tr:nth-child(odd) {
-  /* background: lightblue; */
+.vas-home-table-tr div {
+  padding-left:5px;
+  display:inline-block;
 }
 .vas-queue-addCall {
   position: absolute;
@@ -262,8 +263,10 @@
   box-shadow: none;
 }
 .vas-queue-no-items {
+  padding: 15px 0;
+  width: 100%;
   text-align: center;
-  margin: 22px 0;
+  background: lightblue;
 }
 .vas-home-final-container {
   padding: 22px 10px 25px 20px;
