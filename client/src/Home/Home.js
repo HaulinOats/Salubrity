@@ -46,7 +46,6 @@ export default class Home extends Component{
     this.getConfirmation = this.getConfirmation.bind(this);
     this.getAddedCall = this.getAddedCall.bind(this);
     this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
-    this.handleOpenRecordRelease = this.handleOpenRecordRelease.bind(this);
     this.getDateFromObjectId = this.getDateFromObjectId.bind(this);
     this.addCall = this.addCall.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
@@ -108,6 +107,7 @@ export default class Home extends Component{
 
   logout(){
     this.setState({currentUser:null, activeRecord:null});
+    localStorage.clear();
   }
 
   stateLoadCalls(){
@@ -127,10 +127,6 @@ export default class Home extends Component{
     if(objId){
       return new Date(parseInt(objId.substring(0, 8), 16) * 1000);
     }
-  }
-
-  handleOpenRecordRelease () {
-    clearTimeout(this.openRecordPressTimer);
   }
 
   addCall(){
@@ -291,7 +287,7 @@ export default class Home extends Component{
           completedBy:Number(this.state.currentUser.userId),
           completedAt:completionTime.toISOString(),
           addComments:this.state.addComments.length ? this.state.addComments : null,
-          hospital:Number(this.state.hospital),
+          hospital:this.state.hospital ? Number(this.state.hospital) : null,
           mrn:Number(this.state.mrn),
           provider:this.state.provider,
           procedureTime:completionTime - startTime,
@@ -575,7 +571,7 @@ export default class Home extends Component{
     if(e.target.value !== 'default'){
       this.setState({hospital:e.target.value});
     } else {
-      this.setState({hospital:null});
+      this.setState({hospital:''});
     }
   }
 

@@ -207,6 +207,7 @@
   background:lightblue;
   border-top:solid 2px black;
   font-size:85%;
+  width:100%;
 }
 .vas-admin-custom-table-item {
   display:flex;
@@ -335,4 +336,35 @@
 }
 .vas-admin-query-dropdown-2 option {
   text-transform: capitalize;
+}
+.vas-admin-is-open-container {
+  padding: 10px 5px;
+  font-size: 110%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.vas-admin-is-open-container div{
+  display:inline-block;
+}
+.vas-admin-is-open-container b{
+  font-weight: bold;
+}
+.vas-admin-is-open-container button {
+  float:right;
+}
+.vas-admin-is-open-container div[data-width='10']{
+  width:10%;
+}
+.vas-admin-is-open-container div[data-width='15']{
+  width:15%;
+}
+.vas-admin-is-open-container div[data-width='25']{
+  width:25%;
+}
+.vas-admin-is-open-container div[data-width='40']{
+  width:40%;
+}
+.vas-red-button {
+  background:red;
 }

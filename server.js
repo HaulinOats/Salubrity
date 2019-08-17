@@ -4,6 +4,7 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const seedData = require('./seed-data');
 const Schema = mongoose.Schema;
 mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnvv7pg3', {
   useNewUrlParser:true,
@@ -42,7 +43,8 @@ let callSchema = new Schema({
   completedAt:{type:Date, default:null, index:true},
   responseTime:Number,
   procedureTime:Number,
-  completedBy:{type:Number, default:null}
+  completedBy:{type:Number, default:null},
+  isTest:{type:Boolean, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -346,7 +348,7 @@ app.post('/calls-containing-value', (req, res)=>{
       $regex:req.body.query.value
     }
   }, (err, calls)=>{
-    if(err) res.send(err);
+    if(err) return res.send(err);
     if(calls.length){
       res.send(calls);
     } else {
@@ -365,7 +367,7 @@ app.post('/calls-by-procedure-id', (req, res)=>{
       $eq:req.body.procedureId
     }
   }, (err, calls)=>{
-    if(err) res.send(err);
+    if(err) return res.send(err);
     if(calls.length){
       res.send(calls);
     } else {
@@ -382,7 +384,7 @@ app.post('/calls-by-single-criteria', (req, res)=>{
     },
     [req.body.query.key]:req.body.query.value
   }, (err, calls)=>{
-    if(err) res.send(err);
+    if(err) return res.send(err);
     if(calls.length){
       res.send(calls);
     } else {
@@ -393,7 +395,7 @@ app.post('/calls-by-single-criteria', (req, res)=>{
 
 app.post('/sort-by-field', (req, res)=>{
   Call.find().sort(req.body).exec((err, calls)=>{
-    if(err) res.send(err);
+    if(err) return res.send(err);
     if(calls){
       res.send(calls);
     } else {
@@ -404,18 +406,35 @@ app.post('/sort-by-field', (req, res)=>{
 
 app.post('/add-hospital', (req, res)=>{
   Option.findOne({callFieldName:'hospital'}, (err, hospitals)=>{
-    if(err) res.send(err);
+    if(err) return res.send(err);
     if(hospitals){
       hospitals.options.push({
         id:hospitals.options.length + 1,
         name:req.body.hospitalName
       })
       hospitals.save(err2=>{
-        if(err2) res.send(err2);
+        if(err2) return res.send(err2);
         res.send(hospitals);
       })
     } else {
       res.send({'error':'error getting hospital data'});
+    }
+  })
+})
+
+app.post('/get-open-calls-in-range', (req, res)=>{
+  Call.find({
+    startTime: {
+      $gte: new Date(req.body.startDate),
+      $lt: new Date(req.body.endDate)
+    },
+    isOpen:true
+  }, (err, calls)=>{
+    if(err) return res.send(err);
+    if(calls){
+      res.send(calls);
+    } else {
+      res.send({'error':'no open calls exist within that date query'});
     }
   })
 })
@@ -435,7 +454,7 @@ app.get('/seed-super',(req,res)=>{
 });
 
 app.get('/seed-procedures', (req, res)=>{
-  Procedure.insertMany(getProcedureSeed(), (err, procedures) => {
+  Procedure.insertMany(seedData.procedureSeed, (err, procedures) => {
     if(err) return res.send(err);
     if(procedures){
       res.send(procedures);
@@ -446,7 +465,7 @@ app.get('/seed-procedures', (req, res)=>{
 })
 
 app.get('/seed-options', (req, res)=>{
-  Option.insertMany(getOptionsSeed(), (err, options) => {
+  Option.insertMany(seedData.optionSeed, (err, options) => {
     if(err) return res.send(err);
     if(options){
       res.send(options);
@@ -457,7 +476,7 @@ app.get('/seed-options', (req, res)=>{
 })
 
 app.get('/seed-items', (req, res)=>{
-  Item.insertMany(getItemsSeed(), (err, items) => {
+  Item.insertMany(seedData.itemSeed, (err, items) => {
     if(err) return res.send({'error':err});
     if(items){
       res.send(items);
@@ -474,594 +493,3 @@ app.get('*', (req, res) => {
 app.listen(app.get("port"), () => {
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });
-
-function getOptionsSeed(){
-  return [
-    {
-      name:'Hospital',
-      inputType:'dropdown',
-      callFieldName:'hospital',
-      options:[
-        {
-          id:1,
-          name:'Erlanger Main'
-        },
-        {
-          id:2,
-          name:'Erlanger East'
-        },
-        {
-          id:3,
-          name:'Erlanger North'
-        },
-        {
-          id:4,
-          name:"Erlanger Children's"
-        },
-        {
-          id:5,
-          name:"Erlanger Bledsoe"
-        },
-        {
-          id:6,
-          name:"Siskin"
-        }
-      ]
-    },
-    {
-      name:'Medical Record Number',
-      inputType:'number',
-      callFieldName:'mrn'
-    },
-    {
-      name:'Provider',
-      inputType:'text',
-      callFieldName:'provider'
-    }
-  ];
-}
-
-function getItemsSeed(){
-  return [
-    {
-      itemId:1,
-      procedureName:'PIV Start',
-      groupName:'Size',
-      value:'24g',
-      isCustom:false
-    },
-    {
-      itemId:2,
-      procedureName:'PIV Start',
-      groupName:'Size',
-      value:'22g',
-      isCustom:false
-    },
-    {
-      itemId:3,
-      procedureName:'PIV Start',
-      groupName:'Size',
-      value:'20g',
-      isCustom:false
-    },
-    {
-      itemId:4,
-      procedureName:'PIV Start',
-      groupName:'Size',
-      value:'18g',
-      isCustom:false
-    },
-    {
-      itemId:5,
-      procedureName:'PIV Start',
-      groupName:'Attempts',
-      value:'1 Attempt',
-      isCustom:false
-    },
-    {
-      itemId:6,
-      procedureName:'PIV Start',
-      groupName:'Attempts',
-      value:'2 Attempts',
-      isCustom:false
-    },
-    {
-      itemId:7,
-      procedureName:'PIV Start',
-      groupName:'Ultrasound',
-      value:'US Used',
-      isCustom:false
-    },
-    {
-      itemId:8,
-      procedureName:'Lab Draw',
-      groupName:'Draw Type',
-      value:'From IV',
-      isCustom:false
-    },
-    {
-      itemId:9,
-      procedureName:'Lab Draw',
-      groupName:'Draw Type',
-      value:'Labs Only',
-      isCustom:false
-    },
-    {
-      itemId:10,
-      procedureName:'Lab Draw',
-      groupName:'Attempts',
-      value:'1 Attempt',
-      isCustom:false
-    },
-    {
-      itemId:11,
-      procedureName:'Lab Draw',
-      groupName:'Attempts',
-      value:'2 Attempts',
-      isCustom:false
-    },
-    {
-      itemId:12,
-      procedureName:'Lab Draw',
-      groupName:'Ultrasound',
-      value:'US Used',
-      isCustom:false
-    },
-    {
-      itemId:13,
-      procedureName:'Site Care',
-      groupName:'Care Type',
-      value:'IV Flushed',
-      isCustom:false
-    },
-    {
-      itemId:14,
-      procedureName:'Site Care',
-      groupName:'Care Type',
-      value:'Saline Locked',
-      isCustom:false
-    },
-    {
-      itemId:15,
-      procedureName:'Site Care',
-      groupName:'Care Type',
-      value:'Dressing Changed',
-      isCustom:false
-    },
-    {
-      itemId:16,
-      procedureName:'Site Care',
-      groupName:'Care Type',
-      value:'Dressing Reinforced',
-      isCustom:false
-    },
-    {
-      itemId:17,
-      procedureName:'DC IV',
-      groupName:'Reasons',
-      value:'Inflitration',
-      isCustom:false
-    },
-    {
-      itemId:18,
-      procedureName:'DC IV',
-      groupName:'Reasons',
-      value:'Phlebitis',
-      isCustom:false
-    },
-    {
-      itemId:19,
-      procedureName:'DC IV',
-      groupName:'Reasons',
-      value:'PT Removal',
-      isCustom:false
-    },
-    {
-      itemId:20,
-      procedureName:'DC IV',
-      groupName:'Reasons',
-      value:'Leaking',
-      isCustom:false
-    },
-    {
-      itemId:21,
-      procedureName:'DC IV',
-      groupName:'Reasons',
-      value:'Bleeding',
-      isCustom:false
-    },
-    {
-      itemId:22,
-      procedureName:'Port-A-Cath',
-      groupName:'Access Attempts',
-      value:'1 Attempt',
-      isCustom:false
-    },
-    {
-      itemId:23,
-      procedureName:'Port-A-Cath',
-      groupName:'Access Attempts',
-      value:'2 Attempts',
-      isCustom:false
-    },
-    {
-      itemId:24,
-      procedureName:'Port-A-Cath',
-      groupName:'Deaccess',
-      value:'Contaminated',
-      isCustom:false
-    },
-    {
-      itemId:25,
-      procedureName:'Port-A-Cath',
-      groupName:'Deaccess',
-      value:'Needle Change',
-      isCustom:false
-    },
-    {
-      itemId:26,
-      procedureName:'Port-A-Cath',
-      groupName:'Deaccess',
-      value:'Therapy Complete',
-      isCustom:false
-    },
-    {
-      itemId:27,
-      procedureName:'Port-A-Cath',
-      groupName:'Cathflow',
-      value:'Initiated',
-      isCustom:false
-    },
-    {
-      itemId:28,
-      procedureName:'Port-A-Cath',
-      groupName:'Cathflow',
-      value:'Completed',
-      isCustom:false
-    },
-    {
-      itemId:29,
-      procedureName:'PICC Line',
-      groupName:'Removal',
-      value:'Therapy Complete',
-      isCustom:false
-    },
-    {
-      itemId:30,
-      procedureName:'PICC Line',
-      groupName:'Removal',
-      value:'Discharge',
-      isCustom:false
-    },
-    {
-      itemId:31,
-      procedureName:'PICC Line',
-      groupName:'Removal',
-      value:'Clotted',
-      isCustom:false
-    },
-    {
-      itemId:32,
-      procedureName:'PICC Line',
-      groupName:'Removal',
-      value:'Contaminated',
-      isCustom:false
-    },
-    {
-      itemId:33,
-      procedureName:'PICC Line',
-      groupName:'Removal',
-      value:'PT Removal',
-      isCustom:false
-    },
-    {
-      itemId:34,
-      procedureName:'PICC Line',
-      groupName:'Cathflow',
-      value:'Initiated',
-      isCustom:false
-    },
-    {
-      itemId:35,
-      procedureName:'PICC Line',
-      groupName:'Cathflow',
-      value:'Completed',
-      isCustom:false
-    },
-    {
-      itemId:36,
-      procedureName:'Dressing Change',
-      groupName:'What',
-      value:'PICC',
-      isCustom:false
-    },
-    {
-      itemId:37,
-      procedureName:'Dressing Change',
-      groupName:'What',
-      value:'Port-A-Cath',
-      isCustom:false
-    },
-    {
-      itemId:38,
-      procedureName:'Dressing Change',
-      groupName:'What',
-      value:'Central Line',
-      isCustom:false
-    },
-    {
-      itemId:39,
-      procedureName:'Dressing Change',
-      groupName:'What',
-      value:'Midline',
-      isCustom:false
-    },
-    {
-      itemId:40,
-      procedureName:'Dressing Change',
-      groupName:'Why',
-      value:'Per Protocol',
-      isCustom:false
-    },
-    {
-      itemId:41,
-      procedureName:'Dressing Change',
-      groupName:'Why',
-      value:'Bleeding',
-      isCustom:false
-    },
-    {
-      itemId:42,
-      procedureName:'Dressing Change',
-      groupName:'Why',
-      value:'Dressing Compromised',
-      isCustom:false
-    },
-    {
-      itemId:43,
-      procedureName:'Insertion Procedure',
-      groupName:'Insertion Type',
-      value:'Midline',
-      isCustom:false
-    },
-    {
-      itemId:44,
-      procedureName:'Insertion Procedure',
-      groupName:'Insertion Type',
-      value:'SL PICC',
-      isCustom:false
-    },
-    {
-      itemId:45,
-      procedureName:'Insertion Procedure',
-      groupName:'Insertion Type',
-      value:'TL PICC',
-      isCustom:false
-    },
-    {
-      itemId:46,
-      procedureName:'Insertion Procedure',
-      groupName:'Insertion Type',
-      value:'DL PICC',
-      isCustom:false
-    },
-    {
-      itemId:47,
-      procedureName:'Insertion Procedure',
-      groupName:'Vessel',
-      value:'Basilic',
-      isCustom:false
-    },
-    {
-      itemId:48,
-      procedureName:'Insertion Procedure',
-      groupName:'Vessel',
-      value:'Brachial',
-      isCustom:false
-    },
-    {
-      itemId:49,
-      procedureName:'Insertion Procedure',
-      groupName:'Vessel',
-      value:'Cephalic',
-      isCustom:false
-    },
-    {
-      itemId:50,
-      procedureName:'Insertion Procedure',
-      groupName:'Vessel',
-      value:'Internal Jugular',
-      isCustom:false
-    },
-    {
-      itemId:51,
-      procedureName:'Insertion Procedure',
-      groupName:'Vessel',
-      value:'Femoral',
-      isCustom:false
-    },
-    {
-      itemId:52,
-      procedureName:'Insertion Procedure',
-      groupName:'Laterality',
-      value:'Left',
-      isCustom:false
-    },
-    {
-      itemId:53,
-      procedureName:'Insertion Procedure',
-      groupName:'Laterality',
-      value:'Right',
-      isCustom:false
-    },
-    {
-      itemId:54,
-      procedureName:'Insertion Procedure',
-      groupName:'Insertion Length',
-      value:'',
-      isCustom:true
-    },
-    {
-      itemId:55,
-      procedureName:'Insertion Procedure',
-      groupName:'Circumference',
-      value:'',
-      isCustom:true
-    }
-  ];
-}
-
-function getProcedureSeed(){
-  return [
-    {
-      procedureId:1,
-      name:'PIV Start',
-      groups:[
-        {
-          groupName:'Size',
-          inputType:'radio',
-          groupItems:[1,2,3,4]
-        },
-        {
-          groupName:'Attempts',
-          inputType:'radio',
-          groupItems:[5,6]
-        },
-        {
-          groupName:'Ultrasound',
-          inputType:'radio',
-          groupItems:[7]
-        }
-      ]
-    },
-    {
-      procedureId:2,
-      name:'Lab Draw',
-      groups:[
-        {
-          groupName:'Draw Type',
-          inputType:'radio',
-          groupItems:[8,9]
-        },
-        {
-          groupName:'Attempts',
-          inputType:'radio',
-          groupItems:[10,11]
-        },
-        {
-          groupName:'Ultrasound',
-          inputType:'radio',
-          groupItems:[12]
-        }
-      ]
-    },
-    {
-      procedureId:3,
-      name:'Site Care',
-      groups:[
-        {
-          groupName:'Care Type',
-          inputType:'checkbox',
-          groupItems:[13,14,15,16]
-        }
-      ]
-    },
-    {
-      procedureId:4,
-      name:'DC IV',
-      groups:[
-        {
-          groupName:'Reasons',
-          inputType:'checkbox',
-          groupItems:[17,18,19,20,21]
-        }
-      ]
-    },
-    {
-      procedureId:5,
-      name:'Port-A-Cath',
-      groups:[
-        {
-          groupName:'Access Attempts',
-          inputType:'radio',
-          groupItems:[22,23]
-        },
-        {
-          groupName:'Deaccess',
-          inputType:'radio',
-          groupItems:[24,25,26]
-        },
-        {
-          groupName:'Cathflow',
-          inputType:'radio',
-          groupItems:[27,28]
-        }
-      ]
-    },
-    {
-      procedureId:6,
-      name:'PICC Line',
-      groups:[
-        {
-          groupName:'Removal',
-          inputType:'radio',
-          groupItems:[29,30,31,32,33]
-        },
-        {
-          groupName:'Cathflow',
-          inputType:'radio',
-          groupItems:[34,35]
-        }
-      ]
-    },
-    {
-      procedureId:7,
-      name:'Dressing Change',
-      groups:[
-        {
-          groupName:'What',
-          inputType:'radio',
-          groupItems:[36,37,38,39]
-        },
-        {
-          groupName:'Why',
-          inputType:'radio',
-          groupItems:[40,41,42]
-        }
-      ]
-    },
-    {
-      procedureId:8,
-      name:'Insertion Procedure',
-      groups:[
-        {
-          groupName:'Insertion Type',
-          inputType:'radio',
-          groupItems:[43,44,45,46]
-        },
-        {
-          groupName:'Vessel',
-          inputType:'radio',
-          groupItems:[47,48,49,50,51]
-        },
-        {
-          groupName:'Laterality',
-          inputType:'radio',
-          groupItems:[52,53]
-        },
-        {
-          groupName:'Insertion Length',
-          fieldName:'insertionLength',
-          inputType:'number',
-          groupItems:[54]
-        },
-        {
-          groupName:'Circumference',
-          fieldName:'circumference',
-          inputType:'number',
-          groupItems:[55]
-        }
-      ]
-    }
-  ];
-}

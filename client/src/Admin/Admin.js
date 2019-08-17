@@ -327,6 +327,7 @@ export default class Admin extends Component {
 
   logout(){
     this.setState({currentUser:null});
+    localStorage.clear();
   }
 
   getDateFromObjectId(objId){
@@ -418,6 +419,28 @@ export default class Admin extends Component {
       secondFilterValue:'',
       secondDropdownArr:''
     });
+  }
+
+  getOpenCalls(){
+    this.setState({isLoading:true});
+    axios.post('/get-open-calls-in-range', {
+      startDate:moment(this.state.startDate).startOf('day').toISOString(),
+      endDate:moment(this.state.endDate).endOf('day').toISOString()
+    })
+    .then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        console.log(resp.data);
+        this.setState({queriedCalls:resp.data}, this.resetFilters);
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   queryCallsByProcedure(){
@@ -638,8 +661,12 @@ export default class Admin extends Component {
                       <option value='procedureId'>Procedure</option>
                       <option value='responseTime'>Response Time</option>
                       <option value='procedureTime'>Procedure Time</option>
+                      <option value='isOpen'>Open Calls</option>
                     </select>
                   </div>
+                  {this.state.firstFilterValue === 'isOpen' &&
+                    <button className='vas-admin-search-submit' onClick={e=>{this.getOpenCalls()}}>Submit</button>
+                  }
                   {this.state.firstFilterValue === 'completedBy' &&
                     <div className='vas-admin-filter-container'>
                       <p>Nurse Name:</p>
@@ -711,7 +738,7 @@ export default class Admin extends Component {
                           <p>No calls returned with that query</p>
                         </div>
                       }
-                      {this.state.queriedCalls.map((call, idx)=>{
+                      {this.state.queriedCalls.map((call)=>{
                         let isComments = call.jobComments || call.addComments;
                         let isHospital = call.hospital;
                         let responseTimeHr = Math.floor(call.responseTime/3600000) % 24;
@@ -720,63 +747,87 @@ export default class Admin extends Component {
                         let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
                         return(
                           <div key={call._id} className='vas-admin-custom-table-item-outer'>
-                            <div className='vas-admin-custom-table-item'>
-                              <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-1'>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
-                              </div>
-                              <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2'>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
-                                  <p className='vas-admin-custom-item-subfield'>Hospital:</p>
-                                  <p className='vas-admin-custom-item-subvalue'>{isHospital ? this.state.hospitalsById[call.hospital].name : 'N/A'}</p>
+                            {!call.isOpen &&
+                              <div className='vas-admin-custom-table-item'>
+                                <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-1'>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
                                 </div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
-                                  <p className='vas-admin-custom-item-subfield'>Nurse:</p>
-                                  <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Default'}</p>
+                                <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2'>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
+                                    <p className='vas-admin-custom-item-subfield'>Nurse:</p>
+                                    <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Default'}</p>
+                                  </div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
+                                    <p className='vas-admin-custom-item-subfield'>Room:</p>
+                                    <p className='vas-admin-custom-item-subvalue'>{call.room}</p>
+                                  </div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
+                                    <p className='vas-admin-custom-item-subfield'>Hospital:</p>
+                                    <p className='vas-admin-custom-item-subvalue'>{isHospital ? this.state.hospitalsById[call.hospital].name : 'N/A'}</p>
+                                  </div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
+                                    <p className='vas-admin-custom-item-subfield'>MRN:</p>
+                                    <p className='vas-admin-custom-item-subvalue'>{call.mrn ? call.mrn : 'N/A'}</p>
+                                  </div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
+                                    <p className='vas-admin-custom-item-subfield'>Provider:</p>
+                                    <p className='vas-admin-custom-item-subvalue'>{call.provider ? call.provider : 'N/A'}</p>
+                                  </div>
                                 </div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
-                                  <p className='vas-admin-custom-item-subfield'>MRN:</p>
-                                  <p className='vas-admin-custom-item-subvalue'>{call.mrn ? call.mrn : 'N/A'}</p>
-                                </div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
-                                  <p className='vas-admin-custom-item-subfield'>Room:</p>
-                                  <p className='vas-admin-custom-item-subvalue'>{call.room}</p>
-                                </div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
-                                  <p className='vas-admin-custom-item-subfield'>Provider:</p>
-                                  <p className='vas-admin-custom-item-subvalue'>{call.provider ? call.provider : 'N/A'}</p>
-                                </div>
-                              </div>
-                              <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-3'>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
-                                  {call.proceduresDone.map((procedure, idx2)=>{
-                                    return (
-                                      <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
-                                        <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
-                                        <div className='vas-admin-query-item-container'>
-                                        {procedure.itemIds && procedure.itemIds.length &&
-                                          procedure.itemIds.map((id, idx3)=>{
-                                            let isCustom = this.state.itemsById[id].isCustom;
-                                            return (
-                                              <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].groupName + ":" + procedure.customValues[id]}</p>
-                                            )
-                                          })
-                                        }
+                                <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-3'>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
+                                    {call.proceduresDone.map((procedure)=>{
+                                      return (
+                                        <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
+                                          <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
+                                          <div className='vas-admin-query-item-container'>
+                                          {procedure.itemIds && procedure.itemIds.length &&
+                                            procedure.itemIds.map((id)=>{
+                                              let isCustom = this.state.itemsById[id].isCustom;
+                                              return (
+                                                <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].groupName + ":" + procedure.customValues[id]}</p>
+                                              )
+                                            })
+                                          }
+                                          </div>
                                         </div>
-                                      </div>
-                                    )
-                                  })}
+                                      )
+                                    })}
+                                  </div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-jobComment'></div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-addComments'></div>
                                 </div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-jobComment'></div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-addComments'></div>
+                                <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-4'>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-callTime'><p className='vas-admin-left-column'>Call Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p></div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-startTime'><p className='vas-admin-left-column'>Start Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.startTime}</Moment></p></div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-endTime'><p className='vas-admin-left-column'>End Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.completedAt}</Moment></p></div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Response Time:</p><p className='vas-admin-right-column'>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</p></div>
+                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Procedure Time:</p><p className='vas-admin-right-column'>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}{procedureTimeMin + ' Min'}</p></div>
+                                </div>
                               </div>
-                              <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-4'>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-callTime'><p className='vas-admin-left-column'>Call Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p></div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-startTime'><p className='vas-admin-left-column'>Start Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.startTime}</Moment></p></div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-endTime'><p className='vas-admin-left-column'>End Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.completedAt}</Moment></p></div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Response Time:</p><p className='vas-admin-right-column'>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</p></div>
-                                <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Procedure Time:</p><p className='vas-admin-right-column'>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}{procedureTimeMin + ' Min'}</p></div>
-                              </div>
-                            </div>
+                            }
+                            {call.isOpen &&
+                              <span className='w-100'>
+                                <div className='vas-admin-is-open-container'>
+                                  <div data-width='15'>
+                                    <p><b>Opened:</b> <Moment format='HH:mm'>{call.startTime}</Moment></p>
+                                  </div>
+                                  <div data-width='25'>
+                                    <p><b>Job:</b> {call.job}</p>
+                                  </div>
+                                  <div data-width='10'>
+                                    <p><b>User:</b> {this.state.userDataByUserId[call.openBy] ? this.state.userDataByUserId[call.openBy].fullname : 'Admin'}</p>
+                                  </div>
+                                  <div >
+                                    <p data-width='10'><b>Room:</b> {call.room}</p>
+                                  </div>
+                                  <div data-width='40'>
+                                    <button className='vas-button'>Return To Queue</button>
+                                    <button className='vas-button vas-red-button'>Delete Call</button>
+                                  </div>
+                                </div>
+                              </span>
+                            }
                             {isComments &&
                               <div className='vas-admin-custom-table-item-comments'>
                                 {call.jobComments && 
