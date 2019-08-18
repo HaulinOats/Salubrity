@@ -420,14 +420,16 @@ exports.itemSeed = [
     procedureName:'Insertion Procedure',
     groupName:'Insertion Length',
     value:'',
-    isCustom:true
+    isCustom:true,
+    fieldAbbr:'Len'
   },
   {
     itemId:55,
     procedureName:'Insertion Procedure',
     groupName:'Circumference',
     value:'',
-    isCustom:true
+    isCustom:true,
+    fieldAbbr:'Circ'
   }
 ];
 

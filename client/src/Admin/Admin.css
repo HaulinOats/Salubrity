@@ -179,15 +179,15 @@
   cursor:pointer;
   user-select: none;
 }
-.vas-admin-query-procedure-names {
-  white-space: nowrap;
-}
 
 .vas-admin-custom-table {
   width:100%;
 }
 .vas-admin-custom-table-header {
-  height: 35px;
+  height: 40px;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
   background: cadetblue;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -201,7 +201,11 @@
 .vas-admin-reverse-sort-btn {
   padding: 5px 4px;
   background: lightseagreen;
-  margin-left: 10px;
+  margin: 0 auto;
+  margin-right: 0;
+}
+.vas-admin-custom-table-header-sortby {
+  margin-left:5px;
 }
 .vas-admin-custom-table-item-outer {
   background:lightblue;
@@ -295,13 +299,18 @@
   border-bottom: dotted 1px black;
   width: 95%;
   font-weight: bold;
+  margin-bottom: 3px;
+  padding-bottom: 2px;
+  white-space: nowrap;
+}
+.vas-admin-query-item {
+  margin-bottom: 2px;
+  display: list-item;
+  list-style-position: inside;
 }
 .vas-admin-query-procedure-container {
-  width:33%;
+  width: 33.33%;
   display: inline-table;
-}
-.vas-admin-custom-table-date {
-
 }
 .vas-admin-query-item-container {
   font-size:80%;
@@ -336,6 +345,9 @@
 }
 .vas-admin-query-dropdown-2 option {
   text-transform: capitalize;
+}
+.vas-admin-custom-table-date {
+  font-size:90%;
 }
 .vas-admin-is-open-container {
   padding: 10px 5px;

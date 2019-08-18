@@ -432,7 +432,7 @@ export default class Admin extends Component {
         console.log(resp.data);
       } else {
         console.log(resp.data);
-        this.setState({queriedCalls:resp.data}, this.resetFilters);
+        this.setState({queriedCalls:resp.data});
       }
     })
     .catch(err=>{
@@ -470,6 +470,16 @@ export default class Admin extends Component {
 
   queryCallsByString(){
     this.setState({isLoading:true});
+    console.log({
+      query:{
+        key:this.state.firstFilterValue,
+        value:this.state.secondFilterValue
+      },
+      dateQuery:{
+        startDate:moment(this.state.startDate).startOf('day').toISOString(),
+        endDate:moment(this.state.endDate).endOf('day').toISOString()
+      }
+    });
     axios.post('/calls-containing-value', {
       query:{
         key:this.state.firstFilterValue,
@@ -517,7 +527,7 @@ export default class Admin extends Component {
       return this.queryCallsByProcedure();
     }
 
-    if(this.state.firstFilterValue === 'provider'){
+    if(this.state.firstFilterValue === 'provider' || this.state.firstFilterValue === 'room'){
       return this.queryCallsByString();
     }
 
@@ -785,7 +795,7 @@ export default class Admin extends Component {
                                             procedure.itemIds.map((id)=>{
                                               let isCustom = this.state.itemsById[id].isCustom;
                                               return (
-                                                <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].groupName + ":" + procedure.customValues[id]}</p>
+                                                <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].fieldAbbr + ": " + procedure.customValues[id] + 'cm'}</p>
                                               )
                                             })
                                           }

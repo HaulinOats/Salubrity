@@ -28,7 +28,7 @@ let User = mongoose.model('User', userSchema);
 
 let callSchema = new Schema({
   hospital:{type:Number, default:null},
-  room:{type:String, default:null},
+  room:{type:String, default:null, lowercase:true},
   provider:{type:String, lowercase:true},
   job:String,
   jobComments:String,
@@ -41,8 +41,8 @@ let callSchema = new Schema({
   proceduresDone:[Object],
   mrn:{type:Number, default:null},
   completedAt:{type:Date, default:null, index:true},
-  responseTime:Number,
-  procedureTime:Number,
+  responseTime:{type:Number, default:null},
+  procedureTime:{type:Number, default:null},
   completedBy:{type:Number, default:null},
   isTest:{type:Boolean, default:null}
 })
@@ -54,7 +54,8 @@ let itemSchema = new Schema({
   procedureName:{type:String, required:true},
   groupName:{type:String, required:true},
   value:{type:String, default:null},
-  isCustom:{type:Boolean, required:true}
+  isCustom:{type:Boolean, required:true},
+  fieldAbbr:{type:String, default:null}
 })
 itemSchema.plugin(uniqueValidator, {message: 'Could not insert item on unique constraint: {PATH} {VALUE} {TYPE}'});
 let Item = mongoose.model('Item', itemSchema);

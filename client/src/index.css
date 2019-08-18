@@ -285,8 +285,8 @@ button:active {
 .vas-select {
   border-radius: 3px;
   padding:3px 0;
+  background:white;
 }
-
 .vas-table {
   margin-bottom:0;
   background-color:#c5d5e6;
