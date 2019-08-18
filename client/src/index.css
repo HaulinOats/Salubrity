@@ -96,6 +96,7 @@ button {
   box-shadow: 1px 1px 2px black;
   color: white;
   margin-right:8px;
+  white-space: nowrap;
 }
 button:active {
   box-shadow:none;
@@ -289,6 +290,7 @@ button:active {
 .vas-table {
   margin-bottom:0;
   background-color:#c5d5e6;
+  width:100%;
 }
 .vas-table-tr {
   cursor:pointer;
@@ -323,4 +325,64 @@ button:active {
 .vas-loading-text{
   text-align: center;
   color:cadetblue;
+}
+.vas-width-10 {
+  width:10%;
+}
+.vas-width-15 {
+  width:15%;
+}
+.vas-width-20{
+  width:20%;
+}
+.vas-width-25{
+  width:25%;
+}
+.vas-width-30 {
+  width:30%;
+}
+.vas-width-35{
+  width:35%;
+}
+.vas-width-40{
+  width:40%;
+}
+.vas-width-45{
+  width:45%;
+}
+.vas-width-50{
+  width:50%;
+}
+.vas-nowrap {
+  white-space: nowrap;
+}
+
+@media (max-width: 650px) {
+  body {
+    font-size:15px;
+  }
+  button {
+    padding:2%;
+  }
+  .vas-home-container {
+    padding-top:50px;
+  }
+  .vas-home-main-header {
+    padding:0 2%;
+    height:40px;
+  }
+  .vas-home-header-title {
+    font-size:100%;
+    margin-right:3%;
+  }
+  .vas-home-nav-item {
+    font-size:80%;
+  }
+  .vas-table-thead-row,
+  .vas-home-table-tr {
+    font-size:75%;
+  }
+  .vas-home-refresh {
+    width:12px;
+  }
 }

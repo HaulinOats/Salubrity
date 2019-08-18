@@ -2,9 +2,6 @@
   padding-top:60px;
 }
 .vas-home-main-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   height: 50px;
   position: fixed;
   top: 0;
@@ -18,24 +15,24 @@
 .vas-home-header-title {
   font-size: 150%;
   color: bisque;
-  margin-right:40px;
+  margin-right:20px;
+  display: inline;
 }
-.vas-home-header-option {
-  padding: 5px 10px;
-  border-right: solid 1px white;
-  cursor:pointer;
+.vas-home-main-header-left,
+.vas-home-main-header-right {
+  display: inline-flex;
+  align-items: center;
+  width: 50%;
+  height:100%;
 }
-.vas-home-main-header-left li{
-  display:inline;
+.vas-home-add-call {
+  margin-right:0;
 }
-.vas-home-main-header-left li:last-child {
-  border:none;
-}
-.vas-home-header-ul li {
-  cursor:pointer;
-  display:inline;
+.vas-home-main-header-right {
+  justify-content: flex-end;
 }
 .vas-home-main-header-user{
+  display:inline-block;
   text-transform: capitalize;
   margin-right:10px;
   padding-right:10px;
@@ -46,6 +43,7 @@
   padding: 5px;
   border-radius: 3px;
   box-shadow: 1px 1px 2px black;
+  margin-right:0;
 }
 .vas-home-main-header-logout:active {
   border:none;
@@ -61,7 +59,7 @@
   margin-bottom:10px;
 }
 .vas-home-record-header-subtext {
-  font-size:135%;
+  font-size:110%;
   margin-bottom:10px;
 }
 .vas-home-nav-tabs {
@@ -79,7 +77,7 @@
   border-top-right-radius: 5px;
   color: lightgrey;
   cursor: pointer;
-  line-height: 30px;
+  line-height: 190%;
 }
 .vas-home-nav-item[data-isactive='true']{
   background:cadetblue;
@@ -115,9 +113,6 @@
   border-color: transparent !important;
 }
 /* Main tab/page  */
-.vas-home-inner-container {
-  border-top: solid 2px cadetblue;
-}
 .vas-home-inner-container-main-comment {
   
 }
@@ -205,11 +200,11 @@
   max-width: 30%;
 }
 .vas-table-thead-row {
+  display: flex;
   background: cadetblue;
 }
 .vas-table-thead-row div{
   color: white;
-  border-bottom: 3px solid darkslategrey !important;
   display:inline-block;
   padding:10px 0 10px 5px;
 }
@@ -218,6 +213,8 @@
   width:100%;
   border-top: 1px solid #dee2e6;
   cursor:pointer;
+  display: flex;
+  align-items: end;
 }
 .vas-home-table-tr div {
   padding-left:5px;
@@ -269,7 +266,7 @@
   background: lightblue;
 }
 .vas-home-final-container {
-  padding: 22px 10px 25px 20px;
+  padding: 22px 10px 25px 10px;
 }
 .vas-home-contact-id {
   display: block;
@@ -298,7 +295,7 @@
   font-size: 115%;
   padding: 10px 0px;
   display: inline-block;
-  margin-right: 15px;
+  margin-right: 20px;
 }
 .vas-home-option-inner select{
   height: 40px;
@@ -306,7 +303,9 @@
   cursor: pointer;
 }
 .vas-home-option-inner label {
+  display:block;
   margin-right:10px;
+  margin-bottom:5px;
 }
 .vas-home-inner-span[data-procedure="InsertionProcedure"]{
   display:none;
@@ -325,7 +324,11 @@
   animation-duration: 2s;
   animation-name:refreshAnimate;
 }
-
+.vas-home-complete-procedure-btn {
+  background: seagreen;
+  padding: 10px;
+  font-size: 110%;
+}
 @keyframes refreshAnimate {
   from {
     transform: rotate(0deg)

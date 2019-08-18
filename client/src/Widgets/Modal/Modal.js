@@ -133,7 +133,7 @@ export default class Modal extends Component {
               <div>
                 <div className="vas-modal-add-call-row">
                   <div className="vas-modal-add-call-row-inner">
-                    <p>Room Number</p>
+                    <p>Room:</p>
                       <DebounceInput
                         className="vas-modal-add-call-input"
                         minLength={1}
@@ -141,7 +141,7 @@ export default class Modal extends Component {
                         onChange={e => {this.setState({roomNumber: e.target.value}, this.validateAddCall)}} />
                   </div>
                   <div className="vas-modal-add-call-row-inner">
-                    <p>Need</p>
+                    <p>Need:</p>
                     <select className="vas-modal-add-call-input" onClick={e => {this.setState({needOpened:true})}} onChange={this.handleNeedSelect}>
                       <option value="default">Select Need</option>
                       <option>Lab Draw</option>
@@ -157,7 +157,7 @@ export default class Modal extends Component {
                     </select>
                     </div>
                     <div className="vas-modal-add-call-row-inner">
-                      <p>Contact Number</p>
+                      <p>Contact:</p>
                       <input type='text' className='vas-modal-add-call-input' value={this.state.contactNumber} onChange={e => {this.setState({contactNumber: e.target.value}, this.validateAddCall)}} />
                     </div>
                   </div>

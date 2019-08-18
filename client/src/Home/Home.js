@@ -14,7 +14,6 @@ export default class Home extends Component{
       activeHomeTab:'queue',
       isLoading:false,
       modalIsOpen:false,
-      endTaskSliderValue:0,
       userId:'',
       modalTitle:'',
       modalMessage:'',
@@ -40,8 +39,7 @@ export default class Home extends Component{
       
     }
     this.toggleHandler = this.toggleHandler.bind(this);
-    this.sliderChange = this.sliderChange.bind(this);
-    this.sliderEnd = this.sliderEnd.bind(this);
+    this.completeProcedure = this.completeProcedure.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.getConfirmation = this.getConfirmation.bind(this);
     this.getAddedCall = this.getAddedCall.bind(this);
@@ -257,69 +255,62 @@ export default class Home extends Component{
     });
   }
 
-  sliderChange(e){
-    console.log(e.target.value);
-    if(e.target.value < 100){
-      this.setState({
-        endTaskSliderValue:e.target.value
-      })
-    } else {
-      let proceduresArr = this.createProcedureObject();
-      if(this.procedureVerified(proceduresArr)){
-        // grab custom input values if a procedure was selected that has them
-        //check if any procedures have required fields
-        for(let i = 0; i < proceduresArr.length; i++){
-          //Insertion Procedure
-          if(proceduresArr[i].procedureId === 8){
-            proceduresArr[i].itemIds.push(54, 55);
-            proceduresArr[i].customValues = {
-              '54': Number(this.state.insertionLength),
-              '55': Number(this.state.circumference)
-            }
+  completeProcedure(){
+    let proceduresArr = this.createProcedureObject();
+    if(this.procedureVerified(proceduresArr)){
+      // grab custom input values if a procedure was selected that has them
+      //check if any procedures have required fields
+      for(let i = 0; i < proceduresArr.length; i++){
+        //Insertion Procedure
+        if(proceduresArr[i].procedureId === 8){
+          proceduresArr[i].itemIds.push(54, 55);
+          proceduresArr[i].customValues = {
+            '54': Number(this.state.insertionLength),
+            '55': Number(this.state.circumference)
           }
         }
-
-        let completionTime = new Date();
-        let callTime = this.getDateFromObjectId(this.state.activeRecord._id);
-        let startTime = new Date(this.state.activeRecord.startTime);
-
-        this.setState({isLoading:true});
-        axios.post('/procedure-completed', {
-          _id:this.state.activeRecord._id,
-          proceduresDone:proceduresArr,
-          completedBy:Number(this.state.currentUser.userId),
-          completedAt:completionTime.toISOString(),
-          addComments:this.state.addComments.length ? this.state.addComments : null,
-          hospital:this.state.hospital ? Number(this.state.hospital) : null,
-          mrn:Number(this.state.mrn),
-          provider:this.state.provider,
-          procedureTime:completionTime - startTime,
-          responseTime:startTime - callTime
-        })
-        .then(resp=>{
-          if(resp.data.error || resp.data._message){
-            console.log(resp.data);
-          } else {
-            this.setState({
-              activeRecord:null,
-              modalTitle:'Task Complete',
-              modalMessage:'Procedure was completed. Returning to queue.',
-              modalIsOpen:true,
-              activeHomeTab:'queue'
-            }, ()=>{
-              setTimeout(()=>{
-                window.location.reload();
-              }, 2000);
-            });
-          }
-        })
-        .catch((err)=>{
-          console.log(err);
-        })
-        .finally(()=>{
-          this.setState({isLoading:false});
-        })
       }
+
+      let completionTime = new Date();
+      let callTime = this.getDateFromObjectId(this.state.activeRecord._id);
+      let startTime = new Date(this.state.activeRecord.startTime);
+
+      this.setState({isLoading:true});
+      axios.post('/procedure-completed', {
+        _id:this.state.activeRecord._id,
+        proceduresDone:proceduresArr,
+        completedBy:Number(this.state.currentUser.userId),
+        completedAt:completionTime.toISOString(),
+        addComments:this.state.addComments.length ? this.state.addComments : null,
+        hospital:this.state.hospital ? Number(this.state.hospital) : null,
+        mrn:Number(this.state.mrn),
+        provider:this.state.provider,
+        procedureTime:completionTime - startTime,
+        responseTime:startTime - callTime
+      })
+      .then(resp=>{
+        if(resp.data.error || resp.data._message){
+          console.log(resp.data);
+        } else {
+          this.setState({
+            activeRecord:null,
+            modalTitle:'Task Complete',
+            modalMessage:'Procedure was completed. Returning to queue.',
+            modalIsOpen:true,
+            activeHomeTab:'queue'
+          }, ()=>{
+            setTimeout(()=>{
+              window.location.reload();
+            }, 2000);
+          });
+        }
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+      .finally(()=>{
+        this.setState({isLoading:false});
+      })
     }
   }
 
@@ -372,19 +363,11 @@ export default class Home extends Component{
       this.setState({
         modalIsOpen:true, 
         modalTitle:'Cannot Submit Procedure',
-        modalMessage:errors,
-        endTaskSliderValue:0
+        modalMessage:errors
       });
       return false;
     }
     return true;
-  }
-
-  sliderEnd(e){
-    if(this.state.endTaskSliderValue < 100){
-      this.setState({endTaskSliderValue:0})
-      e.target.value = 0;
-    }
   }
 
   closeModal(){
@@ -591,17 +574,14 @@ export default class Home extends Component{
         {this.state.currentUser &&
           <div className="container-fluid vas-home-container">
             <header className='vas-home-main-header'>
-              <ul className='vas-home-main-header-left'>
-                <li className='vas-home-header-title'>VAS Tracker</li>
-                <li className='vas-home-header-option'><button onClick={this.addCall}>Add Call</button></li>
-                {/* <li className='vas-home-header-option'><button onClick={this.takePicture}>Take Picture</button></li> */}
-              </ul>
-              <span>
-                <ul className='vas-home-header-ul'>
-                  <li className='vas-home-main-header-user'>{this.state.currentUser.fullname}</li>
-                  <li><button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button></li>
-                </ul>
-              </span>
+              <div className='vas-home-main-header-left'>
+                <h1 className='vas-home-header-title'>VAS Tracker</h1>
+                <button className='vas-button vas-home-add-call' onClick={this.addCall}>Add Call</button>
+              </div>
+              <div className='vas-home-main-header-right'>
+                <p className='vas-home-main-header-user vas-nowrap'>{this.state.currentUser.fullname}</p>
+                <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
+              </div>
             </header>
             <ul className='vas-home-nav-tabs'>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.clickQueueTab()}}>Queue <img className='vas-home-refresh' src={refreshImg} alt="refresh" onClick={e=>{this.animateRefresh(e)}}/></li>
@@ -612,10 +592,10 @@ export default class Home extends Component{
             </ul>
             <div className="vas-home-tabContent">
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'queue' ? true : false}>
-                <div className="vas-home-table vas-table table">
+                <div className="vas-home-table vas-table">
                   <div className='vas-table-thead-row'>
-                    <div className='vas-width-10'>Room</div>
-                    <div className='vas-width-40'>Job</div>
+                    <div className='vas-width-15'>Room</div>
+                    <div className='vas-width-35'>Job</div>
                     <div className='vas-width-15'>Contact</div>
                     <div className='vas-width-15'>Open By</div>
                     <div className='vas-width-20'>Call Time</div>
@@ -624,8 +604,8 @@ export default class Home extends Component{
                     {this.state.queueItems.length > 0 && this.state.queueItems.map((item, idx)=>{
                       return(
                         <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
-                          <div className='vas-width-10'>{item.room}</div>
-                          <div className='vas-width-40'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.jobComments}</div>
+                          <div className='vas-width-15'>{item.room}</div>
+                          <div className='vas-width-35'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.jobComments}</div>
                           <div className='vas-width-15'>{item.contact}</div>
                           <div className='vas-width-15'>{item.openBy ? item.openBy : ''}</div>
                           <div className='vas-width-20'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
@@ -639,43 +619,37 @@ export default class Home extends Component{
                 </div>
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'complete' ? true : false}>
-                <table className="vas-home-table vas-queue-table table">
-                  <thead className="vas-queue-thead">
-                    <tr className='vas-table-thead-row'>
-                      <th className='w-10'>Room</th>
-                      <th className='w-30'>Job Requested</th>
-                      <th className='w-10'>Done By</th>
-                      <th className='w-10'>Call Time</th>
-                      <th className='w-10'>Start Time</th>
-                      <th className='w-10'>End Time</th>
-                      <th className='w-10'>Response Time</th>
-                      <th className='w-10'>Procedure Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {this.state.completedCalls.length < 0 &&
-                      <tr><td></td><td className="vas-queue-no-items">There are no items completed</td></tr>
-                    }
-                    {this.state.completedCalls.map((item, idx)=>{
-                      let responseTimeHr = Math.floor(item.responseTime/3600000) % 24;
-                      let responseTimeMin = Math.floor(item.responseTime/60000) % 60;
-                      let procedureTimeHr = Math.floor(item.procedureTime/3600000) % 24;
-                      let procedureTimeMin = Math.floor(item.procedureTime/60000) % 60;
-                      return(
-                        <tr key={item._id} className='vas-table-tbody-row'>
-                          <td>{item.room}</td>
-                          <td><i className='vas-table-job-name'>{item.job}</i></td>
-                          <td>{item.completedBy}</td>
-                          <td><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></td>
-                          <td><Moment format='HH:mm'>{item.startTime}</Moment></td>
-                          <td><Moment format='HH:mm'>{item.completedAt}</Moment></td>
-                          <td>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</td>
-                          <td>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}{procedureTimeMin + ' Min'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+                <div className="vas-home-table vas-table">
+                    <div className='vas-table-thead-row'>
+                      <div className='vas-width-15'>Room</div>
+                      <div className='vas-width-45'>Job Requested</div>
+                      {/* <div className='vas-width-10'>Done By</div> */}
+                      <div className='vas-width-10'>Call Time</div>
+                      <div className='vas-width-15'>Response Time</div>
+                      <div className='vas-width-15'>Procedure Time</div>
+                    </div>
+                    <div className='vas-home-table-body'>
+                      {this.state.completedCalls.length < 0 &&
+                        <div><p className='vas-queue-no-items'>There are no completed items yet for today</p></div>
+                      }
+                      {this.state.completedCalls.map((item, idx)=>{
+                        let responseTimeHr = Math.floor(item.responseTime/3600000) % 24;
+                        let responseTimeMin = Math.floor(item.responseTime/60000) % 60;
+                        let procedureTimeHr = Math.floor(item.procedureTime/3600000) % 24;
+                        let procedureTimeMin = Math.floor(item.procedureTime/60000) % 60;
+                        return(
+                          <div key={item._id} className='vas-home-table-tr'>
+                            <div className='vas-width-15 vas-nowrap'>{item.room}</div>
+                            <div className='vas-width-45'><i className='vas-table-job-name'>{item.job} {item.jobComments ? ' - ' + item.jobComments : ''}</i></div>
+                            {/* <div className='vas-width-10'>{item.completedBy}</div> */}
+                            <div className='vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
+                            <div className='vas-width-15'>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}<span className='vas-nowrap'>{responseTimeMin + ' Min'}</span></div>
+                            <div className='vas-width-15'>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}<span className='vas-nowrap'>{procedureTimeMin + ' Min'}</span></div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                </div>
               </div>
               {this.state.activeRecord && Object.keys(this.state.allItems).length &&
                 <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
@@ -780,8 +754,7 @@ export default class Home extends Component{
                     </header>
                     <div className='vas-home-final-container'>
                       <div>
-                        <p>Slide To Submit Task</p>
-                        <input type="range" min="0" max="100" step="1" defaultValue={this.state.endTaskSliderValue} onChange={this.sliderChange} onMouseUp={this.sliderEnd} className="pullee" />
+                        <button className='vas-button vas-home-complete-procedure-btn' onClick={this.completeProcedure}>Submit Procedure</button>
                       </div>
                     </div>
                   </div>
