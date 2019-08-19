@@ -795,7 +795,7 @@ export default class Admin extends Component {
                                             procedure.itemIds.map((id)=>{
                                               let isCustom = this.state.itemsById[id].isCustom;
                                               return (
-                                                <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].fieldAbbr + ": " + procedure.customValues[id] + 'cm'}</p>
+                                                <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].valuePrefix + procedure.customValues[id] + this.state.itemsById[id].valueSuffix}</p>
                                               )
                                             })
                                           }

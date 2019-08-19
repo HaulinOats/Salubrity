@@ -32,7 +32,6 @@ export default class Home extends Component{
       hospital:'',
       insertionTypeSelected:false,
       insertionLength:'',
-      circumference:'',
       customFields:[],
       mrn:'',
       provider:''
@@ -60,9 +59,10 @@ export default class Home extends Component{
       this.handleUserSessionData();
     }
     if(this.isValidStorageItem(storageActiveTab)){
-      this.setState({activeHomeTab:JSON.parse(storageActiveTab)});
+      this.setState({activeHomeTab:JSON.parse(storageActiveTab)}, this.stateLoadCalls);
+    } else {
+      this.stateLoadCalls();
     }
-    setTimeout(()=>{this.stateLoadCalls()}, 100);
   }
 
   componentDidMount() {
@@ -263,10 +263,9 @@ export default class Home extends Component{
       for(let i = 0; i < proceduresArr.length; i++){
         //Insertion Procedure
         if(proceduresArr[i].procedureId === 8){
-          proceduresArr[i].itemIds.push(54, 55);
+          proceduresArr[i].itemIds.push(54);
           proceduresArr[i].customValues = {
-            '54': Number(this.state.insertionLength),
-            '55': Number(this.state.circumference)
+            '54': Number(this.state.insertionLength)
           }
         }
       }
@@ -345,8 +344,8 @@ export default class Home extends Component{
     }
 
     if(this.state.insertionTypeSelected){
-      if(!this.state.insertionLength.length || !this.state.circumference.length){
-        errors += '- You must enter values for Insertion Length and Circumference\n';
+      if(!this.state.insertionLength.length){
+        errors += '- You must enter an insertion length\n';
       }
       if(!this.state.hospital.length || this.state.hospital === 'default'){
         errors += '- You must select a hospital\n';
@@ -381,7 +380,7 @@ export default class Home extends Component{
   }
 
   clickQueueTab(){
-    this.setState({activeHomeTab:'queue'}, this.getActiveCalls());
+    this.setState({activeHomeTab:'queue'}, this.getActiveCalls);
     document.querySelector('.vas-home-refresh').classList.toggle('vas-refresh-animate');
   }
 
@@ -459,7 +458,7 @@ export default class Home extends Component{
       if(resp.data.error || resp.data._message){
         console.log(resp.data.error)
       } else {
-        this.setState({activeRecord:null, activeHomeTab:'queue'}, this.getActiveCalls());
+        this.setState({activeRecord:null, activeHomeTab:'queue'}, this.getActiveCalls);
       }
     })
     .catch((err)=>{
@@ -514,7 +513,6 @@ export default class Home extends Component{
       let groupContainer = e.target.closest('.vas-home-inner-span');
       while(groupContainer.nextSibling){
         let nextSib =  groupContainer.nextSibling.querySelector('.vas-home-select-input');
-        console.log(nextSib.id);
         if(nextSib.id === '7' || nextSib.id === '12'){
           nextSib.checked = false;
         } else {
@@ -604,7 +602,7 @@ export default class Home extends Component{
                     {this.state.queueItems.length > 0 && this.state.queueItems.map((item, idx)=>{
                       return(
                         <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
-                          <div className='vas-width-15'>{item.room}</div>
+                          <div className='vas-width-15 vas-nowrap vas-uppercase'>{item.room}</div>
                           <div className='vas-width-35'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.jobComments}</div>
                           <div className='vas-width-15'>{item.contact}</div>
                           <div className='vas-width-15'>{item.openBy ? item.openBy : ''}</div>
@@ -629,7 +627,7 @@ export default class Home extends Component{
                       <div className='vas-width-15'>Procedure Time</div>
                     </div>
                     <div className='vas-home-table-body'>
-                      {this.state.completedCalls.length < 0 &&
+                      {this.state.completedCalls.length < 1 &&
                         <div><p className='vas-queue-no-items'>There are no completed items yet for today</p></div>
                       }
                       {this.state.completedCalls.map((item, idx)=>{
@@ -639,7 +637,7 @@ export default class Home extends Component{
                         let procedureTimeMin = Math.floor(item.procedureTime/60000) % 60;
                         return(
                           <div key={item._id} className='vas-home-table-tr'>
-                            <div className='vas-width-15 vas-nowrap'>{item.room}</div>
+                            <div className='vas-width-15 vas-nowrap vas-uppercase'>{item.room}</div>
                             <div className='vas-width-45'><i className='vas-table-job-name'>{item.job} {item.jobComments ? ' - ' + item.jobComments : ''}</i></div>
                             {/* <div className='vas-width-10'>{item.completedBy}</div> */}
                             <div className='vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
@@ -651,7 +649,7 @@ export default class Home extends Component{
                     </div>
                 </div>
               </div>
-              {this.state.activeRecord && Object.keys(this.state.allItems).length &&
+              {this.state.activeRecord && Object.keys(this.state.allItems).length > 0 &&
                 <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                   <header className="vas-home-record-header">
                     <p className="vas-home-record-header-text"><b>{this.state.activeRecord.job}</b></p>

@@ -55,7 +55,9 @@ let itemSchema = new Schema({
   groupName:{type:String, required:true},
   value:{type:String, default:null},
   isCustom:{type:Boolean, required:true},
-  fieldAbbr:{type:String, default:null}
+  fieldAbbr:String,
+  valuePrefix:String,
+  valueSuffix:String
 })
 itemSchema.plugin(uniqueValidator, {message: 'Could not insert item on unique constraint: {PATH} {VALUE} {TYPE}'});
 let Item = mongoose.model('Item', itemSchema);
@@ -153,7 +155,7 @@ app.post('/set-call-as-open', (req, res)=>{
       } else {
         call.isOpen = true;
         call.openBy = req.body.userId;
-        call.startTime = new Date();
+        call.startTime = new Date(Date.now()).toISOString();
         call.save((err2)=>{
           if(err2) return res.send(err2);
           res.send(call);
@@ -201,7 +203,7 @@ app.post('/procedure-completed', (req, res)=>{
       call.provider = req.body.provider;
       call.proceduresDone = req.body.proceduresDone;
       call.completedBy = Number(req.body.completedBy);
-      call.completedAt = req.body.completedAt;
+      call.completedAt = new Date(Date.now()).toISOString();
       call.procedureTime = req.body.procedureTime;
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
@@ -332,11 +334,6 @@ app.post('/get-calls-date-range', (req, res) =>{
     if(err) return res.send(err);
     res.send(calls);
   });
-  // //Get all completed calls
-  // Call.find({completedAt:{$ne:null}}, (err, calls)=>{
-  //   if(err) return res.send(err);
-  //   res.send(calls);
-  // });
 });
 
 app.post('/calls-containing-value', (req, res)=>{

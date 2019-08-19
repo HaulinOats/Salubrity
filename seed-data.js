@@ -421,15 +421,9 @@ exports.itemSeed = [
     groupName:'Insertion Length',
     value:'',
     isCustom:true,
-    fieldAbbr:'Len'
-  },
-  {
-    itemId:55,
-    procedureName:'Insertion Procedure',
-    groupName:'Circumference',
-    value:'',
-    isCustom:true,
-    fieldAbbr:'Circ'
+    fieldAbbr:'Len',
+    valuePrefix:'',
+    valueSuffix:'cm'
   }
 ];
 
@@ -575,12 +569,6 @@ exports.procedureSeed = [
         fieldName:'insertionLength',
         inputType:'number',
         groupItems:[54]
-      },
-      {
-        groupName:'Circumference',
-        fieldName:'circumference',
-        inputType:'number',
-        groupItems:[55]
       }
     ]
   }

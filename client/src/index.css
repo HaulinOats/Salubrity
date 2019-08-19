@@ -356,6 +356,9 @@ button:active {
 .vas-nowrap {
   white-space: nowrap;
 }
+.vas-uppercase {
+  text-transform: uppercase;
+}
 
 @media (max-width: 650px) {
   body {
