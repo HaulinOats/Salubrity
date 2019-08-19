@@ -85,6 +85,8 @@ export default class Admin extends Component {
           this.stateLoadCalls();
         });
       }
+    } else {
+      this.stateLoadCalls();
     }
   }
 
