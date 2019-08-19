@@ -59,9 +59,7 @@ export default class Home extends Component{
       this.handleUserSessionData();
     }
     if(this.isValidStorageItem(storageActiveTab)){
-      this.setState({activeHomeTab:JSON.parse(storageActiveTab)}, this.stateLoadCalls);
-    } else {
-      this.stateLoadCalls();
+      this.setState({activeHomeTab:JSON.parse(storageActiveTab)});
     }
   }
 
@@ -97,6 +95,8 @@ export default class Home extends Component{
           this.stateLoadCalls();
         });
       }
+    } else {
+      this.stateLoadCalls();
     }
   }
 
@@ -653,7 +653,7 @@ export default class Home extends Component{
                 <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                   <header className="vas-home-record-header">
                     <p className="vas-home-record-header-text"><b>{this.state.activeRecord.job}</b></p>
-                    <p className="vas-home-record-header-subtext">Room: <b>{this.state.activeRecord.room}</b></p>
+                    <p className="vas-home-record-header-subtext vas-uppercase">Room: <b>{this.state.activeRecord.room}</b></p>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.resetForm()}}>Reset Form</button>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
                     <button className='vas-home-record-header-btn vas-warn-btn' onClick={e=>{this.deleteCall()}}>Delete Call</button>
