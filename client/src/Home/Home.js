@@ -287,7 +287,7 @@ export default class Home extends Component{
         provider:this.state.provider,
         procedureTime:completionTime - startTime,
         responseTime:startTime - callTime,
-        orderChanged: this.state.orderChanged ? Number(this.state.orderSelected) : null
+        orderChange: this.state.orderChanged ? Number(this.state.orderSelected) : null
       })
       .then(resp=>{
         if(resp.data.error || resp.data._message){
