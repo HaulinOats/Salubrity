@@ -35,7 +35,8 @@ export default class Admin extends Component {
       firstFilterValue:'',
       secondFilterValue:'',
       secondDropdownArr:[],
-      addHospitalName:''
+      addHospitalName:'',
+      addOrderChangeName:''
     }
     this.submitDateRange = this.submitDateRange.bind(this);
     this.seedProcedures = this.seedProcedures.bind(this);
@@ -49,7 +50,9 @@ export default class Admin extends Component {
     this.endDateChange = this.endDateChange.bind(this);
     this.sortByOnChange = this.sortByOnChange.bind(this);
     this.hospitalInputChange = this.hospitalInputChange.bind(this);
+    this.orderInputChange = this.orderInputChange.bind(this);
     this.addHospital = this.addHospital.bind(this);
+    this.addOrderChange = this.addOrderChange.bind(this);
   }
 
   componentWillMount(){
@@ -629,6 +632,10 @@ export default class Admin extends Component {
     this.setState({addHospitalName:e.target.value});
   }
 
+  orderInputChange(e){
+    this.setState({addOrderChangeName:e.target.value});
+  }
+
   addHospital(){
     this.setState({isLoading:true});
     axios.post('/add-hospital', {
@@ -640,6 +647,28 @@ export default class Admin extends Component {
       } else {
         let options = this.state.allOptions;
         options[0] = resp.data;
+        this.setState({allOptions:options});
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
+  }
+
+  addOrderChange(){
+    this.setState({isLoading:true});
+    axios.post('/add-order-change', {
+      orderChangeName:this.state.addOrderChangeName
+    })
+    .then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        let options = this.state.allOptions;
+        options[3] = resp.data;
         this.setState({allOptions:options});
       }
     })
@@ -959,11 +988,11 @@ export default class Admin extends Component {
                 <h3>Modify Options</h3>
                 <div className='vas-admin-options-hospitals-container'>
                   <h4>Manage Hospital Names</h4>
-                  <div className='vas-admin-hospital-input-container'>
-                    <input className='d-block' type="text" value={this.state.addHospitalName} onChange={this.hospitalInputChange} />
-                    <button className='vas-admin-hospital-input-submit' onClick={this.addHospital}>Add Hospital</button>
+                  <div className='vas-block-container'>
+                    <input className='vas-block-input' type="text" value={this.state.addHospitalName} onChange={this.hospitalInputChange} />
+                    <button className='vas-block-button' onClick={this.addHospital}>Add Hospital</button>
                   </div>
-                  <table className='vas-admin-hospitals-list'>
+                  <table className='vas-admin-list-table'>
                     <tbody>
                       <tr>
                         <th>ID</th>
@@ -971,6 +1000,31 @@ export default class Admin extends Component {
                       </tr>
                       {this.state.allOptions && this.state.allOptions[0] &&
                         this.state.allOptions[0].options.map((option, idx)=>{
+                        return(
+                          <tr key={option.id}>
+                            <td>{option.id}</td>
+                            <td>{option.name}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <hr></hr>
+                <div className='vas-admin-options-order-change-container'>
+                  <h4>Manage Order Change Options</h4>
+                  <div className='vas-admin-order-change-input-container vas-block-container'>
+                    <input className='vas-block-input' type="text" value={this.state.addOrderChangeName} onChange={this.orderInputChange} />
+                    <button className='vas-admin-order-change-input-submit vas-block-button' onClick={this.addOrderChange}>Add Order Change</button>
+                  </div>
+                  <table className='vas-admin-list-table'>
+                    <tbody>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                      </tr>
+                      {this.state.allOptions && this.state.allOptions[3] &&
+                        this.state.allOptions[3].options.map((option, idx)=>{
                         return(
                           <tr key={option.id}>
                             <td>{option.id}</td>

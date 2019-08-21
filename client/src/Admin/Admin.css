@@ -319,21 +319,21 @@
   display:inline-block;
   margin-right:15px;
 }
-.vas-admin-hospitals-list {
+.vas-admin-list-table {
   background:white;
   border-top:solid 1px black;
   border-right:solid 1px black;
 }
-.vas-admin-hospitals-list tr{
+.vas-admin-list-table tr{
   border-bottom:solid 1px black;
 }
-.vas-admin-hospitals-list th {
+.vas-admin-list-table th {
   background:cadetblue;
   color:white;
   padding:5px;
   border-left:solid 1px black;
 }
-.vas-admin-hospitals-list td {
+.vas-admin-list-table td {
   border-left:solid 1px black;
   padding:5px;
 }

@@ -422,6 +422,24 @@ app.post('/add-hospital', (req, res)=>{
   })
 })
 
+app.post('/add-order-change', (req, res)=>{
+  Option.findOne({callFieldName:'orderChange'}, (err, orderChanges)=>{
+    if(err) return res.send(err);
+    if(orderChanges){
+      orderChanges.options.push({
+        id:orderChanges.options.length + 1,
+        name:req.body.orderChangeName
+      })
+      orderChanges.save(err2=>{
+        if(err2) return res.send(err2);
+        res.send(orderChanges);
+      })
+    } else {
+      res.send({'error':'error getting order change data'});
+    }
+  })
+})
+
 app.post('/get-open-calls-in-range', (req, res)=>{
   Call.find({
     startTime: {
