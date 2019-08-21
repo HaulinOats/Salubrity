@@ -44,6 +44,7 @@ let callSchema = new Schema({
   responseTime:{type:Number, default:null},
   procedureTime:{type:Number, default:null},
   completedBy:{type:Number, default:null},
+  orderChanged:{type:Number, default:null},
   isTest:{type:Boolean, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
@@ -208,6 +209,7 @@ app.post('/procedure-completed', (req, res)=>{
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
       call.mrn = req.body.mrn;
+      call.orderChanged = req.body.orderChanged;
       call.isOpen = undefined;
       call.openBy = undefined;
       call.contact = undefined;

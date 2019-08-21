@@ -655,11 +655,11 @@ export default class Admin extends Component {
                 <div className='vas-admin-date-range-container'>
                   <div className='vas-admin-date-range-inner'>
                     <p className='vas-damin-date-label'>From:</p>
-                    <DatePicker selected={this.state.startDate} onChange={this.startDateChange} />
+                    <DatePicker className='vas-admin-datepicker' selected={this.state.startDate} onChange={this.startDateChange} />
                   </div>  
                   <div className='vas-admin-date-range-inner'>
                     <p className='vas-damin-date-label'>To:</p>
-                    <DatePicker selected={this.state.endDate} onChange={this.endDateChange} />
+                    <DatePicker className='vas-admin-datepicker' selected={this.state.endDate} onChange={this.endDateChange} />
                   </div>
                   <div className='vas-admin-filter-container'>
                     <p>Filters:</p>

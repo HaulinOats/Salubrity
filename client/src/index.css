@@ -286,6 +286,7 @@ button:active {
   border-radius: 3px;
   padding:3px 0;
   background:white;
+  min-height: 32px;
 }
 .vas-table {
   margin-bottom:0;
@@ -358,6 +359,10 @@ button:active {
 }
 .vas-uppercase {
   text-transform: uppercase;
+}
+.vas-button-pressed {
+  box-shadow: none;
+  background:mediumseagreen;
 }
 
 @media (max-width: 650px) {

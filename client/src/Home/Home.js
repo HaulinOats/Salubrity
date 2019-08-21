@@ -34,8 +34,9 @@ export default class Home extends Component{
       insertionLength:'',
       customFields:[],
       mrn:'',
-      provider:''
-      
+      provider:'',
+      orderChanged:false,
+      orderSelected:''
     }
     this.toggleHandler = this.toggleHandler.bind(this);
     this.completeProcedure = this.completeProcedure.bind(this);
@@ -285,7 +286,8 @@ export default class Home extends Component{
         mrn:Number(this.state.mrn),
         provider:this.state.provider,
         procedureTime:completionTime - startTime,
-        responseTime:startTime - callTime
+        responseTime:startTime - callTime,
+        orderChanged: this.state.orderChanged ? Number(this.state.orderSelected) : null
       })
       .then(resp=>{
         if(resp.data.error || resp.data._message){
@@ -341,6 +343,12 @@ export default class Home extends Component{
     let errors = '';
     if(!proceduresList.length){
       errors += '- You must select at least 1 procedure\n';
+    }
+
+    if(this.state.orderChanged){
+      if(!this.state.orderSelected.length){
+        errors += '- You must select an order change option\n';
+      }
     }
 
     if(this.state.insertionTypeSelected){
@@ -563,6 +571,14 @@ export default class Home extends Component{
     this.setState({[field]:e.target.value});
   }
 
+  orderSelect(e){
+    if(e.target.value === 'default'){
+      this.setState({orderSelected:''});
+    } else {
+      this.setState({orderSelected:e.target.value});
+    }
+  }
+
   render(){
     return(
       <div>
@@ -717,27 +733,41 @@ export default class Home extends Component{
                   }
                   {this.state.insertionTypeSelected &&
                     <div className='vas-home-options-container'>
-                      {this.state.allOptions.map((option, idx)=>{
-                        let isCustomInput = (option.inputType === 'number' || option.inputType === 'text') ? true : false;
-                        return(
-                          <div className='vas-home-option-inner' key={option._id}>
-                            <label>{option.name}:</label>
-                            {option.callFieldName === 'hospital' &&
-                              <select value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
-                                <option value='default'>Select A Hospital</option>
-                                {option.options.map((subOption, idx2)=>{
-                                  return <option key={subOption.id}value={subOption.id}>{subOption.name}</option>
-                                })}
-                              </select>
-                            }
-                            {isCustomInput &&
-                              <input className='vas-custom-input' type={option.inputType} value={this.state[option.callFieldName]} onChange={e=>{this.procedureOptionCustomChange(e, option.callFieldName)}} />
-                            }
-                          </div>
-                        )})
-                      }  
+                      <div className='vas-home-option-inner'>
+                        <label>{this.state.allOptions[0].name}:</label>
+                        <select value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
+                          <option value='default'>Select A Hospital</option>
+                          {this.state.allOptions[0].options.map((subOption, idx2)=>{
+                            return <option key={subOption.id}value={subOption.id}>{subOption.name}</option>
+                          })}
+                        </select>
+                      </div>
+                      <div className='vas-home-option-inner'>
+                        <label>{this.state.allOptions[1].name}:</label>{/* Medical Record Number */}
+                        <input className='vas-custom-input' type={this.state.allOptions[1].inputType} value={this.state[this.state.allOptions[1].callFieldName]} onChange={e=>{this.procedureOptionCustomChange(e, this.state.allOptions[1].callFieldName)}} />
+                      </div>
+                      <div className='vas-home-option-inner'>
+                        <label>{this.state.allOptions[2].name}:</label>{/* Provider */}
+                        <input className='vas-custom-input' type={this.state.allOptions[2].inputType} value={this.state[this.state.allOptions[2].callFieldName]} onChange={e=>{this.procedureOptionCustomChange(e, this.state.allOptions[2].callFieldName)}} />
+                      </div>
                     </div>
                   }
+                  <div className='vas-home-inner-container vas-home-order-change'>
+                    <header className='vas-home-inner-container-header'>
+                      <p>MD Order Change</p>
+                    </header>
+                    <div className='vas-home-inner-container-main'>
+                      <button className={'vas-button ' + (this.state.orderChanged ? 'vas-button-pressed' : '')} onClick={e=>{this.setState({orderChanged:true})}}>Order Was Changed</button>
+                      {this.state.orderChanged &&
+                        <select className='vas-select' value={this.state.orderSelected} onChange={e=>{this.orderSelect(e)}}>
+                          <option value="default">Select An Order</option>
+                          {this.state.allOptions[3].options.map((option, idx)=>{
+                            return <option key={option.id} value={option.id}>{option.name}</option>
+                          })}
+                        </select>
+                      }
+                    </div>
+                  </div>
                   <div className='vas-home-inner-container'>
                     <header className='vas-home-inner-container-header'>
                       <p>Additional Comments</p>
