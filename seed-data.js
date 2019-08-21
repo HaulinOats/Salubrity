@@ -43,7 +43,7 @@ exports.optionSeed = [
   {
     name:'MD Order Changed?',
     inputType:'confirm',
-    callFieldName:'orderChanged',
+    callFieldName:'orderChange',
     options:[
       {
         id:1,

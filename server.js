@@ -44,7 +44,7 @@ let callSchema = new Schema({
   responseTime:{type:Number, default:null},
   procedureTime:{type:Number, default:null},
   completedBy:{type:Number, default:null},
-  orderChanged:{type:Number, default:null},
+  orderChange:{type:Number, default:null},
   isTest:{type:Boolean, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
@@ -209,7 +209,7 @@ app.post('/procedure-completed', (req, res)=>{
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
       call.mrn = req.body.mrn;
-      call.orderChanged = req.body.orderChanged;
+      call.orderChange = req.body.orderChange;
       call.isOpen = undefined;
       call.openBy = undefined;
       call.contact = undefined;
@@ -435,6 +435,23 @@ app.post('/get-open-calls-in-range', (req, res)=>{
       res.send(calls);
     } else {
       res.send({'error':'no open calls exist within that date query'});
+    }
+  })
+})
+
+app.post('/get-order-changes-in-range', (req, res)=>{
+  Call.find({
+    startTime: {
+      $gte: new Date(req.body.startDate),
+      $lt: new Date(req.body.endDate)
+    },
+    orderChange:{$exists:true}
+  }, (err, calls)=>{
+    if(err) return res.send(err);
+    if(calls){
+      res.send(calls);
+    } else {
+      res.send({'error':'no order changes happened within that date range'});
     }
   })
 })

@@ -29,6 +29,7 @@ export default class Admin extends Component {
       hospitalsById:{},
       itemsById:{},
       proceduresById:{},
+      orderChangeById:{},
       allOptions:[],
       queriedCalls:[],
       firstFilterValue:'',
@@ -123,10 +124,15 @@ export default class Admin extends Component {
         let hospitals = {};
         resp.data[0].options.forEach(hospital=>{
           hospitals[hospital.id] = hospital;
-        })
+        });
+        let orders = {};
+        resp.data[3].options.forEach(order=>{
+          orders[order.id] = order;
+        });
         this.setState({
           allOptions:resp.data,
-          hospitalsById:hospitals
+          hospitalsById:hospitals,
+          orderChangeById:orders
         });
       }
     })
@@ -445,6 +451,28 @@ export default class Admin extends Component {
     })
   }
 
+  getOrderChanges(){
+    this.setState({isLoading:true});
+    axios.post('/get-order-changes-in-range', {
+      startDate:moment(this.state.startDate).startOf('day').toISOString(),
+      endDate:moment(this.state.endDate).endOf('day').toISOString()
+    })
+    .then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        console.log(resp.data);
+        this.setState({queriedCalls:resp.data});
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
+  }
+
   queryCallsByProcedure(){
     this.setState({isLoading:true});
     axios.post('/calls-by-procedure-id', {
@@ -671,6 +699,7 @@ export default class Admin extends Component {
                       <option value='provider'>Provider</option>
                       <option value='room'>Room</option>
                       <option value='procedureId'>Procedure</option>
+                      <option value='orderChange'>Order Change</option>
                       <option value='responseTime'>Response Time</option>
                       <option value='procedureTime'>Procedure Time</option>
                       <option value='isOpen'>Open Calls</option>
@@ -700,6 +729,9 @@ export default class Admin extends Component {
                         })}
                       </select>
                     </div>
+                  }
+                  {this.state.firstFilterValue === 'orderChange' &&
+                    <button className='vas-admin-search-submit' onClick={e=>{this.getOrderChanges()}}>Submit</button>
                   }
                   {isCustomSearch &&
                     <div className='vas-admin-filter-container'>
@@ -740,6 +772,7 @@ export default class Admin extends Component {
                           <option value='hospital'>Hospital</option>
                           <option value='mrn'>MRN</option>
                           <option value='provider'>Provider</option>
+                          <option value='orderChange'>Order Change</option>
                           <option value='responseTime'>Response Time</option>
                           <option value='procedureTime'>Procedure Time</option>
                         </select>
@@ -764,14 +797,20 @@ export default class Admin extends Component {
                                 <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-1'>
                                   <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
                                 </div>
-                                <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2'>
+                                <div className={'vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2 ' + (call.orderChange ? 'vas-admin-order-change' : '')}>
+                                  {call.orderChange &&
+                                    <div className='vas-admin-custom-table-td vas-admin-custom-table-order-change'>
+                                      <p className='vas-admin-custom-item-subfield'>Order Change:</p>
+                                      <p className='vas-admin-custom-item-subvalue'>{this.state.orderChangeById[call.orderChange].name}</p>
+                                    </div>
+                                  }
                                   <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
                                     <p className='vas-admin-custom-item-subfield'>Nurse:</p>
                                     <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Default'}</p>
                                   </div>
                                   <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
                                     <p className='vas-admin-custom-item-subfield'>Room:</p>
-                                    <p className='vas-admin-custom-item-subvalue'>{call.room}</p>
+                                    <p className='vas-admin-custom-item-subvalue vas-uppercase'>{call.room}</p>
                                   </div>
                                   <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
                                     <p className='vas-admin-custom-item-subfield'>Hospital:</p>
