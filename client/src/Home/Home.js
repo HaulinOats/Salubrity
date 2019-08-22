@@ -85,19 +85,16 @@ export default class Home extends Component{
     if(this.state.currentUser){
       //Allow user session access for 30 minutes (1800 seconds)
       //if it's been more than 30 minutes since last login, logout user
-      if(Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin > 1800){
+      if((Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin) > 1800){
         this.logout();
       } else {
         //if user has refreshed at any point and it's been less than 30 minutes, refresh session
-        let currentUser = {...this.state.currentUser}
+        let currentUser = {...this.state.currentUser};
         currentUser.lastLogin = Math.floor(Date.now() / 1000);
         this.setState({currentUser}, ()=>{
-          console.log(currentUser);
           this.stateLoadCalls();
         });
       }
-    } else {
-      this.stateLoadCalls();
     }
   }
 
@@ -142,7 +139,6 @@ export default class Home extends Component{
     this.setState({isLoading:true});
     axios.get('/get-procedures')
     .then((resp)=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
@@ -161,7 +157,6 @@ export default class Home extends Component{
     this.setState({isLoading:true});
     axios.get('/get-options')
     .then((resp)=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
@@ -180,7 +175,6 @@ export default class Home extends Component{
     this.setState({isLoading:true});
     axios.get('/get-items')
     .then((resp)=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
@@ -203,7 +197,6 @@ export default class Home extends Component{
     this.setState({isLoading:true});
     axios.get('/get-completed-calls')
     .then((resp)=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
@@ -222,9 +215,7 @@ export default class Home extends Component{
     this.setState({isLoading:true});
     axios.get('/get-active-calls')
     .then((resp)=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
         this.setState({queueItems:[]});
       } else {
         this.setState({queueItems:resp.data}, ()=>{
@@ -449,11 +440,15 @@ export default class Home extends Component{
         this.setState({isLoading:false});
       })
     } else {
-      this.setState({
-        modalIsOpen:true,
-        modalTitle:'Record Already Open',
-        modalMessage:'Please complete open task or return it to the queue'
-      })
+      if(this.state.activeRecord._id === job._id){
+        this.setState({activeHomeTab:'active'});
+      } else {
+        this.setState({
+          modalIsOpen:true,
+          modalTitle:'Record Already Open',
+          modalMessage:'Please complete open task or return it to the queue'
+        })
+      }
     }
   }
 
@@ -532,11 +527,7 @@ export default class Home extends Component{
   }
 
   changeCustomInput(e, fieldName){
-    console.log(e);
-    console.log(fieldName);
-    this.setState({[fieldName]:e.target.value}, ()=>{
-      console.log(this.state);
-    });
+    this.setState({[fieldName]:e.target.value});
   }
 
   resetForm(){

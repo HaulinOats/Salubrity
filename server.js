@@ -228,6 +228,8 @@ app.post('/get-user-by-id', (req, res)=>{
   User.findOne(req.body, (err, user)=>{
     if(err) return res.send(err);
     if(user){
+      let modifiedUser = user;
+      delete user.password;
       res.send(user);
     } else {
       res.send({'error':'could not find user from id: ' + req.body._id});
@@ -235,20 +237,19 @@ app.post('/get-user-by-id', (req, res)=>{
   })
 })
 
-//ADMIN
 app.post('/login', (req, res)=>{
   User.findOne({username:req.body.username.toLowerCase()}, (err, user)=>{
     if(err) return res.send(err);
     if(user){
-      if(user.password.toLowerCase() === req.body.password.toLowerCase()){
+      if(user.password === req.body.password){
         if(req.body.loginType === 'user'){
           let loggedUser = user;
-          delete loggedUser.password;
+          loggedUser.password = undefined;
           res.send(loggedUser);
         } else {
           if(user.role === 'admin' || user.role === 'super'){
             let loggedUser = user;
-            delete loggedUser.password;
+            loggedUser.password = undefined;
             res.send(loggedUser);
           } else {
             res.send({'error':'regular users cannot login to admin'});
@@ -263,6 +264,7 @@ app.post('/login', (req, res)=>{
   })
 });
 
+//ADMIN
 app.post('/add-user', (req, res)=>{
   let newUser = req.body;
   User.find().sort({ userId: -1 }).limit(1).exec((err, users)=>{

@@ -78,7 +78,7 @@ export default class Admin extends Component {
     if(this.state.currentUser){
       //Allow user session access for 30 minutes (1800 seconds)
       //if it's been more than 30 minutes since last login, logout user
-      if(Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin > 1800){
+      if((Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin) > 1800){
         this.logout();
       } else {
         //if user has refreshed at any point and it's been less than 30 minutes, refresh session
@@ -89,8 +89,6 @@ export default class Admin extends Component {
           this.stateLoadCalls();
         });
       }
-    } else {
-      this.stateLoadCalls();
     }
   }
 
@@ -170,7 +168,7 @@ export default class Admin extends Component {
 
     setTimeout(()=>{
       console.log(this.state);
-    }, 100);
+    }, 500);
   }
 
   componentDidMount() {
@@ -442,7 +440,6 @@ export default class Admin extends Component {
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        console.log(resp.data);
         this.setState({queriedCalls:resp.data});
       }
     })
@@ -464,7 +461,6 @@ export default class Admin extends Component {
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        console.log(resp.data);
         this.setState({queriedCalls:resp.data});
       }
     })
@@ -486,7 +482,6 @@ export default class Admin extends Component {
       }
     })
     .then(resp=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
         this.setState({queriedCalls:[]});
       } else {
@@ -503,16 +498,6 @@ export default class Admin extends Component {
 
   queryCallsByString(){
     this.setState({isLoading:true});
-    console.log({
-      query:{
-        key:this.state.firstFilterValue,
-        value:this.state.secondFilterValue
-      },
-      dateQuery:{
-        startDate:moment(this.state.startDate).startOf('day').toISOString(),
-        endDate:moment(this.state.endDate).endOf('day').toISOString()
-      }
-    });
     axios.post('/calls-containing-value', {
       query:{
         key:this.state.firstFilterValue,
@@ -524,7 +509,6 @@ export default class Admin extends Component {
       }
     })
     .then(resp=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
         this.setState({queriedCalls:[]});
       } else {
@@ -564,7 +548,6 @@ export default class Admin extends Component {
       return this.queryCallsByString();
     }
 
-    console.log(query);
     this.setState({isLoading:true});
     axios.post('/calls-by-single-criteria', query)
     .then(resp=>{
