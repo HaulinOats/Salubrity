@@ -49,6 +49,7 @@ export default class Home extends Component{
     this.loginCallback = this.loginCallback.bind(this);
     this.handleUserSessionData = this.handleUserSessionData.bind(this);
     this.logout = this.logout.bind(this);
+    this.broadcastCall = this.broadcastCall.bind(this);
   }
   
   componentWillMount(){
@@ -122,6 +123,10 @@ export default class Home extends Component{
     }
   }
 
+  broadcastCall(e){
+    
+  }
+
   getDateFromObjectId(objId){
     if(objId){
       return new Date(parseInt(objId.substring(0, 8), 16) * 1000);
@@ -142,7 +147,13 @@ export default class Home extends Component{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        this.setState({procedures:resp.data});
+        let procedures = resp.data;
+        procedures.sort((a,b)=>{
+          if(a.seq < b.seq) return -1;
+          if(a.seq > b.seq) return 1;
+          return 0;
+        });
+        this.setState({procedures});
       }
     })
     .catch((err)=>{
@@ -577,13 +588,14 @@ export default class Home extends Component{
           <Login loginType={'user'} loginCallback={this.loginCallback}/>
         }
         {this.state.currentUser &&
-          <div className="container-fluid vas-home-container">
-            <header className='vas-home-main-header'>
-              <div className='vas-home-main-header-left'>
+          <div className="vas-container-fluid vas-home-container">
+            <header className='vas-main-header'>
+              <div className='vas-header-left-container'>
                 <h1 className='vas-home-header-title'>VAS Tracker</h1>
                 <button className='vas-button vas-home-add-call' onClick={this.addCall}>Add Call</button>
+                {/* <button onClick={this.broadcastCall}>Message</button> */}
               </div>
-              <div className='vas-home-main-header-right'>
+              <div className='vas-header-right-container'>
                 <p className='vas-home-main-header-user vas-nowrap'>{this.state.currentUser.fullname}</p>
                 <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
               </div>

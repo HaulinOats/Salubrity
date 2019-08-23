@@ -677,18 +677,22 @@ export default class Admin extends Component {
         }
         {this.state.currentUser && isAdmin &&
           <div className='vas-admin-main-container'>
-            <header>
-              <h2>VAS Tracker Admin Panel</h2>
-              <ul className='vas-admin-menu'>
-                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Query Database</li>
-                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Users</li>
-                <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'options' ? true : false} onClick={e=>{this.setState({activePage:'options'})}}>Options</li>
-                {this.state.currentUser.role === 'super' &&
-                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'super' ? true : false} onClick={e=>{this.setState({activePage:'super'})}}>Super</li>
-                }
-              </ul>
-              <p className='vas-admin-username'>{this.state.currentUser.fullname}</p>
-              <p className='vas-admin-logout' onClick={this.logout}>Logout</p>
+            <header className='vas-main-header'>
+              <div className='vas-header-left-container'>
+                <h2>VAS Tracker Admin Panel</h2>
+                <ul className='vas-admin-menu'>
+                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Query Database</li>
+                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Users</li>
+                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'options' ? true : false} onClick={e=>{this.setState({activePage:'options'})}}>Options</li>
+                  {this.state.currentUser.role === 'super' &&
+                    <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'super' ? true : false} onClick={e=>{this.setState({activePage:'super'})}}>Super</li>
+                  }
+                </ul>
+              </div>
+              <div className='vas-header-right-container'>
+                <p className='vas-admin-username'>{this.state.currentUser.fullname}</p>
+                <p className='vas-admin-logout' onClick={this.logout}>Logout</p>
+              </div>
             </header>
             <div className='vas-admin-main-content'>
               <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'date' ? true : false}>
@@ -872,19 +876,19 @@ export default class Admin extends Component {
                             {call.isOpen &&
                               <span className='w-100'>
                                 <div className='vas-admin-is-open-container'>
-                                  <div data-width='15'>
+                                  <div className='vas-width-15'>
                                     <p><b>Opened:</b> <Moment format='HH:mm'>{call.startTime}</Moment></p>
                                   </div>
-                                  <div data-width='25'>
+                                  <div className='vas-width-25'>
                                     <p><b>Job:</b> {call.job}</p>
                                   </div>
-                                  <div data-width='10'>
+                                  <div className='vas-width-20'>
                                     <p><b>User:</b> {this.state.userDataByUserId[call.openBy] ? this.state.userDataByUserId[call.openBy].fullname : 'Admin'}</p>
                                   </div>
-                                  <div >
-                                    <p data-width='10'><b>Room:</b> {call.room}</p>
+                                  <div className='vas-width-10'>
+                                    <p><b>Room:</b> {call.room}</p>
                                   </div>
-                                  <div data-width='40'>
+                                  <div className='vas-width-30'>
                                     <button className='vas-button'>Return To Queue</button>
                                     <button className='vas-button vas-red-button'>Delete Call</button>
                                   </div>

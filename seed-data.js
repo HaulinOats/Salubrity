@@ -455,6 +455,69 @@ exports.itemSeed = [
     fieldAbbr:'Len',
     valuePrefix:'',
     valueSuffix:'cm'
+  },
+  {
+    itemId:55,
+    procedureName:'Troubleshoot',
+    groupName:'Action Taken',
+    value:'Midline',
+    isCustom:false
+  },
+  {
+    itemId:56,
+    procedureName:'Troubleshoot',
+    groupName:'Action Taken',
+    value:'PICC',
+    isCustom:false
+  },
+  {
+    itemId:57,
+    procedureName:'Troubleshoot',
+    groupName:'Action Taken',
+    value:'Central Line',
+    isCustom:false
+  },
+  {
+    itemId:58,
+    procedureName:'Troubleshoot',
+    groupName:'Action Taken',
+    value:'Port',
+    isCustom:false
+  },
+  {
+    itemId:59,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Power Flush',
+    isCustom:false
+  },
+  {
+    itemId:60,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Clave Change',
+    isCustom:false
+  },
+  {
+    itemId:61,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Recommend DC',
+    isCustom:false
+  },
+  {
+    itemId:62,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Line Retracted',
+    isCustom:false
+  },
+  {
+    itemId:63,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Repositioned',
+    isCustom:false
   }
 ];
 
@@ -462,6 +525,7 @@ exports.procedureSeed = [
   {
     procedureId:1,
     name:'PIV Start',
+    seq:1,
     groups:[
       {
         groupName:'Size',
@@ -483,6 +547,7 @@ exports.procedureSeed = [
   {
     procedureId:2,
     name:'Lab Draw',
+    seq:2,
     groups:[
       {
         groupName:'Draw Type',
@@ -503,6 +568,7 @@ exports.procedureSeed = [
   },
   {
     procedureId:3,
+    seq:3,
     name:'Site Care',
     groups:[
       {
@@ -514,6 +580,7 @@ exports.procedureSeed = [
   },
   {
     procedureId:4,
+    seq:4,
     name:'DC IV',
     groups:[
       {
@@ -525,6 +592,7 @@ exports.procedureSeed = [
   },
   {
     procedureId:5,
+    seq:5,
     name:'Port-A-Cath',
     groups:[
       {
@@ -546,6 +614,7 @@ exports.procedureSeed = [
   },
   {
     procedureId:6,
+    seq:6,
     name:'PICC Line',
     groups:[
       {
@@ -562,6 +631,7 @@ exports.procedureSeed = [
   },
   {
     procedureId:7,
+    seq:7,
     name:'Dressing Change',
     groups:[
       {
@@ -578,6 +648,7 @@ exports.procedureSeed = [
   },
   {
     procedureId:8,
+    seq:9,
     name:'Insertion Procedure',
     groups:[
       {
@@ -600,6 +671,23 @@ exports.procedureSeed = [
         fieldName:'insertionLength',
         inputType:'number',
         groupItems:[54]
+      }
+    ]
+  },
+  {
+    procedureId:9,
+    seq:8,
+    name:'Troubleshoot',
+    groups:[
+      {
+        groupName:'Action Taken',
+        inputType:'radio',
+        groupItems:[55,56,57,58]
+      },
+      {
+        groupName:'Intervention',
+        inputType:'checkbox',
+        groupItems:[59,60,61,62,63]
       }
     ]
   }

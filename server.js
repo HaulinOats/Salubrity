@@ -5,6 +5,8 @@ const path = require('path');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const seedData = require('./seed-data');
+
+//Mongoose
 const Schema = mongoose.Schema;
 mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnvv7pg3', {
   useNewUrlParser:true,
@@ -65,7 +67,8 @@ let Item = mongoose.model('Item', itemSchema);
 
 let procedureSchema = new Schema({
   procedureId:{type:Number, index:true, unique:true},
-  name:String,
+  name:{type:String, required:true},
+  seq:{type:Number, required:true},
   groups:[
     {
       groupName:String,
@@ -527,6 +530,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, './client/build/index.html'));
 });
 
-app.listen(app.get("port"), () => {
+app.listen(app.get('port'), ()=>{
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });

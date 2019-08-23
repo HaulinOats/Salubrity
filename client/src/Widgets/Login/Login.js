@@ -66,7 +66,7 @@ export default class Login extends Component {
 
   render(){
     return(
-      <div className='vas-login-container p-3'>
+      <div className='vas-login-container'>
         <div className="vas-login-wrap">
           <div className='vas-login-color-border'>
             <div className='vas-login-color-border-block vas-login-color-border-block-1'></div>
@@ -76,7 +76,7 @@ export default class Login extends Component {
             <div className='vas-login-color-border-block vas-login-color-border-block-5'></div>
           </div>
           <h2>VAS Tracker</h2>
-          <h3 className='text-capitalize'>{this.state.loginType} Login</h3>
+          <h3 className='vas-capitalize'>{this.state.loginType} Login</h3>
           <div className="vas-login-form">
             <DebounceInput
               className="vas-login-username-field"

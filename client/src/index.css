@@ -59,6 +59,9 @@ button:active,
   -webkit-appearance:none;
   box-shadow: none !important;
 }
+input {
+  font-size:inherit;
+}
 textarea:focus, 
 input:focus,
 button:focus,
@@ -97,9 +100,18 @@ button {
   color: white;
   margin-right:8px;
   white-space: nowrap;
+  font-size:inherit;
+  cursor: pointer;
 }
 button:active {
   box-shadow:none;
+}
+.vas-container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 /* Checkbox */
@@ -121,111 +133,29 @@ button:active {
 .vas-btn-yes {
   background-color:green;
 }
-
-/* Slide to Unlock Slider */
-.pullee {
-  margin-left:-5px;
-  display: block;
-  padding: 15px 0;
-  background: none;
-  width: 15rem;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  opacity: 1;
-  transition: opacity 2s;
+.vas-main-header {
+  position: fixed;
+  top:0;
+  left:0;
+  width:98%;
+  height:45px;
+  background: darkslategrey;
+  color:white;
+  padding:0 1%;
+  z-index: 10;
+  display:flex;
 }
-.pullee:active::-webkit-slider-thumb {
-  appearance: none;
-  transform: scale(1.1);
-  cursor: -webkit-grabbing;
-  cursor: -moz-grabbing;
+.vas-header-left-container,
+.vas-header-right-container {
+  display:flex;
+  align-items: center;
 }
-.pullee:active::-moz-range-thumb {
-  border: 0;
-  transform: scale(1.1);
-  cursor: -webkit-grabbing;
-  cursor: -moz-grabbing;
+.vas-header-left-container {
+  
 }
-.pullee:active::-ms-thumb {
-  transform: scale(1.1);
-  cursor: -webkit-grabbing;
-  cursor: -moz-grabbing;
+.vas-header-right-container {
+  margin-left:auto;
 }
-.pullee:focus {
-  outline: none;
-}
-.pullee::-webkit-slider-thumb {
-  appearance: none;
-  display: block;
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-  background: darkorange;
-  transform-origin: 50% 50%;
-  transform: scale(1);
-  transition: transform ease-out 100ms;
-  cursor: -webkit-grab;
-  cursor: -moz-grab;
-}
-.pullee::-moz-range-thumb {
-  border: 0;
-  display: block;
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-  background: darkorange;
-  transform-origin: 50% 50%;
-  transform: scale(1);
-  transition: transform ease-out 100ms;
-  cursor: -webkit-grab;
-  cursor: -moz-grab;
-}
-.pullee::-ms-thumb {
-  display: block;
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-  background: darkorange;
-  transform-origin: 50% 50%;
-  transform: scale(1);
-  transition: transform ease-out 100ms;
-  cursor: -webkit-grab;
-  cursor: -moz-grab;
-}
-.pullee::-webkit-slider-runnable-track {
-  height: 40px;
-  padding: .25rem;
-  box-sizing: content-box;
-  border-radius: 50px;
-  background-color:#ffc38b;
-}
-.pullee::-moz-range-track {
-  height: 40px;
-  padding: .25rem;
-  box-sizing: content-box;
-  border-radius: 50px;
-  background-color:#ffc38b;
-}
-.pullee::-moz-focus-outer {
-  border: 0;
-}
-.pullee::-ms-track {
-  border: 0;
-  height: 40px;
-  padding: .25rem;
-  box-sizing: content-box;
-  border-radius: 50px;
-  background-color:#ffc38b;
-  color: transparent;
-}
-.pullee::-ms-fill-lower, .pullee::-ms-fill-upper {
-  background-color: transparent;
-}
-.pullee::-ms-tooltip {
-  display: none;
-}
-
 .center-xy {
   position: absolute;
   top: 50%;
@@ -283,6 +213,7 @@ button:active {
   box-shadow: inset 1px 1px 2px black;
 }
 .vas-select {
+  font-size:inherit;
   border-radius: 3px;
   padding:3px 0;
   background:white;
@@ -359,6 +290,9 @@ button:active {
 }
 .vas-uppercase {
   text-transform: uppercase;
+}
+.vas-capitalize {
+  text-transform: capitalize;
 }
 .vas-button-pressed {
   box-shadow: none;
