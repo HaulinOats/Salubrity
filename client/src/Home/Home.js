@@ -136,6 +136,17 @@ export default class Home extends Component{
         }
         this.setState({queueItems:calls});
       }
+
+      if(callObj.action === 'callDeleted'){
+        let calls = this.state.queueItems;
+        for(let i = calls.length - 1; i >= 0; i--) {
+          if(calls[i]._id === callObj.call) {
+            calls.splice(i, 1);
+            break;
+          }
+        }
+        this.setState({queueItems:calls});
+      }
     };
     sockjs.onclose = ()=>{
       console.log('...socket closed');
@@ -453,6 +464,11 @@ export default class Home extends Component{
           })
           .then(resp=>{
             if(resp.data){
+              let callObject = {
+                action:'callDeleted',
+                call:this.state.activeRecord._id
+              }
+              sockjs.send(JSON.stringify(callObject));
               this.setState({activeRecord:null, activeHomeTab:'queue'}, ()=>{
                 window.location.reload();
               });

@@ -137,7 +137,7 @@ app.post('/add-call', (req, res)=>{
 app.post('/delete-call', (req, res)=>{
   Call.deleteOne(req.body, (err)=>{
     if (err) return res.send(err);
-    res.send(true);
+    res.send(req.body);
   });
 });
 
