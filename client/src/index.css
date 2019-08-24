@@ -113,6 +113,9 @@ button:active {
   margin-right: auto;
   margin-left: auto;
 }
+select {
+  font-size:inherit;
+}
 
 /* Checkbox */
 .vas-main-tabContent input[type="checkbox"] {
@@ -185,6 +188,32 @@ button:active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+.vas-status-dot {
+  padding:1px;
+  width: 5px;
+  height: 5px;
+  background: chartreuse;
+  border-radius: 50px;
+  margin-right: 10px;
+  box-shadow: 0px 0px 3px yellow;
+  cursor:pointer;
+}
+.vas-status-bad {
+  box-shadow: none;
+  background:red;
+  animation-name: blink;
+  animation-duration: 2s;
+  animation-direction: alternate-reverse;
+  animation-iteration-count: infinite;
+}
+@keyframes blink {
+  from {
+    background:red;
+  }
+  to {
+    background:none;
+  }
 }
 .vas-radio-select,
 .vas-checkbox-select {

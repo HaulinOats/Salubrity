@@ -150,7 +150,7 @@ export default class Modal extends Component {
                       <option>Midline</option>
                       <option>Port Access</option>
                       <option>Port De-Access</option>
-                      <option>Central Line Troubleshoot</option>
+                      <option>Troubleshoot</option>
                       <option>Dressing Change</option>
                       <option>Labs + IV</option>
                       <option>Custom</option>

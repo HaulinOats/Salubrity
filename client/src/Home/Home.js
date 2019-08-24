@@ -5,12 +5,15 @@ import axios from 'axios';
 import Moment from 'react-moment';
 import './Home.css';
 import loadingGif from '../../public/loading.gif';
-import refreshImg from '../../public/refresh.png';
+// import refreshImg from '../../public/refresh.png';
+const SockJS = require('sockjs-client');
+var sockjs = new SockJS('/calls');
 
 export default class Home extends Component{
   constructor(props){
     super(props);
     this.state = {
+      isError:false,
       activeHomeTab:'queue',
       isLoading:false,
       modalIsOpen:false,
@@ -49,7 +52,6 @@ export default class Home extends Component{
     this.loginCallback = this.loginCallback.bind(this);
     this.handleUserSessionData = this.handleUserSessionData.bind(this);
     this.logout = this.logout.bind(this);
-    this.broadcastCall = this.broadcastCall.bind(this);
   }
   
   componentWillMount(){
@@ -99,6 +101,51 @@ export default class Home extends Component{
     }
   }
 
+  sockListeners(){
+    sockjs.onopen = ()=>{
+      console.log('socket opened...');
+    };
+    sockjs.onmessage = (e)=>{
+      let callObj = JSON.parse(e.data);
+      console.log('call: ', callObj);
+
+      if(callObj.action === 'addCall'){
+        let calls = this.state.queueItems;
+        calls.push(callObj.call);
+        this.setState({queueItems:calls});
+      }
+
+      if(callObj.action === 'statusChange'){
+        let calls = this.state.queueItems;
+        for(let i = 0; i < calls.length; i++){
+          if(calls[i]._id === callObj.call._id){
+            calls[i] = callObj.call;
+            break;
+          }
+        }
+        this.setState({queueItems:calls});
+      }
+
+      if(callObj.action === 'callCompleted'){
+        let calls = this.state.queueItems;
+        for(let i = calls.length - 1; i >= 0; i--) {
+          if(calls[i]._id === callObj.call._id) {
+            calls.splice(i, 1);
+            break;
+          }
+        }
+        this.setState({queueItems:calls});
+      }
+    };
+    sockjs.onclose = ()=>{
+      console.log('...socket closed');
+    };
+    sockjs.onerror = (err)=>{
+      console.log(err);
+      this.setState({isError:true})
+    }
+  }
+
   loginCallback(user){
     let currentUser = user;
     currentUser.lastLogin = Math.floor(Date.now() / 1000);
@@ -112,6 +159,7 @@ export default class Home extends Component{
 
   stateLoadCalls(){
     if(this.state.currentUser){
+      this.sockListeners();
       this.getActiveCalls();
       this.getCompletedCalls();
       this.getProcedureData();
@@ -121,10 +169,6 @@ export default class Home extends Component{
         console.log(this.state);
       }, 250);
     }
-  }
-
-  broadcastCall(e){
-    
   }
 
   getDateFromObjectId(objId){
@@ -295,6 +339,11 @@ export default class Home extends Component{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
         } else {
+          let callObject = {
+            action:'callCompleted',
+            call:resp.data
+          }
+          sockjs.send(JSON.stringify(callObject));
           this.setState({
             activeRecord:null,
             modalTitle:'Task Complete',
@@ -390,8 +439,8 @@ export default class Home extends Component{
   }
 
   clickQueueTab(){
-    this.setState({activeHomeTab:'queue'}, this.getActiveCalls);
-    document.querySelector('.vas-home-refresh').classList.toggle('vas-refresh-animate');
+    this.setState({activeHomeTab:'queue'});
+    // document.querySelector('.vas-home-refresh').classList.toggle('vas-refresh-animate');
   }
 
   getConfirmation(isConfirmed){
@@ -425,9 +474,11 @@ export default class Home extends Component{
   }
 
   getAddedCall(addedCall){
-    let queue = this.state.queueItems;
-    queue.push(addedCall)
-    this.setState({queueItems: queue});
+    let callObject = {
+      action:'addCall',
+      call:addedCall
+    }
+    sockjs.send(JSON.stringify(callObject));
   }
 
   selectJob(job){
@@ -441,7 +492,15 @@ export default class Home extends Component{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
         } else {
-          this.setState({activeRecord:resp.data, activeHomeTab:'active'});
+          let callObject = {
+            action:'statusChange',
+            call:resp.data
+          }
+          sockjs.send(JSON.stringify(callObject));
+          this.setState({
+            activeRecord:resp.data, 
+            activeHomeTab:'active'
+          });
         }
       })
       .catch((err)=>{
@@ -472,7 +531,12 @@ export default class Home extends Component{
       if(resp.data.error || resp.data._message){
         console.log(resp.data.error)
       } else {
-        this.setState({activeRecord:null, activeHomeTab:'queue'}, this.getActiveCalls);
+        let callObject = {
+          action:'statusChange',
+          call:resp.data
+        }
+        sockjs.send(JSON.stringify(callObject));
+        this.setState({activeRecord:null, activeHomeTab:'queue'});
       }
     })
     .catch((err)=>{
@@ -593,16 +657,21 @@ export default class Home extends Component{
               <div className='vas-header-left-container'>
                 <h1 className='vas-home-header-title'>VAS Tracker</h1>
                 <button className='vas-button vas-home-add-call' onClick={this.addCall}>Add Call</button>
-                {/* <button onClick={this.broadcastCall}>Message</button> */}
               </div>
               <div className='vas-header-right-container'>
+                <span className={"vas-status-dot " + (this.state.isError ? 'vas-status-bad' : '')}></span>
                 <p className='vas-home-main-header-user vas-nowrap'>{this.state.currentUser.fullname}</p>
                 <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
               </div>
             </header>
+            {this.state.isError &&
+              <div className='vas-error-popup'>
+                <p>{this.state.errorMessage}</p>
+              </div>
+            }
             <ul className='vas-home-nav-tabs'>
-              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.clickQueueTab()}}>Queue <img className='vas-home-refresh' src={refreshImg} alt="refresh" onClick={e=>{this.animateRefresh(e)}}/></li>
-              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setState({activeHomeTab:'complete'})}}>Completed</li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.clickQueueTab()}}>Queue {/*<img className='vas-home-refresh' src={refreshImg} alt="refresh" onClick={this.animateRefresh}/>*/}</li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setState({activeHomeTab:'complete'}, this.getCompletedCalls)}}>Completed</li>
               {this.state.activeRecord &&
                 <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setState({activeHomeTab:'active'})}}>Active/Open</li>
               }

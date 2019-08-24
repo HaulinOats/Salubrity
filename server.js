@@ -1,10 +1,32 @@
 const express = require("express");
+const sockjs = require('sockjs');
 const bodyParser = require("body-parser");
 const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const seedData = require('./seed-data');
+const sockjsOpts = {prefix:'/calls'};
+const sockjs_echo = sockjs.createServer(sockjsOpts);
+let clients = {};
+
+function broadcast(callData){
+  for (let client in clients){
+    clients[client].write(JSON.stringify(callData));
+  }
+}
+
+sockjs_echo.on('connection', conn => {
+  clients[conn.id] = conn;
+
+  conn.on('data', call=>{
+    broadcast(JSON.parse(call));
+  });
+
+  conn.on('close', ()=>{
+    delete clients[conn.id];
+  })
+});
 
 //Mongoose
 const Schema = mongoose.Schema;
@@ -137,8 +159,8 @@ app.get('/get-completed-calls', (req, res)=>{
   var end = new Date();
   end.setHours(23,59,59,999);
 
-  console.log('start: ', start);
-  console.log('end  : ', end);
+  // console.log('start: ', start);
+  // console.log('end  : ', end);
 
   Call.find({completedAt: {$gte: start, $lt: end}}, (err, calls)=>{
     if(err) return res.send(err);
@@ -530,6 +552,8 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, './client/build/index.html'));
 });
 
-app.listen(app.get('port'), ()=>{
+const server = app.listen(app.get('port'), ()=>{
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });
+
+sockjs_echo.installHandlers(server, sockjsOpts);
