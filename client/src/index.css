@@ -383,6 +383,13 @@ select {
   font-weight: bold;
   color: green;
 }
+.vas-edit-icon {
+  margin-left: 5px;
+  cursor: pointer;
+}
+.vas-pointer {
+  cursor:pointer;
+}
 @media (max-width: 650px) {
   body {
     font-size:15px;

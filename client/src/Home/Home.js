@@ -492,7 +492,11 @@ export default class Home extends Component{
             activeHomeTab:'queue'
           }, ()=>{
             setTimeout(()=>{
-              window.location.reload();
+              this.setState({
+                modalTitle:'',
+                modalMessage:'',
+                modalIsOpen:false
+              })
             }, 2000);
           });
         }
@@ -581,7 +585,6 @@ export default class Home extends Component{
 
   clickQueueTab(){
     this.setState({activeHomeTab:'queue'});
-    // document.querySelector('.vas-home-refresh').classList.toggle('vas-refresh-animate');
   }
 
   getConfirmation(isConfirmed){
@@ -599,9 +602,7 @@ export default class Home extends Component{
                 call:this.state.activeRecord._id
               }
               sockjs.send(JSON.stringify(callObject));
-              this.setState({activeRecord:null, activeHomeTab:'queue'}, ()=>{
-                window.location.reload();
-              });
+              this.setState({activeRecord:null, activeHomeTab:'queue'});
             }
           })
           .catch(err=>{
@@ -813,8 +814,8 @@ export default class Home extends Component{
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'queue' ? true : false}>
                 <div className="vas-home-table vas-table">
                   <div className='vas-table-thead-row'>
-                    <div className='vas-width-10'>Room</div>
-                    <div className='vas-width-35'>Job</div>
+                    <div className='vas-width-15'>Room</div>
+                    <div className='vas-width-30'>Job</div>
                     <div className='vas-width-10'>Contact</div>
                     <div className='vas-width-30'>Open By</div>
                     <div className='vas-width-10'>Call Time</div>
@@ -823,8 +824,8 @@ export default class Home extends Component{
                     {this.state.queueItems.length > 0 && this.state.queueItems.map((item, idx)=>{
                       return(
                         <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
-                          <div className='vas-width-10 vas-nowrap vas-uppercase'>{item.room}</div>
-                          <div className='vas-width-35'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.customJob}</div>
+                          <div className='vas-width-15 vas-nowrap vas-uppercase'>{item.room}</div>
+                          <div className='vas-width-30'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.customJob}</div>
                           <div className='vas-width-10'>{item.contact}</div>
                           <div className='vas-width-30 vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : ''}</div>
                           <div className='vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
@@ -947,8 +948,16 @@ export default class Home extends Component{
               {this.state.activeRecord && this.state.itemsById &&
                 <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                   <header className="vas-home-record-header">
-                    <p className="vas-home-record-header-text"><b>{this.state.activeRecord.job}{this.state.activeRecord.customJob ? ' - ' + this.state.activeRecord.customJob : ''}</b></p>
-                    <p className="vas-home-record-header-subtext vas-uppercase">Room: <b>{this.state.activeRecord.room}</b></p>
+                    <p className="vas-home-record-header-text vas-pointer">
+                      <b onClick={e=>{this.editField('job')}}>{this.state.activeRecord.job}</b>
+                      <b onClick={e=>{this.editField('customJob')}}>{this.state.activeRecord.customJob ? ' - ' + this.state.activeRecord.customJob : ''}</b>
+                      <b className='vas-edit-icon'>&#9998;</b>
+                    </p>
+                    <p className="vas-home-record-header-subtext vas-pointer vas-uppercase">
+                      <b>Room:</b>
+                      <b onClick={e=>{this.editField('room')}}>{this.state.activeRecord.room}</b>
+                      <b className='vas-edit-icon'>&#9998;</b>
+                    </p>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.resetForm()}}>Reset Form</button>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
                     <button className='vas-home-record-header-btn vas-warn-btn' onClick={e=>{this.deleteCall()}}>Delete Call</button>
