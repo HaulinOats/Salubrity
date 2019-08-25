@@ -5,7 +5,6 @@ import axios from 'axios';
 import Moment from 'react-moment';
 import './Home.css';
 import loadingGif from '../../public/loading.gif';
-// import refreshImg from '../../public/refresh.png';
 const SockJS = require('sockjs-client');
 var sockjs = new SockJS('/calls');
 
@@ -414,20 +413,17 @@ export default class Home extends Component{
   }
 
   sendErrorsToAdmin(){
-    if(this.state.errorArr.length){
-      console.log(this.state.errorArr);
-      this.setState({isLoading:true});
-      axios.post('/send-errors-to-admin', [this.state.currentUser])
-      .then(resp=>{
-        alert('Errors sent to admin');
-      })
-      .catch(err=>{
-        alert('Error sending errors to Admin (the irony)');
-      })
-      .finally(()=>{
-        this.setState({isLoading:false});
-      })
-    }
+    this.setState({isLoading:true});
+    axios.post('/send-errors-to-admin', [this.state.currentUser])
+    .then(resp=>{
+      alert('Errors sent to admin');
+    })
+    .catch(err=>{
+      alert('Error sending errors to Admin (the irony)');
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   reverseCompletedSort(){

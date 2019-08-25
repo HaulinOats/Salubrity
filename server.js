@@ -528,32 +528,18 @@ app.post('/get-order-changes-in-range', (req, res)=>{
 
 //SUPER
 app.post('/send-errors-to-admin', (req,res)=>{
-  fs.writeFileSync('vas-errors.json', JSON.stringify(req.body, null, 2));
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'brett84c@gmail.com',
-      pass: 'BDCcon8484!!'
-    }
-  });
-  let mailOptions = {
-    from: '"VAS Tracker" <vastracker@vastracker.com>',
-    to: 'brett84c@gmail.com',
-    subject: 'VAS Errors',
-    text: 'User has reported an error',
-    attachments:[
-      {
-        filename:'vas-errors.json',
-        path:__dirname + '/vas-errors.json'
-      }
-    ]
-  };
-  
-  transporter.sendMail(mailOptions, function(err, info){
-    if (err) return res.send(err)
-    res.send(info);
+  fs.writeFile('vas-errors.json', JSON.stringify(req.body), (err)=>{
+    if(err) return res.send(err);
+    res.send(true);
   });
 });
+
+app.get('/get-errors-json', (req, res)=>{
+  fs.readFile('vas-errors.json', (err, data)=>{
+    if(err) return res.send(err);
+    res.send(JSON.parse(data));
+  });
+})
 
 app.get('/seed-super',(req,res)=>{
   User.create({
