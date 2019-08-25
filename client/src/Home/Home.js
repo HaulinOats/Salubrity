@@ -93,20 +93,21 @@ export default class Home extends Component{
   }
 
   handleUserSessionData(){
-    if(this.state.currentUser){
-      //Allow user session access for 30 minutes (1800 seconds)
-      //if it's been more than 30 minutes since last login, logout user
-      if((Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin) > 1800){
-        // this.logout();
-      } else {
-        //if user has refreshed at any point and it's been less than 30 minutes, refresh session
-        let currentUser = {...this.state.currentUser};
-        currentUser.lastLogin = Math.floor(Date.now() / 1000);
-        this.setState({currentUser}, ()=>{
-          this.stateLoadCalls();
-        });
-      }
-    }
+    // if(this.state.currentUser){
+    //   //Allow user session access for 30 minutes (1800 seconds)
+    //   //if it's been more than 30 minutes since last login, logout user
+    //   if((Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin) > 1800){
+    //     this.logout();
+    //   } else {
+    //     //if user has refreshed at any point and it's been less than 30 minutes, refresh session
+    //     let currentUser = {...this.state.currentUser};
+    //     currentUser.lastLogin = Math.floor(Date.now() / 1000);
+    //     this.setState({currentUser}, ()=>{
+    //       this.stateLoadCalls();
+    //     });
+    //   }
+    // }
+    this.stateLoadCalls();
   }
 
   sockListeners(){
