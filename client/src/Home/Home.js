@@ -13,11 +13,10 @@ export default class Home extends Component{
   constructor(props){
     super(props);
     this.state = {
-      isError:false,
+      errorArr:[],
       activeHomeTab:'queue',
       isLoading:false,
       modalIsOpen:false,
-      userId:'',
       modalTitle:'',
       modalMessage:'',
       modalConfirmation:false,
@@ -60,6 +59,8 @@ export default class Home extends Component{
     this.reverseCompletedSort = this.reverseCompletedSort.bind(this);
     this.resetSection = this.resetSection.bind(this);
     this.stateLoadCalls = this.stateLoadCalls.bind(this);
+    this.addToErrorArray = this.addToErrorArray.bind(this);
+    this.sendErrorsToAdmin = this.sendErrorsToAdmin.bind(this);
   }
   
   componentWillMount(){
@@ -162,7 +163,7 @@ export default class Home extends Component{
     };
     sockjs.onerror = (err)=>{
       console.log(err);
-      this.setState({isError:true})
+      this.addToErrorArray(err);
     }
   }
 
@@ -205,7 +206,7 @@ export default class Home extends Component{
         usersById:usersObj
       });
     }).catch((err)=>{
-      console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
@@ -272,6 +273,7 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
+        this.addToErrorArray(resp.data);
       } else {
         //sort procedures by 'seq' number
         let procedures = resp.data;
@@ -293,6 +295,7 @@ export default class Home extends Component{
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
@@ -305,6 +308,7 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
+        this.addToErrorArray(resp.data);
       } else {
         let hospitals = {};
         resp.data[0].options.forEach(hospital=>{
@@ -323,6 +327,7 @@ export default class Home extends Component{
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
@@ -335,6 +340,7 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
+        this.addToErrorArray(resp.data);
       } else {
         let items = {};
         resp.data.forEach(item=>{
@@ -347,6 +353,7 @@ export default class Home extends Component{
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
@@ -359,12 +366,14 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
+        this.addToErrorArray(resp.data);
       } else {
         this.setState({completedCalls:resp.data});
       }
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
@@ -377,6 +386,7 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         this.setState({queueItems:[]});
+        this.addToErrorArray(resp.data);
       } else {
         this.setState({queueItems:resp.data}, ()=>{
           let activeRecordExists = false;
@@ -395,10 +405,34 @@ export default class Home extends Component{
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
     })
+  }
+
+  addToErrorArray(err){
+    let errArr = this.state.errorArr;
+    errArr.push(err);
+    this.setState({errorArr:errArr});
+  }
+
+  sendErrorsToAdmin(){
+    if(this.state.errorArr.length){
+      console.log(this.state.errorArr);
+      this.setState({isLoading:true});
+      axios.post('/send-errors-to-admin', [this.state.currentUser])
+      .then(resp=>{
+        alert('Errors sent to admin');
+      })
+      .catch(err=>{
+        alert('Error sending errors to Admin (the irony)');
+      })
+      .finally(()=>{
+        this.setState({isLoading:false});
+      })
+    }
   }
 
   reverseCompletedSort(){
@@ -449,6 +483,7 @@ export default class Home extends Component{
       .then(resp=>{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
+          this.addToErrorArray(resp.data);
         } else {
           let callObject = {
             action:'callCompleted',
@@ -470,6 +505,7 @@ export default class Home extends Component{
       })
       .catch((err)=>{
         console.log(err);
+        this.addToErrorArray(err);
       })
       .finally(()=>{
         this.setState({isLoading:false});
@@ -576,7 +612,7 @@ export default class Home extends Component{
           })
           .catch(err=>{
             console.log(err);
-            alert('error deleting record');
+            this.addToErrorArray(err);
           })
           .finally(()=>{
             this.setState({isLoading:false});
@@ -607,6 +643,7 @@ export default class Home extends Component{
       .then((resp)=>{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
+          this.addToErrorArray(resp.data);
         } else {
           let callObject = {
             action:'statusChange',
@@ -621,6 +658,7 @@ export default class Home extends Component{
       })
       .catch((err)=>{
         console.log(err);
+        this.addToErrorArray(err);
       })
       .finally(()=>{
         this.setState({isLoading:false});
@@ -645,7 +683,8 @@ export default class Home extends Component{
     })
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
-        console.log(resp.data.error)
+        console.log(resp.data);
+        this.addToErrorArray(resp.data);
       } else {
         let callObject = {
           action:'statusChange',
@@ -657,6 +696,7 @@ export default class Home extends Component{
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
@@ -765,16 +805,11 @@ export default class Home extends Component{
                 <button className='vas-button vas-home-add-call' onClick={this.addCall}>Add Call</button>
               </div>
               <div className='vas-header-right-container'>
-                <span className={"vas-status-dot " + (this.state.isError ? 'vas-status-bad' : '')}></span>
+                <span className={"vas-status-dot " + (this.state.errorArr.length > 0 ? 'vas-status-bad' : '')} onClick={this.sendErrorsToAdmin}></span>
                 <p className='vas-home-main-header-user vas-nowrap'>{this.state.currentUser.fullname}</p>
                 <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
               </div>
             </header>
-            {this.state.isError &&
-              <div className='vas-error-popup'>
-                <p>{this.state.errorMessage}</p>
-              </div>
-            }
             <ul className='vas-home-nav-tabs'>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.clickQueueTab()}}>Queue {/*<img className='vas-home-refresh' src={refreshImg} alt="refresh" onClick={this.animateRefresh}/>*/}</li>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setState({activeHomeTab:'complete'}, this.getCompletedCalls)}}>Completed</li>
@@ -793,7 +828,7 @@ export default class Home extends Component{
                     <div className='vas-width-10'>Call Time</div>
                   </div>
                   <div className='vas-home-table-body'>
-                    {this.state.queueItems.length > 0 && this.state.queueItems.map((item, idx)=>{
+                    {this.state.queueItems.length > 0 && this.state.usersById && this.state.queueItems.map((item, idx)=>{
                       return(
                         <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
                           <div className='vas-width-10 vas-nowrap vas-uppercase'>{item.room}</div>

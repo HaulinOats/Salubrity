@@ -2,9 +2,11 @@ const express = require("express");
 const sockjs = require('sockjs');
 const bodyParser = require("body-parser");
 const app = express();
+const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const nodemailer = require('nodemailer');
 const seedData = require('./seed-data');
 const sockjsOpts = {prefix:'/calls'};
 const sockjs_echo = sockjs.createServer(sockjsOpts);
@@ -525,6 +527,34 @@ app.post('/get-order-changes-in-range', (req, res)=>{
 })
 
 //SUPER
+app.post('/send-errors-to-admin', (req,res)=>{
+  fs.writeFileSync('vas-errors.json', JSON.stringify(req.body, null, 2));
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'brett84c@gmail.com',
+      pass: 'BDCcon8484!!'
+    }
+  });
+  let mailOptions = {
+    from: '"VAS Tracker" <vastracker@vastracker.com>',
+    to: 'brett84c@gmail.com',
+    subject: 'VAS Errors',
+    text: 'User has reported an error',
+    attachments:[
+      {
+        filename:'vas-errors.json',
+        path:__dirname + '/vas-errors.json'
+      }
+    ]
+  };
+  
+  transporter.sendMail(mailOptions, function(err, info){
+    if (err) return res.send(err)
+    res.send(info);
+  });
+});
+
 app.get('/seed-super',(req,res)=>{
   User.create({
     fullname:'Brett Connolly',
