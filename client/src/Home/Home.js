@@ -273,7 +273,6 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
-        this.addToErrorArray(resp.data);
       } else {
         //sort procedures by 'seq' number
         let procedures = resp.data;
@@ -308,7 +307,6 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
-        this.addToErrorArray(resp.data);
       } else {
         let hospitals = {};
         resp.data[0].options.forEach(hospital=>{
@@ -340,7 +338,6 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
-        this.addToErrorArray(resp.data);
       } else {
         let items = {};
         resp.data.forEach(item=>{
@@ -366,7 +363,6 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
-        this.addToErrorArray(resp.data);
       } else {
         this.setState({completedCalls:resp.data});
       }
@@ -386,7 +382,6 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         this.setState({queueItems:[]});
-        this.addToErrorArray(resp.data);
       } else {
         this.setState({queueItems:resp.data}, ()=>{
           let activeRecordExists = false;
@@ -483,7 +478,6 @@ export default class Home extends Component{
       .then(resp=>{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
-          this.addToErrorArray(resp.data);
         } else {
           let callObject = {
             action:'callCompleted',
@@ -643,7 +637,6 @@ export default class Home extends Component{
       .then((resp)=>{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
-          this.addToErrorArray(resp.data);
         } else {
           let callObject = {
             action:'statusChange',
@@ -684,7 +677,6 @@ export default class Home extends Component{
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
-        this.addToErrorArray(resp.data);
       } else {
         let callObject = {
           action:'statusChange',
