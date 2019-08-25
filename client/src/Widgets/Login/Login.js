@@ -94,6 +94,9 @@ export default class Login extends Component {
               onChange={e => {this.setState({password: e.target.value.toLowerCase()})}}
               onKeyUp={e => {if(e.key === 'Enter'){this.login()}}} />
             <button className='vas-login-btn' onClick={e=>{this.login()}}>Sign in</button>
+            {this.state.loginType === 'user' &&
+              <button className='vas-login-btn' onClick={e=>{this.login(true)}}>Test Login</button>
+            }
             <button style={{'display':'none'}}onClick={e=>{this.seedSuper()}}>Seed Super</button>
           </div>
         </div>
