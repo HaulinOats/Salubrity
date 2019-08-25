@@ -53,6 +53,7 @@ export default class Admin extends Component {
     this.orderInputChange = this.orderInputChange.bind(this);
     this.addHospital = this.addHospital.bind(this);
     this.addOrderChange = this.addOrderChange.bind(this);
+    this.handleUserSessionData = this.handleUserSessionData.bind(this);
   }
 
   componentWillMount(){
@@ -79,7 +80,7 @@ export default class Admin extends Component {
       //Allow user session access for 30 minutes (1800 seconds)
       //if it's been more than 30 minutes since last login, logout user
       if((Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin) > 1800){
-        this.logout();
+        // this.logout();
       } else {
         //if user has refreshed at any point and it's been less than 30 minutes, refresh session
         let currentUser = {...this.state.currentUser}

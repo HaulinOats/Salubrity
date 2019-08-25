@@ -59,6 +59,7 @@ export default class Home extends Component{
     this.logout = this.logout.bind(this);
     this.reverseCompletedSort = this.reverseCompletedSort.bind(this);
     this.resetSection = this.resetSection.bind(this);
+    this.stateLoadCalls = this.stateLoadCalls.bind(this);
   }
   
   componentWillMount(){
@@ -96,7 +97,7 @@ export default class Home extends Component{
       //Allow user session access for 30 minutes (1800 seconds)
       //if it's been more than 30 minutes since last login, logout user
       if((Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin) > 1800){
-        this.logout();
+        // this.logout();
       } else {
         //if user has refreshed at any point and it's been less than 30 minutes, refresh session
         let currentUser = {...this.state.currentUser};
