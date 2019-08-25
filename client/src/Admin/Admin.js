@@ -800,7 +800,7 @@ export default class Admin extends Component {
                         </div>
                       }
                       {this.state.queriedCalls.map((call)=>{
-                        let isComments = call.jobComments || call.addComments;
+                        let isComments = call.preComments || call.addComments;
                         let isHospital = call.hospital;
                         let responseTimeHr = Math.floor(call.responseTime/3600000) % 24;
                         let responseTimeMin = Math.floor(call.responseTime/60000) % 60;
@@ -897,9 +897,6 @@ export default class Admin extends Component {
                             }
                             {isComments &&
                               <div className='vas-admin-custom-table-item-comments'>
-                                {call.jobComments && 
-                                  <p className='vas-admin-job-comments'><b>Job Comments:</b> {call.jobComments}</p>
-                                }
                                 {call.addComments &&
                                   <p className='vas-admin-add-comments'><b>Add'l Comments:</b> {call.addComments}</p>
                                 }

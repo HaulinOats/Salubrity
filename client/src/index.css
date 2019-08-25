@@ -107,9 +107,9 @@ button:active {
   box-shadow:none;
 }
 .vas-container-fluid {
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
+  width: 98%;
+  padding: 0 1%;
+  padding-top: 50px;
   margin-right: auto;
   margin-left: auto;
 }
@@ -129,6 +129,9 @@ select {
   margin: 0 15px;
   min-width: 70px;
   padding: 10px 10px;
+}
+.vas-btn-normal {
+  
 }
 .vas-btn-no {
   background-color:red;
@@ -333,7 +336,53 @@ select {
   display:block;
   margin-bottom:10px;
 }
-
+.vas-call-table-item {
+  display:flex;
+  font-size:90%;
+}
+.vas-call-times-row {
+  border-bottom: dotted 1px black;
+  padding: 1px 0;
+}
+.vas-call-times-row:last-child {
+  border-bottom:none;
+}
+.vas-call-times-left{
+  display: inline-block;
+  font-size: 90%;
+}
+.vas-call-times-right {
+  float:right;
+}
+.vas-call-comments-container {
+  margin-left: 11%;
+  width: 87%;
+  padding: 1%;
+  font-size: 85%;
+}
+.vas-call-comment {
+  margin-bottom:3px;
+}
+.vas-call-comment:last-child {
+  margin-bottom:0;
+}
+.vas-call-comment b{
+  font-weight: bold;
+}
+.vas-positive {
+  font-weight: bold;
+  color:green;
+}
+.vas-call-consultation-container{
+  padding: 1%;
+  width: 87%;
+  margin-left: 11%;
+}
+.vas-call-consultation {
+  font-size: 85%;
+  font-weight: bold;
+  color: green;
+}
 @media (max-width: 650px) {
   body {
     font-size:15px;

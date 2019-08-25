@@ -16,7 +16,9 @@
   font-size: 150%;
   color: bisque;
   margin-right:20px;
-  display: inline;
+  display: inline-block;
+  white-space: nowrap;
+
 }
 .vas-home-main-header-left,
 .vas-home-main-header-right {
@@ -136,6 +138,8 @@
   background-color: darkcyan;
   color: white;
   box-shadow: inset 0px -4px 8px -7px black;
+  display:flex;
+  align-items: center;
 }
 .vas-home-inner-container-final-header {
   background-color:darkorange;
@@ -336,4 +340,45 @@
   to {
     transform:rotate(360deg)
   }
+}
+.vas-home-completed-thead {
+  padding: 1%;
+  display: flex;
+  align-items: center;
+}
+.vas-home-custom-table-column-1 {
+  width:10%;
+  padding:1%;
+}
+.vas-home-custom-table-column-2 {
+  width:43%;
+  padding:1%;
+}
+.vas-home-custom-table-column-3 {
+  width:47%;
+  padding:1%;
+}
+.vas-home-custom-table-item-column-procedures {
+  padding: 1%;
+  width: 87%;
+  margin-left: 11%;
+}
+.vas-home-custom-table-column-2
+.vas-admin-custom-table-td {
+  border-bottom: dotted 1px black;
+  margin-bottom: 2px;
+}
+.vas-home-custom-table-column-2
+.vas-admin-custom-table-td:last-child {
+  border-bottom: none;
+}
+.vas-home-reverse-sort-btn {
+  margin: auto;
+  margin-right: 0;
+  background: teal;
+}
+.vas-btn-reset-buttons {
+  margin: 0 auto;
+  margin-right: 0;
+  padding: 5px;
 }

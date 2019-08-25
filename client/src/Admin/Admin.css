@@ -295,9 +295,11 @@
   margin-bottom: 2px;
   display: list-item;
   list-style-position: inside;
+  white-space: nowrap;
 }
 .vas-admin-query-procedure-container {
-  width: 33.33%;
+  width: 32.33%;
+  padding-left: 1%;
   display: inline-table;
 }
 .vas-admin-query-item-container {

@@ -1,7 +1,5 @@
 .vas-modal-container {
   position: fixed;
-  display: -ms-flexbox;
-  display: flex;
   top: 0;
   left: 0;
   width: 100vw;
@@ -26,13 +24,13 @@
 }
 .vas-modal-content {
   position: relative;
-  display: flex;
   min-width:30%;
   max-width: 90%;
-  margin-top: -25%;
   background: #c5d5e6;
   z-index: 1;
   border-radius: 5px;
+  top:5%;
+  margin:0 auto;
 }
 .vas-modal-content-header {
   background-color: lightseagreen;
@@ -70,6 +68,7 @@
   display: flex;
   justify-content: center;
   margin:15px 0;
+  padding-bottom:10px;
 }
 .vas-modal-cancel {
   margin-right:2%;
@@ -80,11 +79,18 @@
 .vas-modal-add-call-row {
   
 }
+.vas-modal-add-call-row-block {
+  display:block;
+  width:100%;
+  margin-bottom:15px;
+  margin-right:15px;
+}
 .vas-modal-add-call-row-inner {
   margin-right: 15px;
   display: inline-block;
   margin-bottom:15px;
 }
+.vas-modal-add-call-row-block p,
 .vas-modal-add-call-row-inner p {
   margin-bottom:5px;
   font-size:115%;
@@ -99,14 +105,11 @@
   box-shadow: inset 1px 1px 3px -1px black;
 }
 .vas-modal-add-call-textarea {
-  margin: 0 auto;
-  display: block;
-  width: 100%;
+  width: 99%;
   min-height: 110px;
   border-radius: 3px;
   border: none;
   box-shadow: inset 2px 2px 3px -2px black;
-  padding-left: 5px;
   margin-bottom: 20px;
   margin-top: 10px;
 }
@@ -114,9 +117,6 @@
   text-align: center;
   padding: 37px;
   font-size: 140%;
-}
-.vas-modal-comment-text{
-  margin-top:10px;
 }
 .vas-modal-confirmation-container {
   padding: 10px;
@@ -126,4 +126,7 @@
 .vas-modal-confirmation-btn-container {
   margin: 0 auto;
   margin-top: 20px;
+}
+.vas-modal-custom-input {
+  width:100%;
 }

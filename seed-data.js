@@ -70,6 +70,11 @@ exports.optionSeed = [
         name:'IV changed to ML'
       }
     ]
+  },
+  {
+    name:'Consultation',
+    inputType:'radio',
+    callFieldName:'wasConsultation'
   }
 ];
 
@@ -106,348 +111,446 @@ exports.itemSeed = [
   {
     itemId:5,
     procedureName:'PIV Start',
-    groupName:'Attempts',
-    value:'1 Attempt',
-    isCustom:false
-  },
-  {
-    itemId:6,
-    procedureName:'PIV Start',
-    groupName:'Attempts',
-    value:'2 Attempts',
-    isCustom:false
-  },
-  {
-    itemId:7,
-    procedureName:'PIV Start',
     groupName:'Ultrasound',
     value:'US Used',
     isCustom:false
   },
   {
-    itemId:8,
+    itemId:6,
+    procedureName:'PIV Start',
+    groupName:'Blood Drawn',
+    value:'Blood Was Drawn',
+    isCustom:false
+  },
+  {
+    itemId:7,
     procedureName:'Lab Draw',
     groupName:'Draw Type',
     value:'From IV',
     isCustom:false
   },
   {
-    itemId:9,
+    itemId:8,
     procedureName:'Lab Draw',
     groupName:'Draw Type',
     value:'Labs Only',
     isCustom:false
   },
   {
-    itemId:10,
-    procedureName:'Lab Draw',
-    groupName:'Attempts',
-    value:'1 Attempt',
-    isCustom:false
-  },
-  {
-    itemId:11,
-    procedureName:'Lab Draw',
-    groupName:'Attempts',
-    value:'2 Attempts',
-    isCustom:false
-  },
-  {
-    itemId:12,
+    itemId:9,
     procedureName:'Lab Draw',
     groupName:'Ultrasound',
     value:'US Used',
     isCustom:false
   },
   {
+    itemId:10,
+    procedureName:'Blood Culture',
+    groupName:'From',
+    value:'PICC',
+    isCustom:false
+  },
+  {
+    itemId:11,
+    procedureName:'Blood Culture',
+    groupName:'From',
+    value:'Midline',
+    isCustom:false
+  },
+  {
+    itemId:12,
+    procedureName:'Blood Culture',
+    groupName:'From',
+    value:'Central Line',
+    isCustom:false
+  },
+  {
     itemId:13,
+    procedureName:'Blood Culture',
+    groupName:'From',
+    value:'IV',
+    isCustom:false
+  },
+  {
+    itemId:14,
+    procedureName:'Blood Culture',
+    groupName:'From',
+    value:'Peripheral Stick x 1',
+    isCustom:false
+  },
+  {
+    itemId:15,
+    procedureName:'Blood Culture',
+    groupName:'From',
+    value:'Peripheral Stick x 2',
+    isCustom:false
+  },
+  {
+    itemId:16,
+    procedureName:'Blood Culture',
+    groupName:'Ultrasound',
+    value:'US Used',
+    isCustom:false
+  },
+  {
+    itemId:17,
     procedureName:'Site Care',
     groupName:'Care Type',
     value:'IV Flushed',
     isCustom:false
   },
   {
-    itemId:14,
+    itemId:18,
     procedureName:'Site Care',
     groupName:'Care Type',
     value:'Saline Locked',
     isCustom:false
   },
   {
-    itemId:15,
+    itemId:19,
     procedureName:'Site Care',
     groupName:'Care Type',
     value:'Dressing Changed',
     isCustom:false
   },
   {
-    itemId:16,
+    itemId:20,
     procedureName:'Site Care',
     groupName:'Care Type',
     value:'Dressing Reinforced',
     isCustom:false
   },
   {
-    itemId:17,
+    itemId:21,
     procedureName:'DC IV',
     groupName:'Reasons',
     value:'Inflitration',
     isCustom:false
   },
   {
-    itemId:18,
+    itemId:22,
     procedureName:'DC IV',
     groupName:'Reasons',
     value:'Phlebitis',
     isCustom:false
   },
   {
-    itemId:19,
+    itemId:23,
     procedureName:'DC IV',
     groupName:'Reasons',
     value:'PT Removal',
     isCustom:false
   },
   {
-    itemId:20,
+    itemId:24,
     procedureName:'DC IV',
     groupName:'Reasons',
     value:'Leaking',
     isCustom:false
   },
   {
-    itemId:21,
+    itemId:25,
     procedureName:'DC IV',
     groupName:'Reasons',
-    value:'Bleeding',
+    value:'Painful',
     isCustom:false
   },
   {
-    itemId:22,
+    itemId:26,
+    procedureName:'DC IV',
+    groupName:'Reasons',
+    value:'Per Protocol',
+    isCustom:false
+  },
+  {
+    itemId:27,
     procedureName:'Port-A-Cath',
     groupName:'Access Attempts',
     value:'1 Attempt',
     isCustom:false
   },
   {
-    itemId:23,
+    itemId:28,
     procedureName:'Port-A-Cath',
     groupName:'Access Attempts',
     value:'2 Attempts',
     isCustom:false
   },
   {
-    itemId:24,
+    itemId:29,
     procedureName:'Port-A-Cath',
     groupName:'Deaccess',
     value:'Contaminated',
     isCustom:false
   },
   {
-    itemId:25,
+    itemId:30,
     procedureName:'Port-A-Cath',
     groupName:'Deaccess',
     value:'Needle Change',
     isCustom:false
   },
   {
-    itemId:26,
+    itemId:31,
     procedureName:'Port-A-Cath',
     groupName:'Deaccess',
     value:'Therapy Complete',
     isCustom:false
   },
   {
-    itemId:27,
+    itemId:32,
     procedureName:'Port-A-Cath',
     groupName:'Cathflow',
     value:'Initiated',
     isCustom:false
   },
   {
-    itemId:28,
+    itemId:33,
     procedureName:'Port-A-Cath',
     groupName:'Cathflow',
     value:'Completed',
     isCustom:false
   },
   {
-    itemId:29,
+    itemId:34,
     procedureName:'PICC Line',
     groupName:'Removal',
     value:'Therapy Complete',
     isCustom:false
   },
   {
-    itemId:30,
+    itemId:35,
     procedureName:'PICC Line',
     groupName:'Removal',
     value:'Discharge',
     isCustom:false
   },
   {
-    itemId:31,
+    itemId:36,
     procedureName:'PICC Line',
     groupName:'Removal',
     value:'Clotted',
     isCustom:false
   },
   {
-    itemId:32,
+    itemId:37,
     procedureName:'PICC Line',
     groupName:'Removal',
     value:'Contaminated',
     isCustom:false
   },
   {
-    itemId:33,
+    itemId:38,
     procedureName:'PICC Line',
     groupName:'Removal',
     value:'PT Removal',
     isCustom:false
   },
   {
-    itemId:34,
+    itemId:39,
     procedureName:'PICC Line',
     groupName:'Cathflow',
     value:'Initiated',
     isCustom:false
   },
   {
-    itemId:35,
+    itemId:40,
     procedureName:'PICC Line',
     groupName:'Cathflow',
     value:'Completed',
     isCustom:false
   },
   {
-    itemId:36,
+    itemId:41,
     procedureName:'Dressing Change',
     groupName:'What',
     value:'PICC',
     isCustom:false
   },
   {
-    itemId:37,
+    itemId:42,
     procedureName:'Dressing Change',
     groupName:'What',
     value:'Port-A-Cath',
     isCustom:false
   },
   {
-    itemId:38,
+    itemId:43,
     procedureName:'Dressing Change',
     groupName:'What',
     value:'Central Line',
     isCustom:false
   },
   {
-    itemId:39,
+    itemId:44,
     procedureName:'Dressing Change',
     groupName:'What',
     value:'Midline',
     isCustom:false
   },
   {
-    itemId:40,
+    itemId:45,
     procedureName:'Dressing Change',
     groupName:'Why',
     value:'Per Protocol',
     isCustom:false
   },
   {
-    itemId:41,
+    itemId:46,
     procedureName:'Dressing Change',
     groupName:'Why',
     value:'Bleeding',
     isCustom:false
   },
   {
-    itemId:42,
+    itemId:47,
     procedureName:'Dressing Change',
     groupName:'Why',
     value:'Dressing Compromised',
     isCustom:false
   },
   {
-    itemId:43,
+    itemId:48,
+    procedureName:'Troubleshoot',
+    groupName:'Action Taken',
+    value:'Midline',
+    isCustom:false
+  },
+  {
+    itemId:49,
+    procedureName:'Troubleshoot',
+    groupName:'Action Taken',
+    value:'PICC',
+    isCustom:false
+  },
+  {
+    itemId:50,
+    procedureName:'Troubleshoot',
+    groupName:'Action Taken',
+    value:'Central Line',
+    isCustom:false
+  },
+  {
+    itemId:51,
+    procedureName:'Troubleshoot',
+    groupName:'Action Taken',
+    value:'Port',
+    isCustom:false
+  },
+  {
+    itemId:52,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Power Flush',
+    isCustom:false
+  },
+  {
+    itemId:53,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Clave Change',
+    isCustom:false
+  },
+  {
+    itemId:54,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Recommend DC',
+    isCustom:false
+  },
+  {
+    itemId:55,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Line Retracted',
+    isCustom:false
+  },
+  {
+    itemId:56,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
+    value:'Repositioned',
+    isCustom:false
+  },
+  {
+    itemId:57,
     procedureName:'Insertion Procedure',
     groupName:'Insertion Type',
     value:'Midline',
     isCustom:false
   },
   {
-    itemId:44,
+    itemId:58,
     procedureName:'Insertion Procedure',
     groupName:'Insertion Type',
     value:'SL PICC',
     isCustom:false
   },
   {
-    itemId:45,
+    itemId:59,
     procedureName:'Insertion Procedure',
     groupName:'Insertion Type',
     value:'TL PICC',
     isCustom:false
   },
   {
-    itemId:46,
+    itemId:60,
     procedureName:'Insertion Procedure',
     groupName:'Insertion Type',
     value:'DL PICC',
     isCustom:false
   },
   {
-    itemId:47,
+    itemId:61,
     procedureName:'Insertion Procedure',
     groupName:'Vessel',
     value:'Basilic',
     isCustom:false
   },
   {
-    itemId:48,
+    itemId:62,
     procedureName:'Insertion Procedure',
     groupName:'Vessel',
     value:'Brachial',
     isCustom:false
   },
   {
-    itemId:49,
+    itemId:63,
     procedureName:'Insertion Procedure',
     groupName:'Vessel',
     value:'Cephalic',
     isCustom:false
   },
   {
-    itemId:50,
+    itemId:64,
     procedureName:'Insertion Procedure',
     groupName:'Vessel',
     value:'Internal Jugular',
     isCustom:false
   },
   {
-    itemId:51,
+    itemId:65,
     procedureName:'Insertion Procedure',
     groupName:'Vessel',
     value:'Femoral',
     isCustom:false
   },
   {
-    itemId:52,
+    itemId:66,
     procedureName:'Insertion Procedure',
     groupName:'Laterality',
     value:'Left',
     isCustom:false
   },
   {
-    itemId:53,
+    itemId:67,
     procedureName:'Insertion Procedure',
     groupName:'Laterality',
     value:'Right',
     isCustom:false
   },
   {
-    itemId:54,
+    itemId:68,
     procedureName:'Insertion Procedure',
     groupName:'Insertion Length',
     value:'',
@@ -455,69 +558,6 @@ exports.itemSeed = [
     fieldAbbr:'Len',
     valuePrefix:'',
     valueSuffix:'cm'
-  },
-  {
-    itemId:55,
-    procedureName:'Troubleshoot',
-    groupName:'Action Taken',
-    value:'Midline',
-    isCustom:false
-  },
-  {
-    itemId:56,
-    procedureName:'Troubleshoot',
-    groupName:'Action Taken',
-    value:'PICC',
-    isCustom:false
-  },
-  {
-    itemId:57,
-    procedureName:'Troubleshoot',
-    groupName:'Action Taken',
-    value:'Central Line',
-    isCustom:false
-  },
-  {
-    itemId:58,
-    procedureName:'Troubleshoot',
-    groupName:'Action Taken',
-    value:'Port',
-    isCustom:false
-  },
-  {
-    itemId:59,
-    procedureName:'Troubleshoot',
-    groupName:'Intervention',
-    value:'Power Flush',
-    isCustom:false
-  },
-  {
-    itemId:60,
-    procedureName:'Troubleshoot',
-    groupName:'Intervention',
-    value:'Clave Change',
-    isCustom:false
-  },
-  {
-    itemId:61,
-    procedureName:'Troubleshoot',
-    groupName:'Intervention',
-    value:'Recommend DC',
-    isCustom:false
-  },
-  {
-    itemId:62,
-    procedureName:'Troubleshoot',
-    groupName:'Intervention',
-    value:'Line Retracted',
-    isCustom:false
-  },
-  {
-    itemId:63,
-    procedureName:'Troubleshoot',
-    groupName:'Intervention',
-    value:'Repositioned',
-    isCustom:false
   }
 ];
 
@@ -533,14 +573,14 @@ exports.procedureSeed = [
         groupItems:[1,2,3,4]
       },
       {
-        groupName:'Attempts',
-        inputType:'radio',
-        groupItems:[5,6]
-      },
-      {
         groupName:'Ultrasound',
         inputType:'radio',
-        groupItems:[7]
+        groupItems:[5]
+      },
+      {
+        groupName:'Blood Drawn',
+        inputType:'radio',
+        groupItems:[6]
       }
     ]
   },
@@ -552,194 +592,155 @@ exports.procedureSeed = [
       {
         groupName:'Draw Type',
         inputType:'radio',
-        groupItems:[8,9]
-      },
-      {
-        groupName:'Attempts',
-        inputType:'radio',
-        groupItems:[10,11]
+        groupItems:[7,8]
       },
       {
         groupName:'Ultrasound',
         inputType:'radio',
-        groupItems:[12]
+        groupItems:[9]
       }
     ]
   },
   {
     procedureId:3,
     seq:3,
-    name:'Site Care',
+    name:'Blood Culture',
     groups:[
       {
-        groupName:'Care Type',
-        inputType:'checkbox',
-        groupItems:[13,14,15,16]
+        groupName:'From',
+        inputType:'radio',
+        groupItems:[10,11,12,13,14,15]
+      },
+      {
+        groupName:'Ultrasound',
+        inputType:'radio',
+        groupItems:[16]
       }
     ]
   },
   {
     procedureId:4,
     seq:4,
-    name:'DC IV',
+    name:'Site Care',
     groups:[
       {
-        groupName:'Reasons',
+        groupName:'Care Type',
         inputType:'checkbox',
-        groupItems:[17,18,19,20,21]
+        groupItems:[17,18,19,20]
       }
     ]
   },
   {
     procedureId:5,
     seq:5,
-    name:'Port-A-Cath',
+    name:'DC IV',
     groups:[
       {
-        groupName:'Access Attempts',
-        inputType:'radio',
-        groupItems:[22,23]
-      },
-      {
-        groupName:'Deaccess',
-        inputType:'radio',
-        groupItems:[24,25,26]
-      },
-      {
-        groupName:'Cathflow',
-        inputType:'radio',
-        groupItems:[27,28]
+        groupName:'Reasons',
+        inputType:'checkbox',
+        groupItems:[21,22,23,24,25,26]
       }
     ]
   },
   {
     procedureId:6,
     seq:6,
-    name:'PICC Line',
+    name:'Port-A-Cath',
     groups:[
       {
-        groupName:'Removal',
+        groupName:'Access Attempts',
         inputType:'radio',
-        groupItems:[29,30,31,32,33]
+        groupItems:[27,28]
+      },
+      {
+        groupName:'Deaccess',
+        inputType:'radio',
+        groupItems:[29,30,31]
       },
       {
         groupName:'Cathflow',
         inputType:'radio',
-        groupItems:[34,35]
+        groupItems:[32,33]
       }
     ]
   },
   {
     procedureId:7,
     seq:7,
-    name:'Dressing Change',
+    name:'PICC Line',
     groups:[
       {
-        groupName:'What',
+        groupName:'Removal',
         inputType:'radio',
-        groupItems:[36,37,38,39]
+        groupItems:[34,35,36,37,38]
       },
       {
-        groupName:'Why',
+        groupName:'Cathflow',
         inputType:'radio',
-        groupItems:[40,41,42]
+        groupItems:[39,40]
       }
     ]
   },
   {
     procedureId:8,
-    seq:9,
-    name:'Insertion Procedure',
+    seq:8,
+    name:'Dressing Change',
     groups:[
       {
-        groupName:'Insertion Type',
+        groupName:'What',
         inputType:'radio',
-        groupItems:[43,44,45,46]
+        groupItems:[41,42,43,44]
       },
       {
-        groupName:'Vessel',
+        groupName:'Why',
         inputType:'radio',
-        groupItems:[47,48,49,50,51]
-      },
-      {
-        groupName:'Laterality',
-        inputType:'radio',
-        groupItems:[52,53]
-      },
-      {
-        groupName:'Insertion Length',
-        fieldName:'insertionLength',
-        inputType:'number',
-        groupItems:[54]
+        groupItems:[45,46,47]
       }
     ]
   },
   {
     procedureId:9,
-    seq:8,
+    seq:9,
     name:'Troubleshoot',
     groups:[
       {
         groupName:'Action Taken',
         inputType:'radio',
-        groupItems:[55,56,57,58]
+        groupItems:[48,49,50,51]
       },
       {
         groupName:'Intervention',
         inputType:'checkbox',
-        groupItems:[59,60,61,62,63]
+        groupItems:[52,53,54,55,56]
+      }
+    ]
+  },
+  {
+    procedureId:10,
+    seq:10,
+    name:'Insertion Procedure',
+    groups:[
+      {
+        groupName:'Insertion Type',
+        inputType:'radio',
+        groupItems:[57,58,59,60]
+      },
+      {
+        groupName:'Vessel',
+        inputType:'radio',
+        groupItems:[61,62,63,64,65]
+      },
+      {
+        groupName:'Laterality',
+        inputType:'radio',
+        groupItems:[66,67]
+      },
+      {
+        groupName:'Insertion Length',
+        fieldName:'insertionLength',
+        inputType:'number',
+        groupItems:[68]
       }
     ]
   }
 ];
-
-exports.produceCallDummyData = () =>{
-  let dummyCallsArr = [];
-  let providerArr = ['Connolly', 'Dube', 'Ulysses', 'Monroe', 'Knope', 'Smith', 'Manhole', 'Blaton', 'Cruz', 'Rockefeller'];
-  let jobArr = ['Lab Draw','New IV','PICC Line','Midline','Port Access','Port De-Access','Central Line Troubleshoot','Dressing Change','Labs + IV','Custom'];
-  let commentFiller = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
-  let userIds = [1002, 1003, 1004, 1005];
-  
-  for(let i = 0; i < 101; i++){
-    let dummyCall = {};
-    dummyCall.room = Math.floor(Math.random() * 10000);
-    dummyCall.job = jobArr[Math.floor(jobArr.length * Math.random())];
-    dummyCall.jobComments = Math.floor(Math.random() * 10) < 1 ? commentFiller : null;
-    dummyCall.addComments = Math.floor(Math.random() * 10) < 1 ? commentFiller : null;
-    dummyCall.createdBy = userIds[Math.floor(Math.random() * userIds.length)];
-    dummyCall.startTime = randomDate(new Date(2019, 7, 12), new Date());
-    dummyCall.proceduresDone = [];
-    
-    let procedureArr = [];
-    let procedureLoopLength = Math.floor(Math.random() * 2);
-    for(let j = 0; j < procedureLoopLength; j++){
-      let procedureNum = Math.floor(Math.random() * 8) + 1;
-      if(procedureArr.indexOf(procedureNum) < 0){
-        dummyCall.proceduresDone.push({
-          procedureId:procedureNum,
-          itemIds:[12, 45, 33, 20]
-        });
-        procedureArr.push(procedureNum);
-      }
-    }
-
-    //if insertion procedure
-    if(procedureArr.indexOf(8) > 0){
-      dummyCall.hospital = Math.floor(Math.random() * 6) + 1;
-      dummyCall.mrn = Math.random() * (9999999 - 1000000) + 1000000;
-      dummyCall.provider = providerArr[Math.floor(providerArr.length * Math.random())];
-    }
-    dummyCall.completedAt = randomDate(startTime, new Date())
-    dummyCall.responseTime = Math.random() * (120000 - 1000) + 1000;
-    dummyCall.procedureTime = Math.random() * (120000 - 1000) + 1000;
-    dummyCall.completedBy = userIds[Math.floor(Math.random()*userIds.length)];
-    dummyCall.isTest = true;
-    dummyCallsArr.push(dummyCall);
-  }
-  
-  return dummyCallsArr;
-  
-  function randomDate(start, end) {
-    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-  }
-}

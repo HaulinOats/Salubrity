@@ -13,7 +13,8 @@ export default class Modal extends Component {
       currentUser:this.props.currentUser,
       isConfirmation:this.props.isConfirmation,
       customSelected:false,
-      comment:'',
+      custom:'',
+      preComments:'',
       isAddCall:false,
       roomNumber:null,
       need:null,
@@ -44,7 +45,7 @@ export default class Modal extends Component {
         customSelected:true
       }, this.validateAddCall);
     } else {
-      this.setState({need:e.target.value, customSelected:false, comment:""}, this.validateAddCall);
+      this.setState({need:e.target.value, customSelected:false, custom:""}, this.validateAddCall);
     }
   }
 
@@ -52,7 +53,7 @@ export default class Modal extends Component {
     if(this.state.roomNumber && this.state.roomNumber.length && 
       this.state.need){
       if(this.state.customSelected){
-        if(this.state.comment.length){
+        if(this.state.custom.length){
           this.setState({inputsValidated:true});
         } else {
           this.setState({inputsValidated:false});
@@ -72,12 +73,13 @@ export default class Modal extends Component {
       contact:this.state.contactNumber,
       createdAt:new Date().toISOString(),
       createdBy:this.state.currentUser.userId,
-      jobComments:this.state.comment.length ? this.state.comment : null,
+      customJob:this.state.custom.length ? this.state.custom : null,
+      preComments:this.state.preComments.length ? this.state.preComments : null,
       isOpen:false
     };
 
-    if(this.state.comment.length < 1){
-      delete addQuery.comment;
+    if(this.state.custom.length < 1){
+      delete addQuery.custom;
     }
 
     axios.post('/add-call', addQuery)
@@ -156,22 +158,21 @@ export default class Modal extends Component {
                       <option>Custom</option>
                     </select>
                     </div>
+                    {this.state.customSelected &&
+                      <div className='vas-modal-add-call-row-block'>
+                        <p>Custom Name:</p>
+                        <input className='vas-modal-add-call-input vas-modal-custom-input' type='text' value={this.state.custom} onChange={e => {this.setState({custom: e.target.value}, this.validateAddCall)}} />
+                      </div>
+                    }
                     <div className="vas-modal-add-call-row-inner">
                       <p>Contact:</p>
                       <input type='text' className='vas-modal-add-call-input' value={this.state.contactNumber} onChange={e => {this.setState({contactNumber: e.target.value}, this.validateAddCall)}} />
                     </div>
+                    <div className='vas-modal-add-call-row-block'>
+                      <p>Pre-Procedure Notes:</p>
+                      <textarea className='vas-modal-add-call-textarea' value={this.state.preComments} onChange={e=>{this.setState({preComments:e.target.value})}}></textarea>
+                    </div>
                   </div>
-                </div>
-              }
-              {this.state.customSelected &&
-                <div>
-                  <p className="vas-modal-comment-text">Comment:</p>
-                  <DebounceInput
-                    element="textarea"
-                    className="vas-modal-add-call-textarea"
-                    minLength={1}
-                    debounceTimeout={300}
-                    onChange={e => {this.setState({comment: e.target.value}, this.validateAddCall)}} />
                 </div>
               }
             </div>

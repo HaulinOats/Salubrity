@@ -55,7 +55,8 @@ let callSchema = new Schema({
   room:{type:String, default:null, lowercase:true},
   provider:{type:String, lowercase:true},
   job:String,
-  jobComments:String,
+  customJob:String,
+  preComments:String,
   addComments:String,
   contact:Number,
   createdBy:{type:Number, default:null},
@@ -69,7 +70,7 @@ let callSchema = new Schema({
   procedureTime:{type:Number, default:null},
   completedBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
-  isTest:{type:Boolean, default:null}
+  wasConsultation:{type:Boolean, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -162,7 +163,7 @@ app.get('/get-completed-calls', (req, res)=>{
   // console.log('start: ', start);
   // console.log('end  : ', end);
 
-  Call.find({completedAt: {$gte: start, $lt: end}}, (err, calls)=>{
+  Call.find({completedAt: {$gte: start, $lt: end}}).sort({completedAt:-1}).exec((err, calls)=>{
     if(err) return res.send(err);
     if(calls.length){
       res.send(calls);
@@ -181,7 +182,7 @@ app.post('/set-call-as-open', (req, res)=>{
       } else {
         call.isOpen = true;
         call.openBy = req.body.userId;
-        call.startTime = new Date(Date.now()).toISOString();
+        call.startTime = new Date();
         call.save((err2)=>{
           if(err2) return res.send(err2);
           res.send(call);
@@ -222,10 +223,33 @@ app.post('/procedure-completed', (req, res)=>{
       }
 
       //if no job comments, delete node
-      if(call.jobComments === null){
-        call.jobComments = undefined;
+      if(call.customJob === null){
+        call.customJob = undefined;
       }
 
+      if(call.preComments === null){
+        call.preComments = undefined;
+      }
+
+      if(req.body.wasConsultation){
+        call.wasConsultation = true;
+      } else {
+        call.wasConsultation = undefined;
+      }
+
+      if(req.body.orderChange){
+        call.orderChange = req.body.orderChange;
+      } else {
+        call.orderChange = undefined;
+      }
+
+      if(req.body.hospital){
+        call.hospital = req.body.hospital;
+      } else {
+        call.hospital = undefined;
+      }
+      
+      call.wasConsultation = req.body.wasConsultation;
       call.provider = req.body.provider;
       call.proceduresDone = req.body.proceduresDone;
       call.completedBy = Number(req.body.completedBy);
@@ -234,7 +258,6 @@ app.post('/procedure-completed', (req, res)=>{
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
       call.mrn = req.body.mrn;
-      call.orderChange = req.body.orderChange;
       call.isOpen = undefined;
       call.openBy = undefined;
       call.contact = undefined;
