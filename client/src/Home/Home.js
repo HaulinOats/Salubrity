@@ -786,21 +786,21 @@ export default class Home extends Component{
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'queue' ? true : false}>
                 <div className="vas-home-table vas-table">
                   <div className='vas-table-thead-row'>
-                    <div className='vas-width-15'>Room</div>
+                    <div className='vas-width-10'>Room</div>
                     <div className='vas-width-35'>Job</div>
-                    <div className='vas-width-15'>Contact</div>
-                    <div className='vas-width-15'>Open By</div>
-                    <div className='vas-width-20'>Call Time</div>
+                    <div className='vas-width-10'>Contact</div>
+                    <div className='vas-width-30'>Open By</div>
+                    <div className='vas-width-10'>Call Time</div>
                   </div>
                   <div className='vas-home-table-body'>
                     {this.state.queueItems.length > 0 && this.state.queueItems.map((item, idx)=>{
                       return(
                         <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
-                          <div className='vas-width-15 vas-nowrap vas-uppercase'>{item.room}</div>
+                          <div className='vas-width-10 vas-nowrap vas-uppercase'>{item.room}</div>
                           <div className='vas-width-35'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.customJob}</div>
-                          <div className='vas-width-15'>{item.contact}</div>
-                          <div className='vas-width-15'>{item.openBy ? item.openBy : ''}</div>
-                          <div className='vas-width-20'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
+                          <div className='vas-width-10'>{item.contact}</div>
+                          <div className='vas-width-30 vas-capitalize'>{item.openBy ? this.state.usersById[item.openBy].fullname : ''}</div>
+                          <div className='vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
                         </div>
                       )
                     })}
