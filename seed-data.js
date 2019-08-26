@@ -558,7 +558,14 @@ exports.itemSeed = [
     fieldAbbr:'Len',
     valuePrefix:'',
     valueSuffix:'cm'
-  }
+  },
+  {
+    itemId:69,
+    procedureName:'Dressing Change',
+    groupName:'Why',
+    value:'Site Assessment',
+    isCustom:false
+  },
 ];
 
 exports.procedureSeed = [
@@ -694,7 +701,7 @@ exports.procedureSeed = [
       {
         groupName:'Why',
         inputType:'radio',
-        groupItems:[45,46,47]
+        groupItems:[45,46,47,69]
       }
     ]
   },
