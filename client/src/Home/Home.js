@@ -239,6 +239,12 @@ export default class Home extends Component{
     }
   }
 
+  toggleIsImportant(){
+    let activeRecord = this.state.activeRecord;
+    activeRecord.isImportant = !activeRecord.isImportant;
+    this.setState({activeRecord}, this.saveActiveRecord);
+  }
+
   addCall(){
     this.setState({
       modalTitle:'Add Call',
@@ -247,9 +253,9 @@ export default class Home extends Component{
   }
 
   inputLiveUpdate(e, field){
-    let activeRec = this.state.activeRecord;
-    activeRec[field] = e.target.value;
-    this.setState({activeRecord:activeRec}, this.saveActiveRecord);
+    let activeRecord = this.state.activeRecord;
+    activeRecord[field] = e.target.value;
+    this.setState({activeRecord}, this.saveActiveRecord);
   }
 
   saveActiveRecord(){
@@ -939,6 +945,7 @@ export default class Home extends Component{
                     </p>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.resetForm()}}>Reset Form</button>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
+                    <button className='vas-home-record-header-btn' onClick={e=>{this.toggleIsImportant()}}>Toggle STAT</button>
                     <button className='vas-home-record-header-btn vas-warn-btn' onClick={e=>{this.deleteCall()}}>Delete Call</button>
                   </header>
                   {this.state.activeRecord.preComments &&
