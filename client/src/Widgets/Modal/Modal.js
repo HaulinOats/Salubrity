@@ -106,8 +106,8 @@ export default class Modal extends Component {
       contact:this.state.contactNumber,
       createdAt:new Date().toISOString(),
       createdBy:this.state.currentUser.userId,
-      customJob:this.state.custom.length ? this.state.custom : null,
-      preComments:this.state.preComments.length ? this.state.preComments : null,
+      customJob:this.state.custom.trim().length ? this.state.custom : null,
+      preComments:this.state.preComments.trim().length ? this.state.preComments : null,
       hospital:this.state.hospital.length ? Number(this.state.hospital) : null,
       isImportant:this.state.isImportant ? true : null,
       isOpen:false

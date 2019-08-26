@@ -469,7 +469,7 @@ export default class Home extends Component{
         proceduresDone:proceduresArr,
         completedBy:Number(this.state.currentUser.userId),
         completedAt:completionTime.toISOString(),
-        addComments:this.state.addComments.length ? this.state.addComments : null,
+        addComments:this.state.addComments.trim().length ? this.state.addComments : null,
         hospital:this.state.hospital ? Number(this.state.hospital) : null,
         mrn:Number(this.state.mrn),
         provider:this.state.provider,

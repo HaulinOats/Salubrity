@@ -36,7 +36,8 @@ export default class Admin extends Component {
       secondFilterValue:'',
       secondDropdownArr:[],
       addHospitalName:'',
-      addOrderChangeName:''
+      addOrderChangeName:'',
+      addNeedName:''
     }
     this.submitDateRange = this.submitDateRange.bind(this);
     this.seedProcedures = this.seedProcedures.bind(this);
@@ -49,11 +50,11 @@ export default class Admin extends Component {
     this.startDateChange = this.startDateChange.bind(this);
     this.endDateChange = this.endDateChange.bind(this);
     this.sortByOnChange = this.sortByOnChange.bind(this);
-    this.hospitalInputChange = this.hospitalInputChange.bind(this);
-    this.orderInputChange = this.orderInputChange.bind(this);
     this.addHospital = this.addHospital.bind(this);
     this.addOrderChange = this.addOrderChange.bind(this);
     this.handleUserSessionData = this.handleUserSessionData.bind(this);
+    this.addNeed = this.addNeed.bind(this);
+    this.addInputChange = this.addInputChange.bind(this);
   }
 
   componentWillMount(){
@@ -76,21 +77,6 @@ export default class Admin extends Component {
   }
 
   handleUserSessionData(){
-    // if(this.state.currentUser){
-    //   //Allow user session access for 30 minutes (1800 seconds)
-    //   //if it's been more than 30 minutes since last login, logout user
-    //   if((Math.floor(Date.now() / 1000) - this.state.currentUser.lastLogin) > 1800){
-    //     this.logout();
-    //   } else {
-    //     //if user has refreshed at any point and it's been less than 30 minutes, refresh session
-    //     let currentUser = {...this.state.currentUser}
-    //     currentUser.lastLogin = Math.floor(Date.now() / 1000);
-    //     this.setState({currentUser}, ()=>{
-    //       console.log(currentUser);
-    //       this.stateLoadCalls();
-    //     });
-    //   }
-    // }
     this.stateLoadCalls();
   }
 
@@ -613,12 +599,8 @@ export default class Admin extends Component {
     }
   }
 
-  hospitalInputChange(e){
-    this.setState({addHospitalName:e.target.value});
-  }
-
-  orderInputChange(e){
-    this.setState({addOrderChangeName:e.target.value});
+  addInputChange(fieldName, e){
+    this.setState({[fieldName]:e.target.value});
   }
 
   addHospital(){
@@ -632,7 +614,7 @@ export default class Admin extends Component {
       } else {
         let options = this.state.allOptions;
         options[0] = resp.data;
-        this.setState({allOptions:options});
+        this.setState({allOptions:options, addHospitalName:''});
       }
     })
     .catch(err=>{
@@ -654,7 +636,29 @@ export default class Admin extends Component {
       } else {
         let options = this.state.allOptions;
         options[3] = resp.data;
-        this.setState({allOptions:options});
+        this.setState({allOptions:options, addOrderChangeName:''});
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
+  }
+
+  addNeed(){
+    this.setState({isLoading:true});
+    axios.post('/add-need-option', {
+      addNeedName:this.state.addNeedName
+    })
+    .then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        let options = this.state.allOptions;
+        options[5] = resp.data;
+        this.setState({allOptions:options, addNeedName:''});
       }
     })
     .catch(err=>{
@@ -824,7 +828,7 @@ export default class Admin extends Component {
                                   }
                                   <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
                                     <p className='vas-admin-custom-item-subfield'>Nurse:</p>
-                                    <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Default'}</p>
+                                    <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Super Admin'}</p>
                                   </div>
                                   <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
                                     <p className='vas-admin-custom-item-subfield'>Room:</p>
@@ -875,6 +879,21 @@ export default class Admin extends Component {
                                 </div>
                               </div>
                             }
+                            {call.wasConsultation &&
+                              <div className='vas-call-consultation-container'>
+                                <p className='vas-call-consultation'>Consultation Done</p>
+                              </div>
+                            }
+                            {isComments &&
+                              <div className='vas-call-comments-container'>
+                                {call.preComments &&
+                                  <p className='vas-call-comment'><b>Pre-Procedure Comments:</b> {call.addComments}</p>
+                                }
+                                {call.addComments &&
+                                  <p className='vas-call-comment'><b>Add'l Comments:</b> {call.addComments}</p>
+                                }
+                              </div>
+                            }
                             {call.isOpen &&
                               <span className='w-100'>
                                 <div className='vas-admin-is-open-container'>
@@ -896,13 +915,6 @@ export default class Admin extends Component {
                                   </div>
                                 </div>
                               </span>
-                            }
-                            {isComments &&
-                              <div className='vas-admin-custom-table-item-comments'>
-                                {call.addComments &&
-                                  <p className='vas-admin-add-comments'><b>Add'l Comments:</b> {call.addComments}</p>
-                                }
-                              </div>
                             }
                           </div>    
                         )
@@ -946,7 +958,7 @@ export default class Admin extends Component {
                         return(
                           <tr key={user._id}>
                             <td>{user.userId}</td>
-                            <td className='text-capitalize'>{user.fullname}</td>
+                            <td className='vas-capitalize'>{user.fullname}</td>
                             <td>{user.username}</td>
                             <td>
                               {user.role !== 'admin' &&
@@ -975,7 +987,7 @@ export default class Admin extends Component {
                 <div className='vas-admin-options-hospitals-container'>
                   <h4>Manage Hospital Names</h4>
                   <div className='vas-block-container'>
-                    <input className='vas-block-input' type="text" value={this.state.addHospitalName} onChange={this.hospitalInputChange} />
+                    <input className='vas-block-input' type="text" value={this.state.addHospitalName} onChange={e=>{this.addInputChange('addHospitalName',e)}} />
                     <button className='vas-block-button' onClick={this.addHospital}>Add Hospital</button>
                   </div>
                   <table className='vas-admin-list-table'>
@@ -1000,7 +1012,7 @@ export default class Admin extends Component {
                 <div className='vas-admin-options-order-change-container'>
                   <h4>Manage Order Change Options</h4>
                   <div className='vas-admin-order-change-input-container vas-block-container'>
-                    <input className='vas-block-input' type="text" value={this.state.addOrderChangeName} onChange={this.orderInputChange} />
+                    <input className='vas-block-input' type="text" value={this.state.addOrderChangeName} onChange={e=>{this.addInputChange('addOrderChangeName',e)}} />
                     <button className='vas-admin-order-change-input-submit vas-block-button' onClick={this.addOrderChange}>Add Order Change</button>
                   </div>
                   <table className='vas-admin-list-table'>
@@ -1011,6 +1023,30 @@ export default class Admin extends Component {
                       </tr>
                       {this.state.allOptions && this.state.allOptions[3] &&
                         this.state.allOptions[3].options.map((option, idx)=>{
+                        return(
+                          <tr key={option.id}>
+                            <td>{option.id}</td>
+                            <td>{option.name}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <hr></hr>
+                <div className='vas-admin-options-order-change-container'>
+                  <h4>Manage Add Call 'Need' Options</h4>
+                  <div className='vas-admin-order-change-input-container vas-block-container'>
+                    <input className='vas-block-input' type="text" value={this.state.addNeedName} onChange={e=>{this.addInputChange('addNeedName', e)}} />
+                    <button className='vas-admin-order-change-input-submit vas-block-button' onClick={this.addNeed}>Add Need Option</button>
+                  </div>
+                  <table className='vas-admin-list-table'>
+                    <tbody>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                      </tr>
+                      {this.state.allOptions && this.state.allOptions[5] && this.state.allOptions[5].options.map((option, idx)=>{
                         return(
                           <tr key={option.id}>
                             <td>{option.id}</td>

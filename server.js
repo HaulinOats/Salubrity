@@ -476,6 +476,24 @@ app.post('/add-order-change', (req, res)=>{
   })
 })
 
+app.post('/add-need-option', (req, res)=>{
+  Option.findOne({callFieldName:'callNeeds'}, (err, needs)=>{
+    if(err) return res.send(err);
+    if(needs){
+      needs.options.push({
+        id:needs.options.length + 1,
+        name:req.body.addNeedName
+      })
+      needs.save(err2=>{
+        if(err2) return res.send(err2);
+        res.send(needs);
+      })
+    } else {
+      res.send({'error':'error getting order change data'});
+    }
+  })
+})
+
 app.post('/get-open-calls-in-range', (req, res)=>{
   Call.find({
     startTime: {
