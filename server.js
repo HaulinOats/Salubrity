@@ -577,10 +577,6 @@ app.get('/seed-items', (req, res)=>{
   });
 })
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, './client/build/index.html'));
-// });
-
 const server = app.use(((req, res) => res.sendFile(path.join(__dirname, './client/build/index.html')))).listen(app.get('port'), ()=>{
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });

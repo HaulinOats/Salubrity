@@ -12,6 +12,7 @@ export default class Modal extends Component {
       modalMessage:this.props.modalMessage,
       currentUser:this.props.currentUser,
       isConfirmation:this.props.isConfirmation,
+      needOptions:[],
       customSelected:false,
       custom:'',
       preComments:'',
@@ -28,12 +29,38 @@ export default class Modal extends Component {
 
   componentWillMount(){
     if(this.state.modalTitle === "Add Call"){
-      this.setState({isAddCall:true});
+      this.setState({isAddCall:true}, ()=>{
+        this.getOptionsData();
+      });
     }
   }
 
   componentDidMount(){
     console.log(this.state);
+  }
+
+  getOptionsData(){
+    this.setState({isLoading:true});
+    axios.get('/get-options')
+    .then((resp)=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        for(let i = 0; i < resp.data.length; i++){
+          if(resp.data[i].callFieldName === 'callNeeds'){
+            this.setState({needOptions:resp.data[i].options});
+            break;
+          }
+        }
+      }
+    })
+    .catch((err)=>{
+      console.log(err);
+      this.addToErrorArray(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
   }
 
   handleNeedSelect(e){
@@ -139,16 +166,9 @@ export default class Modal extends Component {
                     <p>Need:</p>
                     <select className="vas-modal-add-call-input" onClick={e => {this.setState({needOpened:true})}} onChange={this.handleNeedSelect}>
                       <option value="default">Select Need</option>
-                      <option>Lab Draw</option>
-                      <option>New IV</option>
-                      <option>PICC Line</option>
-                      <option>Midline</option>
-                      <option>Port Access</option>
-                      <option>Port De-Access</option>
-                      <option>Troubleshoot</option>
-                      <option>Dressing Change</option>
-                      <option>Labs + IV</option>
-                      <option>Custom</option>
+                      {this.state.needOptions.map(option=>{
+                        return <option key={option._id}>{option.name}</option>
+                      })}
                     </select>
                     </div>
                     {this.state.customSelected &&

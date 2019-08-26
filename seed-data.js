@@ -75,6 +75,57 @@ exports.optionSeed = [
     name:'Consultation',
     inputType:'radio',
     callFieldName:'wasConsultation'
+  },
+  {
+    name:'Call Needs',
+    inputType:'dropdown',
+    callFieldName:'callNeeds',
+    options:[
+      {
+        id:1,
+        name:'Lab Draw'
+      },
+      {
+        id:2,
+        name:'Blood Culture'
+      },
+      {
+        id:3,
+        name:'New IV'
+      },
+      {
+        id:4,
+        name:'PICC Line'
+      },
+      {
+        id:5,
+        name:'Midline'
+      },
+      {
+        id:6,
+        name:'Port Access'
+      },
+      {
+        id:7,
+        name:'Port De-Access'
+      },
+      {
+        id:8,
+        name:'Troubleshoot'
+      },
+      {
+        id:9,
+        name:'Dressing Change'
+      },
+      {
+        id:10,
+        name:'Labs + IV'
+      },
+      {
+        id:11,
+        name:'Custom'
+      }
+    ]
   }
 ];
 
