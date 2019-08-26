@@ -161,6 +161,10 @@ export default class Modal extends Component {
               }
               {this.state.isAddCall &&
               <div>
+                <div className='vas-modal-add-call-row-block'>
+                  <input type='radio' className="vas-radio-select vas-modal-is-important-input" id='is-important' name='is-important'/>
+                  <label className="vas-btn" htmlFor='is-important' onClick={e=>{this.setState({isImportant:true})}}>Needed Stat</label>
+                </div>
                 <div className="vas-modal-add-call-row">
                   <div className="vas-modal-add-call-row-inner">
                     <p>Room:</p>
@@ -201,10 +205,6 @@ export default class Modal extends Component {
                     <div className='vas-modal-add-call-row-block'>
                       <p>Pre-Procedure Notes:</p>
                       <textarea className='vas-modal-add-call-textarea' value={this.state.preComments} onChange={e=>{this.setState({preComments:e.target.value})}}></textarea>
-                    </div>
-                    <div className='vas-modal-add-call-row-block'>
-                      <input type='radio' className="vas-radio-select vas-modal-is-important-input" id='is-important' name='is-important'/>
-                      <label className="vas-btn" htmlFor='is-important' onClick={e=>{this.setState({isImportant:true})}}>Needed Stat</label>
                     </div>
                   </div>
                 </div>
