@@ -137,3 +137,7 @@
 .vas-modal-custom-input {
   width:100%;
 }
+.vas-modal-is-important {
+  box-shadow:none;
+  background:seagreen;
+}

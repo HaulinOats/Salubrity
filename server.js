@@ -50,7 +50,8 @@ let callSchema = new Schema({
   procedureTime:{type:Number, default:null},
   completedBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
-  wasConsultation:{type:Boolean, default:null}
+  wasConsultation:{type:Boolean, default:null},
+  isImportant:{type:Boolean, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -111,7 +112,7 @@ if (process.env.NODE_ENV === "production") {
 app.post('/add-call', (req, res)=>{
   Call.create(req.body, (err, call)=>{
     if(err) return res.send(err);
-    io.emit('call', JSON.stringify({action:'addCall', call}));;
+    io.emit('call', JSON.stringify({action:'addCall', call}));
     res.send(call);
   });
 });
@@ -167,7 +168,7 @@ app.post('/set-call-as-open', (req, res)=>{
         call.startTime = new Date();
         call.save((err2)=>{
           if(err2) return res.send(err2);
-          io.emit('call', JSON.stringify({action:'statusChange', call}));
+          io.emit('call', JSON.stringify({action:'callUpdate', call}));
           res.send(call);
         })
       }
@@ -186,7 +187,7 @@ app.post('/set-call-as-unopen', (req, res)=>{
       call.startTime = null;
       call.save((err2)=>{
         if(err2) return res.send(err2);
-        io.emit('call', JSON.stringify({action:'statusChange', call}));
+        io.emit('call', JSON.stringify({action:'callUpdate', call}));
         res.send(call);
       })
     } else {
@@ -512,6 +513,7 @@ app.post('/get-order-changes-in-range', (req, res)=>{
 app.post('/save-active-record', (req, res)=>{
   Call.replaceOne({_id:req.body._id}, req.body, err=>{
     if(err) return res.send(err);
+    io.emit('call', JSON.stringify({action:'callUpdate', call:req.body}));
     res.send(true);
   });
 })

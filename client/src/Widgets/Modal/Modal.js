@@ -12,19 +12,22 @@ export default class Modal extends Component {
       modalMessage:this.props.modalMessage,
       currentUser:this.props.currentUser,
       isConfirmation:this.props.isConfirmation,
-      needOptions:[],
+      allOptions:[],
       customSelected:false,
       custom:'',
       preComments:'',
       isAddCall:false,
       roomNumber:null,
-      need:null,
-      needOpened:false,
+      need:'',
+      needSelected:false,
       contactNumber:'',
       inputsValidated:false,
-      addedCall:null
+      addedCall:null,
+      isImportant:false,
+      hospital:''
     }
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
+    this.hospitalSelect = this.hospitalSelect.bind(this);
   };
 
   componentWillMount(){
@@ -46,12 +49,7 @@ export default class Modal extends Component {
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        for(let i = 0; i < resp.data.length; i++){
-          if(resp.data[i].callFieldName === 'callNeeds'){
-            this.setState({needOptions:resp.data[i].options});
-            break;
-          }
-        }
+        this.setState({allOptions:resp.data});
       }
     })
     .catch((err)=>{
@@ -65,14 +63,22 @@ export default class Modal extends Component {
 
   handleNeedSelect(e){
     if(e.target.value === 'default'){
-      this.setState({need:null, customSelected:false}, this.validateAddCall);
+      this.setState({need:'', customSelected:false}, this.validateAddCall);
     } else if(e.target.value.toLowerCase() === 'custom'){ 
       this.setState({
         need:e.target.value,
         customSelected:true
       }, this.validateAddCall);
     } else {
-      this.setState({need:e.target.value, customSelected:false, custom:""}, this.validateAddCall);
+      this.setState({need:e.target.value, customSelected:false, custom:''}, this.validateAddCall);
+    }
+  }
+
+  hospitalSelect(e){
+    if(e.target.value === 'default'){
+      this.setState({hospital:''});
+    } else {
+      this.setState({hospital:e.target.value});
     }
   }
 
@@ -102,6 +108,8 @@ export default class Modal extends Component {
       createdBy:this.state.currentUser.userId,
       customJob:this.state.custom.length ? this.state.custom : null,
       preComments:this.state.preComments.length ? this.state.preComments : null,
+      hospital:this.state.hospital.length ? Number(this.state.hospital) : null,
+      isImportant:this.state.isImportant ? true : null,
       isOpen:false
     };
 
@@ -163,13 +171,13 @@ export default class Modal extends Component {
                         onChange={e => {this.setState({roomNumber: e.target.value}, this.validateAddCall)}} />
                   </div>
                   <div className="vas-modal-add-call-row-inner">
-                    <p>Need:</p>
-                    <select className="vas-modal-add-call-input" onClick={e => {this.setState({needOpened:true})}} onChange={this.handleNeedSelect}>
-                      <option value="default">Select Need</option>
-                      {this.state.needOptions.map(option=>{
-                        return <option key={option._id}>{option.name}</option>
-                      })}
-                    </select>
+                      <p>Need:</p>
+                      <select className="vas-modal-add-call-input" onChange={this.handleNeedSelect}>
+                        <option value="default">Select Need</option>
+                        {this.state.allOptions[5] && this.state.allOptions[5].options.map(option=>{
+                          return <option key={option.id}>{option.name}</option>
+                        })}
+                      </select>
                     </div>
                     {this.state.customSelected &&
                       <div className='vas-modal-add-call-row-inner'>
@@ -178,12 +186,25 @@ export default class Modal extends Component {
                       </div>
                     }
                     <div className="vas-modal-add-call-row-inner">
+                      <p>Hospital:</p>
+                      <select className="vas-modal-add-call-input" onChange={this.hospitalSelect}>
+                        <option value="default">Select Hospital</option>
+                        {this.state.allOptions[0] && this.state.allOptions[0].options.map(option=>{
+                          return <option key={option.id} value={option.id}>{option.name}</option>
+                        })}
+                      </select>
+                    </div>
+                    <div className="vas-modal-add-call-row-inner">
                       <p>Contact:</p>
                       <input type='text' className='vas-modal-add-call-input' value={this.state.contactNumber} onChange={e => {this.setState({contactNumber: e.target.value}, this.validateAddCall)}} />
                     </div>
                     <div className='vas-modal-add-call-row-block'>
                       <p>Pre-Procedure Notes:</p>
                       <textarea className='vas-modal-add-call-textarea' value={this.state.preComments} onChange={e=>{this.setState({preComments:e.target.value})}}></textarea>
+                    </div>
+                    <div className='vas-modal-add-call-row-block'>
+                      <input type='radio' className="vas-radio-select vas-modal-is-important-input" id='is-important' name='is-important'/>
+                      <label className="vas-btn" htmlFor='is-important' onClick={e=>{this.setState({isImportant:true})}}>Needed Stat</label>
                     </div>
                   </div>
                 </div>

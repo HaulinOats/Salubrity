@@ -386,6 +386,7 @@ select {
 .vas-edit-icon {
   margin-left: 5px;
   cursor: pointer;
+  font-size: 80%;
 }
 .vas-pointer {
   cursor:pointer;
@@ -408,6 +409,15 @@ select {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+.vas-clearfix {
+  clear:both;
+}
+.vas-block {
+  display:block;
+}
+.vas-inline-block {
+  display:inline-block;
 }
 @media (max-width: 650px) {
   body {

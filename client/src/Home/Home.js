@@ -93,7 +93,7 @@ export default class Home extends Component{
         this.setState({queueItems:calls});
       }
 
-      if(callObj.action === 'statusChange'){
+      if(callObj.action === 'callUpdate'){
         let calls = this.state.queueItems;
         for(let i = 0; i < calls.length; i++){
           if(calls[i]._id === callObj.call._id){
@@ -771,7 +771,7 @@ export default class Home extends Component{
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setTab('queue')}}>Queue</li>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setTab('complete')}}>Completed</li>
               {this.state.activeRecord &&
-                <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active')}}>Active/Open</li>
+                <li className={'vas-home-nav-item ' + (this.state.activeRecord.isImportant ? 'vas-is-important-container' : '')} data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active')}}>Active/Open</li>
               }
             </ul>
             <div className="vas-home-tabContent">
@@ -787,7 +787,7 @@ export default class Home extends Component{
                   <div className='vas-home-table-body'>
                     {this.state.queueItems.length > 0 && this.state.queueItems.map((item, idx)=>{
                       return(
-                        <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
+                        <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open ' : '') + (item.isImportant ? 'vas-home-table-row-is-important ' : '')} onClick={(e)=>{this.selectJob(item)}}>
                           <div className='vas-width-15 vas-nowrap vas-uppercase'>{item.room}</div>
                           <div className='vas-width-30'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.customJob}</div>
                           <div className='vas-width-10'>{item.contact}</div>
@@ -911,28 +911,27 @@ export default class Home extends Component{
               </div>
               {this.state.activeRecord && this.state.itemsById &&
                 <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
-                  <header className="vas-home-record-header">
+                  <header className={"vas-home-record-header " + (this.state.activeRecord.isImportant ? 'vas-is-important-container' : '')}>
                     <p className="vas-home-record-header-text">
-                      <DebounceInput
-                        className="vas-home-live-edit-input"
-                        minLength={1}
-                        debounceTimeout={500}
-                        value={this.state.activeRecord.job}
-                        onChange={e=>{this.inputLiveUpdate(e, 'job')}} />
-                      <DebounceInput
-                        className="vas-home-live-edit-input vas-home-custom-job-input"
-                        minLength={1}
-                        debounceTimeout={500}
-                        value={this.state.activeRecord.customJob}
-                        onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
+                      <b className="vas-home-live-edit-input vas-block">{this.state.activeRecord.job}</b>
+                      {this.state.activeRecord.customJob &&
+                        <DebounceInput
+                          className="vas-home-live-edit-input vas-home-custom-job-input vas-inline-block"
+                          minLength={1}
+                          debounceTimeout={500}
+                          size={this.state.activeRecord.customJob.length < 1 ? 1 : this.state.activeRecord.customJob.length}
+                          value={this.state.activeRecord.customJob}
+                          onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
+                      }
                     </p>
                     <p className="vas-home-record-header-subtext vas-pointer">
                       <b>Room:</b>
                       <DebounceInput
-                          className="vas-home-live-edit-input"
+                          className="vas-home-live-edit-input vas-home-live-edit-input-room vas-inline-block"
                           minLength={1}
                           debounceTimeout={500}
                           value={this.state.activeRecord.room}
+                          size={this.state.activeRecord.room.length < 1 ? 1 : this.state.activeRecord.room.length}
                           onChange={e=>{this.inputLiveUpdate(e, 'room')}} />
                     </p>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.resetForm()}}>Reset Form</button>
@@ -1000,15 +999,6 @@ export default class Home extends Component{
                   {this.state.insertionTypeSelected &&
                     <div className='vas-home-options-container'>
                       <div className='vas-home-option-inner'>
-                        <label>{this.state.allOptions[0].name}:</label>
-                        <select value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
-                          <option value='default'>Select A Hospital</option>
-                          {this.state.allOptions[0].options.map((subOption, idx2)=>{
-                            return <option key={subOption.id}value={subOption.id}>{subOption.name}</option>
-                          })}
-                        </select>
-                      </div>
-                      <div className='vas-home-option-inner'>
                         <label>{this.state.allOptions[1].name}:</label>{/* Medical Record Number */}
                         <input className='vas-custom-input' type={this.state.allOptions[1].inputType} value={this.state[this.state.allOptions[1].callFieldName]} onChange={e=>{this.procedureOptionCustomChange(e, this.state.allOptions[1].callFieldName)}} />
                       </div>
@@ -1018,6 +1008,20 @@ export default class Home extends Component{
                       </div>
                     </div>
                   }
+                  <div className='vas-home-inner-container'>
+                    <header className='vas-home-inner-container-header'>
+                      <p>Hospital</p>
+                      <button className='vas-btn-reset-buttons' onClick={e=>{this.resetSection(e, 'orderChange')}}>Reset</button>
+                    </header>
+                    <div className='vas-home-inner-container-main'>
+                      <select className='vas-select' value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
+                        <option value='default'>Select A Hospital</option>
+                        {this.state.allOptions[0] && this.state.allOptions[0].options.map((subOption, idx2)=>{
+                          return <option key={subOption.id}value={subOption.id}>{subOption.name}</option>
+                        })}
+                      </select>
+                    </div>
+                  </div>
                   <div className='vas-home-inner-container vas-home-order-change'>
                     <header className='vas-home-inner-container-header'>
                       <p>MD Order Change</p>

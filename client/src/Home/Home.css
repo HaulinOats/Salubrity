@@ -386,7 +386,28 @@
   font-size:90%;
 }
 .vas-home-live-edit-input {
-  background:none;
-  border:none;
+  background: none;
+  border: none;
+  color: white;
+  display: block;
+  /* background-size: contain !important;
+  background-position: right !important;
+  background-repeat: no-repeat !important;
+  background: url(/static/media/edit.d37d9400.svg); */
+}
+.vas-home-live-edit-input-room {
+  display:inline;
+}
+.vas-home-table-row-is-important,
+.vas-is-important-container {
+  background: red !important;
+  color: white !important;
+}
+.vas-home-table-row-is-important
+.vas-table-job-name {
   color:white;
+}
+.vas-is-important-container
+.vas-warn-btn {
+  background:indianred;
 }

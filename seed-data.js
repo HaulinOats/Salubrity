@@ -617,6 +617,34 @@ exports.itemSeed = [
     value:'Site Assessment',
     isCustom:false
   },
+  {
+    itemId:70,
+    procedureName:'PIV Start',
+    groupName:'Patient Refused',
+    value:'Patient Refused',
+    isCustom:false
+  },
+  {
+    itemId:71,
+    procedureName:'Lab Draw',
+    groupName:'Patient Refused',
+    value:'Patient Refused',
+    isCustom:false
+  },
+  {
+    itemId:72,
+    procedureName:'Blood Culture',
+    groupName:'Patient Refused',
+    value:'Patient Refused',
+    isCustom:false
+  },
+  {
+    itemId:73,
+    procedureName:'Insertion Procedure',
+    groupName:'Patient Refused',
+    value:'Patient Refused',
+    isCustom:false
+  }
 ];
 
 exports.procedureSeed = [
@@ -639,6 +667,11 @@ exports.procedureSeed = [
         groupName:'Blood Drawn',
         inputType:'radio',
         groupItems:[6]
+      },
+      {
+        groupName:'Patient Refused',
+        inputType:'radio',
+        groupItems:[70]
       }
     ]
   },
@@ -656,6 +689,11 @@ exports.procedureSeed = [
         groupName:'Ultrasound',
         inputType:'radio',
         groupItems:[9]
+      },
+      {
+        groupName:'Patient Refused',
+        inputType:'radio',
+        groupItems:[71]
       }
     ]
   },
@@ -673,6 +711,11 @@ exports.procedureSeed = [
         groupName:'Ultrasound',
         inputType:'radio',
         groupItems:[16]
+      },
+      {
+        groupName:'Patient Refused',
+        inputType:'radio',
+        groupItems:[72]
       }
     ]
   },
@@ -792,6 +835,11 @@ exports.procedureSeed = [
         groupName:'Laterality',
         inputType:'radio',
         groupItems:[66,67]
+      },
+      {
+        groupName:'Patient Refused',
+        inputType:'radio',
+        groupItems:[73]
       },
       {
         groupName:'Insertion Length',
