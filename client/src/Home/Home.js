@@ -44,7 +44,7 @@ export default class Home extends Component{
       provider:'',
       orderChanged:false,
       orderSelected:'',
-      consultationDone:false
+      wasConsultation:false
     }
     this.toggleHandler = this.toggleHandler.bind(this);
     this.completeProcedure = this.completeProcedure.bind(this);
@@ -470,7 +470,7 @@ export default class Home extends Component{
         procedureTime:completionTime - startTime,
         responseTime:startTime - callTime,
         orderChange: this.state.orderChanged ? Number(this.state.orderSelected) : null,
-        wasConsultation:this.state.consultationDone ? true : false
+        wasConsultation:this.state.wasConsultation
       })
       .then(resp=>{
         if(resp.data.error || resp.data._message){
@@ -543,7 +543,7 @@ export default class Home extends Component{
       if(!this.state.insertionLength.length){
         errors += '- You must enter an insertion length\n';
       }
-      if(!this.state.hospital.length || this.state.hospital === 'default'){
+      if(!this.state.hospital.length || this.state.hospital === ''){
         errors += '- You must select a hospital\n';
       }
       if(this.state.mrn.length !== 7){
@@ -554,7 +554,7 @@ export default class Home extends Component{
       }
     }
 
-    if(errors.length){
+    if(errors.length && !this.state.wasConsultation){
       this.setState({
         modalIsOpen:true, 
         modalTitle:'Cannot Submit Procedure',
@@ -729,10 +729,13 @@ export default class Home extends Component{
   }
 
   hospitalChange(e){
-    if(e.target.value !== 'default'){
-      this.setState({hospital:e.target.value});
+    let activeRecord = this.state.activeRecord;
+    if(e.target.value !== ''){
+      activeRecord.hospital = Number(e.target.value);
+      this.setState({hospital:e.target.value, activeRecord}, this.saveActiveRecord);
     } else {
-      this.setState({hospital:''});
+      activeRecord.hospital = null;
+      this.setState({hospital:'', activeRecord}, this.saveActiveRecord);
     }
   }
 
@@ -909,7 +912,7 @@ export default class Home extends Component{
                     </div>
                 </div>
               </div>
-              {this.state.activeRecord && this.state.itemsById &&
+              {this.state.activeRecord && this.state.itemsById && this.state.allOptions.length > 0 &&
                 <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                   <header className={"vas-home-record-header " + (this.state.activeRecord.isImportant ? 'vas-is-important-container' : '')}>
                     <p className="vas-home-record-header-text">
@@ -1014,10 +1017,10 @@ export default class Home extends Component{
                       <button className='vas-btn-reset-buttons' onClick={e=>{this.resetSection(e, 'orderChange')}}>Reset</button>
                     </header>
                     <div className='vas-home-inner-container-main'>
-                      <select className='vas-select' value={this.state.hospital} onChange={e=>{this.hospitalChange(e)}}>
-                        <option value='default'>Select A Hospital</option>
+                      <select className='vas-select' value={this.state.activeRecord.hospital} onChange={e=>{this.hospitalChange(e)}}>
+                        <option value=''>Select A Hospital</option>
                         {this.state.allOptions[0] && this.state.allOptions[0].options.map((subOption, idx2)=>{
-                          return <option key={subOption.id}value={subOption.id}>{subOption.name}</option>
+                          return <option key={subOption.id} value={subOption.id}>{subOption.name}</option>
                         })}
                       </select>
                     </div>
@@ -1047,7 +1050,7 @@ export default class Home extends Component{
                     </header>
                     <div className='vas-home-inner-container-main'>
                       <input type='radio' className="vas-radio-select vas-home-consultation-input" id='consultation' name='consultation'/>
-                      <label className="vas-btn" htmlFor='consultation' onClick={e=>{this.setState({consultationDone:true})}}>Consultation Done</label>
+                      <label className="vas-btn" htmlFor='consultation' onClick={e=>{this.setState({wasConsultation:true})}}>Consultation Done</label>
                     </div>
                   </div>
                   <div className='vas-home-inner-container'>
