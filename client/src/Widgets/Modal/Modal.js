@@ -113,10 +113,6 @@ export default class Modal extends Component {
       isOpen:false
     };
 
-    if(this.state.custom.length < 1){
-      delete addQuery.custom;
-    }
-
     axios.post('/add-call', addQuery)
     .then((resp)=>{
       this.setState({
