@@ -536,7 +536,7 @@ export default class Home extends Component{
   procedureVerified(proceduresList){
     let errors = '';
     if(!proceduresList.length){
-      errors += '- You must select at least 1 procedure\n';
+      errors += '- You must select at least 1 procedure or confirm consultation\n';
     }
 
     if(this.state.orderChanged){
