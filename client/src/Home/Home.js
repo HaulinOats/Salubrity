@@ -148,7 +148,10 @@ export default class Home extends Component{
   loginCallback(user){
     let currentUser = user;
     currentUser.lastLogin = Math.floor(Date.now() / 1000);
-    this.setState({currentUser:user}, this.stateLoadCalls);
+    this.setState({currentUser:user}, ()=>{
+      ls('currentUser', this.state.currentUser);
+      this.stateLoadCalls();
+    });
   }
 
   logout(){
