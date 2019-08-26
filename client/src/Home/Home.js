@@ -1070,7 +1070,6 @@ export default class Home extends Component{
               <Modal 
                 isConfirmation={this.state.modalConfirmation}
                 currentUser={this.state.currentUser}
-                getAddedCall={this.getAddedCall}
                 getConfirmation={this.getConfirmation}
                 closeModal={this.closeModal}
                 modalTitle={this.state.modalTitle} 

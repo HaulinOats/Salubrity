@@ -98,7 +98,6 @@ export default class Modal extends Component {
 
   closeModal(){
     setTimeout(()=>{
-      this.props.getAddedCall(this.state.addedCall);
       this.props.closeModal()
     }, 2000);
   }
