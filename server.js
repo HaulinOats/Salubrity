@@ -1,34 +1,12 @@
 const express = require("express");
-const sockjs = require('sockjs');
 const bodyParser = require("body-parser");
 const app = express();
 const fs = require('fs');
 const path = require('path');
+const socketIO = require('socket.io');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
-const nodemailer = require('nodemailer');
 const seedData = require('./seed-data');
-const sockjsOpts = {prefix:'/calls'};
-const sockjs_echo = sockjs.createServer(sockjsOpts);
-let clients = {};
-
-function broadcast(callData){
-  for (let client in clients){
-    clients[client].write(JSON.stringify(callData));
-  }
-}
-
-sockjs_echo.on('connection', conn => {
-  clients[conn.id] = conn;
-
-  conn.on('data', call=>{
-    broadcast(JSON.parse(call));
-  });
-
-  conn.on('close', ()=>{
-    delete clients[conn.id];
-  })
-});
 
 //Mongoose
 const Schema = mongoose.Schema;
@@ -133,6 +111,7 @@ if (process.env.NODE_ENV === "production") {
 app.post('/add-call', (req, res)=>{
   Call.create(req.body, (err, call)=>{
     if(err) return res.send(err);
+    io.emit('call', JSON.stringify({action:'addCall', call}));;
     res.send(call);
   });
 });
@@ -140,6 +119,7 @@ app.post('/add-call', (req, res)=>{
 app.post('/delete-call', (req, res)=>{
   Call.deleteOne(req.body, (err)=>{
     if (err) return res.send(err);
+    io.emit('call', JSON.stringify({action:'callDeleted', call:req.body}));
     res.send(req.body);
   });
 });
@@ -187,6 +167,7 @@ app.post('/set-call-as-open', (req, res)=>{
         call.startTime = new Date();
         call.save((err2)=>{
           if(err2) return res.send(err2);
+          io.emit('call', JSON.stringify({action:'statusChange', call}));
           res.send(call);
         })
       }
@@ -205,6 +186,7 @@ app.post('/set-call-as-unopen', (req, res)=>{
       call.startTime = null;
       call.save((err2)=>{
         if(err2) return res.send(err2);
+        io.emit('call', JSON.stringify({action:'statusChange', call}));
         res.send(call);
       })
     } else {
@@ -266,6 +248,7 @@ app.post('/procedure-completed', (req, res)=>{
 
       call.save((err2)=>{
         if(err2) return res.send(err2);
+        io.emit('call', JSON.stringify({action:'callCompleted', call}));
         res.send(call);
       })
     } else {
@@ -594,12 +577,17 @@ app.get('/seed-items', (req, res)=>{
   });
 })
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './client/build/index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, './client/build/index.html'));
+// });
 
-const server = app.listen(app.get('port'), ()=>{
+const server = app.use(((req, res) => res.sendFile(path.join(__dirname, './client/build/index.html')))).listen(app.get('port'), ()=>{
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });
+//Socket.io
+const io = socketIO(server);
 
-sockjs_echo.installHandlers(server, sockjsOpts);
+io.on('connection', (socket) => {
+  console.log('Client connected');
+  socket.on('disconnect', () => console.log('Client disconnected'));
+});

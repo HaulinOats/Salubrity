@@ -4,10 +4,11 @@ import Login from '../Widgets/Login/Login';
 import axios from 'axios';
 import Moment from 'react-moment';
 import {DebounceInput} from 'react-debounce-input';
+import ls from 'local-storage';
 import './Home.css';
 import loadingGif from '../../public/loading.gif';
-import SockJS from 'sockjs-client';
-let sockjs = new SockJS('/calls');
+import io from 'socket.io-client';
+const socket = io();
 
 export default class Home extends Component{
   constructor(props){
@@ -49,8 +50,6 @@ export default class Home extends Component{
     this.completeProcedure = this.completeProcedure.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.getConfirmation = this.getConfirmation.bind(this);
-    this.getAddedCall = this.getAddedCall.bind(this);
-    this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.getDateFromObjectId = this.getDateFromObjectId.bind(this);
     this.addCall = this.addCall.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
@@ -64,34 +63,16 @@ export default class Home extends Component{
     this.saveActiveRecord = this.saveActiveRecord.bind(this);
   }
   
-  componentWillMount(){
-    const storagecurrentUser = localStorage.getItem('currentUser');
-    const storageActiveTab = localStorage.getItem('activeHomeTab');
-    if(this.isValidStorageItem(storagecurrentUser)){
-      this.setState({currentUser:JSON.parse(storagecurrentUser)}, this.handleUserSessionData);
+  componentWillMount() {
+    if(ls('currentUser')){
+      this.setState({currentUser:ls('currentUser')}, this.handleUserSessionData);
     } else {
       this.handleUserSessionData();
     }
-    if(this.isValidStorageItem(storageActiveTab)){
-      this.setState({activeHomeTab:JSON.parse(storageActiveTab)});
+
+    if(ls('activeHomeTab')){
+      this.setState({activeHomeTab:ls('activeHomeTab')});
     }
-  }
-
-  componentDidMount() {
-    window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("beforeunload", this.handleWindowBeforeUnload);
-  }
-
-  handleWindowBeforeUnload(){
-    localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
-    localStorage.setItem('activeHomeTab', JSON.stringify(this.state.activeHomeTab));
-  }
-
-  isValidStorageItem(storageItem){
-    return storageItem !== 'undefined' && storageItem !== undefined && storageItem !== null && storageItem !== 'null'
   }
 
   handleUserSessionData(){
@@ -99,11 +80,11 @@ export default class Home extends Component{
   }
 
   sockListeners(){
-    sockjs.onopen = ()=>{
+    socket.on('connect', ()=>{
       console.log('socket opened...');
-    };
-    sockjs.onmessage = (e)=>{
-      let callObj = JSON.parse(e.data);
+    });
+    socket.on('call', data=>{
+      let callObj = JSON.parse(data);
       console.log('call: ', callObj);
 
       if(callObj.action === 'addCall'){
@@ -124,6 +105,25 @@ export default class Home extends Component{
       }
 
       if(callObj.action === 'callCompleted'){
+        //remove from queue
+        let calls = this.state.queueItems;
+        for(let i = calls.length - 1; i >= 0; i--) {
+          if(calls[i]._id === callObj.call._id) {
+            calls.splice(i, 1);
+            break;
+          }
+        }
+        //add to completed
+        let completedCalls = this.state.completedCalls;
+        completedCalls.unshift(callObj.call);
+
+        this.setState({
+          queueItems:calls,
+          completedCalls
+        });
+      }
+
+      if(callObj.action === 'callDeleted'){
         let calls = this.state.queueItems;
         for(let i = calls.length - 1; i >= 0; i--) {
           if(calls[i]._id === callObj.call._id) {
@@ -133,25 +133,16 @@ export default class Home extends Component{
         }
         this.setState({queueItems:calls});
       }
+    });
+    socket.on('disconnect', ()=>{
+      console.log('... socket closed');
+    });
+  }
 
-      if(callObj.action === 'callDeleted'){
-        let calls = this.state.queueItems;
-        for(let i = calls.length - 1; i >= 0; i--) {
-          if(calls[i]._id === callObj.call) {
-            calls.splice(i, 1);
-            break;
-          }
-        }
-        this.setState({queueItems:calls});
-      }
-    };
-    sockjs.onclose = ()=>{
-      console.log('...socket closed');
-    };
-    sockjs.onerror = (err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    }
+  setTab(tab){
+    this.setState({activeHomeTab:tab}, ()=>{
+      ls('activeHomeTab', this.state.activeHomeTab);
+    });
   }
 
   loginCallback(user){
@@ -399,7 +390,7 @@ export default class Home extends Component{
             }
           }
           if(!activeRecordExists){
-            this.setState({activeHomeTab:'queue'});
+            this.setTab('queue');
           }
         });
       }
@@ -482,17 +473,12 @@ export default class Home extends Component{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
         } else {
-          let callObject = {
-            action:'callCompleted',
-            call:resp.data
-          }
-          sockjs.send(JSON.stringify(callObject));
+          this.setTab('queue');
           this.setState({
             activeRecord:null,
             modalTitle:'Task Complete',
             modalMessage:'Procedure was completed. Returning to queue.',
-            modalIsOpen:true,
-            activeHomeTab:'queue'
+            modalIsOpen:true
           }, ()=>{
             setTimeout(()=>{
               this.setState({
@@ -586,10 +572,6 @@ export default class Home extends Component{
     });
   }
 
-  clickQueueTab(){
-    this.setState({activeHomeTab:'queue'});
-  }
-
   getConfirmation(isConfirmed){
     if(isConfirmed){
       if(this.state.confirmationType){
@@ -600,12 +582,8 @@ export default class Home extends Component{
           })
           .then(resp=>{
             if(resp.data){
-              let callObject = {
-                action:'callDeleted',
-                call:this.state.activeRecord._id
-              }
-              sockjs.send(JSON.stringify(callObject));
-              this.setState({activeRecord:null, activeHomeTab:'queue'});
+              this.setTab('queue');
+              this.setState({activeRecord:null});
             }
           })
           .catch(err=>{
@@ -623,14 +601,6 @@ export default class Home extends Component{
     }
   }
 
-  getAddedCall(addedCall){
-    let callObject = {
-      action:'addCall',
-      call:addedCall
-    }
-    sockjs.send(JSON.stringify(callObject));
-  }
-
   selectJob(job){
     if(!this.state.activeRecord){
       this.setState({isLoading:true});
@@ -642,14 +612,8 @@ export default class Home extends Component{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
         } else {
-          let callObject = {
-            action:'statusChange',
-            call:resp.data
-          }
-          sockjs.send(JSON.stringify(callObject));
-          this.setState({
-            activeRecord:resp.data, 
-            activeHomeTab:'active'
+          this.setState({activeRecord:resp.data}, ()=>{
+            this.setTab('active');
           });
         }
       })
@@ -662,7 +626,7 @@ export default class Home extends Component{
       })
     } else {
       if(this.state.activeRecord._id === job._id){
-        this.setState({activeHomeTab:'active'});
+        this.setTab('active')
       } else {
         this.setState({
           modalIsOpen:true,
@@ -682,12 +646,8 @@ export default class Home extends Component{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        let callObject = {
-          action:'statusChange',
-          call:resp.data
-        }
-        sockjs.send(JSON.stringify(callObject));
-        this.setState({activeRecord:null, activeHomeTab:'queue'});
+        this.setTab('queue')
+        this.setState({activeRecord:null});
       }
     })
     .catch((err)=>{
@@ -807,10 +767,10 @@ export default class Home extends Component{
               </div>
             </header>
             <ul className='vas-home-nav-tabs'>
-              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.clickQueueTab()}}>Queue {/*<img className='vas-home-refresh' src={refreshImg} alt="refresh" onClick={this.animateRefresh}/>*/}</li>
-              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setState({activeHomeTab:'complete'}, this.getCompletedCalls)}}>Completed</li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setTab('queue')}}>Queue</li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setTab('complete'); this.getCompletedCalls()}}>Completed</li>
               {this.state.activeRecord &&
-                <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setState({activeHomeTab:'active'})}}>Active/Open</li>
+                <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active')}}>Active/Open</li>
               }
             </ul>
             <div className="vas-home-tabContent">
