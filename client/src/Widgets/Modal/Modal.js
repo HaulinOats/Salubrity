@@ -159,7 +159,7 @@ export default class Modal extends Component {
                     </select>
                     </div>
                     {this.state.customSelected &&
-                      <div className='vas-modal-add-call-row-block'>
+                      <div className='vas-modal-add-call-row-inner'>
                         <p>Custom Name:</p>
                         <input className='vas-modal-add-call-input vas-modal-custom-input' type='text' value={this.state.custom} onChange={e => {this.setState({custom: e.target.value}, this.validateAddCall)}} />
                       </div>

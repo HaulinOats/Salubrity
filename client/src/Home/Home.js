@@ -3,10 +3,11 @@ import Modal from '../Widgets/Modal/Modal';
 import Login from '../Widgets/Login/Login';
 import axios from 'axios';
 import Moment from 'react-moment';
+import {DebounceInput} from 'react-debounce-input';
 import './Home.css';
 import loadingGif from '../../public/loading.gif';
-const SockJS = require('sockjs-client');
-var sockjs = new SockJS('/calls');
+import SockJS from 'sockjs-client';
+let sockjs = new SockJS('/calls');
 
 export default class Home extends Component{
   constructor(props){
@@ -60,6 +61,7 @@ export default class Home extends Component{
     this.stateLoadCalls = this.stateLoadCalls.bind(this);
     this.addToErrorArray = this.addToErrorArray.bind(this);
     this.sendErrorsToAdmin = this.sendErrorsToAdmin.bind(this);
+    this.saveActiveRecord = this.saveActiveRecord.bind(this);
   }
   
   componentWillMount(){
@@ -247,6 +249,27 @@ export default class Home extends Component{
     this.setState({
       modalTitle:'Add Call',
       modalIsOpen:true
+    })
+  }
+
+  inputLiveUpdate(e, field){
+    let activeRec = this.state.activeRecord;
+    activeRec[field] = e.target.value;
+    this.setState({activeRecord:activeRec}, this.saveActiveRecord);
+  }
+
+  saveActiveRecord(){
+    axios.post('/save-active-record', this.state.activeRecord)
+    .then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        console.log('active record saved');
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+      this.addToErrorArray(err);
     })
   }
 
@@ -928,15 +951,28 @@ export default class Home extends Component{
               {this.state.activeRecord && this.state.itemsById &&
                 <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                   <header className="vas-home-record-header">
-                    <p className="vas-home-record-header-text vas-pointer">
-                      <b onClick={e=>{this.editField('job')}}>{this.state.activeRecord.job}</b>
-                      <b onClick={e=>{this.editField('customJob')}}>{this.state.activeRecord.customJob ? ' - ' + this.state.activeRecord.customJob : ''}</b>
-                      <b className='vas-edit-icon'>&#9998;</b>
+                    <p className="vas-home-record-header-text">
+                      <DebounceInput
+                        className="vas-home-live-edit-input"
+                        minLength={1}
+                        debounceTimeout={500}
+                        value={this.state.activeRecord.job}
+                        onChange={e=>{this.inputLiveUpdate(e, 'job')}} />
+                      <DebounceInput
+                        className="vas-home-live-edit-input vas-home-custom-job-input"
+                        minLength={1}
+                        debounceTimeout={500}
+                        value={this.state.activeRecord.customJob}
+                        onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
                     </p>
-                    <p className="vas-home-record-header-subtext vas-pointer vas-uppercase">
+                    <p className="vas-home-record-header-subtext vas-pointer">
                       <b>Room:</b>
-                      <b onClick={e=>{this.editField('room')}}>{this.state.activeRecord.room}</b>
-                      <b className='vas-edit-icon'>&#9998;</b>
+                      <DebounceInput
+                          className="vas-home-live-edit-input"
+                          minLength={1}
+                          debounceTimeout={500}
+                          value={this.state.activeRecord.room}
+                          onChange={e=>{this.inputLiveUpdate(e, 'room')}} />
                     </p>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.resetForm()}}>Reset Form</button>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>

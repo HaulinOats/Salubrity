@@ -526,6 +526,13 @@ app.post('/get-order-changes-in-range', (req, res)=>{
   })
 })
 
+app.post('/save-active-record', (req, res)=>{
+  Call.replaceOne({_id:req.body._id}, req.body, err=>{
+    if(err) return res.send(err);
+    res.send(true);
+  });
+})
+
 //SUPER
 app.post('/send-errors-to-admin', (req,res)=>{
   fs.writeFile('vas-errors.json', JSON.stringify(req.body), (err)=>{

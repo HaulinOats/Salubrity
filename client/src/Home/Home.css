@@ -382,3 +382,11 @@
   margin-right: 0;
   padding: 5px;
 }
+.vas-home-custom-job-input {
+  font-size:90%;
+}
+.vas-home-live-edit-input {
+  background:none;
+  border:none;
+  color:white;
+}
