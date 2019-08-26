@@ -156,7 +156,7 @@ export default class Home extends Component{
 
   logout(){
     this.setState({currentUser:null, activeRecord:null});
-    localStorage.clear();
+    ls.clear();
   }
 
   stateLoadCalls(){
@@ -682,14 +682,12 @@ export default class Home extends Component{
         checkSiblings();
       }
     }
-    if(procedureName === 'Insertion Procedure'){
-      if(groupName === 'Insertion Type'){
-        this.setState({insertionTypeSelected:true});
-        document.querySelectorAll('.vas-home-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
-          el.style.display = 'inline';
-        })
-        checkSiblings();
-      }
+    if(procedureName === 'Insertion Procedure' && groupName === 'Insertion Type'){
+      this.setState({insertionTypeSelected:true});
+      document.querySelectorAll('.vas-home-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
+        el.style.display = 'inline';
+      })
+      checkSiblings();
     }
 
     function checkSiblings(){
@@ -771,7 +769,7 @@ export default class Home extends Component{
             </header>
             <ul className='vas-home-nav-tabs'>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setTab('queue')}}>Queue</li>
-              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setTab('complete'); this.getCompletedCalls()}}>Completed</li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setTab('complete')}}>Completed</li>
               {this.state.activeRecord &&
                 <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active')}}>Active/Open</li>
               }

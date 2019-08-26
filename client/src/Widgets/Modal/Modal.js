@@ -124,12 +124,6 @@ export default class Modal extends Component {
               {this.state.modalMessage &&
                 <p className='vas-modal-message'>{this.state.modalMessage}</p>
               }
-              {this.state.isConfirmation && 
-                <div className='vas-modal-confirmation-btn-container'>
-                  <button className='vas-btn-confirm vas-btn-no' onClick={e=>{this.getConfirmation(false)}}>Cancel</button>
-                  <button className='vas-btn-confirm vas-btn-yes' onClick={e=>{this.getConfirmation(true)}}>OK</button>
-                </div>
-              }
               {this.state.isAddCall &&
               <div>
                 <div className="vas-modal-add-call-row">
@@ -175,12 +169,20 @@ export default class Modal extends Component {
                 </div>
               }
             </div>
-            {this.state.isAddCall && this.state.inputsValidated &&
-            <div className="vas-modal-content-buttonContainer">
-              <button className="btn btn-danger vas-modal-cancel" onClick={this.props.toggleModal}>Cancel</button>
-              <button className="btn btn-success vas-modal-confirm" onClick={()=>{this.addCall()}}>Add To Queue</button>
+            <div className='vas-modal-content-buttonContainer-outer'>
+              {this.state.isConfirmation && 
+                <div className='vas-modal-content-buttonContainer'>
+                  <button className='vas-btn-confirm vas-btn-no' onClick={e=>{this.getConfirmation(false)}}>Cancel</button>
+                  <button className='vas-btn-confirm vas-btn-yes' onClick={e=>{this.getConfirmation(true)}}>OK</button>
+                </div>
+              }
+              {this.state.isAddCall && this.state.inputsValidated &&
+                <div className="vas-modal-content-buttonContainer">
+                  <button className="btn btn-danger vas-modal-cancel" onClick={this.props.toggleModal}>Cancel</button>
+                  <button className="btn btn-success vas-modal-confirm" onClick={()=>{this.addCall()}}>Add To Queue</button>
+                </div>
+              }
             </div>
-            }
           </div>
         </div>
       </div>
