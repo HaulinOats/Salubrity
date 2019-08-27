@@ -57,6 +57,7 @@
   padding: 10px 10px;
   background-color: #5f9ea0;
   color: #fff;
+  transition: 1s background-color linear;
 }
 .vas-home-record-header-text{
   font-size:160%;
@@ -87,6 +88,7 @@
   line-height: 190%;
   height: 100%;
   padding: 0 8px;
+  transition: 1s background-color linear;
 }
 .vas-home-nav-item[data-isactive='true']{
   background:cadetblue;
@@ -226,6 +228,7 @@
   cursor:pointer;
   display: flex;
   align-items: end;
+  transition: 1s background-color linear;
 }
 .vas-home-table-tr div {
   padding-left:5px;
@@ -411,6 +414,7 @@
 .vas-is-important-container {
   background: red !important;
   color: white !important;
+  animation: fadeToRed 1s;
 }
 .vas-home-table-row-is-important
 .vas-table-job-name {
