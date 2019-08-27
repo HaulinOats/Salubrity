@@ -497,7 +497,7 @@ export default class Home extends Component{
         addComments:this.state.activeRecord.addComments ? this.state.activeRecord.addComments.trim() : null,
         hospital:this.state.activeRecord.hospital ? this.state.activeRecord.hospital : null,
         provider:this.state.activeRecord.provider ? this.state.activeRecord.provider.trim() : null,
-        mrn:(this.state.activeRecord.mrn && this.state.activeRecord.mrn.length === 7) ? this.state.activeRecord.mrn : null,
+        mrn:(this.state.activeRecord.mrn && this.state.activeRecord.mrn.length > 4 && this.state.activeRecord.mrn.length < 8) ? this.state.activeRecord.mrn : null,
         procedureTime:completionTime - startTime,
         responseTime:startTime - callTime,
         orderChange: this.state.orderChanged ? Number(this.state.orderSelected) : null,
@@ -573,9 +573,9 @@ export default class Home extends Component{
       if(!this.state.activeRecord.hospital || this.state.activeRecord.hospital < 1){
         errors += '- You must select a hospital\n';
       }
-      if(!this.state.activeRecord.mrn || String(this.state.activeRecord.mrn).length !== 7){
+      if(!this.state.activeRecord.mrn || String(this.state.activeRecord.mrn).length < 5 || String(this.state.activeRecord.mrn).length > 7){
         console.log(this.state.activeRecord.mrn);
-        errors += '- Medical Record Number must be 7 digits long\n';
+        errors += '- Medical Record Number must be between 5 and 7 digits long\n';
       }
       if(!this.state.activeRecord.provider || !this.state.activeRecord.provider.length){
         errors += '- You must enter a provider name\n';
@@ -1025,8 +1025,7 @@ export default class Home extends Component{
                                             }
                                             {customInput &&
                                               <span>
-                                                {/* <input type={group.inputType} onChange={e=>{this.changeCustomInput(e, group.fieldName)}} data-procedureid={procedure.procedureId} placeholder={this.state.itemsById[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} /> */}
-                                                <input type={group.inputType} data-procedureid={procedure.procedureId} placeholder={this.state.itemsById[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} />
+                                                <input type={group.inputType} onChange={e=>{this.changeCustomInput(e, group.fieldName)}} data-procedureid={procedure.procedureId} placeholder={this.state.itemsById[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} />
                                               </span>
                                             }
                                           </span>
