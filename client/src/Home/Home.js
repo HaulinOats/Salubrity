@@ -267,9 +267,7 @@ export default class Home extends Component{
   }
 
   inputLiveUpdate(e, field){
-    let targetValue = e.target.value.trim();
-    console.log(targetValue);
-    console.log(field);
+    let targetValue = e.target.value;
     let activeRecord = this.state.activeRecord;
 
     if(e.target.type === 'number'){

@@ -234,6 +234,12 @@ app.post('/procedure-completed', (req, res)=>{
       } else {
         call.hospital = undefined;
       }
+
+      if(req.body.mrn){
+        call.mrn = req.body.mrn;
+      } else {
+        call.mrn = undefined;
+      }
       
       call.wasConsultation = req.body.wasConsultation;
       call.provider = req.body.provider;
@@ -243,7 +249,6 @@ app.post('/procedure-completed', (req, res)=>{
       call.procedureTime = req.body.procedureTime;
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
-      call.mrn = req.body.mrn;
       call.isOpen = undefined;
       call.openBy = undefined;
       call.contact = undefined;
