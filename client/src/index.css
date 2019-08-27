@@ -444,7 +444,7 @@ select {
   .vas-home-table-tr {
     font-size:75%;
   }
-  .vas-home-refresh {
-    width:12px;
+  .vas-home-nav-tabs {
+    height: 25px;
   }
 }

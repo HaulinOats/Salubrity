@@ -654,6 +654,12 @@ exports.procedureSeed = [
     seq:1,
     groups:[
       {
+        groupName:'Patient Refused',
+        inputType:'radio',
+        resetSiblings:true,
+        groupItems:[70]
+      },
+      {
         groupName:'Size',
         inputType:'radio',
         groupItems:[1,2,3,4]
@@ -667,11 +673,6 @@ exports.procedureSeed = [
         groupName:'Blood Drawn',
         inputType:'radio',
         groupItems:[6]
-      },
-      {
-        groupName:'Patient Refused',
-        inputType:'radio',
-        groupItems:[70]
       }
     ]
   },
@@ -681,6 +682,12 @@ exports.procedureSeed = [
     seq:2,
     groups:[
       {
+        groupName:'Patient Refused',
+        inputType:'radio',
+        resetSiblings:true,
+        groupItems:[71]
+      },
+      {
         groupName:'Draw Type',
         inputType:'radio',
         groupItems:[7,8]
@@ -689,11 +696,6 @@ exports.procedureSeed = [
         groupName:'Ultrasound',
         inputType:'radio',
         groupItems:[9]
-      },
-      {
-        groupName:'Patient Refused',
-        inputType:'radio',
-        groupItems:[71]
       }
     ]
   },
@@ -703,6 +705,12 @@ exports.procedureSeed = [
     name:'Blood Culture',
     groups:[
       {
+        groupName:'Patient Refused',
+        resetSiblings:true,
+        inputType:'radio',
+        groupItems:[72]
+      },
+      {
         groupName:'From',
         inputType:'radio',
         groupItems:[10,11,12,13,14,15]
@@ -711,11 +719,6 @@ exports.procedureSeed = [
         groupName:'Ultrasound',
         inputType:'radio',
         groupItems:[16]
-      },
-      {
-        groupName:'Patient Refused',
-        inputType:'radio',
-        groupItems:[72]
       }
     ]
   },
@@ -822,6 +825,12 @@ exports.procedureSeed = [
     name:'Insertion Procedure',
     groups:[
       {
+        groupName:'Patient Refused',
+        inputType:'radio',
+        resetSiblings:true,
+        groupItems:[73]
+      },
+      {
         groupName:'Insertion Type',
         inputType:'radio',
         groupItems:[57,58,59,60]
@@ -835,11 +844,6 @@ exports.procedureSeed = [
         groupName:'Laterality',
         inputType:'radio',
         groupItems:[66,67]
-      },
-      {
-        groupName:'Patient Refused',
-        inputType:'radio',
-        groupItems:[73]
       },
       {
         groupName:'Insertion Length',

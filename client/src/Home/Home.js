@@ -35,17 +35,13 @@ export default class Home extends Component{
       selectedProcedures:[],
       currentUser:null,
       procedureVerified:false,
-      addComments:'',
-      hospital:'',
       insertionTypeSelected:false,
       insertionLength:'',
       customFields:[],
-      mrn:'',
-      provider:'',
       orderChanged:false,
       orderSelected:'',
       wasConsultation:false
-    }
+    };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.completeProcedure = this.completeProcedure.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -61,6 +57,27 @@ export default class Home extends Component{
     this.addToErrorArray = this.addToErrorArray.bind(this);
     this.sendErrorsToAdmin = this.sendErrorsToAdmin.bind(this);
     this.saveActiveRecord = this.saveActiveRecord.bind(this);
+  }
+
+  resetState(){
+    this.setState({
+      errorArr:[],
+      activeHomeTab:'queue',
+      modalIsOpen:false,
+      modalTitle:'',
+      modalMessage:'',
+      modalConfirmation:false,
+      confirmationType:null,
+      activeRecord:null,
+      selectedProcedures:[],
+      procedureVerified:false,
+      insertionTypeSelected:false,
+      insertionLength:'',
+      customFields:[],
+      orderChanged:false,
+      orderSelected:'',
+      wasConsultation:false
+    });
   }
   
   componentWillMount() {
@@ -214,15 +231,12 @@ export default class Home extends Component{
     });
     if(isInsertionProcedure){
       document.querySelectorAll('.vas-home-inner-span[data-procedure="InsertionProcedure"]').forEach((el, idx)=>{
-        if(idx > 0){
+        if(idx > 1){
           el.style.display = 'none';
         }
       });
       this.setState({
         insertionTypeSelected:false,
-        mrn:'',
-        provider:'',
-        hospital:'',
         insertionLength:''
       });
     }
@@ -253,8 +267,21 @@ export default class Home extends Component{
   }
 
   inputLiveUpdate(e, field){
+    let targetValue = e.target.value.trim();
+    console.log(targetValue);
+    console.log(field);
     let activeRecord = this.state.activeRecord;
-    activeRecord[field] = e.target.value;
+
+    if(e.target.type === 'number'){
+      activeRecord[field] = Number(targetValue);
+    } else {
+      activeRecord[field] = targetValue;
+    }
+
+    if(targetValue.length < 1){
+      activeRecord[field] = null;
+    }
+
     this.setState({activeRecord}, this.saveActiveRecord);
   }
 
@@ -469,10 +496,10 @@ export default class Home extends Component{
         proceduresDone:proceduresArr,
         completedBy:Number(this.state.currentUser.userId),
         completedAt:completionTime.toISOString(),
-        addComments:this.state.addComments.trim().length ? this.state.addComments : null,
-        hospital:this.state.hospital ? Number(this.state.hospital) : null,
-        mrn:Number(this.state.mrn),
-        provider:this.state.provider,
+        addComments:this.state.activeRecord.addComments.trim().length ? this.state.activeRecord.addComments : null,
+        hospital:this.state.activeRecord.hospital ? this.state.activeRecord.hospital : null,
+        provider:this.state.activeRecord.provider.trim().length ? this.state.activeRecord.provider : null,
+        mrn:this.state.activeRecord.mrn.length === 7 ? this.state.activeRecord.mrn : null,
         procedureTime:completionTime - startTime,
         responseTime:startTime - callTime,
         orderChange: this.state.orderChanged ? Number(this.state.orderSelected) : null,
@@ -490,11 +517,7 @@ export default class Home extends Component{
             modalIsOpen:true
           }, ()=>{
             setTimeout(()=>{
-              this.setState({
-                modalTitle:'',
-                modalMessage:'',
-                modalIsOpen:false
-              })
+              this.resetState();
             }, 2000);
           });
         }
@@ -549,17 +572,22 @@ export default class Home extends Component{
       if(!this.state.insertionLength.length){
         errors += '- You must enter an insertion length\n';
       }
-      if(!this.state.hospital.length || this.state.hospital === ''){
+      if(!this.state.activeRecord.hospital || this.state.activeRecord.hospital < 1){
         errors += '- You must select a hospital\n';
       }
-      if(this.state.mrn.length !== 7){
+      if(!this.state.activeRecord.mrn || String(this.state.activeRecord.mrn).length !== 7){
+        console.log(this.state.activeRecord.mrn);
         errors += '- Medical Record Number must be 7 digits long\n';
       }
-      if(!this.state.provider.length){
+      if(!this.state.activeRecord.provider || !this.state.activeRecord.provider.length){
         errors += '- You must enter a provider name\n';
       }
     }
-
+    
+    if(!this.state.activeRecord.room || !this.state.activeRecord.room.length){
+      errors += '- Room number field cannot be empty\n';
+    }
+    
     if(errors.length && !this.state.wasConsultation){
       this.setState({
         modalIsOpen:true, 
@@ -592,7 +620,9 @@ export default class Home extends Component{
           .then(resp=>{
             if(resp.data){
               this.setTab('queue');
-              this.setState({activeRecord:null});
+              this.setState({activeRecord:null}, ()=>{
+                this.resetState();
+              });
             }
           })
           .catch(err=>{
@@ -656,7 +686,9 @@ export default class Home extends Component{
         console.log(resp.data);
       } else {
         this.setTab('queue')
-        this.setState({activeRecord:null});
+        this.setState({activeRecord:null}, ()=>{
+          this.resetState();
+        });
       }
     })
     .catch((err)=>{
@@ -682,25 +714,27 @@ export default class Home extends Component{
     }
   }
 
-  selectButton(e, procedureName, groupName){
+  selectButton(e, procedureName, groupName, resetSiblings){
     if(procedureName === 'Dressing Change'){
       if(groupName === 'What'){
         checkSiblings();
       }
     }
-    if(procedureName === 'Insertion Procedure' && groupName === 'Insertion Type'){
-      this.setState({insertionTypeSelected:true});
-      document.querySelectorAll('.vas-home-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
-        el.style.display = 'inline';
-      })
-      checkSiblings();
+    if(procedureName === 'Insertion Procedure'){
+      if(groupName === 'Insertion Type'){
+        this.setState({insertionTypeSelected:true});
+        document.querySelectorAll('.vas-home-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
+          el.style.display = 'inline';
+        })
+        checkSiblings();
+      }
     }
 
     function checkSiblings(){
       let groupContainer = e.target.closest('.vas-home-inner-span');
       while(groupContainer.nextSibling){
         let nextSib =  groupContainer.nextSibling.querySelector('.vas-home-select-input');
-        if(nextSib.id === '7' || nextSib.id === '12'){
+        if(nextSib.id === '7' || nextSib.id === '12' || nextSib.id === '73'){
           nextSib.checked = false;
         } else {
           nextSib.checked = true;
@@ -738,11 +772,10 @@ export default class Home extends Component{
     let activeRecord = this.state.activeRecord;
     if(e.target.value !== ''){
       activeRecord.hospital = Number(e.target.value);
-      this.setState({hospital:e.target.value, activeRecord}, this.saveActiveRecord);
     } else {
       activeRecord.hospital = null;
-      this.setState({hospital:'', activeRecord}, this.saveActiveRecord);
     }
+    this.setState({activeRecord}, this.saveActiveRecord);
   }
 
   procedureOptionCustomChange(e, field){
@@ -904,7 +937,7 @@ export default class Home extends Component{
                             {isComments &&
                               <div className='vas-call-comments-container'>
                                 {call.preComments &&
-                                  <p className='vas-call-comment'><b>Pre-Procedure Comments:</b> {call.addComments}</p>
+                                  <p className='vas-call-comment'><b>Pre-Procedure Comments:</b> {call.preComments}</p>
                                 }
                                 {call.addComments &&
                                   <p className='vas-call-comment'><b>Add'l Comments:</b> {call.addComments}</p>
@@ -923,24 +956,20 @@ export default class Home extends Component{
                   <header className={"vas-home-record-header " + (this.state.activeRecord.isImportant ? 'vas-is-important-container' : '')}>
                     <p className="vas-home-record-header-text">
                       <b className="vas-home-live-edit-input vas-block">{this.state.activeRecord.job}</b>
-                      {this.state.activeRecord.customJob &&
-                        <DebounceInput
-                          className="vas-home-live-edit-input vas-home-custom-job-input vas-inline-block"
-                          minLength={1}
-                          debounceTimeout={500}
-                          size={this.state.activeRecord.customJob.length < 1 ? 1 : this.state.activeRecord.customJob.length}
-                          value={this.state.activeRecord.customJob}
-                          onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
-                      }
+                      <DebounceInput
+                        type="text"
+                        className="vas-home-live-edit-input vas-home-custom-job-input vas-inline-block"
+                        debounceTimeout={750}
+                        value={this.state.activeRecord.customJob ? this.state.activeRecord.customJob : ''}
+                        onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
                     </p>
                     <p className="vas-home-record-header-subtext vas-pointer">
                       <b>Room:</b>
                       <DebounceInput
                           className="vas-home-live-edit-input vas-home-live-edit-input-room vas-inline-block"
-                          minLength={1}
-                          debounceTimeout={500}
-                          value={this.state.activeRecord.room}
-                          size={this.state.activeRecord.room.length < 1 ? 1 : this.state.activeRecord.room.length}
+                          type="text"
+                          debounceTimeout={750}
+                          value={this.state.activeRecord.room ? this.state.activeRecord.room : ''}
                           onChange={e=>{this.inputLiveUpdate(e, 'room')}} />
                     </p>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.resetForm()}}>Reset Form</button>
@@ -985,7 +1014,7 @@ export default class Home extends Component{
                                             {!customInput &&
                                               <span>
                                                 <input type={group.inputType} className={"vas-home-select-input vas-"+ group.inputType +"-select"} data-procedureid={procedure.procedureId} id={itemId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
-                                                <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName)}}>{this.state.itemsById[itemId].value}</label>
+                                                <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName, group.resetSiblings)}}>{this.state.itemsById[itemId].value}</label>
                                               </span>
                                             }
                                             {customInput &&
@@ -1010,11 +1039,11 @@ export default class Home extends Component{
                     <div className='vas-home-options-container'>
                       <div className='vas-home-option-inner'>
                         <label>{this.state.allOptions[1].name}:</label>{/* Medical Record Number */}
-                        <input className='vas-custom-input' type={this.state.allOptions[1].inputType} value={this.state[this.state.allOptions[1].callFieldName]} onChange={e=>{this.procedureOptionCustomChange(e, this.state.allOptions[1].callFieldName)}} />
+                        <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.activeRecord.mrn ? this.state.activeRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
                       </div>
                       <div className='vas-home-option-inner'>
                         <label>{this.state.allOptions[2].name}:</label>{/* Provider */}
-                        <input className='vas-custom-input' type={this.state.allOptions[2].inputType} value={this.state[this.state.allOptions[2].callFieldName]} onChange={e=>{this.procedureOptionCustomChange(e, this.state.allOptions[2].callFieldName)}} />
+                        <DebounceInput className='vas-custom-input' debounceTimeout={750} type="text" value={this.state.activeRecord.provider ? this.state.activeRecord.provider : ''} onChange={e=>{this.inputLiveUpdate(e, 'provider')}} />
                       </div>
                     </div>
                   }
@@ -1065,7 +1094,7 @@ export default class Home extends Component{
                       <p>Additional Comments</p>
                     </header>
                     <div className='vas-home-inner-container-main'>
-                      <textarea className='vas-home-post-comments' value={this.state.addComments} onChange={e=>{this.setState({addComments:e.target.value})}}></textarea>
+                      <DebounceInput element='textarea' className='vas-home-add-comments' debounceTimeout={750} value={this.state.activeRecord.addComments ? this.state.activeRecord.addComments : ''} onChange={e=>{this.inputLiveUpdate(e, 'addComments')}}/>
                     </div>
                   </div>
                   <div className="vas-home-inner-container vas-home-inner-container-final">

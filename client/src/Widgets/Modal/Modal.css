@@ -20,13 +20,22 @@
 }
 .vas-modal-content {
   position: relative;
-  max-width: 90%;
   background: #c5d5e6;
-  z-index: 1;
+  max-width: 90%;
   border-radius: 5px;
-  top: 5%;
+  z-index: 1;
   margin: 0 auto;
+}
+.vas-modal-content-add-call {
+  top: 5%;
   height:90%;
+}
+.vas-modal-content-normal {
+  top:15%;
+}
+.vas-modal-content-normal 
+.vas-modal-content-main{
+  border:none;
 }
 .vas-modal-content-header {
   display: flex;
@@ -44,15 +53,10 @@
 .vas-modal-content-main {
   padding: 2%;
   white-space: pre-line;
-  height: 75%;
   overflow-y: auto;
+  height:75%;
   border-bottom: solid 1px grey;
-  /* overflow: -moz-scrollbars-none;
-  -ms-overflow-style: none; */
 }
-/* .vas-modal-content-main::-webkit-scrollbar {
-  width:0 !important;
-} */
 .vas-modal-message {
   line-height: 140%;
   font-size: 120%;
@@ -122,7 +126,8 @@
   flex-flow: column;
 }
 .vas-modal-content-buttonContainer-outer {
-  height:14%;
+  height: 10%;
+  padding: 2% 0;
 }
 .vas-modal-content-buttonContainer {
   height: 100%;

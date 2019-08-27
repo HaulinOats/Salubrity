@@ -77,6 +77,7 @@ let procedureSchema = new Schema({
     {
       groupName:String,
       fieldName:{type:String, default:null},
+      resetSiblings:{type:Boolean, default:false},
       inputType:String,
       groupItems:[Number]
     }
