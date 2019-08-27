@@ -497,7 +497,7 @@ export default class Home extends Component{
         addComments:this.state.activeRecord.addComments ? this.state.activeRecord.addComments.trim() : null,
         hospital:this.state.activeRecord.hospital ? this.state.activeRecord.hospital : null,
         provider:this.state.activeRecord.provider ? this.state.activeRecord.provider.trim() : null,
-        mrn:this.state.activeRecord.mrn.length === 7 ? this.state.activeRecord.mrn : null,
+        mrn:(this.state.activeRecord.mrn && this.state.activeRecord.mrn.length === 7) ? this.state.activeRecord.mrn : null,
         procedureTime:completionTime - startTime,
         responseTime:startTime - callTime,
         orderChange: this.state.orderChanged ? Number(this.state.orderSelected) : null,
