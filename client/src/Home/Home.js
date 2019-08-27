@@ -671,11 +671,13 @@ export default class Home extends Component{
         })
       }
     } else {
-      this.setState({
-        modalIsOpen:true,
-        modalTitle:'You Have An Open Record',
-        modalMessage:'You already have a record open. Complete it or "Return To Queue" to select a different one.'
-      });
+      if(job._id !== this.state.activeRecord._id){
+        this.setState({
+          modalIsOpen:true,
+          modalTitle:'You Have An Open Record',
+          modalMessage:'You already have a record open. Complete it or "Return To Queue" to select a different one.'
+        });
+      }
       this.setTab('active');
     }
   }
