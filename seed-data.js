@@ -657,6 +657,7 @@ exports.procedureSeed = [
         groupName:'Patient Refused',
         inputType:'radio',
         resetSiblings:true,
+        hideHeader:true,
         groupItems:[70]
       },
       {
@@ -685,6 +686,7 @@ exports.procedureSeed = [
         groupName:'Patient Refused',
         inputType:'radio',
         resetSiblings:true,
+        hideHeader:true,
         groupItems:[71]
       },
       {
@@ -706,8 +708,9 @@ exports.procedureSeed = [
     groups:[
       {
         groupName:'Patient Refused',
-        resetSiblings:true,
         inputType:'radio',
+        resetSiblings:true,
+        hideHeader:true,
         groupItems:[72]
       },
       {
@@ -764,6 +767,7 @@ exports.procedureSeed = [
       {
         groupName:'Cathflow',
         inputType:'radio',
+        hideHeader:true,
         groupItems:[32,33]
       }
     ]
@@ -781,6 +785,7 @@ exports.procedureSeed = [
       {
         groupName:'Cathflow',
         inputType:'radio',
+        hideHeader:true,
         groupItems:[39,40]
       }
     ]
@@ -828,6 +833,7 @@ exports.procedureSeed = [
         groupName:'Patient Refused',
         inputType:'radio',
         resetSiblings:true,
+        hideHeader:true,
         groupItems:[73]
       },
       {

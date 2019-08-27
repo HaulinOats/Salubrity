@@ -35,13 +35,12 @@ let callSchema = new Schema({
   room:{type:String, default:null, lowercase:true},
   provider:{type:String, lowercase:true},
   job:String,
-  customJob:String,
-  preComments:String,
-  addComments:String,
-  contact:Number,
+  customJob:{type:String, default:null},
+  preComments:{type:String, default:null},
+  addComments:{type:String, default:null},
+  contact:{type:Number, default:null},
   createdBy:{type:Number, default:null},
   startTime:{type:Date, default:null},
-  isOpen:{type:Boolean, default:false},
   openBy:{type:Number, default:null},
   proceduresDone:[Object],
   mrn:{type:Number, default:null},
@@ -78,6 +77,7 @@ let procedureSchema = new Schema({
       groupName:String,
       fieldName:{type:String, default:null},
       resetSiblings:{type:Boolean, default:false},
+      hideHeader:{type:Boolean, default:false},
       inputType:String,
       groupItems:[Number]
     }
@@ -161,11 +161,10 @@ app.post('/set-call-as-open', (req, res)=>{
   Call.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return res.send(err);
     if(call){
-      if(call.isOpen) {
+      if(call.openBy) {
         res.send({'error':'call is already open'});
       } else {
-        call.isOpen = true;
-        call.openBy = req.body.userId;
+        call.openBy = Number(req.body.userId);
         call.startTime = new Date();
         call.save((err2)=>{
           if(err2) return res.send(err2);
@@ -183,7 +182,6 @@ app.post('/set-call-as-unopen', (req, res)=>{
   Call.findOne(req.body, (err, call)=>{
     if(err) return res.send(err);
     if(call){
-      call.isOpen = false;
       call.openBy = null;
       call.startTime = null;
       call.save((err2)=>{
@@ -249,7 +247,6 @@ app.post('/procedure-completed', (req, res)=>{
       call.procedureTime = req.body.procedureTime;
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
-      call.isOpen = undefined;
       call.openBy = undefined;
       call.contact = undefined;
 
@@ -506,7 +503,9 @@ app.post('/get-open-calls-in-range', (req, res)=>{
       $gte: new Date(req.body.startDate),
       $lt: new Date(req.body.endDate)
     },
-    isOpen:true
+    openBy:{
+      $ne:null
+    }
   }, (err, calls)=>{
     if(err) return res.send(err);
     if(calls){

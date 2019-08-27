@@ -639,38 +639,44 @@ export default class Home extends Component{
   }
 
   selectJob(job){
+    console.log(job);
     if(!this.state.activeRecord){
-      this.setState({isLoading:true});
-      axios.post('/set-call-as-open', {
-        _id:job._id,
-        userId:this.state.currentUser.userId
-      })
-      .then((resp)=>{
-        if(resp.data.error || resp.data._message){
-          console.log(resp.data);
-        } else {
-          this.setState({activeRecord:resp.data}, ()=>{
-            this.setTab('active');
-          });
-        }
-      })
-      .catch((err)=>{
-        console.log(err);
-        this.addToErrorArray(err);
-      })
-      .finally(()=>{
-        this.setState({isLoading:false});
-      })
-    } else {
-      if(this.state.activeRecord._id === job._id){
-        this.setTab('active')
-      } else {
+      if(job.openBy){
         this.setState({
           modalIsOpen:true,
           modalTitle:'Record Already Open',
-          modalMessage:'Please complete open task or return it to the queue'
+          modalMessage:'This record is currently opened by someone else'
+        });
+      } else {
+        this.setState({isLoading:true});
+        axios.post('/set-call-as-open', {
+          _id:job._id,
+          userId:this.state.currentUser.userId
+        })
+        .then((resp)=>{
+          if(resp.data.error || resp.data._message){
+            console.log(resp.data);
+          } else {
+            this.setState({activeRecord:resp.data}, ()=>{
+              this.setTab('active');
+            });
+          }
+        })
+        .catch((err)=>{
+          console.log(err);
+          this.addToErrorArray(err);
+        })
+        .finally(()=>{
+          this.setState({isLoading:false});
         })
       }
+    } else {
+      this.setState({
+        modalIsOpen:true,
+        modalTitle:'You Have An Open Record',
+        modalMessage:'You already have a record open. Complete it or "Return To Queue" to select a different one.'
+      });
+      this.setTab('active');
     }
   }
 
@@ -749,7 +755,7 @@ export default class Home extends Component{
   resetForm(){
     this.setState({
       modalTitle:'Reset Form?',
-      modalMessage:'Are you sure you want to reset the current form?',
+      modalMessage:'Are you sure you want to reset the current form? Will cause an app/page reload.',
       modalIsOpen:true,
       modalConfirmation:true,
       confirmationType:'reset-page'
@@ -860,7 +866,7 @@ export default class Home extends Component{
                         let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
                         return(
                           <div key={call._id} className='vas-admin-custom-table-item-outer'>
-                            {!call.isOpen &&
+                            {!call.openBy &&
                               <div>
                                 <div className='vas-admin-custom-table-item vas-call-table-item'>
                                   <div className='vas-home-custom-table-column-1'>
@@ -1001,7 +1007,7 @@ export default class Home extends Component{
                                   {group.groupName === 'Cathflow' &&
                                     <button className='vas-home-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-home-important-hide')}}>{group.groupName}</button>
                                   }
-                                  {group.groupName !== 'Cathflow' &&
+                                  {!group.hideHeader &&
                                     <h3>{group.groupName}</h3>
                                   }
                                   <div className={group.groupName === 'Cathflow' ? 'vas-home-inner-container-row vas-home-important-hide vas-home-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : 'vas-home-inner-container-row'}>
@@ -1017,7 +1023,8 @@ export default class Home extends Component{
                                             }
                                             {customInput &&
                                               <span>
-                                                <input type={group.inputType} onChange={e=>{this.changeCustomInput(e, group.fieldName)}} data-procedureid={procedure.procedureId} placeholder={this.state.itemsById[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} />
+                                                {/* <input type={group.inputType} onChange={e=>{this.changeCustomInput(e, group.fieldName)}} data-procedureid={procedure.procedureId} placeholder={this.state.itemsById[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} /> */}
+                                                <input type={group.inputType} data-procedureid={procedure.procedureId} placeholder={this.state.itemsById[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} />
                                               </span>
                                             }
                                           </span>

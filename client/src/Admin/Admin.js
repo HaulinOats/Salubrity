@@ -724,10 +724,10 @@ export default class Admin extends Component {
                       <option value='orderChange'>Order Change</option>
                       <option value='responseTime'>Response Time</option>
                       <option value='procedureTime'>Procedure Time</option>
-                      <option value='isOpen'>Open Calls</option>
+                      <option value='openBy'>Open Calls</option>
                     </select>
                   </div>
-                  {this.state.firstFilterValue === 'isOpen' &&
+                  {this.state.firstFilterValue === 'openBy' &&
                     <button className='vas-admin-search-submit' onClick={e=>{this.getOpenCalls()}}>Submit</button>
                   }
                   {this.state.firstFilterValue === 'completedBy' &&
@@ -814,7 +814,7 @@ export default class Admin extends Component {
                         let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
                         return(
                           <div key={call._id} className='vas-admin-custom-table-item-outer'>
-                            {!call.isOpen &&
+                            {!call.openBy &&
                               <div className='vas-admin-custom-table-item'>
                                 <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-1'>
                                   <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
@@ -894,7 +894,7 @@ export default class Admin extends Component {
                                 }
                               </div>
                             }
-                            {call.isOpen &&
+                            {call.openBy &&
                               <span className='w-100'>
                                 <div className='vas-admin-is-open-container'>
                                   <div className='vas-width-15'>
