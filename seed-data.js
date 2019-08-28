@@ -872,7 +872,7 @@ exports.procedureSeed = [
       {
         groupName:'Insertion Type',
         inputType:'radio',
-        groupItems:[57,58,60,59,74]
+        groupItems:[58,60,59,57,74]
       },
       {
         groupName:'Vessel',
