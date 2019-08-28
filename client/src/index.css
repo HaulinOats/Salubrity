@@ -70,6 +70,9 @@ label:focus{
   outline:0px !important;
   -webkit-appearance: none;
 }
+textarea {
+  font-family: inherit;
+}
 html {
   height:100%;
 }
@@ -378,6 +381,8 @@ select {
 .vas-call-times-left{
   display: inline-block;
   font-size: 90%;
+  color: midnightblue;
+  font-weight: bold;
 }
 .vas-call-times-right {
   float:right;
