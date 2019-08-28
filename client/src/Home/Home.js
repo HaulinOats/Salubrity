@@ -834,6 +834,7 @@ export default class Home extends Component{
                   <div className='vas-table-thead-row'></div>
                   <div className='vas-home-table-body'>
                     {this.state.queueItems.length > 0 && this.state.hospitalsById && this.state.queueItems.map((item, idx)=>{
+                      console.log(item);
                       return(
                         <div key={item._id} className={'vas-home-table-tr vas-status-' + item.status + (item.openBy ? ' vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
                           <div className='vas-home-table-tr-left vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
@@ -841,7 +842,7 @@ export default class Home extends Component{
                             <p className='vas-home-table-job-name'>{item.job}{item.customJob ? ' - ' + item.customJob : ''}</p>
                             <div className='vas-home-table-tr-inner'>
                               <p><b>Room:</b><i className='vas-uppercase'>{item.room}</i></p>
-                              <p><b>Hospital:</b><i className='vas-capitalize'>{this.state.hospitalsById[item.hospital].name ? this.state.hospitalsById[item.hospital].name : 'N/A'}</i></p>
+                              <p><b>Hospital:</b><i className='vas-capitalize'>{this.state.hospitalsById[item.hospital] ? this.state.hospitalsById[item.hospital].name : 'N/A'}</i></p>
                               <p><b>Contact:</b><i>{item.contact ? item.contact : 'N/A'}</i></p>
                               <p><b>Nurse:</b><i className='vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : 'N/A'}</i></p>
                             </div>
