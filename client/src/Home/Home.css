@@ -227,7 +227,7 @@
 .vas-home-table-tr {
   padding:8px 0 8px 1%;
   width:99%;
-  border-top: 1px solid #dee2e6;
+  box-shadow: inset 0px 3px 3px -3px black;
   cursor:pointer;
   display: flex;
   align-items: end;
@@ -249,7 +249,7 @@
 .vas-home-table-job-name {
   color:white;
   text-shadow: none;
-  border-color:white;
+  border-color: lightsteelblue;
 }
 .vas-home-table-tr-inner {
   width:98%;
@@ -270,7 +270,7 @@
 }
 .vas-home-table-row-is-open
 .vas-home-table-tr-inner p {
-  border-color:white;
+  border-color:lightsteelblue;
 }
 .vas-status-2
 .vas-home-table-tr-inner p {
@@ -279,7 +279,7 @@
 .vas-home-table-tr-inner p b{
   font-weight: bold;
   font-size:105%;
-  color:midnightblue;
+  color: #4a4a4a;
 }
 .vas-home-table-tr-inner p i{
   margin: 0 auto;
@@ -292,7 +292,7 @@
   z-index: 1;
 }
 .vas-home-table-row-is-open {
-  background-color: #9DAAB8;
+  background-color: #7990a7;
   color:white;
 }
 .vas-home-table-row-is-open
@@ -494,4 +494,15 @@
 .vas-home-job-input {
   font-size: 125%;
   font-weight: bold;
+}
+.vas-home-table-time {
+  font-size:110%;
+}
+.vas-status-3
+.vas-home-table-job-name{
+  border-color:white;
+}
+.vas-status-3 
+.vas-home-table-tr-inner p {
+  border-color:white;
 }

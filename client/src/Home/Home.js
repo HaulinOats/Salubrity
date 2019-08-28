@@ -14,6 +14,7 @@ export default class Home extends Component{
   constructor(props){
     super(props);
     this.state = {
+      currentUser:null,
       errorArr:[],
       activeHomeTab:'queue',
       isLoading:false,
@@ -34,7 +35,6 @@ export default class Home extends Component{
       statusById:null,
       orderChangeById:null,
       selectedProcedures:[],
-      currentUser:null,
       procedureVerified:false,
       insertionTypeSelected:false,
       insertionLength:'',
@@ -50,7 +50,7 @@ export default class Home extends Component{
     this.getDateFromObjectId = this.getDateFromObjectId.bind(this);
     this.addCall = this.addCall.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
-    this.handleUserSessionData = this.handleUserSessionData.bind(this);
+    this.setUserSession = this.setUserSession.bind(this);
     this.logout = this.logout.bind(this);
     this.reverseCompletedSort = this.reverseCompletedSort.bind(this);
     this.resetSection = this.resetSection.bind(this);
@@ -83,9 +83,10 @@ export default class Home extends Component{
   
   componentWillMount() {
     if(ls('currentUser')){
-      this.setState({currentUser:ls('currentUser')}, this.handleUserSessionData);
-    } else {
-      this.handleUserSessionData();
+      this.setState({currentUser:ls('currentUser')}, ()=>{
+        this.checkUserSession();
+        this.stateLoadCalls();
+      });
     }
 
     if(ls('activeHomeTab')){
@@ -93,81 +94,38 @@ export default class Home extends Component{
     }
   }
 
-  handleUserSessionData(){
-    this.stateLoadCalls();
+  componentDidMount(){
+    this.sessionInterval = setInterval(()=>{
+      if(this.state.currentUser){
+        this.checkUserSession();
+      }
+    }, 900000);//check session every 15 minutes (900000)ms
   }
 
-  sockListeners(){
-    socket.on('connect', ()=>{
-      console.log('socket opened...');
-    });
-    socket.on('call', data=>{
-      let callObj = JSON.parse(data);
-      console.log('call: ', callObj);
-
-      if(callObj.action === 'addCall'){
-        let calls = this.state.queueItems;
-        calls.push(callObj.call);
-        this.setState({queueItems:calls});
-      }
-
-      if(callObj.action === 'callUpdate'){
-        let calls = this.state.queueItems;
-        for(let i = 0; i < calls.length; i++){
-          if(calls[i]._id === callObj.call._id){
-            calls[i] = callObj.call;
-            break;
-          }
-        }
-        this.setState({queueItems:calls});
-      }
-
-      if(callObj.action === 'callCompleted'){
-        //remove from queue
-        let calls = this.state.queueItems;
-        for(let i = calls.length - 1; i >= 0; i--) {
-          if(calls[i]._id === callObj.call._id) {
-            calls.splice(i, 1);
-            break;
-          }
-        }
-        //add to completed
-        let completedCalls = this.state.completedCalls;
-        completedCalls.unshift(callObj.call);
-
-        this.setState({
-          queueItems:calls,
-          completedCalls
-        });
-      }
-
-      if(callObj.action === 'callDeleted'){
-        let calls = this.state.queueItems;
-        for(let i = calls.length - 1; i >= 0; i--) {
-          if(calls[i]._id === callObj.call._id) {
-            calls.splice(i, 1);
-            break;
-          }
-        }
-        this.setState({queueItems:calls});
-      }
-    });
-    socket.on('disconnect', ()=>{
-      console.log('... socket closed');
-    });
+  componentWillUnmount(){
+    clearInterval(this.sessionInterval);
   }
 
-  setTab(tab){
-    this.setState({activeHomeTab:tab}, ()=>{
-      ls('activeHomeTab', this.state.activeHomeTab);
+  checkUserSession(){
+    let currentTime = Math.floor(Date.now() / 1000);
+    if((currentTime - this.state.currentUser.lastLogin) > 1800){
+      console.log('Logging user out due to inactivity');
+      this.logout();
+    }
+  }
+
+  setUserSession(){
+    console.log('refreshing session due to activity...');
+    let currentUser = this.state.currentUser;
+    currentUser.lastLogin = Math.floor(Date.now() / 1000);
+    this.setState({currentUser}, ()=>{
+      ls('currentUser', this.state.currentUser);
     });
   }
 
   loginCallback(user){
-    let currentUser = user;
-    currentUser.lastLogin = Math.floor(Date.now() / 1000);
     this.setState({currentUser:user}, ()=>{
-      ls('currentUser', this.state.currentUser);
+      this.setUserSession();
       this.stateLoadCalls();
     });
   }
@@ -188,6 +146,72 @@ export default class Home extends Component{
     setTimeout(()=>{
       console.log(this.state);
     }, 1000);
+  }
+
+  sockListeners(){
+    socket.on('connect', ()=>{
+      console.log('socket opened...');
+    });
+    socket.on('call', data=>{
+      let callObj = JSON.parse(data);
+      let calls;
+      switch(callObj.action){
+        case 'addCall':
+          calls = this.state.queueItems;
+          calls.push(callObj.call);
+          this.setState({queueItems:calls});
+          break;
+        case 'callUpdate':
+          calls = this.state.queueItems;
+          for(let i = 0; i < calls.length; i++){
+            if(calls[i]._id === callObj.call._id){
+              calls[i] = callObj.call;
+              break;
+            }
+          }
+          this.setState({queueItems:calls});
+          break;
+        case 'callCompleted':
+          //remove from queue
+          calls = this.state.queueItems;
+          for(let i = calls.length - 1; i >= 0; i--) {
+            if(calls[i]._id === callObj.call._id) {
+              calls.splice(i, 1);
+              break;
+            }
+          }
+          //add to completed
+          let completedCalls = this.state.completedCalls;
+          completedCalls.unshift(callObj.call);
+    
+          this.setState({
+            queueItems:calls,
+            completedCalls
+          });
+          break;
+        case 'callDeleted':
+          calls = this.state.queueItems;
+          for(let i = calls.length - 1; i >= 0; i--) {
+            if(calls[i]._id === callObj.call._id) {
+              calls.splice(i, 1);
+              break;
+            }
+          }
+          this.setState({queueItems:calls});
+          break;
+        default:
+      }
+    });
+    socket.on('disconnect', ()=>{
+      console.log('... socket closed');
+    });
+  }
+
+  setTab(tab){
+    this.setState({activeHomeTab:tab}, ()=>{
+      ls('activeHomeTab', this.state.activeHomeTab);
+      this.setUserSession();
+    });
   }
 
   getAllUsers(){
@@ -252,6 +276,7 @@ export default class Home extends Component{
         orderSelected:''
       });
     }
+    this.setUserSession();
   }
 
   addCall(){
@@ -259,6 +284,7 @@ export default class Home extends Component{
       modalTitle:'Add Call',
       modalIsOpen:true
     })
+    this.setUserSession();
   }
 
   inputLiveUpdate(e, field){
@@ -291,6 +317,7 @@ export default class Home extends Component{
       console.log(err);
       this.addToErrorArray(err);
     })
+    this.setUserSession();
   }
 
   getProcedureData(){
@@ -461,12 +488,14 @@ export default class Home extends Component{
   reverseCompletedSort(){
     let items = this.state.completedCalls;
     this.setState({completedCalls:items.reverse()});
+    this.setUserSession();
   }
 
   toggleHandler() {
     this.setState({
       modalIsOpen: !this.state.modalIsOpen
     });
+    this.setUserSession();
   }
 
   completeProcedure(){
@@ -528,6 +557,7 @@ export default class Home extends Component{
         this.setState({isLoading:false});
       })
     }
+    this.setUserSession();
   }
 
   createProcedureObject(){
@@ -604,7 +634,7 @@ export default class Home extends Component{
       modalTitle:'',
       modalConfirmation:false,
       confirmationType:null
-    });
+    }, this.setUserSession);
   }
 
   getConfirmation(isConfirmed){
@@ -636,6 +666,7 @@ export default class Home extends Component{
         }
       }
     }
+    this.setUserSession();
   }
 
   selectJob(job){
@@ -680,6 +711,7 @@ export default class Home extends Component{
       }
       this.setTab('active');
     }
+    this.setUserSession();
   }
 
   returnToQueue(){
@@ -703,7 +735,8 @@ export default class Home extends Component{
     })
     .finally(()=>{
       this.setState({isLoading:false});
-    })
+    });
+    this.setUserSession();
   }
 
   showHiddenButtons(procedureName, groupName, elClass){
@@ -748,10 +781,12 @@ export default class Home extends Component{
         groupContainer = groupContainer.nextSibling;
       }
     }
+    this.setUserSession();
   }
 
   changeCustomInput(e, fieldName){
     this.setState({[fieldName]:e.target.value});
+    this.setUserSession();
   }
 
   resetForm(){
@@ -772,6 +807,7 @@ export default class Home extends Component{
       modalConfirmation:true,
       confirmationType:'delete-call'
     });
+    this.setUserSession();
   }
 
   hospitalChange(e){
@@ -786,6 +822,7 @@ export default class Home extends Component{
 
   procedureOptionCustomChange(e, field){
     this.setState({[field]:e.target.value});
+    this.setUserSession();
   }
 
   orderSelect(e){
@@ -794,6 +831,7 @@ export default class Home extends Component{
     } else {
       this.setState({orderSelected:e.target.value});
     }
+    this.setUserSession();
   }
 
   changeStatus(e){
@@ -834,11 +872,10 @@ export default class Home extends Component{
                   <div className='vas-table-thead-row'></div>
                   <div className='vas-home-table-body'>
                     {this.state.queueItems.length > 0 && this.state.hospitalsById && this.state.queueItems.map((item, idx)=>{
-                      console.log(item);
                       return(
                         <div key={item._id} className={'vas-home-table-tr vas-status-' + item.status + (item.openBy ? ' vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
-                          <div className='vas-home-table-tr-left vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
-                          <div className='vas-home-table-tr-right vas-width-90'>
+                          <div className='vas-home-table-time vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
+                          <div className='vas-width-90'>
                             <p className='vas-home-table-job-name'>{item.job}{item.customJob ? ' - ' + item.customJob : ''}</p>
                             <div className='vas-home-table-tr-inner'>
                               <p><b>Room:</b><i className='vas-uppercase'>{item.room}</i></p>
