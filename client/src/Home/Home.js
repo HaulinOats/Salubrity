@@ -84,7 +84,7 @@ export default class Home extends Component{
   componentWillMount() {
     if(ls('currentUser')){
       this.setState({currentUser:ls('currentUser')}, ()=>{
-        this.checkUserSession();
+        this.setUserSession();
         this.stateLoadCalls();
       });
     }
@@ -99,7 +99,7 @@ export default class Home extends Component{
       if(this.state.currentUser){
         this.checkUserSession();
       }
-    }, 900000);//check session every 15 minutes (900000)ms
+    }, 180000);//check session every 3 minutes (180000)ms
   }
 
   componentWillUnmount(){
@@ -108,14 +108,22 @@ export default class Home extends Component{
 
   checkUserSession(){
     let currentTime = Math.floor(Date.now() / 1000);
-    if((currentTime - this.state.currentUser.lastLogin) > 1800){
+    let timeDiff = currentTime - this.state.currentUser.lastLogin;
+    if(timeDiff > 1800){
       console.log('Logging user out due to inactivity');
       this.logout();
+    }
+    if(timeDiff > 1619){
+      this.setState({
+        modalTitle:'Session Is About To End',
+        modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
+        modalIsOpen:true,
+        modalConfirmation:true
+      })
     }
   }
 
   setUserSession(){
-    console.log('refreshing session due to activity...');
     let currentUser = this.state.currentUser;
     currentUser.lastLogin = Math.floor(Date.now() / 1000);
     this.setState({currentUser}, ()=>{
