@@ -109,6 +109,7 @@ export default class Home extends Component{
   checkUserSession(){
     let currentTime = Math.floor(Date.now() / 1000);
     let timeDiff = currentTime - this.state.currentUser.lastLogin;
+    console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 30)`);
     if(timeDiff > 1800){
       console.log('Logging user out due to inactivity');
       this.logout();

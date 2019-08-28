@@ -21,7 +21,6 @@ export default class Login extends Component {
         loginType:'user'
       })
       .then((resp)=>{
-        console.log(resp.data);
         if(resp.data.error){
           console.log(resp.data.error)
         } else {

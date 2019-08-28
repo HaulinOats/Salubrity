@@ -145,15 +145,12 @@ app.get('/get-completed-calls', (req, res)=>{
   var end = new Date();
   end.setHours(23,59,59,999);
 
-  // console.log('start: ', start);
-  // console.log('end  : ', end);
-
   Call.find({completedAt: {$gte: start, $lt: end}}).sort({completedAt:-1}).exec((err, calls)=>{
     if(err) return res.send(err);
     if(calls.length){
       res.send(calls);
     } else {
-      res.send({'error':'no calls were found with that query'});
+      res.send({'error':'no completed calls for today, yet'});
     }
   });
 });
