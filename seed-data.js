@@ -105,7 +105,7 @@ exports.optionSeed = [
       },
       {
         id:5,
-        name:'Midline'
+        name:'ML'
       },
       {
         id:6,
@@ -231,7 +231,7 @@ exports.itemSeed = [
     itemId:11,
     procedureName:'Blood Culture',
     groupName:'From',
-    value:'Midline',
+    value:'ML',
     isCustom:false
   },
   {
@@ -462,7 +462,7 @@ exports.itemSeed = [
     itemId:44,
     procedureName:'Dressing Change',
     groupName:'What',
-    value:'Midline',
+    value:'ML',
     isCustom:false
   },
   {
@@ -490,7 +490,7 @@ exports.itemSeed = [
     itemId:48,
     procedureName:'Troubleshoot',
     groupName:'Action Taken',
-    value:'Midline',
+    value:'ML',
     isCustom:false
   },
   {
@@ -553,7 +553,7 @@ exports.itemSeed = [
     itemId:57,
     procedureName:'Insertion Procedure',
     groupName:'Insertion Type',
-    value:'Midline',
+    value:'ML',
     isCustom:false
   },
   {
@@ -669,6 +669,13 @@ exports.itemSeed = [
     procedureName:'Insertion Procedure',
     groupName:'Patient Refused',
     value:'Patient Refused',
+    isCustom:false
+  },
+  {
+    itemId:74,
+    procedureName:'Insertion Procedure',
+    groupName:'Insertion Type',
+    value:'PG',
     isCustom:false
   }
 ];
@@ -865,7 +872,7 @@ exports.procedureSeed = [
       {
         groupName:'Insertion Type',
         inputType:'radio',
-        groupItems:[57,58,59,60]
+        groupItems:[57,58,60,59,74]
       },
       {
         groupName:'Vessel',

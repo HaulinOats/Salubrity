@@ -61,6 +61,7 @@ button:active,
 }
 input {
   font-size:inherit;
+  font-family: inherit;
 }
 textarea:focus, 
 input:focus,
@@ -76,7 +77,7 @@ body {
   height:100%;
   font-size:16px;
   margin: 0;
-  font-family: 'Rubik', sans-serif;
+  font-family: 'Quicksand', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background:url('../public/agsquare.png') !important;
@@ -102,6 +103,7 @@ button {
   white-space: nowrap;
   font-size:inherit;
   cursor: pointer;
+  font-family: inherit;
 }
 button:active {
   box-shadow:none;
@@ -115,6 +117,7 @@ button:active {
 }
 select {
   font-size:inherit;
+  font-family: inherit;
 }
 
 /* Checkbox */
