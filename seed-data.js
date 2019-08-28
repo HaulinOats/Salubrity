@@ -1,5 +1,6 @@
 exports.optionSeed = [
   {
+    optionId:1,
     name:'Hospital',
     inputType:'dropdown',
     callFieldName:'hospital',
@@ -31,16 +32,19 @@ exports.optionSeed = [
     ]
   },
   {
+    optionId:2,
     name:'Medical Record Number',
     inputType:'number',
     callFieldName:'mrn'
   },
   {
+    optionId:3,
     name:'Provider',
     inputType:'text',
     callFieldName:'provider'
   },
   {
+    optionId:4,
     name:'MD Order Changed?',
     inputType:'confirm',
     callFieldName:'orderChange',
@@ -72,11 +76,13 @@ exports.optionSeed = [
     ]
   },
   {
+    optionId:5,
     name:'Consultation',
     inputType:'radio',
     callFieldName:'wasConsultation'
   },
   {
+    optionId:6,
     name:'Call Needs',
     inputType:'dropdown',
     callFieldName:'callNeeds',
@@ -124,6 +130,26 @@ exports.optionSeed = [
       {
         id:11,
         name:'Custom'
+      }
+    ]
+  },
+  {
+    optionId:7,
+    name:'Status Codes',
+    inputType:'dropdown',
+    callFieldName:'status',
+    options:[
+      {
+        id:1,
+        name:'Normal'
+      },
+      {
+        id:2,
+        name:'Stat'
+      },
+      {
+        id:3,
+        name:'On Hold'
       }
     ]
   }

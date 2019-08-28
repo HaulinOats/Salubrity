@@ -50,7 +50,7 @@ let callSchema = new Schema({
   completedBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
   wasConsultation:{type:Boolean, default:null},
-  isImportant:{type:Boolean, default:false}
+  status:{type:Number, default:0}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -86,7 +86,8 @@ let procedureSchema = new Schema({
 procedureSchema.plugin(uniqueValidator, {message: `Could not insert procedure based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Procedure = mongoose.model('Procedure', procedureSchema);
 
-let optionSchema = new Schema({ 
+let optionSchema = new Schema({
+  optionId:{type:Number, required:true},
   name:String,
   inputType:String,
   callFieldName:{type:String, index:true, unique:true},

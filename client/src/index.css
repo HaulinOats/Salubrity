@@ -264,6 +264,10 @@ select {
   background:red;
   color:white;
 }
+.vas-status-2
+.vas-warn-btn {
+  background:indianred;
+}
 .vas-custom-input {
   border:none;
   border-radius:4px;
@@ -316,6 +320,27 @@ select {
 }
 .vas-width-50{
   width:50%;
+}
+.vas-width-55{
+  width:55%;
+}
+.vas-width-60{
+  width:60%;
+}
+.vas-width-65{
+  width:65%;
+}
+.vas-width-70{
+  width:70%;
+}
+.vas-width-75{
+  width:75%;
+}
+.vas-width-90{
+  width:90%;
+}
+.vas-width-100{
+  width:100%;
 }
 .vas-nowrap {
   white-space: nowrap;
@@ -419,6 +444,15 @@ select {
 .vas-inline-block {
   display:inline-block;
 }
+.vas-status-2{
+  /* Stat */
+  background:red !important;
+}
+.vas-status-3{
+  /* On Hold */
+  background:#e39f20 !important;
+}
+
 @media (max-width: 650px) {
   body {
     font-size:15px;

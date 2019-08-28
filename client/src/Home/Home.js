@@ -31,6 +31,7 @@ export default class Home extends Component{
       itemsById:null,
       proceduresById:null,
       hospitalsById:null,
+      statusById:null,
       orderChangeById:null,
       selectedProcedures:[],
       currentUser:null,
@@ -253,12 +254,6 @@ export default class Home extends Component{
     }
   }
 
-  toggleIsImportant(){
-    let activeRecord = this.state.activeRecord;
-    activeRecord.isImportant = !activeRecord.isImportant;
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
   addCall(){
     this.setState({
       modalTitle:'Add Call',
@@ -347,10 +342,15 @@ export default class Home extends Component{
         resp.data[3].options.forEach(order=>{
           orders[order.id] = order;
         });
+        let status = {};
+        resp.data[6].options.forEach(status=>{
+          status[status.id] = status;
+        })
         this.setState({
           allOptions:resp.data,
           hospitalsById:hospitals,
-          orderChangeById:orders
+          orderChangeById:orders,
+          statusById:status
         });
       }
     })
@@ -575,7 +575,7 @@ export default class Home extends Component{
       }
       if(!this.state.activeRecord.mrn || String(this.state.activeRecord.mrn).length < 5 || String(this.state.activeRecord.mrn).length > 7){
         console.log(this.state.activeRecord.mrn);
-        errors += '- Medical Record Number must be between 5 and 7 digits long\n';
+        errors += '- Medical Record Number must be between 5 and 7 digits\n';
       }
       if(!this.state.activeRecord.provider || !this.state.activeRecord.provider.length){
         errors += '- You must enter a provider name\n';
@@ -796,6 +796,12 @@ export default class Home extends Component{
     }
   }
 
+  changeStatus(e){
+    let activeRecord = this.state.activeRecord;
+    activeRecord.status = e.target.value;
+    this.setState({activeRecord}, this.saveActiveRecord);
+  }
+
   render(){
     return(
       <div>
@@ -819,28 +825,27 @@ export default class Home extends Component{
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setTab('queue')}}>Queue</li>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setTab('complete')}}>Completed</li>
               {this.state.activeRecord &&
-                <li className={'vas-home-nav-item ' + (this.state.activeRecord.isImportant ? 'vas-is-important-container' : '')} data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active')}}>Active/Open</li>
+                <li className={'vas-home-nav-item vas-status-' + this.state.activeRecord.status} data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active')}}>Active/Open</li>
               }
             </ul>
             <div className="vas-home-tabContent">
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'queue' ? true : false}>
                 <div className="vas-home-table vas-table">
-                  <div className='vas-table-thead-row'>
-                    <div className='vas-width-20'>Room/Hospital</div>
-                    <div className='vas-width-25'>Job</div>
-                    <div className='vas-width-10'>Contact</div>
-                    <div className='vas-width-30'>Open By</div>
-                    <div className='vas-width-10'>Call Time</div>
-                  </div>
+                  <div className='vas-table-thead-row'></div>
                   <div className='vas-home-table-body'>
                     {this.state.queueItems.length > 0 && this.state.hospitalsById && this.state.queueItems.map((item, idx)=>{
                       return(
-                        <div key={item._id} className={'vas-home-table-tr ' + (item.openBy ? 'vas-home-table-row-is-open ' : '') + (item.isImportant ? 'vas-home-table-row-is-important ' : '')} onClick={(e)=>{this.selectJob(item)}}>
-                          <div className='vas-width-20 vas-nowrap vas-uppercase'><p>{item.room}</p><p>{this.state.hospitalsById[item.hospital].name}</p></div>
-                          <div className='vas-width-25'><i className='vas-table-job-name'>{item.job}</i>{item.job === 'Custom' && ' - ' + item.customJob}</div>
-                          <div className='vas-width-10'>{item.contact}</div>
-                          <div className='vas-width-30 vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : ''}</div>
-                          <div className='vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
+                        <div key={item._id} className={'vas-home-table-tr vas-status-' + item.status + (item.openBy ? ' vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
+                          <div className='vas-home-table-tr-left vas-width-10'><Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment></div>
+                          <div className='vas-home-table-tr-right vas-width-90'>
+                            <p className='vas-home-table-job-name'>{item.job}{item.job === 'Custom' && ' - ' + item.customJob}</p>
+                            <div className='vas-home-table-tr-inner'>
+                              <p><b>Room:</b><i className='vas-uppercase'>{item.room}</i></p>
+                              <p><b>Hospital:</b><i className='vas-capitalize'>{this.state.hospitalsById[item.hospital].name ? this.state.hospitalsById[item.hospital].name : 'N/A'}</i></p>
+                              <p><b>Contact:</b><i>{item.contact ? item.contact : 'N/A'}</i></p>
+                              <p><b>Nurse:</b><i className='vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : 'N/A'}</i></p>
+                            </div>
+                          </div>
                         </div>
                       )
                     })}
@@ -959,9 +964,9 @@ export default class Home extends Component{
               </div>
               {this.state.activeRecord && this.state.itemsById && this.state.allOptions.length > 0 &&
                 <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
-                  <header className={"vas-home-record-header " + (this.state.activeRecord.isImportant ? 'vas-is-important-container' : '')}>
+                  <header className={"vas-home-record-header vas-status-" + this.state.activeRecord.status}>
                     <p className="vas-home-record-header-text">
-                      <b className="vas-home-live-edit-input vas-block">{this.state.activeRecord.job}</b>
+                      <b className="vas-home-live-edit-input vas-home-job-input vas-block">{this.state.activeRecord.job}</b>
                       <DebounceInput
                         type="text"
                         className="vas-home-live-edit-input vas-home-custom-job-input vas-inline-block"
@@ -970,17 +975,24 @@ export default class Home extends Component{
                         onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
                     </p>
                     <p className="vas-home-record-header-subtext vas-pointer">
-                      <b>Room:</b>
+                      <b className='vas-home-room-text'>Room:</b>
                       <DebounceInput
-                          className="vas-home-live-edit-input vas-home-live-edit-input-room vas-inline-block"
+                          className="vas-home-live-edit-input vas-home-live-edit-input-room vas-inline-block vas-uppercase"
                           type="text"
                           debounceTimeout={750}
                           value={this.state.activeRecord.room ? this.state.activeRecord.room : ''}
                           onChange={e=>{this.inputLiveUpdate(e, 'room')}} />
                     </p>
+                    <div className='vas-home-status-container'>
+                      <p className='vas-home-status-text'>Status:</p>
+                      <select className='vas-select vas-home-status-dropdown' value={this.state.activeRecord.status} onChange={e=>{this.changeStatus(e)}}>
+                        {this.state.allOptions[6].options.map(option=>{
+                          return <option key={option.id} value={option.id}>{option.name}</option>
+                        })}
+                      </select>
+                    </div>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.resetForm()}}>Reset Form</button>
                     <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
-                    <button className='vas-home-record-header-btn' onClick={e=>{this.toggleIsImportant()}}>Toggle STAT</button>
                     <button className='vas-home-record-header-btn vas-warn-btn' onClick={e=>{this.deleteCall()}}>Delete Call</button>
                   </header>
                   {this.state.activeRecord.preComments &&
