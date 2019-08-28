@@ -196,8 +196,8 @@
   margin-left:5px;
 }
 .vas-admin-custom-table-item-outer {
-  background:lightblue;
-  border-top:solid 2px black;
+  background:white;
+  border-bottom:solid 2px black;
   font-size:85%;
   width:100%;
 }
