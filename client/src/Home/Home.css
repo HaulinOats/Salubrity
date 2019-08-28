@@ -239,6 +239,8 @@
   font-size: 125%;
   color: darkcyan;
   text-shadow: 0px 0px 3px white;
+  display:flex;
+  width:95%;
 }
 .vas-status-2
 .vas-home-table-job-name {
@@ -506,4 +508,9 @@
 .vas-status-3 
 .vas-home-table-tr-inner p {
   border-color:white;
+}
+.vas-home-table-open-status {
+  margin:0 auto;
+  margin-right:0;
+  font-weight: bold;
 }
