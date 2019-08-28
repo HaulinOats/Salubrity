@@ -23,7 +23,7 @@ export default class Modal extends Component {
       contactNumber:'',
       inputsValidated:false,
       addedCall:null,
-      isImportant:false,
+      status:0,
       hospital:''
     }
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
@@ -109,7 +109,7 @@ export default class Modal extends Component {
       customJob:this.state.custom.trim().length ? this.state.custom : null,
       preComments:this.state.preComments.trim().length ? this.state.preComments : null,
       hospital:this.state.hospital.length ? Number(this.state.hospital) : null,
-      isImportant:this.state.isImportant ? true : null,
+      status:this.state.status,
       isOpen:false
     };
 
@@ -159,7 +159,7 @@ export default class Modal extends Component {
               <div>
                 <div className='vas-modal-add-call-row-block'>
                   <input type='radio' className="vas-radio-select vas-modal-is-important-input" id='is-important' name='is-important'/>
-                  <label className="vas-btn" htmlFor='is-important' onClick={e=>{this.setState({isImportant:true})}}>Needed Stat</label>
+                  <label className="vas-btn" htmlFor='is-important' onClick={e=>{this.setState({status:2})}}>Needed Stat</label>
                 </div>
                 <div className="vas-modal-add-call-row">
                   <div className="vas-modal-add-call-row-inner">

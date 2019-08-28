@@ -244,6 +244,7 @@
 .vas-home-table-job-name {
   text-shadow: none;
   color:white;
+  border-color:white !important;
 }
 .vas-home-table-row-is-open
 .vas-home-table-job-name {
