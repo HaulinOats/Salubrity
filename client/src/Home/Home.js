@@ -112,6 +112,7 @@ export default class Home extends Component{
     console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 30)`);
     if(timeDiff > 1800){
       console.log('Logging user out due to inactivity');
+      this.resetState();
       this.logout();
     }
     if(timeDiff > 1619){
