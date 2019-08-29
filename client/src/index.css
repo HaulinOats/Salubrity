@@ -460,6 +460,9 @@ select {
   /* On Hold */
   background:#e39f20 !important;
 }
+.vas-ml-10 {
+  margin-left:10px;
+}
 
 @media (max-width: 650px) {
   body {

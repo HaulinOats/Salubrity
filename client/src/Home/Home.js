@@ -41,7 +41,8 @@ export default class Home extends Component{
       customFields:[],
       orderChanged:false,
       orderSelected:'',
-      wasConsultation:false
+      wasConsultation:false,
+      isFullscreen:false
     };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.completeProcedure = this.completeProcedure.bind(this);
@@ -58,6 +59,7 @@ export default class Home extends Component{
     this.addToErrorArray = this.addToErrorArray.bind(this);
     this.sendErrorsToAdmin = this.sendErrorsToAdmin.bind(this);
     this.saveActiveRecord = this.saveActiveRecord.bind(this);
+    this.toggleFullscreen = this.toggleFullscreen.bind(this);
   }
 
   resetState(){
@@ -80,10 +82,19 @@ export default class Home extends Component{
       wasConsultation:false
     });
   }
+
+  componentDidUpdate(){
+    if(this.state.isFullscreen){
+
+    }
+  }
   
   componentWillMount() {
     if(ls('currentUser')){
-      this.setState({currentUser:ls('currentUser')}, ()=>{
+      this.setState({
+        currentUser:ls('currentUser'),
+        isFullscreen:true
+      }, ()=>{
         this.setUserSession();
         this.stateLoadCalls();
       });
@@ -92,6 +103,9 @@ export default class Home extends Component{
     if(ls('activeHomeTab')){
       this.setState({activeHomeTab:ls('activeHomeTab')});
     }
+
+    //get document for accessing fullscreen API
+    this.document = document.documentElement;
   }
 
   componentDidMount(){
@@ -112,7 +126,6 @@ export default class Home extends Component{
     console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 30)`);
     if(timeDiff > 1800){
       console.log('Logging user out due to inactivity');
-      this.resetState();
       this.logout();
     }
     if(timeDiff > 1619){
@@ -134,15 +147,19 @@ export default class Home extends Component{
   }
 
   loginCallback(user){
-    this.setState({currentUser:user}, ()=>{
+    this.setState({
+      currentUser:user,
+      isFullscreen:true
+    }, ()=>{
       this.setUserSession();
       this.stateLoadCalls();
     });
   }
 
   logout(){
-    this.setState({currentUser:null, activeRecord:null});
+    this.setState({currentUser:null}, this.resetState);
     ls.clear();
+    this.exitFullscreen();
   }
 
   stateLoadCalls(){
@@ -215,6 +232,38 @@ export default class Home extends Component{
     socket.on('disconnect', ()=>{
       console.log('... socket closed');
     });
+  }
+
+  toggleFullscreen(){
+    if(this.state.isFullscreen){
+      this.exitFullscreen();
+    } else {
+      this.enterFullscreen();
+    }
+  }
+
+  enterFullscreen(){
+    if (this.document.requestFullscreen) {
+      this.document.requestFullscreen();
+    } else if (this.document.mozRequestFullScreen) { /* Firefox */
+      this.document.mozRequestFullScreen();
+    } else if (this.document.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+      this.document.webkitRequestFullscreen();
+    } else if (this.document.msRequestFullscreen) { /* IE/Edge */
+      this.document.msRequestFullscreen();
+    }
+  }
+
+  exitFullscreen(){
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) { /* Firefox */
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE/Edge */
+      document.msExitFullscreen();
+    }
   }
 
   setTab(tab){
@@ -860,7 +909,7 @@ export default class Home extends Component{
           <div className="vas-container-fluid vas-home-container">
             <header className='vas-main-header'>
               <div className='vas-header-left-container'>
-                <h1 className='vas-home-header-title'>VAS Tracker</h1>
+                <h1 className='vas-home-header-title vas-pointer' onClick={e=>{this.setState({isFullscreen:!this.state.isFullscreen}, this.toggleFullscreen)}}>VAS Tracker</h1>
                 <button className='vas-button vas-home-add-call' onClick={this.addCall}>Add Call</button>
               </div>
               <div className='vas-header-right-container'>
