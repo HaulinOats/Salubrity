@@ -390,21 +390,37 @@
   margin-left: 10px;
   transform: rotate(0);
 }
-.vas-refresh-animate {
-  animation-duration: 2s;
-  animation-name:refreshAnimate;
-}
 .vas-home-complete-procedure-btn {
   background: seagreen;
   padding: 10px;
   font-size: 110%;
 }
-@keyframes refreshAnimate {
-  from {
-    transform: rotate(0deg)
+.vas-home-open-label-blink {
+  display:flex;
+  animation-name: openLabelBlink;
+  animation-duration: 2s;
+  color: white;
+  text-shadow: 0px 0px 2px transparent;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+.vas-home-open-label-blink:before {
+  content:'\2039';
+  margin-right:3px;
+  background-size: 10px 10px;
+}
+.vas-home-open-label-blink:after {
+  content:'\203A';
+  margin-left:3px;
+}
+@keyframes openLabelBlink {
+  from{
+    text-shadow: 0px 0px 2px transparent;
+    color:white;
   }
-  to {
-    transform:rotate(360deg)
+  to{
+    text-shadow: 0px 0px 2px black;
+    color:rgb(255, 205, 80);
   }
 }
 .vas-home-completed-thead {
