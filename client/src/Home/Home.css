@@ -407,7 +407,6 @@
 .vas-home-open-label-blink:before {
   content:'\2039';
   margin-right:3px;
-  background-size: 10px 10px;
 }
 .vas-home-open-label-blink:after {
   content:'\203A';
