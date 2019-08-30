@@ -14,6 +14,7 @@ export default class Home extends Component{
   constructor(props){
     super(props);
     this.state = {
+      socketStatus:[],
       currentUser:null,
       errorArr:[],
       activeHomeTab:'queue',
@@ -82,6 +83,14 @@ export default class Home extends Component{
       wasConsultation:false,
       isFullscreen:false
     });
+  }
+
+  showSocketStatus(){
+    this.setState({
+      modalTitle:'Socket Session Data',
+      modalMessage:this.state.socketStatus,
+      modalIsOpen:true
+    })
   }
   
   componentWillMount() {
@@ -172,19 +181,24 @@ export default class Home extends Component{
 
   sockListeners(){
     socket.on('connect', ()=>{
-      console.log('socket opened...');
+      let status = 'socket opened...\n';
+      let socketStatus = this.state.socketStatus;
+      console.log(status);
+      socketStatus.push(status);
     });
     socket.on('call', data=>{
       let callObj = JSON.parse(data);
-      let calls;
+      let calls = this.state.queueItems;
+      let status = `data sent on socket: ${callObj.action}\n`;
+      let socketStatus = this.state.socketStatus;
+      console.log(status);
+      socketStatus.push(status);
       switch(callObj.action){
         case 'addCall':
-          calls = this.state.queueItems;
           calls.push(callObj.call);
           this.setState({queueItems:calls});
           break;
         case 'callUpdate':
-          calls = this.state.queueItems;
           for(let i = 0; i < calls.length; i++){
             if(calls[i]._id === callObj.call._id){
               calls[i] = callObj.call;
@@ -195,7 +209,6 @@ export default class Home extends Component{
           break;
         case 'callCompleted':
           //remove from queue
-          calls = this.state.queueItems;
           for(let i = calls.length - 1; i >= 0; i--) {
             if(calls[i]._id === callObj.call._id) {
               calls.splice(i, 1);
@@ -212,7 +225,6 @@ export default class Home extends Component{
           });
           break;
         case 'callDeleted':
-          calls = this.state.queueItems;
           for(let i = calls.length - 1; i >= 0; i--) {
             if(calls[i]._id === callObj.call._id) {
               calls.splice(i, 1);
@@ -225,7 +237,10 @@ export default class Home extends Component{
       }
     });
     socket.on('disconnect', ()=>{
-      console.log('... socket closed');
+      let status = `... socket closed\n`;
+      let socketStatus = this.state.socketStatus;
+      console.log(status);
+      socketStatus.push(status);
     });
   }
 
@@ -909,7 +924,7 @@ export default class Home extends Component{
               </div>
               <div className='vas-header-right-container'>
                 <span className={"vas-status-dot " + (this.state.errorArr.length > 0 ? 'vas-status-bad' : '')} onClick={this.sendErrorsToAdmin}></span>
-                <p className='vas-home-main-header-user vas-nowrap'>{this.state.currentUser.fullname}</p>
+                <p className='vas-home-main-header-user vas-nowrap' onClick={e=>{this.showSocketStatus()}}>{this.state.currentUser.fullname}</p>
                 <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
               </div>
             </header>
