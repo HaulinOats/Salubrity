@@ -57,6 +57,7 @@ export default class Home extends Component{
     this.sendErrorsToAdmin = this.sendErrorsToAdmin.bind(this);
     this.saveActiveRecord = this.saveActiveRecord.bind(this);
     this.checkActiveRecord = this.checkActiveRecord.bind(this);
+    this.visibilityChange = this.visibilityChange.bind(this);
   }
 
   resetState(){
@@ -92,6 +93,33 @@ export default class Home extends Component{
 
     if(ls('activeHomeTab')){
       this.setState({activeHomeTab:ls('activeHomeTab')});
+    }
+
+    // Set the name of the hidden property and the change event for visibility
+    this.documentProps = {
+      hidden:null,
+      visibilityChange:null
+    }
+
+    if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 
+      this.documentProps.hidden = "hidden";
+      this.documentProps.visibilityChange = "visibilitychange";
+    } else if (typeof document.msHidden !== "undefined") {
+      this.documentProps.hidden = "msHidden";
+      this.documentProps.visibilityChange = "msvisibilitychange";
+    } else if (typeof document.webkitHidden !== "undefined") {
+      this.documentProps.hidden = "webkitHidden";
+      this.documentProps.visibilityChange = "webkitvisibilitychange";
+    }
+
+    document.addEventListener("visibilitychange", this.visibilityChange);
+  }
+
+  visibilityChange(){
+    if(document[this.documentProps.hidden]){
+      this.stopIntervals();
+    } else {
+      this.startIntervals();
     }
   }
 
