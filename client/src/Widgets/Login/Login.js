@@ -74,7 +74,7 @@ export default class Login extends Component {
             <div className='vas-login-color-border-block vas-login-color-border-block-4'></div>
             <div className='vas-login-color-border-block vas-login-color-border-block-5'></div>
           </div>
-          <h2>VAS Tracker</h2>
+          <h2 onClick={e=>{window.location.reload()}}>VAS Tracker</h2>
           <h3 className='vas-capitalize'>{this.state.loginType} Login</h3>
           <div className="vas-login-form">
             <DebounceInput
