@@ -7,14 +7,11 @@ import {DebounceInput} from 'react-debounce-input';
 import ls from 'local-storage';
 import './Home.css';
 import loadingGif from '../../public/loading.gif';
-import io from 'socket.io-client';
-const socket = io();
 
 export default class Home extends Component{
   constructor(props){
     super(props);
     this.state = {
-      socketStatus:[],
       currentUser:null,
       errorArr:[],
       activeHomeTab:'queue',
@@ -42,8 +39,7 @@ export default class Home extends Component{
       customFields:[],
       orderChanged:false,
       orderSelected:'',
-      wasConsultation:false,
-      isFullscreen:false
+      wasConsultation:false
     };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.completeProcedure = this.completeProcedure.bind(this);
@@ -60,7 +56,7 @@ export default class Home extends Component{
     this.addToErrorArray = this.addToErrorArray.bind(this);
     this.sendErrorsToAdmin = this.sendErrorsToAdmin.bind(this);
     this.saveActiveRecord = this.saveActiveRecord.bind(this);
-    this.toggleFullscreen = this.toggleFullscreen.bind(this);
+    this.checkActiveRecord = this.checkActiveRecord.bind(this);
   }
 
   resetState(){
@@ -80,24 +76,14 @@ export default class Home extends Component{
       customFields:[],
       orderChanged:false,
       orderSelected:'',
-      wasConsultation:false,
-      isFullscreen:false
+      wasConsultation:false
     });
-  }
-
-  showSocketStatus(){
-    this.setState({
-      modalTitle:'Socket Session Data',
-      modalMessage:this.state.socketStatus,
-      modalIsOpen:true
-    })
   }
   
   componentWillMount() {
     if(ls('currentUser')){
       this.setState({
-        currentUser:ls('currentUser'),
-        isFullscreen:true
+        currentUser:ls('currentUser')
       }, ()=>{
         this.setUserSession();
         this.stateLoadCalls();
@@ -107,21 +93,40 @@ export default class Home extends Component{
     if(ls('activeHomeTab')){
       this.setState({activeHomeTab:ls('activeHomeTab')});
     }
-
-    //get document for accessing fullscreen API
-    this.document = document.documentElement;
   }
 
   componentDidMount(){
+    this.startIntervals();
+  }
+
+  startIntervals(){
+    console.log('starting intervals...');
     this.sessionInterval = setInterval(()=>{
       if(this.state.currentUser){
         this.checkUserSession();
       }
     }, 180000);//check session every 3 minutes (180000)ms
+
+    this.getLatestData = setInterval(()=>{
+      if(this.state.currentUser){
+        if(this.state.activeHomeTab === 'queue'){
+          this.getActiveCalls();
+        }
+        if(this.state.activeHomeTab === 'complete'){
+          this.getCompletedCalls();
+        }
+      }
+    }, 10000);
+  }
+
+  stopIntervals(){
+    console.log('stopping intervals...');
+    clearInterval(this.sessionInterval);
+    clearInterval(this.getLatestData);
   }
 
   componentWillUnmount(){
-    clearInterval(this.sessionInterval);
+    this.stopIntervals();
   }
 
   checkUserSession(){
@@ -152,22 +157,22 @@ export default class Home extends Component{
 
   loginCallback(user){
     this.setState({
-      currentUser:user,
-      isFullscreen:true
+      currentUser:user    
     }, ()=>{
       this.setUserSession();
       this.stateLoadCalls();
+      this.startIntervals();
     });
   }
 
   logout(){
+    this.stopIntervals();
+    this.closeModal();
     this.setState({currentUser:null}, this.resetState);
     ls.clear();
-    this.exitFullscreen();
   }
 
   stateLoadCalls(){
-    this.sockListeners();
     this.getAllUsers();
     this.getActiveCalls();
     this.getCompletedCalls();
@@ -179,106 +184,15 @@ export default class Home extends Component{
     }, 1000);
   }
 
-  sockListeners(){
-    socket.on('connect', ()=>{
-      let status = 'socket opened...\n';
-      let socketStatus = this.state.socketStatus;
-      console.log(status);
-      socketStatus.push(status);
-    });
-    socket.on('call', data=>{
-      let callObj = JSON.parse(data);
-      let calls = this.state.queueItems;
-      let status = `data sent on socket: ${callObj.action}\n`;
-      let socketStatus = this.state.socketStatus;
-      console.log(status);
-      socketStatus.push(status);
-      switch(callObj.action){
-        case 'addCall':
-          calls.push(callObj.call);
-          this.setState({queueItems:calls});
-          break;
-        case 'callUpdate':
-          for(let i = 0; i < calls.length; i++){
-            if(calls[i]._id === callObj.call._id){
-              calls[i] = callObj.call;
-              break;
-            }
-          }
-          this.setState({queueItems:calls});
-          break;
-        case 'callCompleted':
-          //remove from queue
-          for(let i = calls.length - 1; i >= 0; i--) {
-            if(calls[i]._id === callObj.call._id) {
-              calls.splice(i, 1);
-              break;
-            }
-          }
-          //add to completed
-          let completedCalls = this.state.completedCalls;
-          completedCalls.unshift(callObj.call);
-    
-          this.setState({
-            queueItems:calls,
-            completedCalls
-          });
-          break;
-        case 'callDeleted':
-          for(let i = calls.length - 1; i >= 0; i--) {
-            if(calls[i]._id === callObj.call._id) {
-              calls.splice(i, 1);
-              break;
-            }
-          }
-          this.setState({queueItems:calls});
-          break;
-        default:
-      }
-    });
-    socket.on('disconnect', ()=>{
-      let status = `... socket closed\n`;
-      let socketStatus = this.state.socketStatus;
-      console.log(status);
-      socketStatus.push(status);
-    });
-  }
-
-  toggleFullscreen(){
-    if(this.state.isFullscreen){
-      this.exitFullscreen();
-    } else {
-      this.enterFullscreen();
-    }
-  }
-
-  enterFullscreen(){
-    if (this.document.requestFullscreen) {
-      this.document.requestFullscreen();
-    } else if (this.document.mozRequestFullScreen) { /* Firefox */
-      this.document.mozRequestFullScreen();
-    } else if (this.document.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-      this.document.webkitRequestFullscreen();
-    } else if (this.document.msRequestFullscreen) { /* IE/Edge */
-      this.document.msRequestFullscreen();
-    }
-  }
-
-  exitFullscreen(){
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) { /* Firefox */
-      document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { /* IE/Edge */
-      document.msExitFullscreen();
-    }
-  }
-
   setTab(tab){
     this.setState({activeHomeTab:tab}, ()=>{
       ls('activeHomeTab', this.state.activeHomeTab);
+      if(this.state.activeHomeTab === 'queue'){
+        this.getActiveCalls();
+      }
+      if(this.state.activeHomeTab === 'complete'){
+        this.getCompletedCalls();
+      }
       this.setUserSession();
     });
   }
@@ -319,7 +233,7 @@ export default class Home extends Component{
       if(el.type === 'number' || el.type === 'text'){
         el.value = '';
       }
-      if(!isInsertionProcedure && el.getAttribute('data-procedureid') === '10'){
+      if(!isInsertionProcedure && el.getAttribute('data-procedureid') === '9'){
         isInsertionProcedure = true;
       }
     });
@@ -390,7 +304,6 @@ export default class Home extends Component{
   }
 
   getProcedureData(){
-    this.setState({isLoading:true});
     axios.get('/get-procedures')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
@@ -417,9 +330,6 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
       this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
     })
   }
 
@@ -485,12 +395,12 @@ export default class Home extends Component{
   }
 
   getCompletedCalls(){
-    this.setState({isLoading:true});
     axios.get('/get-completed-calls')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
+        console.log('completed calls updating...');
         this.setState({completedCalls:resp.data});
       }
     })
@@ -498,40 +408,33 @@ export default class Home extends Component{
       console.log(err);
       this.addToErrorArray(err);
     })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
   }
 
   getActiveCalls(){
-    this.setState({isLoading:true});
     axios.get('/get-active-calls')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
-        this.setState({queueItems:[]});
+        console.log(resp.data);
       } else {
-        this.setState({queueItems:resp.data}, ()=>{
-          let activeRecordExists = false;
-          for(let i = 0; i < this.state.queueItems.length; i++){
-            if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
-              this.setState({activeRecord:this.state.queueItems[i]});
-              activeRecordExists = true;
-              break;
-            }
-          }
-          if(!activeRecordExists){
-            this.setTab('queue');
-          }
-        });
+        console.log('active calls updating...');
+        this.setState({queueItems:resp.data}, this.checkActiveRecord);
       }
     })
     .catch((err)=>{
       console.log(err);
       this.addToErrorArray(err);
     })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
+  }
+
+  checkActiveRecord(){
+    if(!this.state.activeRecord){
+      for(let i = 0; i < this.state.queueItems.length; i++){
+        if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
+          this.setState({activeRecord:this.state.queueItems[i]});
+          break;
+        }
+      }
+    }
   }
 
   addToErrorArray(err){
@@ -574,10 +477,10 @@ export default class Home extends Component{
       //check if any procedures have required fields
       for(let i = 0; i < proceduresArr.length; i++){
         //Insertion Procedure
-        if(proceduresArr[i].procedureId === 10){
-          proceduresArr[i].itemIds.push(68);
+        if(proceduresArr[i].procedureId === 9){
+          proceduresArr[i].itemIds.push(72);
           proceduresArr[i].customValues = {
-            '68': Number(this.state.insertionLength)
+            '72': Number(this.state.insertionLength)
           }
         }
       }
@@ -605,8 +508,15 @@ export default class Home extends Component{
         if(resp.data.error || resp.data._message){
           console.log(resp.data);
         } else {
+          let queueItems = this.state.queueItems;
+          for(var i = queueItems.length -1; i >= 0 ; i--){
+            if(queueItems[i]._id === this.state.activeRecord._id){
+              queueItems.splice(i, 1);
+            }
+          }
           this.setTab('queue');
           this.setState({
+            queueItems,
             activeRecord:null,
             modalTitle:'Task Complete',
             modalMessage:'Procedure was completed. Returning to queue.',
@@ -696,14 +606,19 @@ export default class Home extends Component{
     return true;
   }
 
-  closeModal(){
+  closeModal(callData){
+    if(callData){
+      let queueItems = this.state.queueItems;
+      queueItems.push(callData);
+      this.setState({queueItems});
+    }
     this.setState({
       modalIsOpen:false,
       modalMessage:'',
       modalTitle:'',
       modalConfirmation:false,
       confirmationType:null
-    }, this.setUserSession);
+    });
   }
 
   getConfirmation(isConfirmed){
@@ -716,8 +631,17 @@ export default class Home extends Component{
           })
           .then(resp=>{
             if(resp.data){
+              let queueItems = this.state.queueItems;
+              for(var i = queueItems.length -1; i >= 0 ; i--){
+                if(queueItems[i]._id === this.state.activeRecord._id){
+                  queueItems.splice(i, 1);
+                }
+              }
               this.setTab('queue');
-              this.setState({activeRecord:null}, ()=>{
+              this.setState({
+                activeRecord:null,
+                queueItems
+              }, ()=>{
                 this.resetState();
               });
             }
@@ -924,7 +848,7 @@ export default class Home extends Component{
               </div>
               <div className='vas-header-right-container'>
                 <span className={"vas-status-dot " + (this.state.errorArr.length > 0 ? 'vas-status-bad' : '')} onClick={this.sendErrorsToAdmin}></span>
-                <p className='vas-home-main-header-user vas-nowrap' onClick={e=>{this.showSocketStatus()}}>{this.state.currentUser.fullname}</p>
+                <p className='vas-home-main-header-user vas-nowrap'>{this.state.currentUser.fullname}</p>
                 <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
               </div>
             </header>
@@ -1178,7 +1102,7 @@ export default class Home extends Component{
                       <button className='vas-btn-reset-buttons' onClick={e=>{this.resetSection(e, 'orderChange')}}>Reset</button>
                     </header>
                     <div className='vas-home-inner-container-main'>
-                      <select className='vas-select' value={this.state.activeRecord.hospital} onChange={e=>{this.hospitalChange(e)}}>
+                      <select className='vas-select' value={this.state.activeRecord.hospital ? this.state.activeRecord.hospital : ''} onChange={e=>{this.hospitalChange(e)}}>
                         <option value=''>Select A Hospital</option>
                         {this.state.allOptions[0] && this.state.allOptions[0].options.map((subOption, idx2)=>{
                           return <option key={subOption.id} value={subOption.id}>{subOption.name}</option>

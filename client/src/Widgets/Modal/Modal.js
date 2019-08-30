@@ -128,9 +128,7 @@ export default class Modal extends Component {
   }
 
   closeModal(){
-    setTimeout(()=>{
-      this.props.closeModal()
-    }, 2000);
+    this.props.closeModal(this.state.addedCall);
   }
 
   getConfirmation(isConfirmed){
@@ -141,12 +139,12 @@ export default class Modal extends Component {
   render(){
     return(
       <div className="vas-modal-container" data-isOpen={this.state.isOpen}>
-        <div className="vas-modal-clickguard" onClick={this.props.closeModal}></div>
+        <div className="vas-modal-clickguard" onClick={e=>{this.props.closeModal()}}></div>
         <div className={"vas-modal-content " + (this.state.modalTitle === 'Add Call' ? 'vas-modal-content-add-call' : 'vas-modal-content-normal')}>
           <div className="vas-modal-content-inner">
             <header className="vas-modal-content-header">
               <p className='vas-modal-header-text'>{this.state.modalTitle}</p>
-              <div className="vas-modal-content-closeBtn" onClick={this.props.closeModal}>&#10006;</div>
+              <div className="vas-modal-content-closeBtn" onClick={e=>{this.props.closeModal()}}>&#10006;</div>
             </header>
             <div className={"vas-modal-content-main"}>
               {this.state.saveConfirmed &&

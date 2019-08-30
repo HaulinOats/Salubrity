@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const app = express();
 const fs = require('fs');
 const path = require('path');
-const socketIO = require('socket.io');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const seedData = require('./seed-data');
@@ -114,15 +113,17 @@ if (process.env.NODE_ENV === "production") {
 app.post('/add-call', (req, res)=>{
   Call.create(req.body, (err, call)=>{
     if(err) return res.send(err);
-    io.emit('call', JSON.stringify({action:'addCall', call}));
-    res.send(call);
+    if(call){
+      res.send(call);
+    } else {
+      res.send({'error':'error creating a new call'});
+    }
   });
 });
 
 app.post('/delete-call', (req, res)=>{
   Call.deleteOne(req.body, (err)=>{
     if (err) return res.send(err);
-    io.emit('call', JSON.stringify({action:'callDeleted', call:req.body}));
     res.send(req.body);
   });
 });
@@ -166,7 +167,6 @@ app.post('/set-call-as-open', (req, res)=>{
         call.startTime = new Date();
         call.save((err2)=>{
           if(err2) return res.send(err2);
-          io.emit('call', JSON.stringify({action:'callUpdate', call}));
           res.send(call);
         })
       }
@@ -184,7 +184,6 @@ app.post('/set-call-as-unopen', (req, res)=>{
       call.startTime = null;
       call.save((err2)=>{
         if(err2) return res.send(err2);
-        io.emit('call', JSON.stringify({action:'callUpdate', call}));
         res.send(call);
       })
     } else {
@@ -250,7 +249,6 @@ app.post('/procedure-completed', (req, res)=>{
 
       call.save((err2)=>{
         if(err2) return res.send(err2);
-        io.emit('call', JSON.stringify({action:'callCompleted', call}));
         res.send(call);
       })
     } else {
@@ -534,7 +532,6 @@ app.post('/get-order-changes-in-range', (req, res)=>{
 app.post('/save-active-record', (req, res)=>{
   Call.replaceOne({_id:req.body._id}, req.body, err=>{
     if(err) return res.send(err);
-    io.emit('call', JSON.stringify({action:'callUpdate', call:req.body}));
     res.send(true);
   });
 })
@@ -604,12 +601,4 @@ app.use(((req, res) => res.sendFile(path.join(__dirname, './client/build/index.h
 
 const server = app.listen(app.get('port'), ()=>{
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
-});
-
-//Socket.io
-const io = socketIO(server);
-
-io.on('connection', (socket) => {
-  console.log('Client connected');
-  socket.on('disconnect', () => console.log('Client disconnected'));
 });
