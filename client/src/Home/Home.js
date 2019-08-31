@@ -36,12 +36,7 @@ export default class Home extends Component{
       selectedProcedures:[],
       procedureVerified:false,
       insertionTypeSelected:false,
-      insertionLength:'',
-      customFields:[],
-      orderChanged:false,
-      orderSelected:'',
-      wasConsultation:false,
-      editProcedure:null
+      insertionLength:''
     };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.completeProcedure = this.completeProcedure.bind(this);
@@ -71,8 +66,8 @@ export default class Home extends Component{
     this.changeCustomInput = this.changeCustomInput.bind(this);
     this.hospitalChange = this.hospitalChange.bind(this);
     this.orderSelect = this.orderSelect.bind(this);
-    this.setConsultation = this.setConsultation.bind(this);
-    this.setOrderChanged = this.setOrderChanged.bind(this);
+    this.toggleConsultation = this.toggleConsultation.bind(this);
+    this.setRecordStateItems = this.setRecordStateItems.bind(this);
   }
 
   resetState(){
@@ -88,11 +83,7 @@ export default class Home extends Component{
       selectedProcedures:[],
       procedureVerified:false,
       insertionTypeSelected:false,
-      insertionLength:'',
-      customFields:[],
-      orderChanged:false,
-      orderSelected:'',
-      wasConsultation:false
+      insertionLength:''
     });
   }
   
@@ -138,8 +129,33 @@ export default class Home extends Component{
     }
   }
 
+  // getCallById(id){
+  //   this.setState({isLoading:true})
+  //   axios.post('/get-call-by-id', {
+  //     _id:id
+  //   }).then(resp=>{
+  //     if(resp.data.error || resp.data._message){
+  //       console.log(resp.data);
+  //     } else {
+  //       this.setState({activeRecord:resp.data});
+  //     }
+  //   })
+  //   .catch(err=>{
+  //     console.log(err);
+  //     this.addToErrorArray(err);
+  //   })
+  //   .finally(()=>{
+  //     this.setState({isLoading:false})
+  //   })
+  // }
+
   editCompletedCall(completedCall){
-    this.setState({editProcedure:completedCall});
+    this.setState({
+      activeRecord:completedCall
+    }, ()=>{
+      this.setRecordStateItems();
+      this.setTab('active')
+    });
   }
 
   componentDidMount(){
@@ -168,7 +184,6 @@ export default class Home extends Component{
 
   stopIntervals(){
     console.log('stopping intervals...');
-    clearInterval(this.sessionInterval);
     clearInterval(this.getLatestData);
   }
 
@@ -296,25 +311,22 @@ export default class Home extends Component{
       });
     }
     
+    let activeRecord = this.state.activeRecord;
     if(type === 'consultation'){
-      this.setState({wasConsultation:false});
+      activeRecord.wasConsultation = false;
     }
-
+    
     if(type === 'orderChange'){
-      this.setState({
-        orderChanged:false,
-        orderSelected:''
-      });
+      activeRecord.orderChange = null;
     }
+    this.setState({activeRecord}, this.saveActiveRecord);
     this.setUserSession();
   }
 
-  setConsultation(){
-    this.setState({wasConsultation:true});
-  }
-
-  setOrderChanged(){
-    this.setState({orderChanged:true})
+  toggleConsultation(){
+    let activeRecord = this.state.activeRecord;
+    activeRecord.wasConsultation = !activeRecord.wasConsultation;
+    this.setState({activeRecord}, this.saveActiveRecord);
   }
 
   addCall(){
@@ -345,12 +357,12 @@ export default class Home extends Component{
   }
 
   saveActiveRecord(){
-    axios.post('/save-active-record', this.state.activeRecord)
+    axios.post('/save-call', this.state.activeRecord)
     .then(resp=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        console.log('active record saved');
+        console.log('active call saved');
       }
     })
     .catch(err=>{
@@ -485,13 +497,44 @@ export default class Home extends Component{
 
   checkActiveRecord(){
     if(!this.state.activeRecord){
+      let activeRecordExists = false;
       for(let i = 0; i < this.state.queueItems.length; i++){
         if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
-          this.setState({activeRecord:this.state.queueItems[i]});
+          activeRecordExists = true;
+          this.setState({activeRecord:this.state.queueItems[i]}, this.setRecordStateItems);
           break;
         }
       }
+      if(!activeRecordExists){
+        this.setState({activeHomeTab:'queue'});
+      }
     }
+  }
+
+  setRecordStateItems(){
+    let stateObj = {};
+    //check which procedure items should updated state
+    if(this.state.activeRecord.proceduresDone.length){
+      console.log(this.state.activeRecord.proceduresDone)
+      this.state.activeRecord.proceduresDone.forEach(procedureArr=>{
+        procedureArr.itemIds.forEach(itemId=>{
+          switch(this.state.itemsById[itemId].groupName){
+            case 'Insertion Length':
+              stateObj.insertionTypeSelected = true;
+              break;
+            default:
+          }
+        });
+
+        //find and set custom values, if they exist
+        if(procedureArr.hasOwnProperty('customValues')){
+          stateObj.insertionLength = String(procedureArr.customValues['72']);
+        }
+      });
+    }
+    this.setState(stateObj, ()=>{
+      console.log(this.state);
+    });
   }
 
   addToErrorArray(err){
@@ -527,20 +570,54 @@ export default class Home extends Component{
     this.setUserSession();
   }
 
+  orderSelect(e){
+    let activeRecord = this.state.activeRecord;
+    if(e.target.value === ''){
+      activeRecord.orderChange = null;
+    } else {
+      activeRecord.orderChange = Number(e.target.value);
+    }
+    this.setState({activeRecord}, this.saveActiveRecord);
+  }
+
   completeProcedure(){
+    if(this.state.activeRecord.completedAt){
+      this.updateProcedure();
+    } else {
+      this.saveNewProcedure();
+    }
+    this.setUserSession();
+  }
+
+  updateProcedure(){
     let proceduresArr = this.createProcedureObject();
     if(this.procedureVerified(proceduresArr)){
-      // grab custom input values if a procedure was selected that has them
-      //check if any procedures have required fields
-      for(let i = 0; i < proceduresArr.length; i++){
-        //Insertion Procedure
-        if(proceduresArr[i].procedureId === 9){
-          proceduresArr[i].itemIds.push(72);
-          proceduresArr[i].customValues = {
-            '72': Number(this.state.insertionLength)
-          }
+      let updatedRecord = this.state.activeRecord;
+      updatedRecord.proceduresDone = this.addCustomValuesToProceduresArr(proceduresArr);
+      this.setState({activeRecord:updatedRecord}, ()=>{
+        this.saveActiveRecord();
+        this.procedureSaved(true);
+      });
+    }
+  }
+
+  addCustomValuesToProceduresArr(proceduresArr){
+    for(let i = 0; i < proceduresArr.length; i++){
+      //Insertion Procedure
+      if(proceduresArr[i].procedureId === 9){
+        proceduresArr[i].itemIds.push(72);
+        proceduresArr[i].customValues = {
+          '72': Number(this.state.insertionLength)
         }
       }
+    }
+    return proceduresArr;
+  }
+  
+  saveNewProcedure(){
+    let proceduresArr = this.createProcedureObject();
+    if(this.procedureVerified(proceduresArr)){
+      proceduresArr = this.addCustomValuesToProceduresArr(proceduresArr);
 
       let completionTime = new Date();
       let callTime = this.getDateFromObjectId(this.state.activeRecord._id);
@@ -558,8 +635,7 @@ export default class Home extends Component{
         mrn:(this.state.activeRecord.mrn && this.state.activeRecord.mrn.length > 4 && this.state.activeRecord.mrn.length < 8) ? this.state.activeRecord.mrn : null,
         procedureTime:completionTime - startTime,
         responseTime:startTime - callTime,
-        orderChange: this.state.orderChanged ? Number(this.state.orderSelected) : null,
-        wasConsultation:this.state.wasConsultation
+        orderChange: this.state.activeRecord.orderChange ? this.state.activeRecord.orderChange : null
       })
       .then(resp=>{
         if(resp.data.error || resp.data._message){
@@ -571,18 +647,7 @@ export default class Home extends Component{
               queueItems.splice(i, 1);
             }
           }
-          this.setTab('queue');
-          this.setState({
-            queueItems,
-            activeRecord:null,
-            modalTitle:'Task Complete',
-            modalMessage:'Procedure was completed. Returning to queue.',
-            modalIsOpen:true
-          }, ()=>{
-            setTimeout(()=>{
-              this.resetState();
-            }, 2000);
-          });
+          this.procedureSaved(false, queueItems);
         }
       })
       .catch((err)=>{
@@ -593,7 +658,21 @@ export default class Home extends Component{
         this.setState({isLoading:false});
       })
     }
-    this.setUserSession();
+  }
+
+  procedureSaved(isEdit, queueItems){
+    this.setTab('queue');
+    this.setState({
+      queueItems: queueItems ? queueItems : this.state.queueItems,
+      activeRecord:null,
+      modalTitle: isEdit ? 'Procedure Updated' : 'Task Complete',
+      modalMessage: isEdit ? 'Procedure was updated. Returning to queue.' : 'Procedure was completed. Returning to queue.',
+      modalIsOpen:true
+    }, ()=>{
+      setTimeout(()=>{
+        this.resetState();
+      }, 2000);
+    });
   }
 
   createProcedureObject(){
@@ -626,21 +705,14 @@ export default class Home extends Component{
       errors += '- You must select at least 1 procedure or confirm consultation\n';
     }
 
-    if(this.state.orderChanged){
-      if(!this.state.orderSelected.length){
-        errors += '- You must select an order change option\n';
-      }
-    }
-
     if(this.state.insertionTypeSelected){
-      if(!this.state.insertionLength.length){
-        errors += '- You must enter an insertion length\n';
+      if(!this.state.insertionLength.length || this.state.insertionLength === '0'){
+        errors += '- You must enter an insertion length (cannot be 0)\n';
       }
       if(!this.state.activeRecord.hospital || this.state.activeRecord.hospital < 1){
         errors += '- You must select a hospital\n';
       }
       if(!this.state.activeRecord.mrn || String(this.state.activeRecord.mrn).length < 5 || String(this.state.activeRecord.mrn).length > 7){
-        console.log(this.state.activeRecord.mrn);
         errors += '- Medical Record Number must be between 5 and 7 digits\n';
       }
       if(!this.state.activeRecord.provider || !this.state.activeRecord.provider.length){
@@ -667,8 +739,21 @@ export default class Home extends Component{
     if(callData){
       let queueItems = this.state.queueItems;
       queueItems.push(callData);
-      this.setState({queueItems});
+      this.setState({
+        queueItems,
+        modalTitle:'Call Was Added',
+        modalMessage:'Your call was added to the queue!'
+      }, ()=>{
+        setTimeout(()=>{
+          this.resetModal();
+        }, 2000);
+      });
+    } else {
+      this.resetModal();
     }
+  }
+
+  resetModal(){
     this.setState({
       modalIsOpen:false,
       modalMessage:'',
@@ -720,7 +805,6 @@ export default class Home extends Component{
   }
 
   selectJob(job){
-    console.log(job);
     if(!this.state.activeRecord){
       if(job.openBy){
         this.setState({
@@ -738,7 +822,9 @@ export default class Home extends Component{
           if(resp.data.error || resp.data._message){
             console.log(resp.data);
           } else {
-            this.setState({activeRecord:resp.data}, ()=>{
+            this.setState({
+              activeRecord:resp.data
+            }, ()=>{
               this.setTab('active');
             });
           }
@@ -882,15 +968,6 @@ export default class Home extends Component{
     this.setUserSession();
   }
 
-  orderSelect(e){
-    if(e.target.value === 'default'){
-      this.setState({orderSelected:''});
-    } else {
-      this.setState({orderSelected:e.target.value});
-    }
-    this.setUserSession();
-  }
-
   changeStatus(e){
     let activeRecord = this.state.activeRecord;
     activeRecord.status = e.target.value;
@@ -967,7 +1044,7 @@ export default class Home extends Component{
                         let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
                         let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
                         return(
-                          <ClickNHold className='vas-admin-custom-table-item-outer-container' key={call._id} time={4} onClickNHold={e=>{this.editCompletedCall(call)}}>
+                          <ClickNHold className='vas-admin-custom-table-item-outer-container' key={call._id} time={1} onClickNHold={e=>{this.editCompletedCall(call)}}>
                             <div className='vas-admin-custom-table-item-outer'>
                               {!call.openBy &&
                                 <div className='vas-admin-custom-table-item-outer'>
@@ -1044,10 +1121,10 @@ export default class Home extends Component{
                               {isComments &&
                                 <div className='vas-call-comments-container'>
                                   {call.preComments &&
-                                    <p className='vas-call-comment'><b>Pre-Procedure Comments:</b> {call.preComments}</p>
+                                    <p className='vas-call-comment'><b>Pre-Procedure:</b> {call.preComments}</p>
                                   }
                                   {call.addComments &&
-                                    <p className='vas-call-comment'><b>Add'l Comments:</b> {call.addComments}</p>
+                                    <p className='vas-call-comment'><b>Add'l:</b> {call.addComments}</p>
                                   }
                                 </div>
                               }
@@ -1063,7 +1140,9 @@ export default class Home extends Component{
                 {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
                     insertionTypeSelected={this.state.insertionTypeSelected}
-                    activeRecord={this.state.activeRecord} 
+                    insertionLength={this.state.insertionLength}
+                    currentRecord={this.state.activeRecord}
+                    isPostEdit={this.state.activeRecord.completedAt ? true : false}
                     allOptions={this.state.allOptions}
                     procedures={this.state.procedures}
                     itemsById={this.state.itemsById}
@@ -1078,9 +1157,8 @@ export default class Home extends Component{
                     changeCustomInput={this.changeCustomInput}
                     hospitalChange={this.hospitalChange}
                     orderSelect={this.orderSelect}
-                    setConsultation={this.setConsultation} 
-                    orderChanged={this.state.orderChanged}
-                    setOrderChanged={this.setOrderChanged}
+                    toggleConsultation={this.toggleConsultation} 
+                    setOrderWasChanged={this.setOrderWasChanged}
                     completeProcedure={this.completeProcedure}/>
                 }
               </div>

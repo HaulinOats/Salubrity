@@ -78,7 +78,7 @@ exports.optionSeed = [
   {
     optionId:5,
     name:'Consultation',
-    inputType:'radio',
+    inputType:'checkbox',
     callFieldName:'wasConsultation'
   },
   {
@@ -658,7 +658,7 @@ exports.itemSeed = [
     itemId:72,
     procedureName:'Insertion Procedure',
     groupName:'Insertion Length',
-    value:'',
+    value:'in CM',
     isCustom:true,
     fieldAbbr:'Len',
     valuePrefix:'',

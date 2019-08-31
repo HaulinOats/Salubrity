@@ -145,3 +145,21 @@
 .vas-edit-procedure-final-container {
   padding: 22px 10px 25px 10px;
 }
+/* Post Edit */
+.vas-edit-procedure-is-post-edit {
+
+}
+.vas-edit-procedure-is-post-edit 
+.vas-edit-procedure-record-header {
+  background:grey !important;
+}
+.vas-edit-procedure-edit-title {
+  font-size: 165%;
+  border-bottom: solid 2px white;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+}
+.vas-edit-procedure-is-post-edit 
+.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]{
+  display:block;
+}

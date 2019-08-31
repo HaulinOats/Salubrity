@@ -49,8 +49,7 @@ let callSchema = new Schema({
   completedBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
   wasConsultation:{type:Boolean, default:null},
-  status:{type:Number, default:1},
-  editedBy:{type:Number, default:null}
+  status:{type:Number, default:1}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -197,56 +196,18 @@ app.post('/procedure-completed', (req, res)=>{
   Call.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return res.send(err);
     if(call){
-      //if no comments added, delete node
-      if(req.body.addComments !== null){
-        call.addComments = req.body.addComments;
-      } else {
-        call.addComments = undefined;
-      }
-
-      //if no job comments, delete node
-      if(call.customJob === null){
-        call.customJob = undefined;
-      }
-
-      if(call.preComments === null){
-        call.preComments = undefined;
-      }
-
-      if(req.body.wasConsultation){
-        call.wasConsultation = true;
-      } else {
-        call.wasConsultation = undefined;
-      }
-
-      if(req.body.orderChange){
-        call.orderChange = req.body.orderChange;
-      } else {
-        call.orderChange = undefined;
-      }
-
-      if(req.body.hospital){
-        call.hospital = req.body.hospital;
-      } else {
-        call.hospital = undefined;
-      }
-
-      if(req.body.mrn){
-        call.mrn = req.body.mrn;
-      } else {
-        call.mrn = undefined;
-      }
-      
+      call.addComments = req.body.addComments;
       call.wasConsultation = req.body.wasConsultation;
-      call.provider = req.body.provider;
       call.proceduresDone = req.body.proceduresDone;
       call.completedBy = Number(req.body.completedBy);
       call.completedAt = new Date(Date.now()).toISOString();
       call.procedureTime = req.body.procedureTime;
       call.responseTime = req.body.responseTime;
       call.hospital = req.body.hospital;
+      call.provider = req.body.provider;
+      call.mrn = req.body.mrn;
+      call.orderChange = req.body.orderChange;
       call.openBy = undefined;
-      call.contact = undefined;
 
       call.save((err2)=>{
         if(err2) return res.send(err2);
@@ -297,6 +258,17 @@ app.post('/login', (req, res)=>{
     }
   })
 });
+
+app.post('/get-call-by-id', (req, res)=>{
+  Call.findOne(req.body, (err, call)=>{
+    if(err) return res.send(err);
+    if(call){
+      res.send(call);
+    } else {
+      res.send({'error':'could not find a call with that id' + req.body._id});
+    }
+  });
+})
 
 //ADMIN
 app.post('/add-user', (req, res)=>{
@@ -530,7 +502,7 @@ app.post('/get-order-changes-in-range', (req, res)=>{
   })
 })
 
-app.post('/save-active-record', (req, res)=>{
+app.post('/save-call', (req, res)=>{
   Call.replaceOne({_id:req.body._id}, req.body, err=>{
     if(err) return res.send(err);
     res.send(true);

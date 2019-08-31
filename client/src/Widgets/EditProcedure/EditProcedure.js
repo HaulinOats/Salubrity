@@ -6,24 +6,42 @@ export default class Modal extends Component {
   constructor(props){
     super(props);
     this.state = {
-      activeRecord:this.props.activeRecord,
-      allOptions:this.props.allOptions,
-      procedures:this.props.procedures,
-      itemsById:this.props.itemsById
+      proceduresDoneIdArr:null
     }
   };
 
+  componentWillMount(){
+    let proceduresDoneIdArr = [];
+    this.props.currentRecord.proceduresDone.forEach(procedureArr=>{
+      procedureArr.itemIds.forEach(itemId=>{
+        proceduresDoneIdArr.push(itemId);
+      })
+    });
+    this.setState({
+      proceduresDoneIdArr
+    }, ()=>{
+      console.log(this.state.proceduresDoneIdArr);
+    })
+  }
+
+  componentDidMount(){
+    console.log(this.props.currentRecord);
+  }
+
   render(){
     return(
-      <div className='vas-edit-procedure-page-record-container'>
-        <header className={"vas-edit-procedure-record-header vas-status-" + this.state.activeRecord.status}>
+      <div className={'vas-edit-procedure-page-record-container ' + (this.props.isPostEdit ? 'vas-edit-procedure-is-post-edit' : '')}>
+        <header className={"vas-edit-procedure-record-header vas-status-" + this.props.currentRecord.status}>
+          {this.props.isPostEdit &&
+            <h2 className='vas-edit-procedure-edit-title'>POST PROCEDURE EDIT</h2>
+          }
           <p className="vas-edit-procedure-record-header-text">
-            <b className="vas-edit-procedure-live-edit-input vas-edit-procedure-job-input vas-block">{this.state.activeRecord.job}</b>
+            <b className="vas-edit-procedure-live-edit-input vas-edit-procedure-job-input vas-block">{this.props.currentRecord.job}</b>
             <DebounceInput
               type="text"
               className="vas-edit-procedure-live-edit-input vas-edit-procedure-custom-job-input vas-inline-block"
               debounceTimeout={750}
-              value={this.state.activeRecord.customJob ? this.state.activeRecord.customJob : ''}
+              value={this.props.currentRecord.customJob ? this.props.currentRecord.customJob : ''}
               onChange={e=>{this.props.inputLiveUpdate(e, 'customJob')}} />
           </p>
           <p className="vas-edit-procedure-record-header-subtext vas-pointer">
@@ -32,34 +50,41 @@ export default class Modal extends Component {
                 className="vas-edit-procedure-live-edit-input vas-edit-procedure-live-edit-input-room vas-inline-block vas-uppercase"
                 type="text"
                 debounceTimeout={750}
-                value={this.state.activeRecord.room ? this.state.activeRecord.room : ''}
+                value={this.props.currentRecord.room ? this.props.currentRecord.room : ''}
                 onChange={e=>{this.props.inputLiveUpdate(e, 'room')}} />
           </p>
           <div className='vas-edit-procedure-status-container'>
             <p className='vas-edit-procedure-status-text'>Status:</p>
-            <select className='vas-select' value={this.state.activeRecord.status} onChange={e=>{this.props.changeStatus(e)}}>
-              {this.state.allOptions[6].options.map(option=>{
+            <select className='vas-select' value={this.props.currentRecord.status} onChange={e=>{this.props.changeStatus(e)}}>
+              {this.props.allOptions[6].options.map(option=>{
                 return <option key={option.id} value={option.id}>{option.name}</option>
               })}
             </select>
           </div>
-          <button className="vas-edit-procedure-record-header-btn" onClick={e=>{this.props.resetForm()}}>Reset Form</button>
-          <button className="vas-edit-procedure-record-header-btn" onClick={e=>{this.props.returnToQueue()}}>Return To Queue</button>
+          {!this.props.isPostEdit &&
+            <span>
+              <button className="vas-edit-procedure-record-header-btn" onClick={e=>{this.props.resetForm()}}>Reset Form</button>
+              <button className="vas-edit-procedure-record-header-btn" onClick={e=>{this.props.returnToQueue()}}>Return To Queue</button>
+            </span>
+          }
+          {this.props.isPostEdit &&
+            <button className="vas-edit-procedure-record-header-btn" onClick={e=>{this.props.resetForm()}}>Cancel Editing</button>
+          }
           <button className='vas-edit-procedure-record-header-btn vas-warn-btn' onClick={e=>{this.props.deleteCall()}}>Delete Call</button>
         </header>
-        {this.state.activeRecord.preComments &&
+        {this.props.currentRecord.preComments &&
           <div className="vas-edit-procedure-inner-container vas-edit-procedure-inner-container-main-comment">
             <header className="vas-edit-procedure-inner-container-header">
               <p>Pre-Procedure Notes</p>
             </header>
             <div className="vas-edit-procedure-inner-container-main">
               <div className="vas-edit-procedure-inner-container-row">
-                <p className='vas-edit-procedure-comment'>{this.state.activeRecord.preComments}</p>
+                <p className='vas-edit-procedure-comment'>{this.props.currentRecord.preComments}</p>
               </div>
             </div>
           </div>
         }
-        {this.state.procedures.map((procedure, idx)=>{
+        {this.state.proceduresDoneIdArr && this.props.procedures.map((procedure, idx)=>{
             return (
               <div className="vas-edit-procedure-inner-container" key={procedure._id}>
                 <header className="vas-edit-procedure-inner-container-header">
@@ -76,20 +101,32 @@ export default class Modal extends Component {
                         {!group.hideHeader &&
                           <h3>{group.groupName}</h3>
                         }
-                        <div className={'vas-edit-procedure-inner-container-row ' + (group.groupName === 'Cathflow' ? 'vas-edit-procedure-important-hide vas-edit-procedure-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : '')}>
+                        <div className={'vas-edit-procedure-inner-container-row ' + (group.groupName === 'Cathflow' && !this.props.isPostEdit ? 'vas-edit-procedure-important-hide vas-edit-procedure-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : '')}>
                           {group.groupItems.map((itemId)=>{
                               let customInput = (group.inputType === 'number' || group.inputType === 'text') ? true : false;
                               return(
                                 <span key={itemId}>
                                   {!customInput &&
                                     <span>
-                                      <input type={group.inputType} className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} data-procedureid={procedure.procedureId} id={itemId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
-                                      <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.props.selectButton(e, procedure.name, group.groupName, group.resetSiblings)}}>{this.state.itemsById[itemId].value}</label>
+                                      <input 
+                                        type={group.inputType} 
+                                        className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} 
+                                        data-procedureid={procedure.procedureId} id={itemId} 
+                                        name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}
+                                        defaultChecked={this.state.proceduresDoneIdArr.indexOf(itemId) > -1 ? true : false}/>
+                                      <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.props.selectButton(e, procedure.name, group.groupName, group.resetSiblings)}}>{this.props.itemsById[itemId].value}</label>
                                     </span>
                                   }
                                   {customInput &&
                                     <span>
-                                      <input type={group.inputType} onChange={e=>{this.props.changeCustomInput(e, group.fieldName)}} data-procedureid={procedure.procedureId} placeholder={this.state.itemsById[itemId].value} className={"vas-custom-input vas-"+ group.inputType +"-select"} id={itemId} />
+                                      <input 
+                                        type={group.inputType} 
+                                        className={"vas-custom-input vas-"+ group.inputType +"-select"} 
+                                        onChange={e=>{this.props.changeCustomInput(e, group.fieldName)}} 
+                                        data-procedureid={procedure.procedureId} 
+                                        placeholder={this.props.itemsById[itemId].value}
+                                        value={this.props.insertionLength}
+                                        id={itemId} />
                                     </span>
                                   }
                                 </span>
@@ -105,15 +142,15 @@ export default class Modal extends Component {
             )
           })
         }
-        {this.props.insertionTypeSelected &&
+        {(this.props.insertionTypeSelected || this.props.isPostEdit) &&
           <div className='vas-edit-procedure-options-container'>
             <div className='vas-edit-procedure-option-inner'>
-              <label>{this.state.allOptions[1].name}:</label>{/* Medical Record Number */}
-              <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.activeRecord.mrn ? this.state.activeRecord.mrn : ''} onChange={e=>{this.props.inputLiveUpdate(e, 'mrn')}} />
+              <label>{this.props.allOptions[1].name}:</label>{/* Medical Record Number */}
+              <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.props.currentRecord.mrn ? this.props.currentRecord.mrn : ''} onChange={e=>{this.props.inputLiveUpdate(e, 'mrn')}} />
             </div>
             <div className='vas-edit-procedure-option-inner'>
-              <label>{this.state.allOptions[2].name}:</label>{/* Provider */}
-              <DebounceInput className='vas-custom-input' debounceTimeout={750} type="text" value={this.state.activeRecord.provider ? this.state.activeRecord.provider : ''} onChange={e=>{this.props.inputLiveUpdate(e, 'provider')}} />
+              <label>{this.props.allOptions[2].name}:</label>{/* Provider */}
+              <DebounceInput className='vas-custom-input' debounceTimeout={750} type="text" value={this.props.currentRecord.provider ? this.props.currentRecord.provider : ''} onChange={e=>{this.props.inputLiveUpdate(e, 'provider')}} />
             </div>
           </div>
         }
@@ -123,9 +160,9 @@ export default class Modal extends Component {
             <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.props.resetSection(e, 'orderChange')}}>Reset</button>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
-            <select className='vas-select' value={this.state.activeRecord.hospital ? this.state.activeRecord.hospital : ''} onChange={e=>{this.props.hospitalChange(e)}}>
+            <select className='vas-select' value={this.props.currentRecord.hospital ? this.props.currentRecord.hospital : ''} onChange={e=>{this.props.hospitalChange(e)}}>
               <option value=''>Select A Hospital</option>
-              {this.state.allOptions[0] && this.state.allOptions[0].options.map((subOption, idx2)=>{
+              {this.props.allOptions[0] && this.props.allOptions[0].options.map((subOption, idx2)=>{
                 return <option key={subOption.id} value={subOption.id}>{subOption.name}</option>
               })}
             </select>
@@ -137,16 +174,12 @@ export default class Modal extends Component {
             <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.props.resetSection(e, 'orderChange')}}>Reset</button>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
-            <input type='radio' className="vas-radio-select" id='order-change' name='order-change'/>
-            <label className="vas-btn" htmlFor='order-change' onClick={e=>{this.setState({orderChanged:true}, this.props.setOrderChanged)}}>Order Was Changed</label>
-            {this.state.orderChanged &&
-              <select className='vas-select' value={this.state.orderSelected} onChange={e=>{this.props.orderSelect(e)}}>
-                <option value="default">Select An Order</option>
-                {this.state.allOptions[3].options.map((option, idx)=>{
-                  return <option key={option.id} value={option.id}>{option.name}</option>
-                })}
-              </select>
-            }
+            <select className='vas-select' value={this.props.currentRecord.orderChange ? this.props.currentRecord.orderChange : ''} onChange={this.props.orderSelect}>
+              <option value=''>Select An Order Change</option>
+              {this.props.allOptions[3].options.map((option, idx)=>{
+                return <option key={option.id} value={option.id}>{option.name}</option>
+              })}
+            </select>
           </div>
         </div>
         <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
@@ -155,8 +188,8 @@ export default class Modal extends Component {
             <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.props.resetSection(e, 'consultation')}}>Reset</button>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
-            <input type='radio' className="vas-radio-select vas-edit-procedure-consultation-input" id='consultation' name='consultation'/>
-            <label className="vas-btn" htmlFor='consultation' onClick={e=>{this.props.setConsultation()}}>Consultation Done</label>
+            <input type='checkbox' className="vas-radio-select vas-edit-procedure-consultation-input" id='consultation' defaultChecked={this.props.currentRecord.wasConsultation} onChange={this.props.toggleConsultation} name='consultation'/>
+            <label className="vas-btn" htmlFor='consultation'>Consultation Done</label>
           </div>
         </div>
         <div className='vas-edit-procedure-inner-container'>
@@ -164,16 +197,16 @@ export default class Modal extends Component {
             <p>Additional Comments</p>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
-            <DebounceInput element='textarea' className='vas-edit-procedure-add-comments' debounceTimeout={750} value={this.state.activeRecord.addComments ? this.state.activeRecord.addComments : ''} onChange={e=>{this.props.inputLiveUpdate(e, 'addComments')}}/>
+            <DebounceInput element='textarea' className='vas-edit-procedure-add-comments' debounceTimeout={750} value={this.props.currentRecord.addComments ? this.props.currentRecord.addComments : ''} onChange={e=>{this.props.inputLiveUpdate(e, 'addComments')}}/>
           </div>
         </div>
         <div className="vas-edit-procedure-inner-container vas-edit-procedure-inner-container-final">
           <header className="vas-edit-procedure-inner-container-header vas-edit-procedure-inner-container-final-header">
-            <p>Complete Task</p>
+            <p>{this.props.isPostEdit ? 'Complete Task' : 'Update Record?'}</p>
           </header>
           <div className='vas-edit-procedure-final-container'>
             <div>
-              <button className='vas-button vas-edit-procedure-complete-procedure-btn' onClick={this.props.completeProcedure}>Submit Procedure</button>
+              <button className='vas-button vas-edit-procedure-complete-procedure-btn' onClick={this.props.completeProcedure}>{this.props.isPostEdit ? 'Update Procedure' : 'Submit Procedure'}</button>
             </div>
           </div>
         </div>
