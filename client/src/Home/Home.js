@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import Modal from '../Widgets/Modal/Modal';
 import Login from '../Widgets/Login/Login';
+import EditProcedure from '../Widgets/EditProcedure/EditProcedure';
 import axios from 'axios';
 import Moment from 'react-moment';
-import {DebounceInput} from 'react-debounce-input';
 import ls from 'local-storage';
 import './Home.css';
+import ClickNHold from 'react-click-n-hold'; 
 import loadingGif from '../../public/loading.gif';
 
 export default class Home extends Component{
@@ -39,7 +40,8 @@ export default class Home extends Component{
       customFields:[],
       orderChanged:false,
       orderSelected:'',
-      wasConsultation:false
+      wasConsultation:false,
+      editProcedure:null
     };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.completeProcedure = this.completeProcedure.bind(this);
@@ -58,6 +60,19 @@ export default class Home extends Component{
     this.saveActiveRecord = this.saveActiveRecord.bind(this);
     this.checkActiveRecord = this.checkActiveRecord.bind(this);
     this.visibilityChange = this.visibilityChange.bind(this);
+    this.editCompletedCall = this.editCompletedCall.bind(this);
+    this.inputLiveUpdate = this.inputLiveUpdate.bind(this);
+    this.changeStatus = this.changeStatus.bind(this);
+    this.resetForm = this.resetForm.bind(this);
+    this.returnToQueue = this.returnToQueue.bind(this);
+    this.deleteCall = this.deleteCall.bind(this);
+    this.showHiddenButtons = this.showHiddenButtons.bind(this);
+    this.selectButton = this.selectButton.bind(this);
+    this.changeCustomInput = this.changeCustomInput.bind(this);
+    this.hospitalChange = this.hospitalChange.bind(this);
+    this.orderSelect = this.orderSelect.bind(this);
+    this.setConsultation = this.setConsultation.bind(this);
+    this.setOrderChanged = this.setOrderChanged.bind(this);
   }
 
   resetState(){
@@ -121,6 +136,10 @@ export default class Home extends Component{
     } else {
       this.startIntervals();
     }
+  }
+
+  editCompletedCall(completedCall){
+    this.setState({editProcedure:completedCall});
   }
 
   componentDidMount(){
@@ -253,7 +272,7 @@ export default class Home extends Component{
 
   resetSection(e, type){
     let isInsertionProcedure = false;
-    let sectionInputs = e.target.closest('.vas-home-inner-container').querySelectorAll('input');
+    let sectionInputs = e.target.closest('.vas-edit-procedure-inner-container').querySelectorAll('input');
     sectionInputs.forEach(el=>{
       if(el.type === 'checkbox' || el.type === 'radio'){
         el.checked = false;
@@ -266,7 +285,7 @@ export default class Home extends Component{
       }
     });
     if(isInsertionProcedure){
-      document.querySelectorAll('.vas-home-inner-span[data-procedure="InsertionProcedure"]').forEach((el, idx)=>{
+      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]').forEach((el, idx)=>{
         if(idx > 1){
           el.style.display = 'none';
         }
@@ -290,6 +309,14 @@ export default class Home extends Component{
     this.setUserSession();
   }
 
+  setConsultation(){
+    this.setState({wasConsultation:true});
+  }
+
+  setOrderChanged(){
+    this.setState({orderChanged:true})
+  }
+
   addCall(){
     this.setState({
       modalTitle:'Add Call',
@@ -299,8 +326,10 @@ export default class Home extends Component{
   }
 
   inputLiveUpdate(e, field){
+    console.log(e, field);
     let targetValue = e.target.value;
     let activeRecord = this.state.activeRecord;
+    console.log(this.state);
 
     if(e.target.type === 'number'){
       activeRecord[field] = Number(targetValue);
@@ -569,7 +598,7 @@ export default class Home extends Component{
 
   createProcedureObject(){
     let procedureObj = {};
-    let selectedTasks = document.querySelectorAll('.vas-home-select-input:checked');
+    let selectedTasks = document.querySelectorAll('.vas-edit-procedure-select-input:checked');
     selectedTasks.forEach((el)=>{
       let itemId = Number(el.id);
       let procedureId = Number(el.getAttribute('data-procedureid'));
@@ -761,7 +790,7 @@ export default class Home extends Component{
   }
 
   showHiddenButtons(procedureName, groupName, elClass){
-    let className = `.vas-home-${procedureName}-${groupName}`;
+    let className = `.vas-edit-procedure-${procedureName}-${groupName}`;
     let container = document.querySelector(className);
     if(container.classList.contains(elClass)){
       container.classList.remove(elClass);
@@ -774,35 +803,38 @@ export default class Home extends Component{
     }
   }
 
-  selectButton(e, procedureName, groupName, resetSiblings){
+  selectButton(e, procedureName, groupName){
     if(procedureName === 'Dressing Change'){
       if(groupName === 'What'){
-        checkSiblings();
+        this.checkSiblings(e);
+      }
+    }
+    if(procedureName === 'Troubleshoot'){
+      if(groupName === 'Action Taken'){
+        this.checkSiblings(e);
       }
     }
     if(procedureName === 'Insertion Procedure'){
       if(groupName === 'Insertion Type'){
         this.setState({insertionTypeSelected:true});
-        document.querySelectorAll('.vas-home-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
+        document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
           el.style.display = 'inline';
         })
-        checkSiblings();
-      }
-    }
-
-    function checkSiblings(){
-      let groupContainer = e.target.closest('.vas-home-inner-span');
-      while(groupContainer.nextSibling){
-        let nextSib =  groupContainer.nextSibling.querySelector('.vas-home-select-input');
-        if(nextSib.id === '7' || nextSib.id === '12' || nextSib.id === '73'){
-          nextSib.checked = false;
-        } else {
-          nextSib.checked = true;
-        }
-        groupContainer = groupContainer.nextSibling;
+        this.checkSiblings(e);
       }
     }
     this.setUserSession();
+  }
+  
+  checkSiblings(e){
+    let groupContainer = e.target.closest('.vas-edit-procedure-inner-span');
+    while(groupContainer.nextSibling){
+      let nextSib =  groupContainer.nextSibling.querySelector('.vas-edit-procedure-select-input');
+      if(nextSib){
+        nextSib.checked = true;
+      }
+      groupContainer = groupContainer.nextSibling;
+    }
   }
 
   changeCustomInput(e, fieldName){
@@ -917,7 +949,7 @@ export default class Home extends Component{
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'complete' ? true : false}>
                 <div className="vas-home-table vas-table">
                     <div className='vas-table-thead-row vas-home-completed-thead'>
-                      <button className='vas-btn-normal vas-home-reverse-sort-btn' onClick={this.reverseCompletedSort}>Reverse Sort</button>
+                      {/* <button className='vas-btn-normal vas-home-reverse-sort-btn' onClick={this.reverseCompletedSort}>Reverse Sort</button> */}
                     </div>
                     <div className='vas-home-table-body'>
                       {this.state.completedCalls.length < 1 &&
@@ -931,261 +963,123 @@ export default class Home extends Component{
                         let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
                         let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
                         return(
-                          <div key={call._id} className='vas-admin-custom-table-item-outer'>
-                            {!call.openBy &&
-                              <div>
-                                <div className='vas-admin-custom-table-item vas-call-table-item'>
-                                  <div className='vas-home-custom-table-column-1'>
-                                    <p><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p>
-                                  </div>
-                                  <div className={'vas-home-custom-table-column-2 ' + (call.orderChange ? 'vas-admin-order-change' : '')}>
-                                    {call.orderChange &&
-                                      <div className='vas-admin-custom-table-td vas-admin-custom-table-order-change'>
-                                        <p className='vas-admin-custom-item-subfield'>Order Change:</p>
-                                        <p className='vas-admin-custom-item-subvalue'>{this.state.orderChangeById[call.orderChange].name}</p>
-                                      </div>
-                                    }
-                                    <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
-                                      <p className='vas-admin-custom-item-subfield'>Nurse:</p>
-                                      <p className='vas-admin-custom-item-subvalue'>{this.state.usersById[call.completedBy] ? this.state.usersById[call.completedBy].fullname : 'Super Admin'}</p>
+                          <ClickNHold className='vas-admin-custom-table-item-outer-container' key={call._id} time={4} onClickNHold={e=>{this.editCompletedCall(call)}}>
+                            <div className='vas-admin-custom-table-item-outer'>
+                              {!call.openBy &&
+                                <div className='vas-admin-custom-table-item-outer'>
+                                  <div className='vas-admin-custom-table-item vas-call-table-item'>
+                                    <div className='vas-home-custom-table-column-1'>
+                                      <p><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p>
                                     </div>
-                                    <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
-                                      <p className='vas-admin-custom-item-subfield'>Room:</p>
-                                      <p className='vas-admin-custom-item-subvalue vas-uppercase'>{call.room}</p>
-                                    </div>
-                                    <span>
-                                      <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
-                                        <p className='vas-admin-custom-item-subfield'>Hospital:</p>
-                                        <p className='vas-admin-custom-item-subvalue'>{isHospital ? this.state.hospitalsById[call.hospital].name : 'N/A'}</p>
-                                      </div>
-                                      <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
-                                        <p className='vas-admin-custom-item-subfield'>MRN:</p>
-                                        <p className='vas-admin-custom-item-subvalue'>{call.mrn ? call.mrn : 'N/A'}</p>
-                                      </div>
-                                      <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
-                                        <p className='vas-admin-custom-item-subfield'>Provider:</p>
-                                        <p className='vas-admin-custom-item-subvalue'>{call.provider ? call.provider : 'N/A'}</p>
-                                      </div>
-                                    </span>
-                                  </div>
-                                  <div className='vas-home-custom-table-column-3'>
-                                    <div className='vas-call-times-row'><p className='vas-call-times-left'>Call Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p></div>
-                                    <div className='vas-call-times-row'><p className='vas-call-times-left'>Start Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{call.startTime}</Moment></p></div>
-                                    <div className='vas-call-times-row'><p className='vas-call-times-left'>End Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{call.completedAt}</Moment></p></div>
-                                    <div className='vas-call-times-row'><p className='vas-call-times-left'>Response Time:</p><p className='vas-call-times-right'>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</p></div>
-                                    <div className='vas-call-times-row'><p className='vas-call-times-left'>Procedure Time:</p><p className='vas-call-times-right'>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}{procedureTimeMin + ' Min'}</p></div>
-                                  </div>
-                                </div>
-                                <div className='vas-home-custom-table-item-column-procedures'>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
-                                    {call.proceduresDone.map((procedure)=>{
-                                      return (
-                                        <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
-                                          <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
-                                          <div className='vas-admin-query-item-container'>
-                                          {procedure.itemIds && procedure.itemIds.length > 0 &&
-                                            procedure.itemIds.map((id)=>{
-                                              let isCustom = this.state.itemsById[id].isCustom;
-                                              return (
-                                                <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].valuePrefix + procedure.customValues[id] + this.state.itemsById[id].valueSuffix}</p>
-                                              )
-                                            })
-                                          }
-                                          </div>
+                                    <div className={'vas-home-custom-table-column-2 ' + (call.orderChange ? 'vas-admin-order-change' : '')}>
+                                      {call.orderChange &&
+                                        <div className='vas-admin-custom-table-td vas-admin-custom-table-order-change'>
+                                          <p className='vas-admin-custom-item-subfield'>Order Change:</p>
+                                          <p className='vas-admin-custom-item-subvalue'>{this.state.orderChangeById[call.orderChange].name}</p>
                                         </div>
-                                      )
-                                    })}
+                                      }
+                                      <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
+                                        <p className='vas-admin-custom-item-subfield'>Nurse:</p>
+                                        <p className='vas-admin-custom-item-subvalue'>{this.state.usersById[call.completedBy] ? this.state.usersById[call.completedBy].fullname : 'Super Admin'}</p>
+                                      </div>
+                                      <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
+                                        <p className='vas-admin-custom-item-subfield'>Room:</p>
+                                        <p className='vas-admin-custom-item-subvalue vas-uppercase'>{call.room}</p>
+                                      </div>
+                                      <span>
+                                        <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
+                                          <p className='vas-admin-custom-item-subfield'>Hospital:</p>
+                                          <p className='vas-admin-custom-item-subvalue'>{isHospital ? this.state.hospitalsById[call.hospital].name : 'N/A'}</p>
+                                        </div>
+                                        <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
+                                          <p className='vas-admin-custom-item-subfield'>MRN:</p>
+                                          <p className='vas-admin-custom-item-subvalue'>{call.mrn ? call.mrn : 'N/A'}</p>
+                                        </div>
+                                        <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
+                                          <p className='vas-admin-custom-item-subfield'>Provider:</p>
+                                          <p className='vas-admin-custom-item-subvalue'>{call.provider ? call.provider : 'N/A'}</p>
+                                        </div>
+                                      </span>
+                                    </div>
+                                    <div className='vas-home-custom-table-column-3'>
+                                      <div className='vas-call-times-row'><p className='vas-call-times-left'>Call Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p></div>
+                                      <div className='vas-call-times-row'><p className='vas-call-times-left'>Start Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{call.startTime}</Moment></p></div>
+                                      <div className='vas-call-times-row'><p className='vas-call-times-left'>End Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{call.completedAt}</Moment></p></div>
+                                      <div className='vas-call-times-row'><p className='vas-call-times-left'>Response Time:</p><p className='vas-call-times-right'>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</p></div>
+                                      <div className='vas-call-times-row'><p className='vas-call-times-left'>Procedure Time:</p><p className='vas-call-times-right'>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}{procedureTimeMin + ' Min'}</p></div>
+                                    </div>
+                                  </div>
+                                  <div className='vas-home-custom-table-item-column-procedures'>
+                                    <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
+                                      {call.proceduresDone.map((procedure)=>{
+                                        return (
+                                          <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
+                                            <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
+                                            <div className='vas-admin-query-item-container'>
+                                            {procedure.itemIds && procedure.itemIds.length > 0 &&
+                                              procedure.itemIds.map((id)=>{
+                                                let isCustom = this.state.itemsById[id].isCustom;
+                                                return (
+                                                  <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].valuePrefix + procedure.customValues[id] + this.state.itemsById[id].valueSuffix}</p>
+                                                )
+                                              })
+                                            }
+                                            </div>
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            }
-                            {call.wasConsultation &&
-                              <div className='vas-call-consultation-container'>
-                                <p className='vas-call-consultation'>Consultation Done</p>
-                              </div>
-                            }
-                            {isComments &&
-                              <div className='vas-call-comments-container'>
-                                {call.preComments &&
-                                  <p className='vas-call-comment'><b>Pre-Procedure Comments:</b> {call.preComments}</p>
-                                }
-                                {call.addComments &&
-                                  <p className='vas-call-comment'><b>Add'l Comments:</b> {call.addComments}</p>
-                                }
-                              </div>
-                            }
-                          </div>    
+                              }
+                              {call.wasConsultation &&
+                                <div className='vas-call-consultation-container'>
+                                  <p className='vas-call-consultation'>Consultation Done</p>
+                                </div>
+                              }
+                              {isComments &&
+                                <div className='vas-call-comments-container'>
+                                  {call.preComments &&
+                                    <p className='vas-call-comment'><b>Pre-Procedure Comments:</b> {call.preComments}</p>
+                                  }
+                                  {call.addComments &&
+                                    <p className='vas-call-comment'><b>Add'l Comments:</b> {call.addComments}</p>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          </ClickNHold>  
                         )
                       })
                       }
                     </div>
                 </div>
               </div>
-              {this.state.activeRecord && this.state.itemsById && this.state.allOptions.length > 0 &&
-                <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
-                  <header className={"vas-home-record-header vas-status-" + this.state.activeRecord.status}>
-                    <p className="vas-home-record-header-text">
-                      <b className="vas-home-live-edit-input vas-home-job-input vas-block">{this.state.activeRecord.job}</b>
-                      <DebounceInput
-                        type="text"
-                        className="vas-home-live-edit-input vas-home-custom-job-input vas-inline-block"
-                        debounceTimeout={750}
-                        value={this.state.activeRecord.customJob ? this.state.activeRecord.customJob : ''}
-                        onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
-                    </p>
-                    <p className="vas-home-record-header-subtext vas-pointer">
-                      <b className='vas-home-room-text'>Room:</b>
-                      <DebounceInput
-                          className="vas-home-live-edit-input vas-home-live-edit-input-room vas-inline-block vas-uppercase"
-                          type="text"
-                          debounceTimeout={750}
-                          value={this.state.activeRecord.room ? this.state.activeRecord.room : ''}
-                          onChange={e=>{this.inputLiveUpdate(e, 'room')}} />
-                    </p>
-                    <div className='vas-home-status-container'>
-                      <p className='vas-home-status-text'>Status:</p>
-                      <select className='vas-select vas-home-status-dropdown' value={this.state.activeRecord.status} onChange={e=>{this.changeStatus(e)}}>
-                        {this.state.allOptions[6].options.map(option=>{
-                          return <option key={option.id} value={option.id}>{option.name}</option>
-                        })}
-                      </select>
-                    </div>
-                    <button className="vas-home-record-header-btn" onClick={e=>{this.resetForm()}}>Reset Form</button>
-                    <button className="vas-home-record-header-btn" onClick={e=>{this.returnToQueue()}}>Return To Queue</button>
-                    <button className='vas-home-record-header-btn vas-warn-btn' onClick={e=>{this.deleteCall()}}>Delete Call</button>
-                  </header>
-                  {this.state.activeRecord.preComments &&
-                    <div className="vas-home-inner-container vas-home-inner-container-main-comment">
-                      <header className="vas-home-inner-container-header">
-                        <p>Pre-Procedure Notes</p>
-                      </header>
-                      <div className="vas-home-inner-container-main">
-                        <div className="vas-home-inner-container-row">
-                          <p className='vas-home-comment'>{this.state.activeRecord.preComments}</p>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                  {this.state.procedures.map((procedure, idx)=>{
-                      return (
-                        <div className="vas-home-inner-container" key={procedure._id}>
-                          <header className="vas-home-inner-container-header">
-                            <p>{procedure.name}</p>
-                            <button className='vas-btn-reset-buttons' onClick={e=>{this.resetSection(e)}}>Reset</button>
-                          </header>
-                          <div className="vas-home-inner-container-main">
-                            {procedure.groups.map((group, idx2)=>{
-                              return(
-                                <span className='vas-home-inner-span' data-procedure={procedure.name.replace(/\s+/g, '')} data-idx={idx2} key={idx+group.groupName}>
-                                  {group.groupName === 'Cathflow' &&
-                                    <button className='vas-home-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-home-important-hide')}}>{group.groupName}</button>
-                                  }
-                                  {!group.hideHeader &&
-                                    <h3>{group.groupName}</h3>
-                                  }
-                                  <div className={group.groupName === 'Cathflow' ? 'vas-home-inner-container-row vas-home-important-hide vas-home-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : 'vas-home-inner-container-row'}>
-                                    {group.groupItems.map((itemId)=>{
-                                        let customInput = (group.inputType === 'number' || group.inputType === 'text') ? true : false;
-                                        return(
-                                          <span key={itemId}>
-                                            {!customInput &&
-                                              <span>
-                                                <input type={group.inputType} className={"vas-home-select-input vas-"+ group.inputType +"-select"} data-procedureid={procedure.procedureId} id={itemId} name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}/>
-                                                <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, procedure.name, group.groupName, group.resetSiblings)}}>{this.state.itemsById[itemId].value}</label>
-                                              </span>
-                                            }
-                                            {customInput &&
-                                              <span>
-                                                <input type={group.inputType} onChange={e=>{this.changeCustomInput(e, group.fieldName)}} data-procedureid={procedure.procedureId} placeholder={this.state.itemsById[itemId].value} className={"vas-custom-input vas-home-select-input vas-"+ group.inputType +"-select"} id={itemId} />
-                                              </span>
-                                            }
-                                          </span>
-                                        )
-                                      })
-                                    }
-                                  </div>
-                                </span>
-                              )})
-                            }
-                            </div>
-                        </div>
-                      )
-                    })
-                  }
-                  {this.state.insertionTypeSelected &&
-                    <div className='vas-home-options-container'>
-                      <div className='vas-home-option-inner'>
-                        <label>{this.state.allOptions[1].name}:</label>{/* Medical Record Number */}
-                        <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.activeRecord.mrn ? this.state.activeRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
-                      </div>
-                      <div className='vas-home-option-inner'>
-                        <label>{this.state.allOptions[2].name}:</label>{/* Provider */}
-                        <DebounceInput className='vas-custom-input' debounceTimeout={750} type="text" value={this.state.activeRecord.provider ? this.state.activeRecord.provider : ''} onChange={e=>{this.inputLiveUpdate(e, 'provider')}} />
-                      </div>
-                    </div>
-                  }
-                  <div className='vas-home-inner-container'>
-                    <header className='vas-home-inner-container-header'>
-                      <p>Hospital</p>
-                      <button className='vas-btn-reset-buttons' onClick={e=>{this.resetSection(e, 'orderChange')}}>Reset</button>
-                    </header>
-                    <div className='vas-home-inner-container-main'>
-                      <select className='vas-select' value={this.state.activeRecord.hospital ? this.state.activeRecord.hospital : ''} onChange={e=>{this.hospitalChange(e)}}>
-                        <option value=''>Select A Hospital</option>
-                        {this.state.allOptions[0] && this.state.allOptions[0].options.map((subOption, idx2)=>{
-                          return <option key={subOption.id} value={subOption.id}>{subOption.name}</option>
-                        })}
-                      </select>
-                    </div>
-                  </div>
-                  <div className='vas-home-inner-container vas-home-order-change'>
-                    <header className='vas-home-inner-container-header'>
-                      <p>MD Order Change</p>
-                      <button className='vas-btn-reset-buttons' onClick={e=>{this.resetSection(e, 'orderChange')}}>Reset</button>
-                    </header>
-                    <div className='vas-home-inner-container-main'>
-                      <input type='radio' className="vas-radio-select vas-home-order-change-input" id='order-change' name='order-change'/>
-                      <label className="vas-btn" htmlFor='order-change' onClick={e=>{this.setState({orderChanged:true})}}>Order Was Changed</label>
-                      {this.state.orderChanged &&
-                        <select className='vas-select' value={this.state.orderSelected} onChange={e=>{this.orderSelect(e)}}>
-                          <option value="default">Select An Order</option>
-                          {this.state.allOptions[3].options.map((option, idx)=>{
-                            return <option key={option.id} value={option.id}>{option.name}</option>
-                          })}
-                        </select>
-                      }
-                    </div>
-                  </div>
-                  <div className='vas-home-inner-container vas-home-order-change'>
-                    <header className='vas-home-inner-container-header'>
-                      <p>Consultation</p>
-                      <button className='vas-btn-reset-buttons' onClick={e=>{this.resetSection(e, 'consultation')}}>Reset</button>
-                    </header>
-                    <div className='vas-home-inner-container-main'>
-                      <input type='radio' className="vas-radio-select vas-home-consultation-input" id='consultation' name='consultation'/>
-                      <label className="vas-btn" htmlFor='consultation' onClick={e=>{this.setState({wasConsultation:true})}}>Consultation Done</label>
-                    </div>
-                  </div>
-                  <div className='vas-home-inner-container'>
-                    <header className='vas-home-inner-container-header'>
-                      <p>Additional Comments</p>
-                    </header>
-                    <div className='vas-home-inner-container-main'>
-                      <DebounceInput element='textarea' className='vas-home-add-comments' debounceTimeout={750} value={this.state.activeRecord.addComments ? this.state.activeRecord.addComments : ''} onChange={e=>{this.inputLiveUpdate(e, 'addComments')}}/>
-                    </div>
-                  </div>
-                  <div className="vas-home-inner-container vas-home-inner-container-final">
-                    <header className="vas-home-inner-container-header vas-home-inner-container-final-header">
-                      <p>Complete Task</p>
-                    </header>
-                    <div className='vas-home-final-container'>
-                      <div>
-                        <button className='vas-button vas-home-complete-procedure-btn' onClick={this.completeProcedure}>Submit Procedure</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              }
+              <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
+                {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
+                  <EditProcedure 
+                    insertionTypeSelected={this.state.insertionTypeSelected}
+                    activeRecord={this.state.activeRecord} 
+                    allOptions={this.state.allOptions}
+                    procedures={this.state.procedures}
+                    itemsById={this.state.itemsById}
+                    inputLiveUpdate={this.inputLiveUpdate}
+                    changeStatus={this.changeStatus}
+                    resetForm={this.resetForm} 
+                    returnToQueue={this.returnToQueue}
+                    deleteCall={this.deleteCall}
+                    resetSection={this.resetSection}
+                    showHiddenButtons={this.showHiddenButtons}
+                    selectButton={this.selectButton}
+                    changeCustomInput={this.changeCustomInput}
+                    hospitalChange={this.hospitalChange}
+                    orderSelect={this.orderSelect}
+                    setConsultation={this.setConsultation} 
+                    orderChanged={this.state.orderChanged}
+                    setOrderChanged={this.setOrderChanged}
+                    completeProcedure={this.completeProcedure}/>
+                }
+              </div>
             </div>
             {this.state.modalIsOpen && 
               <Modal 

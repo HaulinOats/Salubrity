@@ -49,7 +49,8 @@ let callSchema = new Schema({
   completedBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
   wasConsultation:{type:Boolean, default:null},
-  status:{type:Number, default:1}
+  status:{type:Number, default:1},
+  editedBy:{type:Number, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -599,6 +600,6 @@ app.get('/seed-items', (req, res)=>{
 
 app.use(((req, res) => res.sendFile(path.join(__dirname, './client/build/index.html'))));
 
-const server = app.listen(app.get('port'), ()=>{
+app.listen(app.get('port'), ()=>{
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });

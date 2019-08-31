@@ -12,6 +12,7 @@
     "local-storage": "^2.0.0",
     "moment": "^2.24.0",
     "react": "15.4.0",
+    "react-click-n-hold": "^1.0.7",
     "react-datepicker": "1.4.1",
     "react-debounce-input": "^3.2.0",
     "react-dom": "15.4.0",

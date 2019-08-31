@@ -17,6 +17,7 @@ export default class Modal extends Component {
       custom:'',
       preComments:'',
       isAddCall:false,
+      isEditProcedure:false,
       roomNumber:null,
       need:'',
       needSelected:false,

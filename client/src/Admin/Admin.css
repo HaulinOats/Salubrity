@@ -197,9 +197,11 @@
 }
 .vas-admin-custom-table-item-outer {
   background:white;
-  border-bottom:solid 2px black;
   font-size:85%;
   width:100%;
+}
+.vas-admin-custom-table-item-outer-container {
+  border-bottom:solid 2px black;
 }
 .vas-admin-custom-table-item {
   display:flex;
