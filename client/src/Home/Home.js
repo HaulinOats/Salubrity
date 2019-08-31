@@ -831,7 +831,11 @@ export default class Home extends Component{
     while(groupContainer.nextSibling){
       let nextSib =  groupContainer.nextSibling.querySelector('.vas-edit-procedure-select-input');
       if(nextSib){
-        nextSib.checked = true;
+        if(nextSib.id === '57' || nextSib.id === '58'){
+          nextSib.checked = false;
+        } else {
+          nextSib.checked = true;
+        }
       }
       groupContainer = groupContainer.nextSibling;
     }
