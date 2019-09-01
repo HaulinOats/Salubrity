@@ -337,10 +337,8 @@ export default class Home extends Component{
   }
 
   inputLiveUpdate(e, field){
-    console.log(e, field);
     let targetValue = e.target.value;
     let activeRecord = this.state.activeRecord;
-    console.log(this.state);
 
     if(e.target.type === 'number'){
       activeRecord[field] = Number(targetValue);
@@ -628,13 +626,13 @@ export default class Home extends Component{
         proceduresDone:proceduresArr,
         completedBy:Number(this.state.currentUser.userId),
         completedAt:completionTime.toISOString(),
-        addComments:this.state.activeRecord.addComments ? this.state.activeRecord.addComments.trim() : null,
-        hospital:this.state.activeRecord.hospital ? this.state.activeRecord.hospital : null,
-        provider:this.state.activeRecord.provider ? this.state.activeRecord.provider.trim() : null,
-        mrn:(this.state.activeRecord.mrn && this.state.activeRecord.mrn.length > 4 && this.state.activeRecord.mrn.length < 8) ? this.state.activeRecord.mrn : null,
+        addComments:this.state.activeRecord.addComments,
+        hospital:this.state.activeRecord.hospital,
+        provider:this.state.activeRecord.provider,
+        mrn:this.state.activeRecord.mrn,
         procedureTime:completionTime - startTime,
         responseTime:startTime - callTime,
-        orderChange: this.state.activeRecord.orderChange ? this.state.activeRecord.orderChange : null
+        orderChange: this.state.activeRecord.orderChange
       })
       .then(resp=>{
         if(resp.data.error || resp.data._message){
