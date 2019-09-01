@@ -675,7 +675,6 @@ exports.procedureSeed = [
       {
         groupName:'Patient Refused',
         inputType:'radio',
-        resetSiblings:true,
         hideHeader:true,
         groupItems:[1]
       },
@@ -709,7 +708,6 @@ exports.procedureSeed = [
       {
         groupName:'Patient Refused',
         inputType:'radio',
-        resetSiblings:true,
         hideHeader:true,
         groupItems:[12]
       },
@@ -733,7 +731,6 @@ exports.procedureSeed = [
       {
         groupName:'Patient Refused',
         inputType:'radio',
-        resetSiblings:true,
         hideHeader:true,
         groupItems:[16]
       },
@@ -838,7 +835,6 @@ exports.procedureSeed = [
       {
         groupName:'Patient Refused',
         inputType:'radio',
-        resetSiblings:true,
         hideHeader:true,
         groupItems:[59]
       },
