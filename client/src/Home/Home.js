@@ -721,7 +721,7 @@ export default class Home extends Component{
       errors += '- Room number field cannot be empty\n';
     }
     
-    if(errors.length && !this.state.wasConsultation){
+    if(errors.length && !this.state.activeRecord.wasConsultation){
       this.setState({
         modalIsOpen:true, 
         modalTitle:'Cannot Submit Procedure',
@@ -1012,7 +1012,7 @@ export default class Home extends Component{
                               <p><b>Room:</b><i className='vas-uppercase'>{item.room}</i></p>
                               <p><b>Hospital:</b><i className='vas-capitalize'>{this.state.hospitalsById[item.hospital] ? this.state.hospitalsById[item.hospital].name : 'N/A'}</i></p>
                               <p><b>Contact:</b><i>{item.contact ? item.contact : 'N/A'}</i></p>
-                              <p><b>Nurse:</b><i className='vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : 'N/A'}</i></p>
+                              <p><b>Nurse:</b><i className='vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : item.openBy}</i></p>
                             </div>
                           </div>
                         </div>
@@ -1056,7 +1056,7 @@ export default class Home extends Component{
                                       }
                                       <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
                                         <p className='vas-admin-custom-item-subfield'>Nurse:</p>
-                                        <p className='vas-admin-custom-item-subvalue'>{this.state.usersById[call.completedBy] ? this.state.usersById[call.completedBy].fullname : 'Super Admin'}</p>
+                                        <p className='vas-admin-custom-item-subvalue'>{this.state.usersById[call.completedBy] ? this.state.usersById[call.completedBy].fullname : call.completedBy}</p>
                                       </div>
                                       <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
                                         <p className='vas-admin-custom-item-subfield'>Room:</p>
