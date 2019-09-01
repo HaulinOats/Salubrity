@@ -199,6 +199,7 @@
   background:white;
   font-size:85%;
   width:100%;
+  user-select:none;
 }
 .vas-admin-custom-table-item-outer-container {
   border-bottom:solid 2px black;

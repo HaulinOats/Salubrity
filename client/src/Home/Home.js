@@ -6,7 +6,6 @@ import axios from 'axios';
 import Moment from 'react-moment';
 import ls from 'local-storage';
 import './Home.css';
-import ClickNHold from 'react-click-n-hold'; 
 import loadingGif from '../../public/loading.gif';
 
 export default class Home extends Component{
@@ -1037,14 +1036,12 @@ export default class Home extends Component{
                         <div><p className='vas-queue-no-items'>There are no completed items yet for today</p></div>
                       }
                       {this.state.completedCalls.length > 0 && this.state.hospitalsById && this.state.proceduresById && this.state.itemsById && this.state.completedCalls.map((call)=>{
-                        let isComments = call.addComments;
-                        let isHospital = call.hospital;
                         let responseTimeHr = Math.floor(call.responseTime/3600000) % 24;
                         let responseTimeMin = Math.floor(call.responseTime/60000) % 60;
                         let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
                         let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
                         return(
-                          <ClickNHold className='vas-admin-custom-table-item-outer-container' key={call._id} time={1} onClickNHold={e=>{this.editCompletedCall(call)}}>
+                          <div className='vas-admin-custom-table-item-outer-container' key={call._id} onClick={e=>{this.editCompletedCall(call)}}>
                             <div className='vas-admin-custom-table-item-outer'>
                               {!call.openBy &&
                                 <div className='vas-admin-custom-table-item-outer'>
@@ -1070,7 +1067,7 @@ export default class Home extends Component{
                                       <span>
                                         <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
                                           <p className='vas-admin-custom-item-subfield'>Hospital:</p>
-                                          <p className='vas-admin-custom-item-subvalue'>{isHospital ? this.state.hospitalsById[call.hospital].name : 'N/A'}</p>
+                                          <p className='vas-admin-custom-item-subvalue'>{call.hospital ? this.state.hospitalsById[call.hospital].name : 'N/A'}</p>
                                         </div>
                                         <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
                                           <p className='vas-admin-custom-item-subfield'>MRN:</p>
@@ -1118,7 +1115,7 @@ export default class Home extends Component{
                                   <p className='vas-call-consultation'>Consultation Done</p>
                                 </div>
                               }
-                              {isComments &&
+                              {(call.addComments || call.preComments) &&
                                 <div className='vas-call-comments-container'>
                                   {call.preComments &&
                                     <p className='vas-call-comment'><b>Pre-Procedure:</b> {call.preComments}</p>
@@ -1129,7 +1126,7 @@ export default class Home extends Component{
                                 </div>
                               }
                             </div>
-                          </ClickNHold>  
+                          </div>  
                         )
                       })
                       }
