@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Login from '../Widgets/Login/Login';
+import Modal from '../Widgets/Modal/Modal';
 import './Admin.css';
 import axios from 'axios';
 import moment from 'moment';
@@ -21,7 +22,6 @@ export default class Admin extends Component {
       addUserName:'',
       addPassword:'',
       addAdminAccess:false,
-      addValidationErrors:[],
       userDataByUserId:{},
       allUsers:[],
       allProcedures:[],
@@ -37,7 +37,12 @@ export default class Admin extends Component {
       secondDropdownArr:[],
       addHospitalName:'',
       addOrderChangeName:'',
-      addNeedName:''
+      addNeedName:'',
+      modalIsOpen:false,
+      modalMessage:'',
+      modalTitle:'',
+      modalConfirmation:false,
+      confirmationType:null
     }
     this.submitDateRange = this.submitDateRange.bind(this);
     this.seedProcedures = this.seedProcedures.bind(this);
@@ -55,6 +60,7 @@ export default class Admin extends Component {
     this.handleUserSessionData = this.handleUserSessionData.bind(this);
     this.addNeed = this.addNeed.bind(this);
     this.addInputChange = this.addInputChange.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   }
 
   componentWillMount(){
@@ -247,12 +253,7 @@ export default class Admin extends Component {
   }
 
   addUser(){
-    let validationErrors = []
-    if(this.state.addPassword.length < 4){
-      validationErrors.push('Password or PIN must be atleast 4 characters');
-    }
-    if(!validationErrors.length){
-      this.setState({addValidationErrors:[]});
+    if(this.userIsValidated()){
       this.setState({isLoading:true});
       axios.post('/add-user', {
         fullname:this.state.addFullName,
@@ -281,9 +282,31 @@ export default class Admin extends Component {
       .finally(()=>{
         this.setState({isLoading:false});
       })
-    } else {
-      this.setState({addValidationErrors:validationErrors});
     }
+  }
+
+  userIsValidated(){
+    let errors = '';
+
+    if(this.state.addUserName.length < 5){
+      errors += '- Username must be at least 5 characters long\n';
+    }
+    if(this.state.addPassword.length < 4){
+      errors += '- Password must be at least 4 characters long\n';
+    }
+    if(this.state.addFullName.length < 5){
+      errors += '- Full Name must be at least 5 characters long\n';
+    }
+
+    if(errors.length){
+      this.setState({
+        modalIsOpen:true, 
+        modalTitle:'Add User Validation Failed',
+        modalMessage:errors
+      });
+      return false;
+    }
+    return true;
   }
 
   deleteUser(id){
@@ -667,6 +690,16 @@ export default class Admin extends Component {
     .finally(()=>{
       this.setState({isLoading:false});
     })
+  }
+
+  closeModal(){
+    this.setState({
+      modalIsOpen:false,
+      modalMessage:'',
+      modalTitle:'',
+      modalConfirmation:false,
+      confirmationType:null
+    });
   }
 
   render(){
@@ -1074,6 +1107,13 @@ export default class Admin extends Component {
             <img className='vas-loading-img' src={loadingGif} alt='loading'/>
             <p className='vas-loading-text'>Loading...</p>
           </div>
+        }
+        {this.state.modalIsOpen && 
+          <Modal 
+            closeModal={this.closeModal}
+            modalTitle={this.state.modalTitle} 
+            modalMessage={this.state.modalMessage}
+            toggleModal={this.toggleHandler}/>
         }
       </div>
     )
