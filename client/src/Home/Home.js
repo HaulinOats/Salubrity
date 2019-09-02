@@ -250,7 +250,7 @@ export default class Home extends Component{
 
   logout(){
     this.stopIntervals();
-    this.closeModal();
+    this.resetModal();
     this.setState({currentUser:null}, this.resetState);
     ls.clear();
   }
@@ -335,7 +335,7 @@ export default class Home extends Component{
       if(el.type === 'number' || el.type === 'text'){
         el.value = '';
       }
-      if(!isInsertionProcedure && el.getAttribute('data-procedureid') === '9'){
+      if(!isInsertionProcedure && el.getAttribute('data-procedureid') === '8'){
         isInsertionProcedure = true;
       }
     });
@@ -574,7 +574,7 @@ export default class Home extends Component{
 
         //find and set custom values, if they exist
         if(procedureArr.hasOwnProperty('customValues')){
-          stateObj.insertionLength = String(procedureArr.customValues['72']);
+          stateObj.insertionLength = String(procedureArr.customValues['69']);
         }
       });
     }
@@ -653,7 +653,7 @@ export default class Home extends Component{
       if(proceduresArr[i].procedureId === 9){
         proceduresArr[i].itemIds.push(72);
         proceduresArr[i].customValues = {
-          '72': Number(this.state.insertionLength)
+          '69': Number(this.state.insertionLength)
         }
       }
     }
@@ -958,7 +958,8 @@ export default class Home extends Component{
     while(groupContainer.nextSibling){
       let nextSib =  groupContainer.nextSibling.querySelector('.vas-edit-procedure-select-input');
       if(nextSib){
-        if(nextSib.id === '57' || nextSib.id === '58'){
+        //57 = PAC:Initiated (Port-A-Cath), 60 = Patient Refused (Insertion Procedure)
+        if(nextSib.id === '57' || nextSib.id === '60'){
           nextSib.checked = false;
         } else {
           nextSib.checked = true;

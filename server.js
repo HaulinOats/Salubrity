@@ -38,7 +38,6 @@ let callSchema = new Schema({
   preComments:{type:String, default:null},
   addComments:{type:String, default:null},
   contact:{type:Number, default:null},
-  createdBy:{type:Number, default:null},
   startTime:{type:Date, default:null},
   openBy:{type:Number, default:null},
   proceduresDone:[Object],

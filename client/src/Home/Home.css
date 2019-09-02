@@ -411,11 +411,11 @@
 }
 .vas-status-3
 .vas-home-table-job-name{
-  border-color:white;
+  border-color:darkslategray;
 }
 .vas-status-3 
 .vas-home-table-tr-inner p {
-  border-color:white;
+  border-color:darkslategray;
 }
 .vas-home-table-open-status {
   margin:0 auto;

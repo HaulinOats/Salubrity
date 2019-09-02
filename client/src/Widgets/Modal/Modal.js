@@ -24,11 +24,12 @@ export default class Modal extends Component {
       contactNumber:'',
       inputsValidated:false,
       addedCall:null,
-      status:0,
+      status:1,
       hospital:''
     }
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
     this.hospitalSelect = this.hospitalSelect.bind(this);
+    this.toggleStat = this.toggleStat.bind(this);
   };
 
   componentWillMount(){
@@ -41,6 +42,14 @@ export default class Modal extends Component {
 
   componentDidMount(){
     console.log(this.state);
+  }
+
+  toggleStat(){
+    if(this.state.status === 1){
+      this.setState({status:2})
+    } else {
+      this.setState({status:1});
+    }
   }
 
   getOptionsData(){
@@ -157,8 +166,8 @@ export default class Modal extends Component {
               {this.state.isAddCall &&
               <div>
                 <div className='vas-modal-add-call-row-block'>
-                  <input type='radio' className="vas-radio-select vas-modal-is-important-input" id='is-important' name='is-important'/>
-                  <label className="vas-btn" htmlFor='is-important' onClick={e=>{this.setState({status:2})}}>Needed Stat</label>
+                  <input type='checkbox' checked={this.state.status === 2 ? true : false} className="vas-checkbox-select vas-modal-is-important-input" id='is-important' name='is-important'/>
+                  <label className="vas-btn" htmlFor='is-important' onClick={this.toggleStat}>Needed Stat</label>
                 </div>
                 <div className="vas-modal-add-call-row">
                   <div className="vas-modal-add-call-row-inner">
