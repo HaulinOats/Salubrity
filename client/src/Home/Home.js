@@ -35,7 +35,9 @@ export default class Home extends Component{
       selectedProcedures:[],
       procedureVerified:false,
       insertionTypeSelected:false,
-      insertionLength:''
+      insertionLength:'',
+      lastUpdate:0,
+      lastUpdateHide:false
     };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.completeProcedure = this.completeProcedure.bind(this);
@@ -67,6 +69,7 @@ export default class Home extends Component{
     this.orderSelect = this.orderSelect.bind(this);
     this.toggleConsultation = this.toggleConsultation.bind(this);
     this.setRecordStateItems = this.setRecordStateItems.bind(this);
+    this.timerTick = this.timerTick.bind(this);
   }
 
   resetState(){
@@ -97,7 +100,11 @@ export default class Home extends Component{
     }
 
     if(ls('activeHomeTab')){
-      this.setState({activeHomeTab:ls('activeHomeTab')});
+      this.setState({activeHomeTab:ls('activeHomeTab')}, ()=>{
+        if(this.state.activeHomeTab === 'active'){
+          this.setState({lastUpdateHide:true});
+        }
+      });
     }
 
     // Set the name of the hidden property and the change event for visibility
@@ -125,6 +132,12 @@ export default class Home extends Component{
       this.stopIntervals();
     } else {
       this.startIntervals();
+      if(this.state.activeHomeTab === 'queue'){
+        this.getActiveCalls();
+      }
+      if(this.state.activeHomeTab === 'complete'){
+        this.getCompletedCalls();
+      }
     }
   }
 
@@ -169,21 +182,27 @@ export default class Home extends Component{
       }
     }, 180000);//check session every 3 minutes (180000)ms
 
-    this.getLatestData = setInterval(()=>{
-      if(this.state.currentUser){
-        if(this.state.activeHomeTab === 'queue'){
-          this.getActiveCalls();
-        }
-        if(this.state.activeHomeTab === 'complete'){
-          this.getCompletedCalls();
-        }
-      }
-    }, 10000);
+    //Timer showing when last update occured
+    this.setState({lastUpdate:0}, ()=>{
+      this.updateTimer = setInterval(this.timerTick, 1000);
+    })
+
+    // this.getLatestData = setInterval(()=>{
+    //   if(this.state.currentUser){
+    //     if(this.state.activeHomeTab === 'queue'){
+    //       this.getActiveCalls();
+    //     }
+    //     if(this.state.activeHomeTab === 'complete'){
+    //       this.getCompletedCalls();
+    //     }
+    //   }
+    // }, 10000);
   }
 
   stopIntervals(){
-    console.log('stopping intervals...');
-    clearInterval(this.getLatestData);
+    // console.log('stopping intervals...');
+    // clearInterval(this.getLatestData);
+    clearInterval(this.updateTimer);
   }
 
   componentWillUnmount(){
@@ -193,12 +212,12 @@ export default class Home extends Component{
   checkUserSession(){
     let currentTime = Math.floor(Date.now() / 1000);
     let timeDiff = currentTime - this.state.currentUser.lastLogin;
-    console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 30)`);
-    if(timeDiff > 1800){
+    console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 60)`);
+    if(timeDiff > 3600){
       console.log('Logging user out due to inactivity');
       this.logout();
     }
-    if(timeDiff > 1619){
+    if(timeDiff > 3419){
       this.setState({
         modalTitle:'Session Is About To End',
         modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
@@ -245,17 +264,36 @@ export default class Home extends Component{
     }, 1000);
   }
 
-  setTab(tab){
-    this.setState({activeHomeTab:tab}, ()=>{
+  setTab(tab, event){
+    if(event){
+      let tabElement = event.currentTarget.querySelector('.vas-home-nav-item-refresh-bar');
+      tabElement.classList.add('vas-home-refresh-bar-activate');
+      setTimeout(()=>{
+        tabElement.classList.remove('vas-home-refresh-bar-activate');
+      }, 1000);
+    }
+    clearInterval(this.updateTimer);
+    this.setState({activeHomeTab:tab, lastUpdate:0}, ()=>{
       ls('activeHomeTab', this.state.activeHomeTab);
       if(this.state.activeHomeTab === 'queue'){
+        this.setState({lastUpdateHide:false});
         this.getActiveCalls();
+        this.updateTimer = setInterval(this.timerTick, 1000);
       }
       if(this.state.activeHomeTab === 'complete'){
+        this.setState({lastUpdateHide:false});
         this.getCompletedCalls();
+        this.updateTimer = setInterval(this.timerTick, 1000);
+      }
+      if(this.state.activeHomeTab === 'active'){
+        this.setState({lastUpdateHide:true});
       }
       this.setUserSession();
     });
+  }
+
+  timerTick(){
+    this.setState({lastUpdate:this.state.lastUpdate + 1});
   }
 
   getAllUsers(){
@@ -461,6 +499,7 @@ export default class Home extends Component{
   }
 
   getCompletedCalls(){
+    // this.setState({isLoading:true});
     axios.get('/get-completed-calls')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
@@ -474,9 +513,13 @@ export default class Home extends Component{
       console.log(err);
       this.addToErrorArray(err);
     })
+    .finally(()=>{
+      // this.setState({isLoading:false});
+    });
   }
 
   getActiveCalls(){
+    // this.setState({isLoading:true});
     axios.get('/get-active-calls')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
@@ -489,6 +532,9 @@ export default class Home extends Component{
     .catch((err)=>{
       console.log(err);
       this.addToErrorArray(err);
+    })
+    .finally(()=>{
+      // this.setState({isLoading:false});
     })
   }
 
@@ -972,6 +1018,9 @@ export default class Home extends Component{
   }
 
   render(){
+    let lastUpdateMin = Math.floor(this.state.lastUpdate/60);
+    let lastUpdateSec = this.state.lastUpdate - lastUpdateMin * 60;
+
     return(
       <div>
         {!this.state.currentUser &&
@@ -991,10 +1040,25 @@ export default class Home extends Component{
               </div>
             </header>
             <ul className='vas-home-nav-tabs'>
-              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setTab('queue')}}>Queue</li>
-              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setTab('complete')}}>Completed</li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setTab('queue', e)}}>
+                <p className='vas-home-nav-item-text'>Queue</p>
+                <div className='vas-home-nav-item-refresh-bar'></div>
+              </li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setTab('complete', e)}}>
+                <p className='vas-home-nav-item-text'>Completed</p>
+                <div className='vas-home-nav-item-refresh-bar'></div>
+              </li>
               {this.state.activeRecord &&
-                <li className={'vas-home-nav-item vas-status-' + this.state.activeRecord.status} data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active')}}>Active/Open</li>
+                <li className={'vas-home-nav-item vas-status-' + this.state.activeRecord.status} data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active', e)}}>
+                  <p className='vas-home-nav-item-text'>Open</p>
+                  <div className='vas-home-nav-item-refresh-bar'></div>
+                </li>
+              }
+              {!this.state.lastUpdateHide &&
+                <div className='vas-home-last-update-container'>
+                  <p className='vas-home-last-update-label'>Last Update:</p>
+                  <p className='vas-home-last-update-timer'>{lastUpdateMin > 0 ? lastUpdateMin : '0'}:{lastUpdateSec < 10 ? '0' + lastUpdateSec : lastUpdateSec}</p>
+                </div>
               }
             </ul>
             <div className="vas-home-tabContent">

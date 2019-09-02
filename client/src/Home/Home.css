@@ -53,12 +53,14 @@
   border:none;
 }
 .vas-home-nav-tabs {
+  display:flex;
   background:none;
   position: relative;
   border-bottom:none;
   height: 30px;
 }
 .vas-home-nav-item {
+  position: relative;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -78,6 +80,40 @@
 .vas-home-nav-item[data-isactive='true']{
   background:cadetblue;
   color:white;
+}
+.vas-home-nav-item-text {
+  position: relative;
+  z-index: 1;
+}
+.vas-home-nav-item-refresh-bar {
+  height: 100%;
+  width: 0%;
+  background: darkslategrey;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  z-index: 0;
+}
+.vas-home-refresh-bar-activate {
+  animation-name:loading;
+  animation-duration: 1s;
+}
+@keyframes loading{
+  0%{
+    width:0;
+  }
+  99%{
+    width:100%;
+  }
+  99.1%{
+    background: transparent;
+    width:100%;
+  }
+  100%{
+    width:0;
+  }
 }
 .vas-home-nav-link {
   border:solid 2px lightgrey;
@@ -379,4 +415,17 @@
   margin:0 auto;
   margin-right:0;
   font-weight: bold;
+}
+.vas-home-last-update-container {
+  margin: 0 auto;
+  margin-right: 0;
+}
+.vas-home-last-update-label {
+  display:inline-block;
+}
+.vas-home-last-update-timer {
+  display: inline-block;
+  font-size: 110%;
+  min-width: 45px;
+  text-align: right;
 }

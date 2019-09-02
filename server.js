@@ -224,7 +224,7 @@ app.post('/get-user-by-id', (req, res)=>{
     if(user){
       let modifiedUser = user;
       delete user.password;
-      res.send(user);
+      res.send(modifiedUser);
     } else {
       res.send({'error':'could not find user from id: ' + req.body._id});
     }
