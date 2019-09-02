@@ -138,23 +138,6 @@ app.get('/get-active-calls', (req, res)=>{
   })
 });
 
-app.get('/get-completed-calls', (req, res)=>{
-  var start = new Date();
-  start.setHours(0,0,0,0);
-  
-  var end = new Date();
-  end.setHours(23,59,59,999);
-
-  Call.find({completedAt: {$gte: start, $lt: end}}).sort({completedAt:-1}).exec((err, calls)=>{
-    if(err) return res.send(err);
-    if(calls.length){
-      res.send(calls);
-    } else {
-      res.send({'error':'no completed calls for today, yet'});
-    }
-  });
-});
-
 app.post('/set-call-as-open', (req, res)=>{
   Call.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return res.send(err);
@@ -329,6 +312,23 @@ app.get('/get-items', (req, res)=>{
       res.send(items);
     } else {
       res.send({'error':'there were no items to return'});
+    }
+  });
+});
+
+app.get('/get-completed-calls', (req, res)=>{
+  var start = new Date();
+  start.setHours(0,0,0,0);
+  
+  var end = new Date();
+  end.setHours(23,59,59,999);
+
+  Call.find({completedAt: {$gte: start, $lt: end}}).sort({completedAt:-1}).exec((err, calls)=>{
+    if(err) return res.send(err);
+    if(calls.length){
+      res.send(calls);
+    } else {
+      res.send({'error':'no completed calls for today, yet'});
     }
   });
 });

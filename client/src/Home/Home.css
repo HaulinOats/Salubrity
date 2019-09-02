@@ -403,6 +403,11 @@
 .vas-home-table-time {
   font-size:110%;
 }
+.vas-home-table-time-date {
+  display: block;
+  margin-top: 3px;
+  font-size: 80%;
+}
 .vas-status-3
 .vas-home-table-job-name{
   border-color:white;
