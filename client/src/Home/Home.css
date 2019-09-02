@@ -357,8 +357,9 @@
   align-items: center;
 }
 .vas-home-custom-table-column-1 {
-  width:10%;
-  padding:1%;
+  width: 10%;
+  padding: 1%;
+  font-size: 125%;
 }
 .vas-home-custom-table-column-2 {
   width:43%;

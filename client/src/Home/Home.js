@@ -1112,7 +1112,8 @@ export default class Home extends Component{
                                 <div className='vas-admin-custom-table-item-outer'>
                                   <div className='vas-admin-custom-table-item vas-call-table-item'>
                                     <div className='vas-home-custom-table-column-1'>
-                                      <p><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p>
+                                      <Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment>
+                                      <Moment className='vas-home-table-time-date' format='M/D'>{this.getDateFromObjectId(call._id)}</Moment>
                                     </div>
                                     <div className={'vas-home-custom-table-column-2 ' + (call.orderChange ? 'vas-admin-order-change' : '')}>
                                       {call.orderChange &&
