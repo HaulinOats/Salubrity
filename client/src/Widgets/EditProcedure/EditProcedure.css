@@ -163,3 +163,11 @@
 .vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]{
   display:block;
 }
+.vas-edit-procedure-completed-by-container {
+  padding: 8px 0px;
+  border-bottom: solid 1px white;
+  text-transform: capitalize;
+}
+.vas-edit-procedure-completed-by-container b {
+  font-weight:bold;
+}

@@ -178,18 +178,11 @@ app.post('/procedure-completed', (req, res)=>{
   Call.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return res.send(err);
     if(call){
-      call.addComments = req.body.addComments;
-      call.wasConsultation = req.body.wasConsultation;
       call.proceduresDone = req.body.proceduresDone;
       call.completedBy = Number(req.body.completedBy);
       call.completedAt = new Date(Date.now()).toISOString();
       call.procedureTime = req.body.procedureTime;
       call.responseTime = req.body.responseTime;
-      call.hospital = req.body.hospital;
-      call.provider = req.body.provider;
-      call.mrn = req.body.mrn;
-      call.orderChange = req.body.orderChange;
-      call.openBy = undefined;
 
       call.save((err2)=>{
         if(err2) return res.send(err2);

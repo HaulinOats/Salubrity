@@ -22,6 +22,10 @@ export default class Modal extends Component {
     });
   }
 
+  componentDidMount(){
+    console.log(this.props);
+  }
+
   render(){
     return(
       <div className={'vas-edit-procedure-page-record-container ' + (this.props.isPostEdit ? 'vas-edit-procedure-is-post-edit' : '')}>
@@ -55,6 +59,11 @@ export default class Modal extends Component {
               })}
             </select>
           </div>
+          {this.props.usersById && this.props.usersById[this.props.currentRecord.completedBy] &&
+            <div className='vas-edit-procedure-completed-by-container'>
+              <p><b>Completed By: </b>{this.props.usersById[this.props.currentRecord.completedBy].fullname}</p>
+            </div>
+          }
           {!this.props.isPostEdit &&
             <span>
               <button className="vas-edit-procedure-record-header-btn" onClick={e=>{this.props.resetForm()}}>Reset Form</button>
