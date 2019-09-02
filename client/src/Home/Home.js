@@ -1079,7 +1079,7 @@ export default class Home extends Component{
                               <p><b>Room:</b><i className='vas-uppercase'>{item.room}</i></p>
                               <p><b>Hospital:</b><i className='vas-capitalize'>{this.state.hospitalsById[item.hospital] ? this.state.hospitalsById[item.hospital].name : 'N/A'}</i></p>
                               <p><b>Contact:</b><i>{item.contact ? item.contact : 'N/A'}</i></p>
-                              <p><b>Nurse:</b><i className='vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : item.openBy}</i></p>
+                              <p><b>Nurse:</b><i className='vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : (item.openBy ? item.openBy : 'N/A')}</i></p>
                             </div>
                           </div>
                         </div>

@@ -19,13 +19,7 @@ export default class Modal extends Component {
     });
     this.setState({
       proceduresDoneIdArr
-    }, ()=>{
-      console.log(this.state.proceduresDoneIdArr);
-    })
-  }
-
-  componentDidMount(){
-    console.log(this.props.currentRecord);
+    });
   }
 
   render(){
@@ -202,11 +196,11 @@ export default class Modal extends Component {
         </div>
         <div className="vas-edit-procedure-inner-container vas-edit-procedure-inner-container-final">
           <header className="vas-edit-procedure-inner-container-header vas-edit-procedure-inner-container-final-header">
-            <p>{this.props.isPostEdit ? 'Complete Task' : 'Update Record?'}</p>
+            <p>Submit Procedure</p>
           </header>
           <div className='vas-edit-procedure-final-container'>
             <div>
-              <button className='vas-button vas-edit-procedure-complete-procedure-btn' onClick={this.props.completeProcedure}>{this.props.isPostEdit ? 'Update Procedure' : 'Submit Procedure'}</button>
+              <button className='vas-button vas-edit-procedure-complete-procedure-btn' onClick={this.props.completeProcedure}>{this.props.isPostEdit ? 'Save Record' : 'Submit Procedure'}</button>
             </div>
           </div>
         </div>
