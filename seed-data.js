@@ -468,29 +468,36 @@ exports.itemSeed = [
   {
     itemId:45,
     procedureName:'Troubleshoot',
-    groupName:'Action Taken',
+    groupName:'What',
     value:'ML',
     isCustom:false
   },
   {
     itemId:46,
     procedureName:'Troubleshoot',
-    groupName:'Action Taken',
+    groupName:'What',
     value:'PICC',
     isCustom:false
   },
   {
     itemId:47,
     procedureName:'Troubleshoot',
-    groupName:'Action Taken',
+    groupName:'What',
     value:'Central Line',
     isCustom:false
   },
   {
     itemId:48,
     procedureName:'Troubleshoot',
-    groupName:'Action Taken',
+    groupName:'What',
     value:'Port',
+    isCustom:false
+  },
+  {
+    itemId:70,
+    procedureName:'Troubleshoot',
+    groupName:'What',
+    value:'IV',
     isCustom:false
   },
   {
@@ -652,35 +659,41 @@ exports.procedureSeed = [
     seq:1,
     groups:[
       {
+        seq:1,
         groupName:'Patient Refused',
         inputType:'checkbox',
         hideHeader:true,
         groupItems:[1]
       },
       {
+        seq:2,
         groupName:'Size',
         inputType:'radio',
         groupItems:[2,3,4,5]
       },
       {
-        groupName:'Care Type',
-        inputType:'checkbox',
-        groupItems:[6,7,8,9]
-      },
-      {
-        groupName:'DC IV',
-        inputType:'checkbox',
-        groupItems:[10,11,12,13,14,15],
-      },
-      {
+        seq:3,
         groupName:'Ultrasound',
         inputType:'checkbox',
         groupItems:[16]
       },
       {
+        seq:4,
         groupName:'Blood Drawn',
-        inputType:'radio',
+        inputType:'checkbox',
         groupItems:[17]
+      },
+      {
+        seq:5,
+        groupName:'Care Type',
+        inputType:'checkbox',
+        groupItems:[6,7,8,9]
+      },
+      {
+        seq:6,
+        groupName:'DC IV',
+        inputType:'checkbox',
+        groupItems:[10,11,12,13,14,15],
       }
     ]
   },
@@ -690,17 +703,20 @@ exports.procedureSeed = [
     seq:2,
     groups:[
       {
+        seq:1,
         groupName:'Patient Refused',
         inputType:'checkbox',
         hideHeader:true,
         groupItems:[18]
       },
       {
+        seq:2,
         groupName:'Draw Type',
         inputType:'radio',
         groupItems:[19,20]
       },
       {
+        seq:3,
         groupName:'Ultrasound',
         inputType:'checkbox',
         groupItems:[21]
@@ -713,17 +729,20 @@ exports.procedureSeed = [
     name:'Blood Culture',
     groups:[
       {
+        seq:1,
         groupName:'Patient Refused',
         inputType:'checkbox',
         hideHeader:true,
         groupItems:[22]
       },
       {
+        seq:2,
         groupName:'From',
         inputType:'radio',
         groupItems:[23,24,25,26,27,28]
       },
       {
+        seq:3,
         groupName:'Ultrasound',
         inputType:'checkbox',
         groupItems:[29]
@@ -736,6 +755,7 @@ exports.procedureSeed = [
     name:'Port-A-Cath',
     groups:[
       {
+        seq:1,
         groupName:'Type',
         hideHeader:true,
         inputType:'checkbox',
@@ -749,6 +769,7 @@ exports.procedureSeed = [
     name:'PICC Line',
     groups:[
       {
+        seq:1,
         groupName:'Removal',
         inputType:'radio',
         groupItems:[32,33,34,35,36]
@@ -761,11 +782,13 @@ exports.procedureSeed = [
     name:'Dressing Change',
     groups:[
       {
+        seq:1,
         groupName:'What',
         inputType:'radio',
         groupItems:[37,38,39,40]
       },
       {
+        seq:2,
         groupName:'Why',
         inputType:'radio',
         groupItems:[41,42,43,44]
@@ -778,16 +801,19 @@ exports.procedureSeed = [
     name:'Troubleshoot',
     groups:[
       {
-        groupName:'Action Taken',
+        seq:1,
+        groupName:'What',
         inputType:'radio',
-        groupItems:[45,46,47,48]
+        groupItems:[70,45,46,47,48]
       },
       {
+        seq:2,
         groupName:'Intervention',
         inputType:'checkbox',
         groupItems:[49,50,51,52,53]
       },
       {
+        seq:3,
         groupName:'Cathflow',
         inputType:'radio',
         hideHeader:true,
@@ -801,27 +827,32 @@ exports.procedureSeed = [
     name:'Insertion Procedure',
     groups:[
       {
+        seq:1,
         groupName:'Patient Refused',
         inputType:'checkbox',
         hideHeader:true,
         groupItems:[56]
       },
       {
+        seq:2,
         groupName:'Insertion Type',
         inputType:'radio',
         groupItems:[57,58,59,60,61]
       },
       {
+        seq:3,
         groupName:'Vessel',
         inputType:'radio',
         groupItems:[62,63,64,65,66]
       },
       {
+        seq:4,
         groupName:'Laterality',
         inputType:'radio',
         groupItems:[67,68]
       },
       {
+        seq:5,
         groupName:'Insertion Length',
         fieldName:'insertionLength',
         inputType:'number',

@@ -650,8 +650,8 @@ export default class Home extends Component{
   addCustomValuesToProceduresArr(proceduresArr){
     for(let i = 0; i < proceduresArr.length; i++){
       //Insertion Procedure
-      if(proceduresArr[i].procedureId === 9){
-        proceduresArr[i].itemIds.push(72);
+      if(proceduresArr[i].procedureId === 8){
+        proceduresArr[i].itemIds.push(69);
         proceduresArr[i].customValues = {
           '69': Number(this.state.insertionLength)
         }
