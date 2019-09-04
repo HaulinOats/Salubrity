@@ -46,7 +46,7 @@ export default class Home extends Component{
     this.getDateFromObjectId = this.getDateFromObjectId.bind(this);
     this.addCall = this.addCall.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
-    this.setUserSession = this.setUserSession.bind(this);
+    this.refreshUserSession = this.refreshUserSession.bind(this);
     this.logout = this.logout.bind(this);
     this.reverseCompletedSort = this.reverseCompletedSort.bind(this);
     this.resetSection = this.resetSection.bind(this);
@@ -94,7 +94,7 @@ export default class Home extends Component{
       this.setState({
         currentUser:ls('currentUser')
       }, ()=>{
-        this.setUserSession();
+        this.refreshUserSession();
         this.stateLoadCalls();
       });
     }
@@ -129,9 +129,8 @@ export default class Home extends Component{
 
   visibilityChange(){
     if(document[this.documentProps.hidden]){
-      this.stopIntervals();
+      this.stopUpdateTimer();
     } else {
-      this.startIntervals();
       if(this.state.activeHomeTab === 'queue'){
         this.getActiveCalls();
       }
@@ -140,26 +139,6 @@ export default class Home extends Component{
       }
     }
   }
-
-  // getCallById(id){
-  //   this.setState({isLoading:true})
-  //   axios.post('/get-call-by-id', {
-  //     _id:id
-  //   }).then(resp=>{
-  //     if(resp.data.error || resp.data._message){
-  //       console.log(resp.data);
-  //     } else {
-  //       this.setState({activeRecord:resp.data});
-  //     }
-  //   })
-  //   .catch(err=>{
-  //     console.log(err);
-  //     this.addToErrorArray(err);
-  //   })
-  //   .finally(()=>{
-  //     this.setState({isLoading:false})
-  //   })
-  // }
 
   editCompletedCall(completedCall){
     let isAdmin = this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super';
@@ -174,42 +153,28 @@ export default class Home extends Component{
   }
 
   componentDidMount(){
-    this.startIntervals();
+    this.startSessionInterval();
   }
 
-  startIntervals(){
+  startSessionInterval(){
     console.log('starting intervals...');
     this.sessionInterval = setInterval(()=>{
       if(this.state.currentUser){
         this.checkUserSession();
       }
     }, 180000);//check session every 3 minutes (180000)ms
-
-    //Timer showing when last update occured
-    this.setState({lastUpdate:0}, ()=>{
-      this.updateTimer = setInterval(this.timerTick, 1000);
-    })
-
-    // this.getLatestData = setInterval(()=>{
-    //   if(this.state.currentUser){
-    //     if(this.state.activeHomeTab === 'queue'){
-    //       this.getActiveCalls();
-    //     }
-    //     if(this.state.activeHomeTab === 'complete'){
-    //       this.getCompletedCalls();
-    //     }
-    //   }
-    // }, 10000);
   }
 
-  stopIntervals(){
-    // console.log('stopping intervals...');
-    // clearInterval(this.getLatestData);
+  stopSessionInterval(){
+    clearInterval(this.sessionInterval);
+  }
+
+  stopUpdateTimer(){
     clearInterval(this.updateTimer);
   }
 
   componentWillUnmount(){
-    this.stopIntervals();
+    this.stopUpdateTimer();
   }
 
   checkUserSession(){
@@ -230,7 +195,7 @@ export default class Home extends Component{
     }
   }
 
-  setUserSession(){
+  refreshUserSession(){
     let currentUser = this.state.currentUser;
     currentUser.lastLogin = Math.floor(Date.now() / 1000);
     this.setState({currentUser}, ()=>{
@@ -240,16 +205,17 @@ export default class Home extends Component{
 
   loginCallback(user){
     this.setState({
-      currentUser:user    
+      currentUser:user
     }, ()=>{
-      this.setUserSession();
+      this.startSessionInterval();
+      this.refreshUserSession();
       this.stateLoadCalls();
-      this.startIntervals();
     });
   }
 
   logout(){
-    this.stopIntervals();
+    this.stopUpdateTimer();
+    this.sessionInterval();
     this.resetModal();
     this.setState({currentUser:null}, this.resetState);
     ls.clear();
@@ -275,23 +241,20 @@ export default class Home extends Component{
         tabElement.classList.remove('vas-home-refresh-bar-activate');
       }, 1000);
     }
-    clearInterval(this.updateTimer);
-    this.setState({activeHomeTab:tab, lastUpdate:0}, ()=>{
+    this.setState({activeHomeTab:tab}, ()=>{
       ls('activeHomeTab', this.state.activeHomeTab);
       if(this.state.activeHomeTab === 'queue'){
         this.setState({lastUpdateHide:false});
         this.getActiveCalls();
-        this.updateTimer = setInterval(this.timerTick, 1000);
       }
       if(this.state.activeHomeTab === 'complete'){
         this.setState({lastUpdateHide:false});
         this.getCompletedCalls();
-        this.updateTimer = setInterval(this.timerTick, 1000);
       }
       if(this.state.activeHomeTab === 'active'){
         this.setState({lastUpdateHide:true});
       }
-      this.setUserSession();
+      this.refreshUserSession();
     });
   }
 
@@ -360,7 +323,7 @@ export default class Home extends Component{
       activeRecord.orderChange = null;
     }
     this.setState({activeRecord}, this.saveActiveRecord);
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   toggleConsultation(){
@@ -374,7 +337,7 @@ export default class Home extends Component{
       modalTitle:'Add Call',
       modalIsOpen:true
     })
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   inputLiveUpdate(e, field){
@@ -407,7 +370,7 @@ export default class Home extends Component{
       console.log(err);
       this.addToErrorArray(err);
     })
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   getProcedureData(){
@@ -489,28 +452,7 @@ export default class Home extends Component{
     })
   }
 
-  getCompletedCalls(){
-    // this.setState({isLoading:true});
-    axios.get('/get-completed-calls')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        console.log('completed calls updating...');
-        this.setState({completedCalls:resp.data});
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      // this.setState({isLoading:false});
-    });
-  }
-
   getActiveCalls(){
-    // this.setState({isLoading:true});
     axios.get('/get-active-calls')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
@@ -525,9 +467,35 @@ export default class Home extends Component{
       this.addToErrorArray(err);
     })
     .finally(()=>{
-      // this.setState({isLoading:false});
+      clearInterval(this.updateTimer);
+      this.setState({lastUpdate:0}, ()=>{
+        this.updateTimer = setInterval(this.timerTick, 1000);
+      })
     })
   }
+
+  getCompletedCalls(){
+    axios.get('/get-completed-calls')
+    .then((resp)=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        console.log('completed calls updating...');
+        this.setState({completedCalls:resp.data});
+      }
+    })
+    .catch((err)=>{
+      console.log(err);
+      this.addToErrorArray(err);
+    })
+    .finally(()=>{
+      clearInterval(this.updateTimer);
+      this.setState({lastUpdate:0}, ()=>{
+        this.updateTimer = setInterval(this.timerTick, 1000);
+      })
+    });
+  }
+
 
   checkActiveRecord(){
     if(!this.state.activeRecord){
@@ -594,14 +562,14 @@ export default class Home extends Component{
   reverseCompletedSort(){
     let items = this.state.completedCalls;
     this.setState({completedCalls:items.reverse()});
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   toggleHandler() {
     this.setState({
       modalIsOpen: !this.state.modalIsOpen
     });
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   orderSelect(e){
@@ -620,7 +588,7 @@ export default class Home extends Component{
     } else {
       this.saveNewProcedure();
     }
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   updateProcedure(){
@@ -830,7 +798,7 @@ export default class Home extends Component{
         }
       }
     }
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   selectJob(job){
@@ -876,7 +844,7 @@ export default class Home extends Component{
       }
       this.setTab('active');
     }
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   returnToQueue(){
@@ -901,7 +869,7 @@ export default class Home extends Component{
     .finally(()=>{
       this.setState({isLoading:false});
     });
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   showHiddenButtons(procedureId, groupId, elClass){
@@ -929,7 +897,7 @@ export default class Home extends Component{
       })
       this.checkSiblings(e);
     }
-    this.setUserSession();
+    this.refreshUserSession();
   }
   
   checkSiblings(e){
@@ -950,7 +918,7 @@ export default class Home extends Component{
 
   changeCustomInput(e, fieldName){
     this.setState({[fieldName]:e.target.value});
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   resetForm(){
@@ -971,7 +939,7 @@ export default class Home extends Component{
       modalConfirmation:true,
       confirmationType:'delete-call'
     });
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   hospitalChange(e){
@@ -986,7 +954,7 @@ export default class Home extends Component{
 
   procedureOptionCustomChange(e, field){
     this.setState({[field]:e.target.value});
-    this.setUserSession();
+    this.refreshUserSession();
   }
 
   changeStatus(e){
