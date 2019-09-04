@@ -215,7 +215,7 @@ export default class Home extends Component{
 
   logout(){
     this.stopUpdateTimer();
-    this.sessionInterval();
+    this.stopSessionInterval();
     this.resetModal();
     this.setState({currentUser:null}, this.resetState);
     ls.clear();
