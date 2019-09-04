@@ -924,7 +924,7 @@ export default class Home extends Component{
     }
     if(Number(groupId) === 15){//Insertion Type
       this.setState({insertionTypeSelected:true});
-      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
+      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="8"]').forEach((el)=>{
         el.style.display = 'inline';
       })
       this.checkSiblings(e);

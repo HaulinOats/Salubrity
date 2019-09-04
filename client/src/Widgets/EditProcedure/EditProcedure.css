@@ -99,11 +99,11 @@
   margin-right: 0;
   padding: 5px;
 }
-.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]{
+.vas-edit-procedure-inner-span[data-procedure="8"]{
   display:none;
 }
-.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"][data-idx='0'],
-.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"][data-idx='1']{
+.vas-edit-procedure-inner-span[data-procedure="8"][data-idx='0'],
+.vas-edit-procedure-inner-span[data-procedure="8"][data-idx='1']{
   display:inline;
 }
 .vas-edit-procedure-cathflow-btn {
@@ -160,7 +160,7 @@
   padding-bottom: 5px;
 }
 .vas-edit-procedure-is-post-edit 
-.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]{
+.vas-edit-procedure-inner-span[data-procedure="8"]{
   display:block;
 }
 .vas-edit-procedure-completed-by-container {
