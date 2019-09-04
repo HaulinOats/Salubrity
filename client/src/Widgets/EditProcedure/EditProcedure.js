@@ -75,18 +75,16 @@ export default class Modal extends Component {
           }
           <button className='vas-edit-procedure-record-header-btn vas-warn-btn' onClick={e=>{this.props.deleteCall()}}>Delete Call</button>
         </header>
-        {this.props.currentRecord.preComments &&
-          <div className="vas-edit-procedure-inner-container vas-edit-procedure-inner-container-main-comment">
-            <header className="vas-edit-procedure-inner-container-header">
-              <p>Pre-Procedure Notes</p>
-            </header>
-            <div className="vas-edit-procedure-inner-container-main">
-              <div className="vas-edit-procedure-inner-container-row">
-                <p className='vas-edit-procedure-comment'>{this.props.currentRecord.preComments}</p>
-              </div>
+        <div className="vas-edit-procedure-inner-container vas-edit-procedure-inner-container-main-comment">
+          <header className="vas-edit-procedure-inner-container-header">
+            <p>Pre-Procedure Notes</p>
+          </header>
+          <div className="vas-edit-procedure-inner-container-main">
+            <div className="vas-edit-procedure-inner-container-row">
+              <DebounceInput element='textarea' className='vas-edit-procedure-add-comments' debounceTimeout={750} value={this.props.currentRecord.preComments ? this.props.currentRecord.preComments : ''} onChange={e=>{this.props.inputLiveUpdate(e, 'preComments')}}/>
             </div>
           </div>
-        }
+        </div>
         {this.state.proceduresDoneIdArr && this.props.referenceObj && this.props.procedures.map((procedure, idx)=>{
             return (
               <div className="vas-edit-procedure-inner-container" key={procedure._id}>
