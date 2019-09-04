@@ -55,8 +55,8 @@ let Call = mongoose.model('Call', callSchema);
 
 let itemSchema = new Schema({
   itemId:{type:Number, index:true, unique:true, required:true},
-  procedureName:{type:String, required:true},
-  groupName:{type:String, required:true},
+  procedureId:{type:Number, required:true},
+  groupId:{type:Number, required:true},
   value:{type:String, default:null},
   isCustom:{type:Boolean, required:true},
   fieldAbbr:String,
@@ -68,11 +68,10 @@ let Item = mongoose.model('Item', itemSchema);
 
 let procedureSchema = new Schema({
   procedureId:{type:Number, index:true, unique:true},
-  name:{type:String, required:true},
   seq:{type:Number, required:true},
   groups:[
     {
-      groupName:String,
+      groupId:String,
       fieldName:{type:String, default:null},
       hideHeader:{type:Boolean, default:false},
       inputType:String,
@@ -98,7 +97,6 @@ let Option = mongoose.model('Option', optionSchema);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
 app.set("port", process.env.PORT || 3001);
 
 // Express only serves static assets in production
@@ -276,10 +274,13 @@ app.get('/get-all-users', (req, res)=>{
 });
 
 app.get('/get-procedures', (req, res)=>{
-  Procedure.find().sort({procedureId:1}).exec((err, procedures)=>{
+  Procedure.find().sort({seq:1}).exec((err, procedures)=>{
     if(err) return res.send(err);
     if(procedures.length){
-      res.send(procedures);
+      res.send({
+        procedures,
+        referenceObj:seedData.referencesObject
+      });
     } else {
       res.send({'error':'there were no procedures to return'});
     }
@@ -562,7 +563,6 @@ app.get('/seed-items', (req, res)=>{
 })
 
 app.use(((req, res) => res.sendFile(path.join(__dirname, './client/build/index.html'))));
-
 app.listen(app.get('port'), ()=>{
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });

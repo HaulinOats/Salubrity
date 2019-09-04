@@ -28,8 +28,8 @@ export default class Home extends Component{
       allOptions:[],
       usersById:null,
       itemsById:null,
-      proceduresById:null,
       hospitalsById:null,
+      referenceObj:null,
       statusById:null,
       orderChangeById:null,
       selectedProcedures:[],
@@ -340,7 +340,7 @@ export default class Home extends Component{
       }
     });
     if(isInsertionProcedure){
-      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]').forEach((el, idx)=>{
+      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedureid="8"]').forEach((el, idx)=>{
         if(idx > 1){
           el.style.display = 'none';
         }
@@ -416,21 +416,9 @@ export default class Home extends Component{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        //sort procedures by 'seq' number
-        let procedures = resp.data;
-        procedures.sort((a,b)=>{
-          if(a.seq < b.seq) return -1;
-          if(a.seq > b.seq) return 1;
-          return 0;
-        });
-        //create procedure names object
-        let procedureNamesObj = {};
-        for(let i = 0; i < resp.data.length; i++){
-          procedureNamesObj[resp.data[i].procedureId] = resp.data[i];
-        }
         this.setState({
-          procedures,
-          proceduresById:procedureNamesObj
+          procedures:resp.data.procedures,
+          referenceObj:resp.data.referenceObj
         });
       }
     })
@@ -564,8 +552,8 @@ export default class Home extends Component{
       console.log(this.state.activeRecord.proceduresDone)
       this.state.activeRecord.proceduresDone.forEach(procedureArr=>{
         procedureArr.itemIds.forEach(itemId=>{
-          switch(this.state.itemsById[itemId].groupName){
-            case 'Insertion Length':
+          switch(this.state.itemsById[itemId].groupId){
+            case 18://Insertion Length
               stateObj.insertionTypeSelected = true;
               break;
             default:
@@ -574,7 +562,7 @@ export default class Home extends Component{
 
         //find and set custom values, if they exist
         if(procedureArr.hasOwnProperty('customValues')){
-          stateObj.insertionLength = String(procedureArr.customValues['69']);
+          stateObj.insertionLength = String(procedureArr.customValues['70']);
         }
       });
     }
@@ -651,9 +639,9 @@ export default class Home extends Component{
     for(let i = 0; i < proceduresArr.length; i++){
       //Insertion Procedure
       if(proceduresArr[i].procedureId === 8){
-        proceduresArr[i].itemIds.push(69);
+        proceduresArr[i].itemIds.push(70);
         proceduresArr[i].customValues = {
-          '69': Number(this.state.insertionLength)
+          '70': Number(this.state.insertionLength)
         }
       }
     }
@@ -916,8 +904,8 @@ export default class Home extends Component{
     this.setUserSession();
   }
 
-  showHiddenButtons(procedureName, groupName, elClass){
-    let className = `.vas-edit-procedure-${procedureName}-${groupName}`;
+  showHiddenButtons(procedureId, groupId, elClass){
+    let className = `.vas-edit-procedure-${procedureId}-${groupId}`;
     let container = document.querySelector(className);
     if(container.classList.contains(elClass)){
       container.classList.remove(elClass);
@@ -930,25 +918,16 @@ export default class Home extends Component{
     }
   }
 
-  selectButton(e, procedureName, groupName){
-    if(procedureName === 'Dressing Change'){
-      if(groupName === 'What'){
-        this.checkSiblings(e);
-      }
+  selectButton(e, groupId){
+    if(Number(groupId) === 11){//What
+      this.checkSiblings(e);
     }
-    if(procedureName === 'Troubleshoot'){
-      if(groupName === 'Action Taken'){
-        this.checkSiblings(e);
-      }
-    }
-    if(procedureName === 'Insertion Procedure'){
-      if(groupName === 'Insertion Type'){
-        this.setState({insertionTypeSelected:true});
-        document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
-          el.style.display = 'inline';
-        })
-        this.checkSiblings(e);
-      }
+    if(Number(groupId) === 15){//Insertion Type
+      this.setState({insertionTypeSelected:true});
+      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="InsertionProcedure"]').forEach((el)=>{
+        el.style.display = 'inline';
+      })
+      this.checkSiblings(e);
     }
     this.setUserSession();
   }
@@ -959,7 +938,7 @@ export default class Home extends Component{
       let nextSib =  groupContainer.nextSibling.querySelector('.vas-edit-procedure-select-input');
       if(nextSib){
         //57 = PAC:Initiated (Port-A-Cath), 60 = Patient Refused (Insertion Procedure)
-        if(nextSib.id === '57' || nextSib.id === '60'){
+        if(nextSib.id === '55' || nextSib.id === '57'){
           nextSib.checked = false;
         } else {
           nextSib.checked = true;
@@ -1099,7 +1078,7 @@ export default class Home extends Component{
                       {this.state.completedCalls.length < 1 &&
                         <div><p className='vas-queue-no-items'>There are no completed items yet for today</p></div>
                       }
-                      {this.state.completedCalls.length > 0 && this.state.hospitalsById && this.state.proceduresById && this.state.itemsById && this.state.completedCalls.map((call)=>{
+                      {this.state.completedCalls.length > 0 && this.state.hospitalsById && this.state.referenceObj && this.state.itemsById && this.state.completedCalls.map((call)=>{
                         let responseTimeHr = Math.floor(call.responseTime/3600000) % 24;
                         let responseTimeMin = Math.floor(call.responseTime/60000) % 60;
                         let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
@@ -1153,16 +1132,16 @@ export default class Home extends Component{
                                 </div>
                                 <div className='vas-home-custom-table-item-column-procedures'>
                                   <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
-                                    {call.proceduresDone.map((procedure)=>{
+                                    {call.proceduresDone.map((procedure, idx)=>{
                                       return (
                                         <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
-                                          <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
+                                          <p className='vas-admin-query-procedure-names'>{this.state.referenceObj.procedures[procedure.procedureId].name}</p>
                                           <div className='vas-admin-query-item-container'>
                                           {procedure.itemIds && procedure.itemIds.length > 0 &&
-                                            procedure.itemIds.map((id)=>{
+                                            procedure.itemIds.map((id, idx)=>{
                                               let isCustom = this.state.itemsById[id].isCustom;
                                               return (
-                                                <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].valuePrefix + procedure.customValues[id] + this.state.itemsById[id].valueSuffix}</p>
+                                                <p key={id + idx} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].valuePrefix + procedure.customValues[id] + this.state.itemsById[id].valueSuffix}</p>
                                               )
                                             })
                                           }
@@ -1197,7 +1176,7 @@ export default class Home extends Component{
                 </div>
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
-                {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
+                {this.state.activeRecord && this.state.procedures && this.state.referenceObj && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
                     insertionTypeSelected={this.state.insertionTypeSelected}
                     insertionLength={this.state.insertionLength}
@@ -1207,6 +1186,7 @@ export default class Home extends Component{
                     procedures={this.state.procedures}
                     usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
+                    referenceObj={this.state.referenceObj}
                     inputLiveUpdate={this.inputLiveUpdate}
                     changeStatus={this.changeStatus}
                     resetForm={this.resetForm} 

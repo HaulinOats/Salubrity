@@ -87,24 +87,26 @@ export default class Modal extends Component {
             </div>
           </div>
         }
-        {this.state.proceduresDoneIdArr && this.props.procedures.map((procedure, idx)=>{
+        {this.state.proceduresDoneIdArr && this.props.referenceObj && this.props.procedures.map((procedure, idx)=>{
             return (
               <div className="vas-edit-procedure-inner-container" key={procedure._id}>
                 <header className="vas-edit-procedure-inner-container-header">
-                  <p>{procedure.name}</p>
+                  <p>{this.props.referenceObj.procedures[procedure.procedureId].name}</p>
                   <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.props.resetSection(e)}}>Reset</button>
                 </header>
                 <div className="vas-edit-procedure-inner-container-main">
                   {procedure.groups.map((group, idx2)=>{
                     return(
-                      <span className='vas-edit-procedure-inner-span' data-procedure={procedure.name.replace(/\s+/g, '')} data-idx={idx2} key={idx+group.groupName}>
-                        {group.groupName === 'Cathflow' &&
-                          <button className='vas-edit-procedure-cathflow-btn' onClick={e=>{this.props.showHiddenButtons(procedure.name.replace(/\s+/g, ''), group.groupName.replace(/\s+/g, ''), 'vas-edit-procedure-important-hide')}}>{group.groupName}</button>
+                      <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + group.groupId}>
+                        {/* Cathflow: groupId = 14 */}
+                        {group.groupId === '14' &&
+                          <button className='vas-edit-procedure-cathflow-btn' onClick={e=>{this.props.showHiddenButtons(procedure.procedureId, group.groupId, 'vas-edit-procedure-important-hide')}}>{this.props.referenceObj.groups[group.groupId].name}</button>
                         }
                         {!group.hideHeader &&
-                          <h3>{group.groupName}</h3>
+                          <h3>{this.props.referenceObj.groups[group.groupId].name}</h3>
                         }
-                        <div className={'vas-edit-procedure-inner-container-row ' + (group.groupName === 'Cathflow' && !this.props.isPostEdit ? 'vas-edit-procedure-important-hide vas-edit-procedure-' + procedure.name.replace(/\s+/g, '') + '-' + group.groupName.replace(/\s+/g, '')  : '')}>
+                        {/* Cathflow: groupId = 14 */}
+                        <div className={'vas-edit-procedure-inner-container-row ' + (group.groupId === '14' && !this.props.isPostEdit ? 'vas-edit-procedure-important-hide vas-edit-procedure-' + procedure.procedureId + '-' + group.groupId : '')}>
                           {group.groupItems.map((itemId)=>{
                               let customInput = (group.inputType === 'number' || group.inputType === 'text') ? true : false;
                               return(
@@ -115,9 +117,9 @@ export default class Modal extends Component {
                                         type={group.inputType} 
                                         className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} 
                                         data-procedureid={procedure.procedureId} id={itemId} 
-                                        name={procedure.name.replace(/\s+/g, '') +"_"+ group.groupName.replace(/\s+/g, '')}
+                                        name={procedure.procedureId + "_" + group.groupId}
                                         defaultChecked={this.state.proceduresDoneIdArr.indexOf(itemId) > -1 ? true : false}/>
-                                      <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.props.selectButton(e, procedure.name, group.groupName, group.resetSiblings)}}>{this.props.itemsById[itemId].value}</label>
+                                      <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.props.selectButton(e, group.groupId, group.resetSiblings)}}>{this.props.itemsById[itemId].value}</label>
                                     </span>
                                   }
                                   {customInput &&
