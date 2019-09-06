@@ -1,12 +1,13 @@
 
-.vas-admin-main-container h2 {
+.vas-admin-main-title {
   border-right: solid 2px darkgrey;
   padding-right: 10px;
   color:gold;
   font-weight: bold;
   font-size:110%;
+  white-space: nowrap;
 }
-.vas-admin-main-container h3 {
+.vas-admin-h3{
   color: cadetblue;
   font-size: 120%;
   text-shadow: 0px 1px 0px black;
@@ -28,6 +29,7 @@
   margin:0 10px;
   cursor: pointer;
   color:darkgray;
+  white-space: nowrap;
 }
 .vas-admin-menu-item[data-isactive='true'] {
   color: white;
@@ -38,6 +40,7 @@
   display: inline-flex;
   margin: auto;
   margin-right: 0;
+  white-space: nowrap;
 }
 .vas-admin-logout {
   display:inline-flex;
@@ -63,8 +66,8 @@
 .vas-admin-page-container[data-isactive='true'] {
   display:block;
 }
-.vas-admin-date-range-container {
-
+.vas-admin-filters-container {
+  margin-bottom:10px;
 }
 .vas-admin-date-range-inner {
   display:inline-block;
@@ -167,21 +170,6 @@
   cursor:pointer;
   user-select: none;
 }
-
-.vas-admin-custom-table {
-  width:100%;
-}
-.vas-admin-custom-table-header {
-  height: 40px;
-  display: flex;
-  flex-flow: row;
-  align-items: center;
-  background: cadetblue;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  padding: 5px;
-  color: white;
-}
 .vas-admin-no-calls-container {
   background:lightblue;
   padding:5px;
@@ -191,69 +179,6 @@
   background: lightseagreen;
   margin: 0 auto;
   margin-right: 0;
-}
-.vas-admin-custom-table-header-sortby {
-  margin-left:5px;
-}
-.vas-admin-custom-table-item-outer {
-  background:white;
-  font-size:85%;
-  width:100%;
-  user-select:none;
-}
-.vas-admin-custom-table-item-outer-container {
-  border-bottom:solid 2px black;
-}
-.vas-admin-custom-table-item {
-  display:flex;
-}
-.vas-admin-custom-table-td {
-  
-}
-.vas-admin-custom-table-item-column {
-  display:inline-block;
-  padding:.7%;
-}
-.vas-admin-custom-table-item-column-1 {
-  width:10%;
-}
-.vas-admin-custom-table-item-column-2 {
-  width:25%;
-}
-.vas-admin-custom-table-item-column-2
-.vas-admin-custom-table-td {
-  border-bottom: dotted 1px black;
-  padding-bottom: 2px;
-}
-.vas-admin-custom-table-item-column-2
-.vas-admin-custom-table-td:last-child {
-  border:none;
-}
-.vas-admin-custom-table-item-column-3 {
-  display:inline-block;
-  width:40%;
-}
-.vas-admin-custom-table-item-column-4 {
-  display:inline-block;
-  width:25%;
-}
-.vas-admin-custom-table-item-column-4
-.vas-admin-left-column {
-  display:inline-block;
-  font-size:90%;
-}
-.vas-admin-custom-table-item-column-4
-.vas-admin-right-column {
-  float:right;
-}
-.vas-admin-custom-table-item-column-4
-.vas-admin-custom-table-td {
-  border-bottom:dotted 1px black;
-  padding:1px 0;
-}
-.vas-admin-custom-table-item-column-4
-.vas-admin-custom-table-td:last-child {
-  border:none;
 }
 .vas-admin-custom-item-subfield,
 .vas-admin-custom-item-subvalue {
@@ -311,6 +236,7 @@
 .vas-admin-filter-container {
   display:inline-block;
   margin-right:15px;
+  margin-top:5px;
 }
 .vas-admin-list-table {
   background:white;
@@ -363,4 +289,63 @@
 }
 .vas-admin-order-change {
   font-size:85%;
+}
+.vas-admin-menu-toggle {
+  white-space: nowrap;
+  cursor:pointer;
+}
+.vas-admin-menu-toggle {
+  display:none;
+  margin-left:10px;
+  padding:8px 0;
+}
+.vas-admin-menu-visible {
+  display: block !important;
+  position: absolute;
+  top: 45px;
+  left: 23%;
+  box-shadow: 0px 0px 3px black;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  background: white;
+  z-index: 1;
+}
+.vas-admin-menu-visible 
+.vas-admin-menu-item {
+  display:block;
+  padding:8px 5px;
+  margin:0;
+  color:black;
+  text-shadow: none;
+}
+.vas-admin-menu-visible 
+.vas-admin-menu-item[data-isactive='true'] {
+  color: green !important;
+  font-weight: bold;
+}
+.vas-admin-menu-visible 
+.vas-admin-menu-item:hover {
+  background:grey;
+  color:white;
+}
+.vas-menu-clickguard {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: black;
+  opacity:.1;
+}
+@media (max-width: 650px) {
+  .vas-admin-menu {
+    display:none;
+  }
+  .vas-admin-menu-toggle {
+    display:inline-block;
+  }
+}
+@media (min-width: 650px) {
+
 }

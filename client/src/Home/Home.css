@@ -360,33 +360,6 @@
   display: flex;
   align-items: center;
 }
-.vas-home-custom-table-column-1 {
-  width: 10%;
-  padding: 1%;
-  font-size: 125%;
-}
-.vas-home-custom-table-column-2 {
-  width:43%;
-  padding:1%;
-}
-.vas-home-custom-table-column-3 {
-  width:47%;
-  padding:1%;
-}
-.vas-home-custom-table-item-column-procedures {
-  padding: 1%;
-  width: 87%;
-  margin-left: 11%;
-}
-.vas-home-custom-table-column-2
-.vas-admin-custom-table-td {
-  border-bottom: dotted 1px black;
-  margin-bottom: 2px;
-}
-.vas-home-custom-table-column-2
-.vas-admin-custom-table-td:last-child {
-  border-bottom: none;
-}
 .vas-home-reverse-sort-btn {
   margin: auto;
   margin-right: 0;

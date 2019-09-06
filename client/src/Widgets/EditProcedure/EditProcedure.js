@@ -160,7 +160,6 @@ export default class Modal extends Component {
         <div className='vas-edit-procedure-inner-container'>
           <header className='vas-edit-procedure-inner-container-header'>
             <p>Hospital</p>
-            <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.props.resetSection(e, 'orderChange')}}>Reset</button>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
             <select className='vas-select' value={this.props.currentRecord.hospital ? this.props.currentRecord.hospital : ''} onChange={e=>{this.props.hospitalChange(e)}}>
@@ -174,7 +173,6 @@ export default class Modal extends Component {
         <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
           <header className='vas-edit-procedure-inner-container-header'>
             <p>MD Order Change</p>
-            <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.props.resetSection(e, 'orderChange')}}>Reset</button>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
             <select className='vas-select' value={this.props.currentRecord.orderChange ? this.props.currentRecord.orderChange : ''} onChange={this.props.orderSelect}>

@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
 import Login from '../Widgets/Login/Login';
 import Modal from '../Widgets/Modal/Modal';
+import EditProcedure from '../Widgets/EditProcedure/EditProcedure';
 import './Admin.css';
 import axios from 'axios';
 import moment from 'moment';
-import Moment from 'react-moment';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import loadingGif from '../../public/loading.gif';
+import ReturnedProcedures from '../Widgets/ReturnedProcedures/ReturnedProcedures';
+import ls from 'local-storage';
 
 export default class Admin extends Component {
   constructor(props){
@@ -18,18 +20,20 @@ export default class Admin extends Component {
       endDate:moment(),
       isLoading:false,
       activePage:'date',
+      activeRecord:null,
       addFullName:'',
       addUserName:'',
       addPassword:'',
       addAdminAccess:false,
-      userDataByUserId:{},
       allUsers:[],
-      allProcedures:[],
+      procedures:[],
       allItems:[],
-      hospitalsById:{},
-      itemsById:{},
-      proceduresById:{},
-      orderChangeById:{},
+      usersById:null,
+      referenceObj:null,
+      hospitalsById:null,
+      itemsById:null,
+      proceduresById:null,
+      orderChangeById:null,
       allOptions:[],
       queriedCalls:[],
       firstFilterValue:'',
@@ -42,13 +46,15 @@ export default class Admin extends Component {
       modalMessage:'',
       modalTitle:'',
       modalConfirmation:false,
-      confirmationType:null
+      confirmationType:null,
+      menuIsVisible:false,
+      insertionLength:'',
+      insertionTypeSelected:false
     }
     this.submitDateRange = this.submitDateRange.bind(this);
     this.seedProcedures = this.seedProcedures.bind(this);
     this.seedOptions = this.seedOptions.bind(this);
     this.seedItems = this.seedItems.bind(this);
-    this.handleWindowBeforeUnload = this.handleWindowBeforeUnload.bind(this);
     this.addUser = this.addUser.bind(this);
     this.logout = this.logout.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
@@ -61,19 +67,52 @@ export default class Admin extends Component {
     this.addNeed = this.addNeed.bind(this);
     this.addInputChange = this.addInputChange.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.refreshUserSession = this.refreshUserSession.bind(this);
+    this.toggleMainMenu = this.toggleMainMenu.bind(this);
+    this.closeMenu = this.closeMenu.bind(this);
+    this.editCompletedCall = this.editCompletedCall.bind(this);
+    this.setRecordStateItems = this.setRecordStateItems.bind(this);
+    this.resetForm = this.resetForm.bind(this);
+    this.deleteCall = this.deleteCall.bind(this);
+    this.getConfirmation = this.getConfirmation.bind(this);
+    this.changeCustomInput = this.changeCustomInput.bind(this);
+    this.completeProcedure = this.completeProcedure.bind(this);
+    this.inputLiveUpdate = this.inputLiveUpdate.bind(this);
+    this.toggleConsultation = this.toggleConsultation.bind(this);
+    this.orderSelect = this.orderSelect.bind(this);
+    this.hospitalChange = this.hospitalChange.bind(this);
   }
 
   componentWillMount(){
-    const storagecurrentUser = localStorage.getItem('currentUser');
-    if(this.isValidStorageItem(storagecurrentUser)){
-      this.setState({currentUser:JSON.parse(storagecurrentUser)}, this.handleUserSessionData);
-    } else {
-      this.handleUserSessionData();
+    if(ls('currentUser')){
+      this.setState({
+        currentUser:ls('currentUser')
+      }, ()=>{
+        this.refreshUserSession();
+        this.stateLoadCalls();
+      });
+    }
+
+    if(ls('activeHomeTab')){
+      this.setState({activeHomeTab:ls('activeHomeTab')}, ()=>{
+        if(this.state.activeHomeTab === 'active'){
+          this.setState({lastUpdateHide:true});
+        }
+      });
     }
   }
 
-  isValidStorageItem(storageItem){
-    return storageItem !== 'undefined' && storageItem !== undefined && storageItem !== null && storageItem !== 'null'
+  componentDidMount(){
+    this.startSessionInterval();
+    console.log(this.state);
+  }
+
+  refreshUserSession(){
+    let currentUser = this.state.currentUser;
+    currentUser.lastLogin = Math.floor(Date.now() / 1000);
+    this.setState({currentUser}, ()=>{
+      ls('currentUser', this.state.currentUser);
+    });
   }
 
   loginCallback(user){
@@ -86,31 +125,61 @@ export default class Admin extends Component {
     this.stateLoadCalls();
   }
 
+  startSessionInterval(){
+    console.log('starting intervals...');
+    this.sessionInterval = setInterval(()=>{
+      if(this.state.currentUser){
+        this.checkUserSession();
+      }
+    }, 180000);//check session every 3 minutes (180000)ms
+  }
+
+  checkUserSession(){
+    let currentTime = Math.floor(Date.now() / 1000);
+    let timeDiff = currentTime - this.state.currentUser.lastLogin;
+    console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 60)`);
+    if(timeDiff > 3600){
+      console.log('Logging user out due to inactivity');
+      this.logout();
+    }
+    if(timeDiff > 3419){
+      this.setState({
+        modalTitle:'Session Is About To End',
+        modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
+        modalIsOpen:true,
+        modalConfirmation:true
+      })
+    }
+  }
+
   stateLoadCalls(){
     this.setState({isLoading:true});
     this.getAllUsers();
+    this.getProcedureData();
+    this.getOptionsData();
+    this.getItemsData();
+  }
+
+  getProcedureData(){
     axios.get('/get-procedures')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        let procedureNamesObj = {};
-        for(let i = 0; i < resp.data.length; i++){
-          procedureNamesObj[resp.data[i].procedureId] = resp.data[i];
-        }
         this.setState({
-          allProcedures:resp.data,
-          proceduresById:procedureNamesObj
+          procedures:resp.data.procedures,
+          referenceObj:resp.data.referenceObj
         });
       }
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
+  }
 
+  getOptionsData(){
+    this.setState({isLoading:true});
     axios.get('/get-options')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
@@ -124,20 +193,29 @@ export default class Admin extends Component {
         resp.data[3].options.forEach(order=>{
           orders[order.id] = order;
         });
+        let status = {};
+        resp.data[6].options.forEach(status=>{
+          status[status.id] = status;
+        })
         this.setState({
           allOptions:resp.data,
           hospitalsById:hospitals,
-          orderChangeById:orders
+          orderChangeById:orders,
+          statusById:status
         });
       }
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
     })
+  }
 
+  getItemsData(){
+    this.setState({isLoading:true});
     axios.get('/get-items')
     .then((resp)=>{
       if(resp.data.error || resp.data._message){
@@ -148,33 +226,17 @@ export default class Admin extends Component {
           items[item.itemId] = item;
         })
         this.setState({
-          allItems:resp.data,
           itemsById:items
         });
       }
     })
     .catch((err)=>{
       console.log(err);
+      this.addToErrorArray(err);
     })
     .finally(()=>{
       this.setState({isLoading:false});
     })
-
-    setTimeout(()=>{
-      console.log(this.state);
-    }, 500);
-  }
-
-  componentDidMount() {
-    window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("beforeunload", this.handleWindowBeforeUnload);
-  }
-
-  handleWindowBeforeUnload(){
-    localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
   }
 
   getAllUsers(){
@@ -186,7 +248,7 @@ export default class Admin extends Component {
       }
       this.setState({
         allUsers:resp.data,
-        userDataByUserId:usersObj
+        usersById:usersObj
       });
     }).catch((err)=>{
       console.log(err);
@@ -252,6 +314,219 @@ export default class Admin extends Component {
     })
   }
 
+  hospitalChange(e){
+    let activeRecord = this.state.activeRecord;
+    if(e.target.value !== ''){
+      activeRecord.hospital = Number(e.target.value);
+    } else {
+      activeRecord.hospital = null;
+    }
+    this.setState({activeRecord}, this.saveActiveRecord);
+  }
+
+  orderSelect(e){
+    let activeRecord = this.state.activeRecord;
+    if(e.target.value === ''){
+      activeRecord.orderChange = null;
+    } else {
+      activeRecord.orderChange = Number(e.target.value);
+    }
+    this.setState({activeRecord}, this.saveActiveRecord);
+  }
+
+  closeMenu(){
+    this.setState({menuIsVisible:false});
+  }
+
+  toggleConsultation(){
+    let activeRecord = this.state.activeRecord;
+    activeRecord.wasConsultation = !activeRecord.wasConsultation;
+    this.setState({activeRecord}, this.saveActiveRecord);
+  }
+
+  completeProcedure(){
+    let proceduresArr = this.createProcedureObject();
+    if(this.procedureVerified(proceduresArr)){
+      let updatedRecord = this.state.activeRecord;
+      updatedRecord.proceduresDone = this.addCustomValuesToProceduresArr(proceduresArr);
+      this.setState({activeRecord:updatedRecord}, ()=>{
+        this.saveActiveRecord();
+        this.setState({activePage:'date'});
+      });
+    }
+    this.refreshUserSession();
+  }
+
+  addCustomValuesToProceduresArr(proceduresArr){
+    for(let i = 0; i < proceduresArr.length; i++){
+      //Insertion Procedure
+      if(proceduresArr[i].procedureId === 8){
+        proceduresArr[i].itemIds.push(70);
+        proceduresArr[i].customValues = {
+          '70': Number(this.state.insertionLength)
+        }
+      }
+    }
+    return proceduresArr;
+  }
+
+  saveActiveRecord(){
+    axios.post('/save-call', this.state.activeRecord)
+    .then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        console.log('active call saved');
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+      this.addToErrorArray(err);
+    })
+    this.refreshUserSession();
+  }
+
+  procedureVerified(proceduresList){
+    let errors = '';
+    if(!proceduresList.length){
+      errors += '- You must select at least 1 procedure or confirm consultation\n';
+    }
+
+    if(this.state.insertionTypeSelected){
+      if(!this.state.insertionLength.length || this.state.insertionLength === '0'){
+        errors += '- You must enter an insertion length (cannot be 0)\n';
+      }
+      if(!this.state.activeRecord.hospital || this.state.activeRecord.hospital < 1){
+        errors += '- You must select a hospital\n';
+      }
+      if(!this.state.activeRecord.mrn || String(this.state.activeRecord.mrn).length < 5 || String(this.state.activeRecord.mrn).length > 7){
+        errors += '- Medical Record Number must be between 5 and 7 digits\n';
+      }
+      if(!this.state.activeRecord.provider || !this.state.activeRecord.provider.length){
+        errors += '- You must enter a provider name\n';
+      }
+    }
+    
+    if(!this.state.activeRecord.room || !this.state.activeRecord.room.length){
+      errors += '- Room number field cannot be empty\n';
+    }
+    
+    if(errors.length && !this.state.activeRecord.wasConsultation){
+      this.setState({
+        modalIsOpen:true, 
+        modalTitle:'Cannot Submit Procedure',
+        modalMessage:errors
+      });
+      return false;
+    }
+    return true;
+  }
+
+  createProcedureObject(){
+    let procedureObj = {};
+    let selectedTasks = document.querySelectorAll('.vas-edit-procedure-select-input:checked');
+    selectedTasks.forEach((el)=>{
+      let itemId = Number(el.id);
+      let procedureId = Number(el.getAttribute('data-procedureid'));
+      if(!procedureObj.hasOwnProperty(procedureId)){
+        procedureObj[procedureId] = []
+      }
+      procedureObj[procedureId].push(itemId);
+    });
+
+    let procedureArr = [];
+    let procedureObjKeys = Object.keys(procedureObj);
+    for(let key of procedureObjKeys){
+      procedureArr.push({
+        procedureId:Number(key),
+        itemIds:procedureObj[key]
+      })
+    }
+
+    return procedureArr
+  }
+
+  inputLiveUpdate(e, field){
+    let targetValue = e.target.value;
+    let activeRecord = this.state.activeRecord;
+
+    if(e.target.type === 'number'){
+      activeRecord[field] = Number(targetValue);
+    } else {
+      activeRecord[field] = targetValue;
+    }
+
+    if(targetValue.length < 1){
+      activeRecord[field] = null;
+    }
+
+    this.setState({activeRecord}, this.saveActiveRecord);
+  }
+
+  changeCustomInput(e, fieldName){
+    this.setState({[fieldName]:e.target.value});
+    this.refreshUserSession();
+  }
+
+  getConfirmation(isConfirmed){
+    if(isConfirmed){
+      if(this.state.confirmationType){
+        if(this.state.confirmationType === 'delete-call'){
+          this.setState({isLoading:true});
+          axios.post('/delete-call', {
+            _id:this.state.activeRecord._id
+          })
+          .then(resp=>{
+            if(resp.data){
+              let queriedCalls = this.state.queriedCalls;
+              for(var i = queriedCalls.length -1; i >= 0 ; i--){
+                if(queriedCalls[i]._id === this.state.activeRecord._id){
+                  queriedCalls.splice(i, 1);
+                }
+              }
+              this.setState({
+                activePage:'date',
+                activeRecord:null
+              });
+            }
+          })
+          .catch(err=>{
+            console.log(err);
+            this.addToErrorArray(err);
+          })
+          .finally(()=>{
+            this.setState({isLoading:false});
+          })
+        }
+        if(this.state.confirmationType === 'reset-page'){
+          this.setState({activePage:'date', activeRecord:null});
+        }
+      }
+    }
+    this.refreshUserSession();
+  }
+
+  resetForm(){
+    this.setState({
+      modalTitle:'Reset Form?',
+      modalMessage:'Are you sure you want to reset the current form? Will cause an app/page reload.',
+      modalIsOpen:true,
+      modalConfirmation:true,
+      confirmationType:'reset-page'
+    });
+  }
+
+  deleteCall(){
+    this.setState({
+      modalTitle:'Delete Active Record?',
+      modalMessage:'Are you sure you want to delete the currently active record?',
+      modalIsOpen:true,
+      modalConfirmation:true,
+      confirmationType:'delete-call'
+    });
+    this.refreshUserSession();
+  }
+
   addUser(){
     if(this.userIsValidated()){
       this.setState({isLoading:true});
@@ -283,6 +558,12 @@ export default class Admin extends Component {
         this.setState({isLoading:false});
       })
     }
+  }
+
+  toggleMainMenu(){
+    this.setState({
+      menuIsVisible:!this.state.menuIsVisible
+    });
   }
 
   userIsValidated(){
@@ -346,8 +627,9 @@ export default class Admin extends Component {
   }
 
   logout(){
-    this.setState({currentUser:null});
-    localStorage.clear();
+    clearInterval(this.sessionInterval);
+    this.setState({currentUser:null}, this.resetState);
+    ls.clear();
   }
 
   getDateFromObjectId(objId){
@@ -373,7 +655,6 @@ export default class Admin extends Component {
       endDate:moment(this.state.endDate).endOf('day').toISOString()
     })
     .then(resp=>{
-      console.log(resp.data);
       this.setState({queriedCalls:resp.data});
     })
     .catch(err=>{
@@ -398,8 +679,33 @@ export default class Admin extends Component {
     })
   }
 
+  setRecordStateItems(){
+    let stateObj = {};
+    //check which procedure items should updated state
+    if(this.state.activeRecord.proceduresDone.length){
+      console.log(this.state.activeRecord.proceduresDone)
+      this.state.activeRecord.proceduresDone.forEach(procedureArr=>{
+        procedureArr.itemIds.forEach(itemId=>{
+          switch(this.state.itemsById[itemId].groupId){
+            case 18://Insertion Length
+              stateObj.insertionTypeSelected = true;
+              break;
+            default:
+          }
+        });
+
+        //find and set custom values, if they exist
+        if(procedureArr.hasOwnProperty('customValues')){
+          stateObj.insertionLength = String(procedureArr.customValues['70']);
+        }
+      });
+    }
+    this.setState(stateObj, ()=>{
+      console.log(this.state);
+    });
+  }
+
   filterDropdown(e, whichDropdown){
-    document.querySelector('.vas-admin-custom-table-header-sortby').selectedIndex = 0;
     if(whichDropdown === 1){
       if(e.target.value !== 'default'){
         let filterArr = [];
@@ -469,6 +775,7 @@ export default class Admin extends Component {
       endDate:moment(this.state.endDate).endOf('day').toISOString()
     })
     .then(resp=>{
+      console.log(resp.data);
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
@@ -535,7 +842,6 @@ export default class Admin extends Component {
   }
 
   queryCalls(){
-    document.querySelector('.vas-admin-custom-table-header-sortby').selectedIndex = 0;
     let query = {
       query: {
         key:this.state.firstFilterValue,
@@ -692,6 +998,20 @@ export default class Admin extends Component {
     })
   }
 
+  editCompletedCall(completedCall){
+    let isAdmin = this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super';
+    if(isAdmin || this.state.currentUser.userId === completedCall.completedBy){
+      console.log(completedCall);
+      this.setState({
+        activeRecord:completedCall,
+        activePage:'active'
+      }, ()=>{
+        window.scrollTo(0,0);
+        this.setRecordStateItems();
+      });
+    }
+  }
+
   closeModal(){
     this.setState({
       modalIsOpen:false,
@@ -718,15 +1038,22 @@ export default class Admin extends Component {
           <div className='vas-admin-main-container'>
             <header className='vas-main-header'>
               <div className='vas-header-left-container'>
-                <h2>VAS Tracker Admin Panel</h2>
-                <ul className='vas-admin-menu'>
+                <h2 className='vas-admin-main-title'>VAS Admin</h2>
+                <p className='vas-admin-menu-toggle' onClick={this.toggleMainMenu}>Menu &#9660;</p>
+                <ul className={'vas-admin-menu ' + (this.state.menuIsVisible ? 'vas-admin-menu-visible' : '')} onClick={this.closeMenu}>
                   <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Query Database</li>
+                  {this.state.activeRecord &&
+                    <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'active' ? true : false} onClick={e=>{this.setState({activePage:'active'})}}>Active</li>
+                  }
                   <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'users' ? true : false} onClick={e=>{this.setState({activePage:'users'})}}>Users</li>
                   <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'options' ? true : false} onClick={e=>{this.setState({activePage:'options'})}}>Options</li>
                   {this.state.currentUser.role === 'super' &&
                     <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'super' ? true : false} onClick={e=>{this.setState({activePage:'super'})}}>Super</li>
                   }
                 </ul>
+                {this.state.menuIsVisible &&
+                  <div className='vas-menu-clickguard' onClick={this.closeMenu}></div>
+                }
               </div>
               <div className='vas-header-right-container'>
                 <p className='vas-admin-username'>{this.state.currentUser.fullname}</p>
@@ -735,7 +1062,7 @@ export default class Admin extends Component {
             </header>
             <div className='vas-admin-main-content'>
               <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'date' ? true : false}>
-                <div className='vas-admin-date-range-container'>
+                <div className='vas-admin-filters-container'>
                   <div className='vas-admin-date-range-inner'>
                     <p className='vas-damin-date-label'>From:</p>
                     <DatePicker className='vas-admin-datepicker' selected={this.state.startDate} onChange={this.startDateChange} />
@@ -757,7 +1084,7 @@ export default class Admin extends Component {
                       <option value='orderChange'>Order Change</option>
                       <option value='responseTime'>Response Time</option>
                       <option value='procedureTime'>Procedure Time</option>
-                      <option value='openBy'>Open Calls</option>
+                      {/* <option value='openBy'>Open Calls</option> */}
                     </select>
                   </div>
                   {this.state.firstFilterValue === 'openBy' &&
@@ -769,7 +1096,7 @@ export default class Admin extends Component {
                       <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
                         <option value='default'>Select User</option>
                         {this.state.secondDropdownArr.map((user, idx)=>{
-                          return <option key={user._id} value={user.userId}>{user.fullname}</option>
+                          return <option className='vas-capitalize' key={user._id} value={user.userId}>{user.fullname}</option>
                         })}
                       </select>
                     </div>
@@ -816,150 +1143,47 @@ export default class Admin extends Component {
                     <button className='vas-admin-date-range-submit d-inline' onClick={this.submitDateRange}>Submit</button>
                   }
                 </div>
-                <div className='vas-admin-date-query-container'>
-                  <div className='vas-admin-custom-table'>
-                    <div className='vas-admin-custom-table-body'>
-                      <div className='vas-admin-custom-table-header'>
-                        <p className='d-inline'>Sort By:</p>
-                        <select className='vas-select vas-admin-custom-table-header-sortby' onChange={this.sortByOnChange}>
-                          <option value='default'>Select A Field</option>
-                          <option value='userId'>User</option>
-                          <option value='hospital'>Hospital</option>
-                          <option value='mrn'>MRN</option>
-                          <option value='provider'>Provider</option>
-                          <option value='orderChange'>Order Change</option>
-                          <option value='responseTime'>Response Time</option>
-                          <option value='procedureTime'>Procedure Time</option>
-                        </select>
-                        <button className='vas-admin-reverse-sort-btn float-right' onClick={e=>{this.toggleSort()}}>Reverse Sort</button>
-                      </div>
-                      {!this.state.queriedCalls.length &&
-                        <div className='vas-admin-no-calls-container'>
-                          <p>No calls returned with that query</p>
-                        </div>
-                      }
-                      {this.state.queriedCalls.map((call)=>{
-                        let isComments = call.preComments || call.addComments;
-                        let isHospital = call.hospital;
-                        let responseTimeHr = Math.floor(call.responseTime/3600000) % 24;
-                        let responseTimeMin = Math.floor(call.responseTime/60000) % 60;
-                        let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
-                        let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
-                        return(
-                          <div key={call._id} className='vas-admin-custom-table-item-outer'>
-                            {!call.openBy &&
-                              <div className='vas-admin-custom-table-item'>
-                                <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-1'>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-date'><Moment format='MM/DD/YYYY'>{call.completedAt}</Moment></div>
-                                </div>
-                                <div className={'vas-admin-custom-table-item-column vas-admin-custom-table-item-column-2 ' + (call.orderChange ? 'vas-admin-order-change' : '')}>
-                                  {call.orderChange &&
-                                    <div className='vas-admin-custom-table-td vas-admin-custom-table-order-change'>
-                                      <p className='vas-admin-custom-item-subfield'>Order Change:</p>
-                                      <p className='vas-admin-custom-item-subvalue'>{this.state.orderChangeById[call.orderChange].name}</p>
-                                    </div>
-                                  }
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
-                                    <p className='vas-admin-custom-item-subfield'>Nurse:</p>
-                                    <p className='vas-admin-custom-item-subvalue'>{this.state.userDataByUserId[call.completedBy] ? this.state.userDataByUserId[call.completedBy].fullname : 'Super Admin'}</p>
-                                  </div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-room'>
-                                    <p className='vas-admin-custom-item-subfield'>Room:</p>
-                                    <p className='vas-admin-custom-item-subvalue vas-uppercase'>{call.room}</p>
-                                  </div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
-                                    <p className='vas-admin-custom-item-subfield'>Hospital:</p>
-                                    <p className='vas-admin-custom-item-subvalue'>{isHospital ? this.state.hospitalsById[call.hospital].name : 'N/A'}</p>
-                                  </div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
-                                    <p className='vas-admin-custom-item-subfield'>MRN:</p>
-                                    <p className='vas-admin-custom-item-subvalue'>{call.mrn ? call.mrn : 'N/A'}</p>
-                                  </div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
-                                    <p className='vas-admin-custom-item-subfield'>Provider:</p>
-                                    <p className='vas-admin-custom-item-subvalue'>{call.provider ? call.provider : 'N/A'}</p>
-                                  </div>
-                                </div>
-                                <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-3'>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-procedures'>
-                                    {call.proceduresDone.map((procedure)=>{
-                                      return (
-                                        <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
-                                          <p className='vas-admin-query-procedure-names'>{this.state.proceduresById[procedure.procedureId].name}</p>
-                                          <div className='vas-admin-query-item-container'>
-                                          {procedure.itemIds && procedure.itemIds.length &&
-                                            procedure.itemIds.map((id)=>{
-                                              let isCustom = this.state.itemsById[id].isCustom;
-                                              return (
-                                                <p key={id} className='vas-admin-query-item'>{!isCustom ? this.state.itemsById[id].value : this.state.itemsById[id].valuePrefix + procedure.customValues[id] + this.state.itemsById[id].valueSuffix}</p>
-                                              )
-                                            })
-                                          }
-                                          </div>
-                                        </div>
-                                      )
-                                    })}
-                                  </div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-jobComment'></div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-addComments'></div>
-                                </div>
-                                <div className='vas-admin-custom-table-item-column vas-admin-custom-table-item-column-4'>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-callTime'><p className='vas-admin-left-column'>Call Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{this.getDateFromObjectId(call._id)}</Moment></p></div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-startTime'><p className='vas-admin-left-column'>Start Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.startTime}</Moment></p></div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-endTime'><p className='vas-admin-left-column'>End Time:</p><p className='vas-admin-right-column'><Moment format='HH:mm'>{call.completedAt}</Moment></p></div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Response Time:</p><p className='vas-admin-right-column'>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</p></div>
-                                  <div className='vas-admin-custom-table-td vas-admin-custom-table-response'><p className='vas-admin-left-column'>Procedure Time:</p><p className='vas-admin-right-column'>{procedureTimeHr > 0 ? procedureTimeHr + ' Hr ' : ''}{procedureTimeMin + ' Min'}</p></div>
-                                </div>
-                              </div>
-                            }
-                            {call.wasConsultation &&
-                              <div className='vas-call-consultation-container'>
-                                <p className='vas-call-consultation'>Consultation Done</p>
-                              </div>
-                            }
-                            {isComments &&
-                              <div className='vas-call-comments-container'>
-                                {call.preComments &&
-                                  <p className='vas-call-comment'><b>Pre-Procedure Comments:</b> {call.addComments}</p>
-                                }
-                                {call.addComments &&
-                                  <p className='vas-call-comment'><b>Add'l Comments:</b> {call.addComments}</p>
-                                }
-                              </div>
-                            }
-                            {call.openBy &&
-                              <span className='w-100'>
-                                <div className='vas-admin-is-open-container'>
-                                  <div className='vas-width-15'>
-                                    <p><b>Opened:</b> <Moment format='HH:mm'>{call.startTime}</Moment></p>
-                                  </div>
-                                  <div className='vas-width-25'>
-                                    <p><b>Job:</b> {call.job}</p>
-                                  </div>
-                                  <div className='vas-width-20'>
-                                    <p><b>User:</b> {this.state.userDataByUserId[call.openBy] ? this.state.userDataByUserId[call.openBy].fullname : 'Admin'}</p>
-                                  </div>
-                                  <div className='vas-width-10'>
-                                    <p><b>Room:</b> {call.room}</p>
-                                  </div>
-                                  <div className='vas-width-30'>
-                                    <button className='vas-button'>Return To Queue</button>
-                                    <button className='vas-button vas-red-button'>Delete Call</button>
-                                  </div>
-                                </div>
-                              </span>
-                            }
-                          </div>    
-                        )
-                      })
-                      }
-                    </div>
-                  </div>
-                </div>
+                <ReturnedProcedures 
+                  queriedProcedures={this.state.queriedCalls}
+                  hospitalsById={this.state.hospitalsById}
+                  usersById={this.state.usersById}
+                  referenceObj={this.state.referenceObj}
+                  itemsById={this.state.itemsById}
+                  getDateFromObjectId={this.getDateFromObjectId}
+                  editCompletedCall={this.editCompletedCall} 
+                  orderChangeById={this.state.orderChangeById}/>
+              </div>
+              <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
+                {this.state.activeRecord && this.state.procedures && this.state.referenceObj && this.state.itemsById && this.state.allOptions.length > 0 &&
+                  <EditProcedure 
+                    insertionTypeSelected={this.state.insertionTypeSelected}
+                    insertionLength={this.state.insertionLength}
+                    currentRecord={this.state.activeRecord}
+                    isPostEdit={this.state.activeRecord.completedAt ? true : false}
+                    allOptions={this.state.allOptions}
+                    procedures={this.state.procedures}
+                    usersById={this.state.usersById}
+                    itemsById={this.state.itemsById}
+                    referenceObj={this.state.referenceObj}
+                    inputLiveUpdate={this.inputLiveUpdate}
+                    changeStatus={this.changeStatus}
+                    resetForm={this.resetForm} 
+                    returnToQueue={this.returnToQueue}
+                    deleteCall={this.deleteCall}
+                    resetSection={this.resetSection}
+                    showHiddenButtons={this.showHiddenButtons}
+                    selectButton={this.selectButton}
+                    changeCustomInput={this.changeCustomInput}
+                    hospitalChange={this.hospitalChange}
+                    orderSelect={this.orderSelect}
+                    toggleConsultation={this.toggleConsultation} 
+                    setOrderWasChanged={this.setOrderWasChanged}
+                    completeProcedure={this.completeProcedure}/>
+                }
               </div>
               <div className='vas-admin-page-container vas-admin-users-container' data-isactive={this.state.activePage === 'users' ? true : false}>
                 <div className='vas-admin-add-user-container'>
-                  <h3>Add User</h3>
+                  <h3 className="vas-admin-h3">Add User</h3>
                   <label>User's Full Name:</label>
                   <input type='text' placeholder="example: Brett Connolly" value={this.state.addFullName} onChange={e=>{this.setState({addFullName:e.target.value})}} />
                   <label>Username:</label>
@@ -975,7 +1199,7 @@ export default class Admin extends Component {
                   <button className='vas-admin-create-user' onClick={this.addUser}>Add User</button>
                 </div>
                 <div className='vas-admin-remove-user-container'>
-                  <h3>Modify Users</h3>
+                  <h3 className="vas-admin-h3">Modify Users</h3>
                   <p className='vas-admin-add-user-notes'>Click on table header to sort by field</p>
                   <table className='vas-admin-table'>
                     <tbody>
@@ -1016,7 +1240,7 @@ export default class Admin extends Component {
                 </div>
               </div>
               <div className='vas-admin-page-container vas-admin-options-container' data-isactive={this.state.activePage === 'options' ? true : false}>
-                <h3>Modify Options</h3>
+                <h3 className="vas-admin-h3">Modify Options</h3>
                 <div className='vas-admin-options-hospitals-container'>
                   <h4>Manage Hospital Names</h4>
                   <div className='vas-block-container'>
@@ -1093,7 +1317,7 @@ export default class Admin extends Component {
               </div>
               {this.state.currentUser.role === 'super' &&
                 <div className='vas-admin-page-container vas-admin-super-container' data-isactive={this.state.activePage === 'super' ? true : false}>
-                  <h3>Super Page</h3>
+                  <h3 className="vas-admin-h3">Super Page</h3>
                   <button onClick={this.seedProcedures}>Seed Procedures</button>
                   <button onClick={this.seedOptions}>Seed Options</button>
                   <button onClick={this.seedItems}>Seed Items</button>
@@ -1110,6 +1334,9 @@ export default class Admin extends Component {
         }
         {this.state.modalIsOpen && 
           <Modal 
+            isConfirmation={this.state.modalConfirmation}
+            currentUser={this.state.currentUser}
+            getConfirmation={this.getConfirmation}
             closeModal={this.closeModal}
             modalTitle={this.state.modalTitle} 
             modalMessage={this.state.modalMessage}

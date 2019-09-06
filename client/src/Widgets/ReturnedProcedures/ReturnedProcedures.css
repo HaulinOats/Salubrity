@@ -1,0 +1,142 @@
+.vas-admin-custom-table-item-outer-container {
+  cursor:pointer;
+  border-bottom:solid 2px black;
+}
+.vas-call-table-item {
+  display:inline-flex;
+  width:100%;
+  font-size:90%;
+}
+.vas-admin-custom-table {
+  width:100%;
+}
+.vas-admin-custom-table-header {
+  height: 40px;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  background: cadetblue;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 5px;
+  color: white;
+}
+.vas-admin-custom-table-header-sortby {
+  margin-left:5px;
+}
+.vas-admin-custom-table-item-outer {
+  background:white;
+  font-size:85%;
+  width:100%;
+  user-select:none;
+}
+.vas-home-custom-table-column-1 {
+  width: 10%;
+  padding: 1%;
+  font-size: 125%;
+}
+.vas-home-custom-table-column-2 {
+  width:43%;
+  padding:1%;
+}
+.vas-home-custom-table-column-3 {
+  width:47%;
+  padding:1%;
+}
+.vas-admin-custom-table-item-column {
+  display:inline-block;
+  padding:.7%;
+}
+.vas-admin-custom-table-item-column-1 {
+  width:10%;
+}
+.vas-admin-custom-table-item-column-2 {
+  width:25%;
+}
+.vas-admin-custom-table-item-column-2
+.vas-admin-custom-table-td {
+  border-bottom: dotted 1px black;
+  padding-bottom: 2px;
+}
+.vas-admin-custom-table-item-column-2
+.vas-admin-custom-table-td:last-child {
+  border:none;
+}
+.vas-home-custom-table-item-column-procedures {
+  padding: 1%;
+  width: 87%;
+  margin-left: 11%;
+}
+.vas-admin-custom-table-item-column-3 {
+  display:inline-block;
+  width:40%;
+}
+.vas-admin-custom-table-item-column-4 {
+  display:inline-block;
+  width:25%;
+}
+.vas-admin-custom-table-item-column-4
+.vas-admin-left-column {
+  display:inline-block;
+  font-size:90%;
+}
+.vas-admin-custom-table-item-column-4
+.vas-admin-right-column {
+  float:right;
+}
+.vas-admin-custom-table-item-column-4
+.vas-admin-custom-table-td {
+  border-bottom:dotted 1px black;
+  padding:1px 0;
+}
+.vas-admin-custom-table-item-column-4
+.vas-admin-custom-table-td:last-child {
+  border:none;
+}
+.vas-home-custom-table-column-2
+.vas-admin-custom-table-td {
+  border-bottom: dotted 1px black;
+  margin-bottom: 2px;
+}
+.vas-home-custom-table-column-2
+.vas-admin-custom-table-td:last-child {
+  border-bottom: none;
+}
+.vas-call-comments-container {
+  margin-left: 11%;
+  width: 87%;
+  padding: 1%;
+  font-size: 85%;
+}
+.vas-call-consultation-container{
+  padding: 1%;
+  width: 87%;
+  margin-left: 11%;
+}
+
+@media (min-width: 650px) {
+  .vas-home-custom-table-column-1 {
+    width:6%;
+  }
+  .vas-home-custom-table-column-2,
+  .vas-home-custom-table-column-3 {
+   
+  }
+  .vas-call-table-item {
+    width:60%;
+  }
+  .vas-home-custom-table-item-column-procedures {
+    padding: .5% 0 .5% .5%;
+    margin: 0;
+    width: 39%;
+    display: inline-block;
+  }
+  .vas-call-comments-container,
+  .vas-call-consultation-container {
+    margin-left: 5%;
+    padding: 3px;
+  }
+  .vas-call-consultation-container {
+
+  }
+}

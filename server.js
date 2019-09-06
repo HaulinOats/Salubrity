@@ -483,7 +483,7 @@ app.post('/get-order-changes-in-range', (req, res)=>{
       $gte: new Date(req.body.startDate),
       $lt: new Date(req.body.endDate)
     },
-    orderChange:{$exists:true}
+    orderChange:{$ne:null}
   }, (err, calls)=>{
     if(err) return res.send(err);
     if(calls){

@@ -256,6 +256,7 @@ select {
   padding:3px 0;
   background:white;
   min-height: 32px;
+  text-transform: capitalize;
 }
 .vas-table {
   margin-bottom:0;
@@ -367,10 +368,6 @@ select {
   display:block;
   margin-bottom:10px;
 }
-.vas-call-table-item {
-  display:flex;
-  font-size:90%;
-}
 .vas-call-times-row {
   border-bottom: dotted 1px black;
   padding: 1px 0;
@@ -387,12 +384,6 @@ select {
 .vas-call-times-right {
   float:right;
 }
-.vas-call-comments-container {
-  margin-left: 11%;
-  width: 87%;
-  padding: 1%;
-  font-size: 85%;
-}
 .vas-call-comment {
   margin-bottom:3px;
 }
@@ -405,11 +396,6 @@ select {
 .vas-positive {
   font-weight: bold;
   color:green;
-}
-.vas-call-consultation-container{
-  padding: 1%;
-  width: 87%;
-  margin-left: 11%;
 }
 .vas-call-consultation {
   font-size: 85%;
