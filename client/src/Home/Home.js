@@ -621,14 +621,16 @@ export default class Home extends Component{
                 </div>
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'complete' ? true : false}>
-                <ReturnedProcedures 
-                  queriedProcedures={this.state.completedCalls}
-                  hospitalsById={this.state.hospitalsById}
-                  usersById={this.state.usersById}
-                  referenceObj={this.state.referenceObj}
-                  itemsById={this.state.itemsById}
-                  editCompletedCall={this.editCompletedCall} 
-                  orderChangeById={this.state.orderChangeById}/>
+                {this.state.completedCalls.length > 0 &&
+                  <ReturnedProcedures 
+                    queriedProcedures={this.state.completedCalls}
+                    hospitalsById={this.state.hospitalsById}
+                    usersById={this.state.usersById}
+                    referenceObj={this.state.referenceObj}
+                    itemsById={this.state.itemsById}
+                    editCompletedCall={this.editCompletedCall} 
+                    orderChangeById={this.state.orderChangeById}/>
+                }
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.referenceObj && this.state.itemsById && this.state.allOptions.length > 0 &&
