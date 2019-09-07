@@ -251,8 +251,12 @@ export default class Home extends Component{
         this.getActiveCalls();
       }
       if(this.state.activeHomeTab === 'complete'){
-        this.setState({lastUpdateHide:false});
-        this.getCompletedCalls();
+        this.setState({
+          lastUpdateHide:false,
+          completedCalls:[]
+        }, ()=>{
+          this.getCompletedCalls();
+        });
       }
       if(this.state.activeHomeTab === 'active'){
         this.setState({lastUpdateHide:true});
