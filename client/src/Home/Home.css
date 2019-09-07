@@ -129,8 +129,6 @@
 }
 .vas-home-page-container[data-isactive='true']{
   display: block;
-  padding-top: 5px;
-  background: cadetblue;
 }
 .vas-nav-link {
     cursor:pointer;
@@ -169,11 +167,6 @@
   border:solid 2px #007bff;
 }
 /* queue tab/page */
-.vas-home-table {
-  margin-bottom:0;
-  background-color:#c5d5e6;
-  
-}
 .vas-table-job-name {
   font-weight: bold;
   color: #4C7E80;

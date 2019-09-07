@@ -910,10 +910,6 @@ export default class Admin extends Component {
                     usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
                     referenceObj={this.state.referenceObj}
-                    deleteCall={this.deleteCall}
-                    showHiddenButtons={this.showHiddenButtons}
-                    selectButton={this.selectButton}
-                    setOrderWasChanged={this.setOrderWasChanged}
                     refreshUserSession={this.refreshUserSession}
                     closeRecordCallback={this.closeRecordCallback}
                     currentUser={this.state.currentUser}/>

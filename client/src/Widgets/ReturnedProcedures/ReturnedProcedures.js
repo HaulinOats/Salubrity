@@ -37,7 +37,7 @@ export default class ReturnedProcedures extends Component {
 
   render(){
     return(
-    <div className="vas-home-table vas-table">
+    <div className="vas-table vas-returned-procedures-table">
       {this.state.queriedProcedures &&
       <span className="vas-returned-procedures-outer">
         <div className='vas-table-thead-row vas-home-completed-thead'>
