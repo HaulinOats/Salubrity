@@ -47,9 +47,7 @@ export default class Admin extends Component {
       modalTitle:'',
       modalConfirmation:false,
       confirmationType:null,
-      menuIsVisible:false,
-      insertionLength:'',
-      insertionTypeSelected:false
+      menuIsVisible:false
     }
     this.submitDateRange = this.submitDateRange.bind(this);
     this.seedProcedures = this.seedProcedures.bind(this);
@@ -60,10 +58,8 @@ export default class Admin extends Component {
     this.loginCallback = this.loginCallback.bind(this);
     this.startDateChange = this.startDateChange.bind(this);
     this.endDateChange = this.endDateChange.bind(this);
-    this.sortByOnChange = this.sortByOnChange.bind(this);
     this.addHospital = this.addHospital.bind(this);
     this.addOrderChange = this.addOrderChange.bind(this);
-    this.handleUserSessionData = this.handleUserSessionData.bind(this);
     this.addNeed = this.addNeed.bind(this);
     this.addInputChange = this.addInputChange.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -71,16 +67,7 @@ export default class Admin extends Component {
     this.toggleMainMenu = this.toggleMainMenu.bind(this);
     this.closeMenu = this.closeMenu.bind(this);
     this.editCompletedCall = this.editCompletedCall.bind(this);
-    this.setRecordStateItems = this.setRecordStateItems.bind(this);
-    this.resetForm = this.resetForm.bind(this);
-    this.deleteCall = this.deleteCall.bind(this);
-    this.getConfirmation = this.getConfirmation.bind(this);
-    this.changeCustomInput = this.changeCustomInput.bind(this);
-    this.completeProcedure = this.completeProcedure.bind(this);
-    this.inputLiveUpdate = this.inputLiveUpdate.bind(this);
-    this.toggleConsultation = this.toggleConsultation.bind(this);
-    this.orderSelect = this.orderSelect.bind(this);
-    this.hospitalChange = this.hospitalChange.bind(this);
+    this.closeRecordCallback = this.closeRecordCallback.bind(this);
   }
 
   componentWillMount(){
@@ -107,6 +94,33 @@ export default class Admin extends Component {
     console.log(this.state);
   }
 
+  closeRecordCallback(type){
+    let queriedCalls = this.state.queriedCalls;
+    switch(type){
+      case 'delete':
+        for(var i = queriedCalls.length -1; i >= 0 ; i--){
+          if(queriedCalls[i]._id === this.state.activeRecord._id){
+            queriedCalls.splice(i, 1);
+            break;
+          }
+        }
+        break;
+      default:
+        for(var j = 0; j < queriedCalls.length;j++){
+          if(queriedCalls[j]._id === this.state.activeRecord._id){
+            queriedCalls[j] = this.state.activeRecord;
+            break;
+          }
+        }
+        break;
+    }
+    this.setState({
+      activePage:'date',
+      activeRecord:null,
+      queriedCalls
+    })
+  }
+
   refreshUserSession(){
     let currentUser = this.state.currentUser;
     currentUser.lastLogin = Math.floor(Date.now() / 1000);
@@ -119,10 +133,6 @@ export default class Admin extends Component {
     let currentUser = user;
     currentUser.lastLogin = Math.floor(Date.now() / 1000);
     this.setState({currentUser:user}, this.stateLoadCalls);
-  }
-
-  handleUserSessionData(){
-    this.stateLoadCalls();
   }
 
   startSessionInterval(){
@@ -153,7 +163,6 @@ export default class Admin extends Component {
   }
 
   stateLoadCalls(){
-    this.setState({isLoading:true});
     this.getAllUsers();
     this.getProcedureData();
     this.getOptionsData();
@@ -314,217 +323,8 @@ export default class Admin extends Component {
     })
   }
 
-  hospitalChange(e){
-    let activeRecord = this.state.activeRecord;
-    if(e.target.value !== ''){
-      activeRecord.hospital = Number(e.target.value);
-    } else {
-      activeRecord.hospital = null;
-    }
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
-  orderSelect(e){
-    let activeRecord = this.state.activeRecord;
-    if(e.target.value === ''){
-      activeRecord.orderChange = null;
-    } else {
-      activeRecord.orderChange = Number(e.target.value);
-    }
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
   closeMenu(){
     this.setState({menuIsVisible:false});
-  }
-
-  toggleConsultation(){
-    let activeRecord = this.state.activeRecord;
-    activeRecord.wasConsultation = !activeRecord.wasConsultation;
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
-  completeProcedure(){
-    let proceduresArr = this.createProcedureObject();
-    if(this.procedureVerified(proceduresArr)){
-      let updatedRecord = this.state.activeRecord;
-      updatedRecord.proceduresDone = this.addCustomValuesToProceduresArr(proceduresArr);
-      this.setState({activeRecord:updatedRecord}, ()=>{
-        this.saveActiveRecord();
-        this.setState({activePage:'date'});
-      });
-    }
-    this.refreshUserSession();
-  }
-
-  addCustomValuesToProceduresArr(proceduresArr){
-    for(let i = 0; i < proceduresArr.length; i++){
-      //Insertion Procedure
-      if(proceduresArr[i].procedureId === 8){
-        proceduresArr[i].itemIds.push(70);
-        proceduresArr[i].customValues = {
-          '70': Number(this.state.insertionLength)
-        }
-      }
-    }
-    return proceduresArr;
-  }
-
-  saveActiveRecord(){
-    axios.post('/save-call', this.state.activeRecord)
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        console.log('active call saved');
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-    this.refreshUserSession();
-  }
-
-  procedureVerified(proceduresList){
-    let errors = '';
-    if(!proceduresList.length){
-      errors += '- You must select at least 1 procedure or confirm consultation\n';
-    }
-
-    if(this.state.insertionTypeSelected){
-      if(!this.state.insertionLength.length || this.state.insertionLength === '0'){
-        errors += '- You must enter an insertion length (cannot be 0)\n';
-      }
-      if(!this.state.activeRecord.hospital || this.state.activeRecord.hospital < 1){
-        errors += '- You must select a hospital\n';
-      }
-      if(!this.state.activeRecord.mrn || String(this.state.activeRecord.mrn).length < 5 || String(this.state.activeRecord.mrn).length > 7){
-        errors += '- Medical Record Number must be between 5 and 7 digits\n';
-      }
-      if(!this.state.activeRecord.provider || !this.state.activeRecord.provider.length){
-        errors += '- You must enter a provider name\n';
-      }
-    }
-    
-    if(!this.state.activeRecord.room || !this.state.activeRecord.room.length){
-      errors += '- Room number field cannot be empty\n';
-    }
-    
-    if(errors.length && !this.state.activeRecord.wasConsultation){
-      this.setState({
-        modalIsOpen:true, 
-        modalTitle:'Cannot Submit Procedure',
-        modalMessage:errors
-      });
-      return false;
-    }
-    return true;
-  }
-
-  createProcedureObject(){
-    let procedureObj = {};
-    let selectedTasks = document.querySelectorAll('.vas-edit-procedure-select-input:checked');
-    selectedTasks.forEach((el)=>{
-      let itemId = Number(el.id);
-      let procedureId = Number(el.getAttribute('data-procedureid'));
-      if(!procedureObj.hasOwnProperty(procedureId)){
-        procedureObj[procedureId] = []
-      }
-      procedureObj[procedureId].push(itemId);
-    });
-
-    let procedureArr = [];
-    let procedureObjKeys = Object.keys(procedureObj);
-    for(let key of procedureObjKeys){
-      procedureArr.push({
-        procedureId:Number(key),
-        itemIds:procedureObj[key]
-      })
-    }
-
-    return procedureArr
-  }
-
-  inputLiveUpdate(e, field){
-    let targetValue = e.target.value;
-    let activeRecord = this.state.activeRecord;
-
-    if(e.target.type === 'number'){
-      activeRecord[field] = Number(targetValue);
-    } else {
-      activeRecord[field] = targetValue;
-    }
-
-    if(targetValue.length < 1){
-      activeRecord[field] = null;
-    }
-
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
-  changeCustomInput(e, fieldName){
-    this.setState({[fieldName]:e.target.value});
-    this.refreshUserSession();
-  }
-
-  getConfirmation(isConfirmed){
-    if(isConfirmed){
-      if(this.state.confirmationType){
-        if(this.state.confirmationType === 'delete-call'){
-          this.setState({isLoading:true});
-          axios.post('/delete-call', {
-            _id:this.state.activeRecord._id
-          })
-          .then(resp=>{
-            if(resp.data){
-              let queriedCalls = this.state.queriedCalls;
-              for(var i = queriedCalls.length -1; i >= 0 ; i--){
-                if(queriedCalls[i]._id === this.state.activeRecord._id){
-                  queriedCalls.splice(i, 1);
-                }
-              }
-              this.setState({
-                activePage:'date',
-                activeRecord:null
-              });
-            }
-          })
-          .catch(err=>{
-            console.log(err);
-            this.addToErrorArray(err);
-          })
-          .finally(()=>{
-            this.setState({isLoading:false});
-          })
-        }
-        if(this.state.confirmationType === 'reset-page'){
-          this.setState({activePage:'date', activeRecord:null});
-        }
-      }
-    }
-    this.refreshUserSession();
-  }
-
-  resetForm(){
-    this.setState({
-      modalTitle:'Reset Form?',
-      modalMessage:'Are you sure you want to reset the current form? Will cause an app/page reload.',
-      modalIsOpen:true,
-      modalConfirmation:true,
-      confirmationType:'reset-page'
-    });
-  }
-
-  deleteCall(){
-    this.setState({
-      modalTitle:'Delete Active Record?',
-      modalMessage:'Are you sure you want to delete the currently active record?',
-      modalIsOpen:true,
-      modalConfirmation:true,
-      confirmationType:'delete-call'
-    });
-    this.refreshUserSession();
   }
 
   addUser(){
@@ -632,10 +432,6 @@ export default class Admin extends Component {
     ls.clear();
   }
 
-  getDateFromObjectId(objId){
-    return new Date(parseInt(objId.substring(0, 8), 16) * 1000);
-  }
-
   startDateChange(date){
     this.setState({
       startDate: date
@@ -679,32 +475,6 @@ export default class Admin extends Component {
     })
   }
 
-  setRecordStateItems(){
-    let stateObj = {};
-    //check which procedure items should updated state
-    if(this.state.activeRecord.proceduresDone.length){
-      console.log(this.state.activeRecord.proceduresDone)
-      this.state.activeRecord.proceduresDone.forEach(procedureArr=>{
-        procedureArr.itemIds.forEach(itemId=>{
-          switch(this.state.itemsById[itemId].groupId){
-            case 18://Insertion Length
-              stateObj.insertionTypeSelected = true;
-              break;
-            default:
-          }
-        });
-
-        //find and set custom values, if they exist
-        if(procedureArr.hasOwnProperty('customValues')){
-          stateObj.insertionLength = String(procedureArr.customValues['70']);
-        }
-      });
-    }
-    this.setState(stateObj, ()=>{
-      console.log(this.state);
-    });
-  }
-
   filterDropdown(e, whichDropdown){
     if(whichDropdown === 1){
       if(e.target.value !== 'default'){
@@ -721,8 +491,7 @@ export default class Admin extends Component {
         this.setState({
           firstFilterValue:e.target.value,
           secondFilterValue:'',
-          secondDropdownArr:filterArr,
-          sortBy:'default'
+          secondDropdownArr:filterArr
         });
       } else {
         this.resetFilters();
@@ -801,7 +570,7 @@ export default class Admin extends Component {
     })
     .then(resp=>{
       if(resp.data.error || resp.data._message){
-        this.setState({queriedCalls:[]});
+        alert(resp.data);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -828,7 +597,7 @@ export default class Admin extends Component {
     })
     .then(resp=>{
       if(resp.data.error || resp.data._message){
-        this.setState({queriedCalls:[]});
+        alert(resp.data);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -870,7 +639,7 @@ export default class Admin extends Component {
     .then(resp=>{
       console.log(resp.data);
       if(resp.data.error || resp.data._message){
-        this.setState({queriedCalls:[]});
+        alert(resp.data);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -889,7 +658,7 @@ export default class Admin extends Component {
     .then(resp=>{
       console.log(resp.data);
       if(resp.data.error || resp.data._message){
-        this.setState({queriedCalls:[]});
+        alert(resp.data)
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -902,29 +671,11 @@ export default class Admin extends Component {
     })
   }
 
-  toggleSort(){
-    let sortArr = this.state.queriedCalls;
-    sortArr.reverse();
-    this.setState({queriedCalls:sortArr});
-  }
-
   customInputKeyUp(e){
     if(e.which === 13){//Enter
       if(this.state.secondFilterValue.length){
         document.querySelector('.vas-admin-search-submit').click();
       }
-    }
-  }
-
-  sortByOnChange(e){
-    if(e.target.value !== 'default'){
-      let sortArr = this.state.queriedCalls;
-      sortArr.sort((a,b)=>{
-        if(a[e.target.value] < b[e.target.value]) return -1;
-        if(a[e.target.value] > b[e.target.value]) return 1;
-        return 0;
-      })
-      this.setState({queriedCalls:sortArr});
     }
   }
 
@@ -1001,13 +752,9 @@ export default class Admin extends Component {
   editCompletedCall(completedCall){
     let isAdmin = this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super';
     if(isAdmin || this.state.currentUser.userId === completedCall.completedBy){
-      console.log(completedCall);
       this.setState({
         activeRecord:completedCall,
         activePage:'active'
-      }, ()=>{
-        window.scrollTo(0,0);
-        this.setRecordStateItems();
       });
     }
   }
@@ -1143,42 +890,33 @@ export default class Admin extends Component {
                     <button className='vas-admin-date-range-submit d-inline' onClick={this.submitDateRange}>Submit</button>
                   }
                 </div>
+                {this.state.queriedCalls.length > 0 &&
                 <ReturnedProcedures 
                   queriedProcedures={this.state.queriedCalls}
                   hospitalsById={this.state.hospitalsById}
                   usersById={this.state.usersById}
                   referenceObj={this.state.referenceObj}
                   itemsById={this.state.itemsById}
-                  getDateFromObjectId={this.getDateFromObjectId}
                   editCompletedCall={this.editCompletedCall} 
                   orderChangeById={this.state.orderChangeById}/>
+                }
               </div>
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.referenceObj && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
-                    insertionTypeSelected={this.state.insertionTypeSelected}
-                    insertionLength={this.state.insertionLength}
-                    currentRecord={this.state.activeRecord}
-                    isPostEdit={this.state.activeRecord.completedAt ? true : false}
+                    activeRecord={this.state.activeRecord}
                     allOptions={this.state.allOptions}
                     procedures={this.state.procedures}
                     usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
                     referenceObj={this.state.referenceObj}
-                    inputLiveUpdate={this.inputLiveUpdate}
-                    changeStatus={this.changeStatus}
-                    resetForm={this.resetForm} 
-                    returnToQueue={this.returnToQueue}
                     deleteCall={this.deleteCall}
-                    resetSection={this.resetSection}
                     showHiddenButtons={this.showHiddenButtons}
                     selectButton={this.selectButton}
-                    changeCustomInput={this.changeCustomInput}
-                    hospitalChange={this.hospitalChange}
-                    orderSelect={this.orderSelect}
-                    toggleConsultation={this.toggleConsultation} 
                     setOrderWasChanged={this.setOrderWasChanged}
-                    completeProcedure={this.completeProcedure}/>
+                    refreshUserSession={this.refreshUserSession}
+                    closeRecordCallback={this.closeRecordCallback}
+                    currentUser={this.state.currentUser}/>
                 }
               </div>
               <div className='vas-admin-page-container vas-admin-users-container' data-isactive={this.state.activePage === 'users' ? true : false}>
@@ -1336,7 +1074,6 @@ export default class Admin extends Component {
           <Modal 
             isConfirmation={this.state.modalConfirmation}
             currentUser={this.state.currentUser}
-            getConfirmation={this.getConfirmation}
             closeModal={this.closeModal}
             modalTitle={this.state.modalTitle} 
             modalMessage={this.state.modalMessage}

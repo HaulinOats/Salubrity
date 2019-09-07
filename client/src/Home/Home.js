@@ -3,6 +3,7 @@ import Modal from '../Widgets/Modal/Modal';
 import Login from '../Widgets/Login/Login';
 import EditProcedure from '../Widgets/EditProcedure/EditProcedure';
 import ReturnedProcedures from '../Widgets/ReturnedProcedures/ReturnedProcedures';
+import helpers from '../helpers';
 import axios from 'axios';
 import Moment from 'react-moment';
 import ls from 'local-storage';
@@ -34,44 +35,25 @@ export default class Home extends Component{
       statusById:null,
       orderChangeById:null,
       selectedProcedures:[],
-      procedureVerified:false,
-      insertionTypeSelected:false,
-      insertionLength:'',
       lastUpdate:0,
       lastUpdateHide:false
     };
     this.toggleHandler = this.toggleHandler.bind(this);
-    this.completeProcedure = this.completeProcedure.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.getConfirmation = this.getConfirmation.bind(this);
-    this.getDateFromObjectId = this.getDateFromObjectId.bind(this);
     this.addCall = this.addCall.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
     this.refreshUserSession = this.refreshUserSession.bind(this);
     this.logout = this.logout.bind(this);
     this.reverseCompletedSort = this.reverseCompletedSort.bind(this);
-    this.resetSection = this.resetSection.bind(this);
     this.stateLoadCalls = this.stateLoadCalls.bind(this);
     this.addToErrorArray = this.addToErrorArray.bind(this);
     this.sendErrorsToAdmin = this.sendErrorsToAdmin.bind(this);
-    this.saveActiveRecord = this.saveActiveRecord.bind(this);
-    this.checkActiveRecord = this.checkActiveRecord.bind(this);
+    this.checkActiveRecordExists = this.checkActiveRecordExists.bind(this);
     this.visibilityChange = this.visibilityChange.bind(this);
     this.editCompletedCall = this.editCompletedCall.bind(this);
-    this.inputLiveUpdate = this.inputLiveUpdate.bind(this);
-    this.changeStatus = this.changeStatus.bind(this);
-    this.resetForm = this.resetForm.bind(this);
-    this.returnToQueue = this.returnToQueue.bind(this);
-    this.deleteCall = this.deleteCall.bind(this);
-    this.showHiddenButtons = this.showHiddenButtons.bind(this);
-    this.selectButton = this.selectButton.bind(this);
-    this.changeCustomInput = this.changeCustomInput.bind(this);
-    this.hospitalChange = this.hospitalChange.bind(this);
-    this.orderSelect = this.orderSelect.bind(this);
-    this.toggleConsultation = this.toggleConsultation.bind(this);
-    this.setRecordStateItems = this.setRecordStateItems.bind(this);
     this.timerTick = this.timerTick.bind(this);
     this.resetState = this.resetState.bind(this);
+    this.closeRecordCallback = this.closeRecordCallback.bind(this);
   }
 
   resetState(){
@@ -148,7 +130,6 @@ export default class Home extends Component{
       this.setState({
         activeRecord:completedCall
       }, ()=>{
-        this.setRecordStateItems();
         this.setTab('active');
       });
     }
@@ -177,6 +158,26 @@ export default class Home extends Component{
 
   componentWillUnmount(){
     this.stopUpdateTimer();
+  }
+
+  closeRecordCallback(type){
+    switch(type){
+      case 'delete':
+        let queueItems = this.state.queueItems;
+        for(var i = queueItems.length -1; i >= 0 ; i--){
+          if(queueItems[i]._id === this.state.activeRecord._id){
+            queueItems.splice(i, 1);
+          }
+        }
+        this.setState({queueItems});
+        break;
+      default:
+        break;
+    }
+    this.setTab('queue');
+    this.setState({
+      activeRecord:null
+    })
   }
 
   checkUserSession(){
@@ -284,85 +285,10 @@ export default class Home extends Component{
     })
   }
 
-  getDateFromObjectId(objId){
-    if(objId){
-      return new Date(parseInt(objId.substring(0, 8), 16) * 1000);
-    }
-  }
-
-  resetSection(e, type){
-    let isInsertionProcedure = false;
-    let sectionInputs = e.target.closest('.vas-edit-procedure-inner-container').querySelectorAll('input');
-    sectionInputs.forEach(el=>{
-      if(el.type === 'checkbox' || el.type === 'radio'){
-        el.checked = false;
-      }
-      if(el.type === 'number' || el.type === 'text'){
-        el.value = '';
-      }
-      if(!isInsertionProcedure && el.getAttribute('data-procedureid') === '8'){
-        isInsertionProcedure = true;
-      }
-    });
-    if(isInsertionProcedure){
-      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedureid="8"]').forEach((el, idx)=>{
-        if(idx > 1){
-          el.style.display = 'none';
-        }
-      });
-      this.setState({
-        insertionTypeSelected:false,
-        insertionLength:''
-      });
-    }
-  
-    this.saveActiveRecord();
-    this.refreshUserSession();
-  }
-
-  toggleConsultation(){
-    let activeRecord = this.state.activeRecord;
-    activeRecord.wasConsultation = !activeRecord.wasConsultation;
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
   addCall(){
     this.setState({
       modalTitle:'Add Call',
       modalIsOpen:true
-    })
-    this.refreshUserSession();
-  }
-
-  inputLiveUpdate(e, field){
-    let targetValue = e.target.value;
-    let activeRecord = this.state.activeRecord;
-
-    if(e.target.type === 'number'){
-      activeRecord[field] = Number(targetValue);
-    } else {
-      activeRecord[field] = targetValue;
-    }
-
-    if(targetValue.length < 1){
-      activeRecord[field] = null;
-    }
-
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
-  saveActiveRecord(){
-    axios.post('/save-call', this.state.activeRecord)
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        console.log('active call saved');
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-      this.addToErrorArray(err);
     })
     this.refreshUserSession();
   }
@@ -453,7 +379,7 @@ export default class Home extends Component{
         console.log(resp.data);
       } else {
         console.log('active calls updating...');
-        this.setState({queueItems:resp.data}, this.checkActiveRecord);
+        this.setState({queueItems:resp.data}, this.checkActiveRecordExists);
       }
     })
     .catch((err)=>{
@@ -491,13 +417,13 @@ export default class Home extends Component{
   }
 
 
-  checkActiveRecord(){
+  checkActiveRecordExists(){
     if(!this.state.activeRecord){
       let activeRecordExists = false;
       for(let i = 0; i < this.state.queueItems.length; i++){
         if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
           activeRecordExists = true;
-          this.setState({activeRecord:this.state.queueItems[i]}, this.setRecordStateItems);
+          this.setState({activeRecord:this.state.queueItems[i]});
           break;
         }
       }
@@ -505,32 +431,6 @@ export default class Home extends Component{
         this.setState({activeHomeTab:'queue'});
       }
     }
-  }
-
-  setRecordStateItems(){
-    let stateObj = {};
-    //check which procedure items should updated state
-    if(this.state.activeRecord.proceduresDone.length){
-      console.log(this.state.activeRecord.proceduresDone)
-      this.state.activeRecord.proceduresDone.forEach(procedureArr=>{
-        procedureArr.itemIds.forEach(itemId=>{
-          switch(this.state.itemsById[itemId].groupId){
-            case 18://Insertion Length
-              stateObj.insertionTypeSelected = true;
-              break;
-            default:
-          }
-        });
-
-        //find and set custom values, if they exist
-        if(procedureArr.hasOwnProperty('customValues')){
-          stateObj.insertionLength = String(procedureArr.customValues['70']);
-        }
-      });
-    }
-    this.setState(stateObj, ()=>{
-      console.log(this.state);
-    });
   }
 
   addToErrorArray(err){
@@ -566,166 +466,6 @@ export default class Home extends Component{
     this.refreshUserSession();
   }
 
-  orderSelect(e){
-    let activeRecord = this.state.activeRecord;
-    if(e.target.value === ''){
-      activeRecord.orderChange = null;
-    } else {
-      activeRecord.orderChange = Number(e.target.value);
-    }
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
-  completeProcedure(){
-    if(this.state.activeRecord.completedAt){
-      this.updateProcedure();
-    } else {
-      this.saveNewProcedure();
-    }
-    this.refreshUserSession();
-  }
-
-  updateProcedure(){
-    let proceduresArr = this.createProcedureObject();
-    if(this.procedureVerified(proceduresArr)){
-      let updatedRecord = this.state.activeRecord;
-      updatedRecord.proceduresDone = this.addCustomValuesToProceduresArr(proceduresArr);
-      this.setState({activeRecord:updatedRecord}, ()=>{
-        this.saveActiveRecord();
-        this.procedureSaved(true);
-      });
-    }
-  }
-
-  addCustomValuesToProceduresArr(proceduresArr){
-    for(let i = 0; i < proceduresArr.length; i++){
-      //Insertion Procedure
-      if(proceduresArr[i].procedureId === 8){
-        proceduresArr[i].itemIds.push(70);
-        proceduresArr[i].customValues = {
-          '70': Number(this.state.insertionLength)
-        }
-      }
-    }
-    return proceduresArr;
-  }
-  
-  saveNewProcedure(){
-    let proceduresArr = this.createProcedureObject();
-    if(this.procedureVerified(proceduresArr)){
-      proceduresArr = this.addCustomValuesToProceduresArr(proceduresArr);
-
-      let completionTime = new Date();
-      let callTime = this.getDateFromObjectId(this.state.activeRecord._id);
-      let startTime = new Date(this.state.activeRecord.startTime);
-
-      this.setState({isLoading:true});
-      axios.post('/procedure-completed', {
-        _id:this.state.activeRecord._id,
-        proceduresDone:proceduresArr,
-        completedBy:Number(this.state.currentUser.userId),
-        completedAt:completionTime.toISOString(),
-        procedureTime:completionTime - startTime,
-        responseTime:startTime - callTime
-      })
-      .then(resp=>{
-        if(resp.data.error || resp.data._message){
-          console.log(resp.data);
-        } else {
-          let queueItems = this.state.queueItems;
-          for(var i = queueItems.length -1; i >= 0 ; i--){
-            if(queueItems[i]._id === this.state.activeRecord._id){
-              queueItems.splice(i, 1);
-            }
-          }
-          this.procedureSaved(false, queueItems);
-        }
-      })
-      .catch((err)=>{
-        console.log(err);
-        this.addToErrorArray(err);
-      })
-      .finally(()=>{
-        this.setState({isLoading:false});
-      })
-    }
-  }
-
-  procedureSaved(isEdit, queueItems){
-    this.setTab('queue');
-    this.setState({
-      queueItems: queueItems ? queueItems : this.state.queueItems,
-      activeRecord:null,
-      modalTitle: isEdit ? 'Procedure Updated' : 'Task Complete',
-      modalMessage: isEdit ? 'Procedure was updated. Returning to queue.' : 'Procedure was completed. Returning to queue.',
-      modalIsOpen:true
-    }, ()=>{
-      setTimeout(()=>{
-        this.resetState();
-      }, 2000);
-    });
-  }
-
-  createProcedureObject(){
-    let procedureObj = {};
-    let selectedTasks = document.querySelectorAll('.vas-edit-procedure-select-input:checked');
-    selectedTasks.forEach((el)=>{
-      let itemId = Number(el.id);
-      let procedureId = Number(el.getAttribute('data-procedureid'));
-      if(!procedureObj.hasOwnProperty(procedureId)){
-        procedureObj[procedureId] = []
-      }
-      procedureObj[procedureId].push(itemId);
-    });
-
-    let procedureArr = [];
-    let procedureObjKeys = Object.keys(procedureObj);
-    for(let key of procedureObjKeys){
-      procedureArr.push({
-        procedureId:Number(key),
-        itemIds:procedureObj[key]
-      })
-    }
-
-    return procedureArr
-  }
-
-  procedureVerified(proceduresList){
-    let errors = '';
-    if(!proceduresList.length){
-      errors += '- You must select at least 1 procedure or confirm consultation\n';
-    }
-
-    if(this.state.insertionTypeSelected){
-      if(!this.state.insertionLength.length || this.state.insertionLength === '0'){
-        errors += '- You must enter an insertion length (cannot be 0)\n';
-      }
-      if(!this.state.activeRecord.hospital || this.state.activeRecord.hospital < 1){
-        errors += '- You must select a hospital\n';
-      }
-      if(!this.state.activeRecord.mrn || String(this.state.activeRecord.mrn).length < 5 || String(this.state.activeRecord.mrn).length > 7){
-        errors += '- Medical Record Number must be between 5 and 7 digits\n';
-      }
-      if(!this.state.activeRecord.provider || !this.state.activeRecord.provider.length){
-        errors += '- You must enter a provider name\n';
-      }
-    }
-    
-    if(!this.state.activeRecord.room || !this.state.activeRecord.room.length){
-      errors += '- Room number field cannot be empty\n';
-    }
-    
-    if(errors.length && !this.state.activeRecord.wasConsultation){
-      this.setState({
-        modalIsOpen:true, 
-        modalTitle:'Cannot Submit Procedure',
-        modalMessage:errors
-      });
-      return false;
-    }
-    return true;
-  }
-
   closeModal(callData){
     if(callData){
       let queueItems = this.state.queueItems;
@@ -754,48 +494,8 @@ export default class Home extends Component{
     });
   }
 
-  getConfirmation(isConfirmed){
-    if(isConfirmed){
-      if(this.state.confirmationType){
-        if(this.state.confirmationType === 'delete-call'){
-          this.setState({isLoading:true});
-          axios.post('/delete-call', {
-            _id:this.state.activeRecord._id
-          })
-          .then(resp=>{
-            if(resp.data){
-              let queueItems = this.state.queueItems;
-              for(var i = queueItems.length -1; i >= 0 ; i--){
-                if(queueItems[i]._id === this.state.activeRecord._id){
-                  queueItems.splice(i, 1);
-                }
-              }
-              this.setTab('queue');
-              this.setState({
-                activeRecord:null,
-                queueItems
-              }, ()=>{
-                this.resetState();
-              });
-            }
-          })
-          .catch(err=>{
-            console.log(err);
-            this.addToErrorArray(err);
-          })
-          .finally(()=>{
-            this.setState({isLoading:false});
-          })
-        }
-        if(this.state.confirmationType === 'reset-page'){
-          window.location.reload();
-        }
-      }
-    }
-    this.refreshUserSession();
-  }
-
   selectJob(job){
+    console.log(job);
     if(!this.state.activeRecord){
       if(job.openBy){
         this.setState({
@@ -841,121 +541,9 @@ export default class Home extends Component{
     this.refreshUserSession();
   }
 
-  returnToQueue(){
-    this.setState({isLoading:true});
-    axios.post('/set-call-as-unopen', {
-      _id:this.state.activeRecord._id
-    })
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        this.setTab('queue')
-        this.setState({activeRecord:null}, ()=>{
-          this.resetState();
-        });
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    });
-    this.refreshUserSession();
-  }
-
-  showHiddenButtons(procedureId, groupId, elClass){
-    let className = `.vas-edit-procedure-${procedureId}-${groupId}`;
-    let container = document.querySelector(className);
-    if(container.classList.contains(elClass)){
-      container.classList.remove(elClass);
-      let containerInputs = document.querySelectorAll(`${className} input`);
-      containerInputs.forEach((el)=>{
-        el.checked = false;
-      });
-    } else {
-      container.classList.add(elClass)
-    }
-  }
-
-  selectButton(e, groupId){
-    if(Number(groupId) === 11){//What
-      this.checkSiblings(e);
-    }
-    if(Number(groupId) === 15){//Insertion Type
-      this.setState({insertionTypeSelected:true});
-      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="8"]').forEach((el)=>{
-        el.style.display = 'inline';
-      })
-      this.checkSiblings(e);
-    }
-    this.refreshUserSession();
-  }
-  
-  checkSiblings(e){
-    let groupContainer = e.target.closest('.vas-edit-procedure-inner-span');
-    while(groupContainer.nextSibling){
-      let nextSib =  groupContainer.nextSibling.querySelector('.vas-edit-procedure-select-input');
-      if(nextSib){
-        //if next id is a 
-        //55 = PAC:Initiated (Port-A-Cath), 57 = Patient Refused (Insertion Procedure)
-        if(nextSib.id === '55' || nextSib.id === '57'){
-          nextSib.checked = false;
-        } else {
-          nextSib.checked = true;
-        }
-      }
-      groupContainer = groupContainer.nextSibling;
-    }
-  }
-
-  changeCustomInput(e, fieldName){
-    this.setState({[fieldName]:e.target.value});
-    this.refreshUserSession();
-  }
-
-  resetForm(){
-    this.setState({
-      modalTitle:'Reset Form?',
-      modalMessage:'Are you sure you want to reset the current form? Will cause an app/page reload.',
-      modalIsOpen:true,
-      modalConfirmation:true,
-      confirmationType:'reset-page'
-    });
-  }
-
-  deleteCall(){
-    this.setState({
-      modalTitle:'Delete Active Record?',
-      modalMessage:'Are you sure you want to delete the currently active record?',
-      modalIsOpen:true,
-      modalConfirmation:true,
-      confirmationType:'delete-call'
-    });
-    this.refreshUserSession();
-  }
-
-  hospitalChange(e){
-    let activeRecord = this.state.activeRecord;
-    if(e.target.value !== ''){
-      activeRecord.hospital = Number(e.target.value);
-    } else {
-      activeRecord.hospital = null;
-    }
-    this.setState({activeRecord}, this.saveActiveRecord);
-  }
-
   procedureOptionCustomChange(e, field){
     this.setState({[field]:e.target.value});
     this.refreshUserSession();
-  }
-
-  changeStatus(e){
-    let activeRecord = this.state.activeRecord;
-    activeRecord.status = e.target.value;
-    this.setState({activeRecord}, this.saveActiveRecord);
   }
 
   render(){
@@ -1011,8 +599,8 @@ export default class Home extends Component{
                       return(
                         <div key={item._id} className={'vas-home-table-tr vas-status-' + item.status + (item.openBy ? ' vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
                           <div className='vas-home-table-time vas-width-10'>
-                            <Moment format='HH:mm'>{this.getDateFromObjectId(item._id)}</Moment>
-                            <Moment className='vas-home-table-time-date' format='M/D'>{this.getDateFromObjectId(item._id)}</Moment>
+                            <Moment format='HH:mm'>{helpers.getDateFromObjectId(item._id)}</Moment>
+                            <Moment className='vas-home-table-time-date' format='M/D'>{helpers.getDateFromObjectId(item._id)}</Moment>
                           </div>
                           <div className='vas-width-90'>
                             <p className='vas-home-table-job-name'>{item.job}{item.customJob ? ' - ' + item.customJob : ''}<b className={'vas-home-table-open-status ' + (item.openBy ? 'vas-home-open-label-blink' : '' )}>{item.openBy ? 'OPEN' : ''}</b></p>
@@ -1039,36 +627,25 @@ export default class Home extends Component{
                   usersById={this.state.usersById}
                   referenceObj={this.state.referenceObj}
                   itemsById={this.state.itemsById}
-                  getDateFromObjectId={this.getDateFromObjectId}
                   editCompletedCall={this.editCompletedCall} 
                   orderChangeById={this.state.orderChangeById}/>
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.referenceObj && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
-                    insertionTypeSelected={this.state.insertionTypeSelected}
-                    insertionLength={this.state.insertionLength}
-                    currentRecord={this.state.activeRecord}
-                    isPostEdit={this.state.activeRecord.completedAt ? true : false}
+                    activeRecord={this.state.activeRecord}
                     allOptions={this.state.allOptions}
                     procedures={this.state.procedures}
                     usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
                     referenceObj={this.state.referenceObj}
-                    inputLiveUpdate={this.inputLiveUpdate}
-                    changeStatus={this.changeStatus}
-                    resetForm={this.resetForm} 
-                    returnToQueue={this.returnToQueue}
                     deleteCall={this.deleteCall}
-                    resetSection={this.resetSection}
                     showHiddenButtons={this.showHiddenButtons}
                     selectButton={this.selectButton}
-                    changeCustomInput={this.changeCustomInput}
-                    hospitalChange={this.hospitalChange}
-                    orderSelect={this.orderSelect}
-                    toggleConsultation={this.toggleConsultation} 
                     setOrderWasChanged={this.setOrderWasChanged}
-                    completeProcedure={this.completeProcedure}/>
+                    refreshUserSession={this.refreshUserSession}
+                    closeRecordCallback={this.closeRecordCallback}
+                    currentUser={this.state.currentUser}/>
                 }
               </div>
             </div>
@@ -1076,7 +653,6 @@ export default class Home extends Component{
               <Modal 
                 isConfirmation={this.state.modalConfirmation}
                 currentUser={this.state.currentUser}
-                getConfirmation={this.getConfirmation}
                 closeModal={this.closeModal}
                 modalTitle={this.state.modalTitle} 
                 modalMessage={this.state.modalMessage}
