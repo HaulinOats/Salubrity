@@ -57,6 +57,7 @@ export default class Home extends Component{
     this.closeRecordCallback = this.closeRecordCallback.bind(this);
     this.getCompletedCalls = this.getCompletedCalls.bind(this);
     this.getOptionsData = this.getOptionsData.bind(this);
+    this.getModalConfirmation = this.getModalConfirmation.bind(this);
   }
 
   resetState(){
@@ -127,6 +128,10 @@ export default class Home extends Component{
     }
   }
 
+  getModalConfirmation(isConfirmed){
+    this.resetModal();
+  }
+
   editCompletedCall(completedCall){
     let isAdmin = this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super';
     if(isAdmin || this.state.currentUser.userId === completedCall.completedBy){
@@ -135,6 +140,12 @@ export default class Home extends Component{
       }, ()=>{
         this.setTab('active');
       });
+    } else {
+      this.setState({
+        modalTitle:"Not Allowed To Edit",
+        modalMessage:"You cannot edit someone else's completed record",
+        modalIsOpen:true
+      })
     }
   }
 
@@ -188,10 +199,6 @@ export default class Home extends Component{
     let currentTime = Math.floor(Date.now() / 1000);
     let timeDiff = currentTime - this.state.currentUser.lastLogin;
     console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 60)`);
-    if(timeDiff > 3600){
-      console.log('Logging user out due to inactivity');
-      this.logout();
-    }
     if(timeDiff > 3419){
       this.setState({
         modalTitle:'Session Is About To End',
@@ -199,6 +206,10 @@ export default class Home extends Component{
         modalIsOpen:true,
         modalConfirmation:true
       })
+    }
+    if(timeDiff > 3600){
+      console.log('Logging user out due to inactivity');
+      this.logout();
     }
   }
 
@@ -585,6 +596,7 @@ export default class Home extends Component{
             </div>
             {this.state.modalIsOpen && 
               <Modal 
+                getConfirmation={this.state.getModalConfirmation}
                 isConfirmation={this.state.modalConfirmation}
                 currentUser={this.state.currentUser}
                 closeModal={this.closeModal}

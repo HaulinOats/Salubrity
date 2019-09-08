@@ -18,14 +18,20 @@ export default class ReturnedProcedures extends Component {
   }
 
   sortByOnChange(e){
-    if(e.target.value !== 'default'){
-      let queriedProcedures = this.state.queriedProcedures;
+    let queriedProcedures = this.state.queriedProcedures;
+    if(e.target.value !== 'callTime'){
       queriedProcedures.sort((a,b)=>{
         if(a[e.target.value] < b[e.target.value]) return -1;
         if(a[e.target.value] > b[e.target.value]) return 1;
         return 0;
       })
       this.setState({queriedProcedures});
+    } else {
+      queriedProcedures.sort((a,b)=>{
+        if(helpers.getDateFromObjectId(a._id) > helpers.getDateFromObjectId(b._id)) return -1;
+        if(helpers.getDateFromObjectId(a._id) < helpers.getDateFromObjectId(b._id)) return 1;
+        return 0;
+      })
     }
   }
 
@@ -42,7 +48,7 @@ export default class ReturnedProcedures extends Component {
       <span className="vas-returned-procedures-outer">
         <div className='vas-table-thead-row vas-home-completed-thead'>
           <select className='vas-select vas-returned-procedures-sortby-select' onChange={this.sortByOnChange}>
-            <option value='default'>Select Sort Field</option>
+            <option value='callTime'>Call Created Time</option>
             <option value='hospitalName'>Hospital</option>
             <option value='completedByName'>Nurse</option>
             <option value='completedAt'>Completion Time</option>
