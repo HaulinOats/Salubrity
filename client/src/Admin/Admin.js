@@ -36,7 +36,7 @@ export default class Admin extends Component {
       proceduresById:null,
       orderChangeById:null,
       allOptions:[],
-      queriedCalls:[],
+      queriedCalls:null,
       firstFilterValue:'',
       secondFilterValue:'',
       secondDropdownArr:[],
@@ -208,7 +208,7 @@ export default class Admin extends Component {
     this.setState({isLoading:true});
     axios.get('/seed-procedures').then((resp)=>{
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({allProcedures:resp.data});
       }
@@ -225,7 +225,7 @@ export default class Admin extends Component {
     .then(resp=>{
       console.log(resp.data);
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({allOptions:resp.data});
       }
@@ -244,7 +244,7 @@ export default class Admin extends Component {
     .then(resp=>{
       console.log(resp.data);
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({allItems:resp.data});
       }
@@ -272,7 +272,7 @@ export default class Admin extends Component {
       })
       .then((resp)=>{
         if(resp.data.error || resp.data._message){
-          console.log(resp.data);
+          alert(resp.data.error ? resp.data.error : resp.data._message);
         } else {
           let users = this.state.allUsers;
           users.push(resp.data);
@@ -330,7 +330,7 @@ export default class Admin extends Component {
     .then((resp)=>{
       console.log('user deleted');
       if(resp.data.error || resp.data._message){
-        console.log(resp.data)
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.getAllUsers();
       }
@@ -470,7 +470,7 @@ export default class Admin extends Component {
     })
     .then(resp=>{
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -490,9 +490,8 @@ export default class Admin extends Component {
       endDate:moment(this.state.endDate).endOf('day').toISOString()
     })
     .then(resp=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -513,10 +512,9 @@ export default class Admin extends Component {
         startDate:moment(this.state.startDate).startOf('day').toISOString(),
         endDate:moment(this.state.endDate).endOf('day').toISOString()
       }
-    })
-    .then(resp=>{
+    }).then(resp=>{
       if(resp.data.error || resp.data._message){
-        alert(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -543,7 +541,7 @@ export default class Admin extends Component {
     })
     .then(resp=>{
       if(resp.data.error || resp.data._message){
-        alert(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -581,11 +579,9 @@ export default class Admin extends Component {
     }
 
     this.setState({isLoading:true});
-    axios.post('/calls-by-single-criteria', query)
-    .then(resp=>{
-      console.log(resp.data);
+    axios.post('/calls-by-single-criteria', query).then(resp=>{
       if(resp.data.error || resp.data._message){
-        alert(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -604,7 +600,7 @@ export default class Admin extends Component {
     .then(resp=>{
       console.log(resp.data);
       if(resp.data.error || resp.data._message){
-        alert(resp.data)
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -636,7 +632,7 @@ export default class Admin extends Component {
     })
     .then(resp=>{
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         let options = this.state.allOptions;
         options[0] = resp.data;
@@ -658,7 +654,7 @@ export default class Admin extends Component {
     })
     .then(resp=>{
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         let options = this.state.allOptions;
         options[3] = resp.data;
@@ -680,7 +676,7 @@ export default class Admin extends Component {
     })
     .then(resp=>{
       if(resp.data.error || resp.data._message){
-        console.log(resp.data);
+        alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
         let options = this.state.allOptions;
         options[5] = resp.data;
@@ -836,7 +832,7 @@ export default class Admin extends Component {
                     <button className='vas-admin-date-range-submit d-inline' onClick={this.submitDateRange}>Submit</button>
                   }
                 </div>
-                {this.state.queriedCalls.length > 0 &&
+                {this.state.queriedCalls &&
                 <ReturnedProcedures 
                   queriedProcedures={this.state.queriedCalls}
                   hospitalsById={this.state.hospitalsById}

@@ -9,8 +9,8 @@ export default class EditProcedure extends Component {
   constructor(props){
     super(props);
     this.state = {
-      currentRecord:this.props.activeRecord,
-      isPostEdit:this.props.activeRecord.completedAt ? true : false,
+      currentRecord:null,
+      isPostEdit:false,
       insertionLength:'',
       insertionTypeSelected:false,
       proceduresDoneIdArr:null,
@@ -45,6 +45,13 @@ export default class EditProcedure extends Component {
     this.showHiddenButtons = this.showHiddenButtons.bind(this);
     this.setRecordStateItems = this.setRecordStateItems.bind(this);
   };
+
+  componentWillReceiveProps(nextProps){
+    this.setState({
+      currentRecord:nextProps.activeRecord,
+      isPostEdit:nextProps.activeRecord.completedAt ? true : false
+    })
+  }
 
   componentWillMount(){
     let proceduresDoneIdArr = [];

@@ -355,7 +355,7 @@ app.post('/calls-containing-value', (req, res)=>{
     if(calls.length){
       res.send(calls);
     } else {
-      res.send({'error':`no calls returned for query`});
+      res.send({'error':`no calls returned for this query: ${req.body.query.key} = ${req.body.query.value}`});
     }
   })
 })
@@ -374,7 +374,7 @@ app.post('/calls-by-procedure-id', (req, res)=>{
     if(calls.length){
       res.send(calls);
     } else {
-      res.send({'error':`no calls returned for query`});
+      res.send({'error':`no calls returned for this query: procedureId = ${req.body.procedureId}`});
     }
   })
 });
@@ -391,7 +391,7 @@ app.post('/calls-by-single-criteria', (req, res)=>{
     if(calls.length){
       res.send(calls);
     } else {
-      res.send({'error':`no calls returned for query`});
+      res.send({'error':`no calls returned for this query: ${req.body.query.key} = ${req.body.query.value}`});
     }
   })
 });
