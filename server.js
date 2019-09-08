@@ -267,8 +267,11 @@ app.post('/delete-user', (req, res)=>{
 });
 
 app.get('/get-all-users', (req, res)=>{
-  User.find({role: {$ne: 'super'}}).sort({ userId: 1 }).exec((err, users)=>{
+  User.find().sort({userId:1}).exec((err, users)=>{
     if(err) return res.send(err);
+    users.forEach((user, idx)=>{
+      delete users[idx].password;
+    })
     res.send(users);
   });
 });

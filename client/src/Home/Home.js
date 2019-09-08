@@ -28,6 +28,7 @@ export default class Home extends Component{
       completedCalls:[],
       procedures:[],
       allOptions:[],
+      allUsers:[],
       usersById:null,
       itemsById:null,
       hospitalsById:null,
@@ -54,6 +55,8 @@ export default class Home extends Component{
     this.timerTick = this.timerTick.bind(this);
     this.resetState = this.resetState.bind(this);
     this.closeRecordCallback = this.closeRecordCallback.bind(this);
+    this.getCompletedCalls = this.getCompletedCalls.bind(this);
+    this.getOptionsData = this.getOptionsData.bind(this);
   }
 
   resetState(){
@@ -137,6 +140,7 @@ export default class Home extends Component{
 
   componentDidMount(){
     this.startSessionInterval();
+    console.log(this.state);
   }
 
   startSessionInterval(){
@@ -224,15 +228,44 @@ export default class Home extends Component{
   }
 
   stateLoadCalls(){
-    this.getAllUsers();
+    helpers.getAllUsers().then(data=>{
+      this.setState({
+        allUsers:data.usersArr,
+        usersById:data.usersById
+      }, this.getOptionsData)
+    }).catch(err=>{
+      this.addToErrorArray(err);
+    });
+
+    helpers.getProcedureData().then(data=>{
+      this.setState({
+        procedures:data.procedures,
+        referenceObj:data.referenceObj
+      })
+    }).catch(err=>{
+      this.addToErrorArray(err);
+    })
+
+    helpers.getItemsData().then(data=>{
+      this.setState({itemsById:data});
+    }).catch(err=>{
+      this.addToErrorArray(err);
+    })
+
     this.getActiveCalls();
-    this.getCompletedCalls();
-    this.getProcedureData();
-    this.getOptionsData();
-    this.getItemsData();
-    setTimeout(()=>{
-      console.log(this.state);
-    }, 1000);
+  }
+
+  getOptionsData(){
+    helpers.getOptionsData().then(data=>{
+      this.setState({
+        allOptions:data.options,
+        hospitalsById:data.hospitals,
+        orderChangeById:data.orders,
+        statusById:data.statuses
+      }, this.getCompletedCalls)
+    }).catch(err=>{
+      this.addToErrorArray()
+    })
   }
 
   setTab(tab, event){
@@ -269,26 +302,6 @@ export default class Home extends Component{
     this.setState({lastUpdate:this.state.lastUpdate + 1});
   }
 
-  getAllUsers(){
-    axios.get('/get-all-users')
-    .then((resp)=>{
-      let usersObj = {};
-      for(let i = 0; i < resp.data.length; i++){
-        let user = resp.data[i];
-        delete user.password;
-        usersObj[resp.data[i].userId] = user;
-      }
-      this.setState({
-        usersById:usersObj
-      });
-    }).catch((err)=>{
-      this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
   addCall(){
     this.setState({
       modalTitle:'Add Call',
@@ -297,100 +310,12 @@ export default class Home extends Component{
     this.refreshUserSession();
   }
 
-  getProcedureData(){
-    axios.get('/get-procedures')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        this.setState({
-          procedures:resp.data.procedures,
-          referenceObj:resp.data.referenceObj
-        });
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-  }
-
-  getOptionsData(){
-    this.setState({isLoading:true});
-    axios.get('/get-options')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        let hospitals = {};
-        resp.data[0].options.forEach(hospital=>{
-          hospitals[hospital.id] = hospital;
-        });
-        let orders = {};
-        resp.data[3].options.forEach(order=>{
-          orders[order.id] = order;
-        });
-        let status = {};
-        resp.data[6].options.forEach(status=>{
-          status[status.id] = status;
-        })
-        this.setState({
-          allOptions:resp.data,
-          hospitalsById:hospitals,
-          orderChangeById:orders,
-          statusById:status
-        });
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  getItemsData(){
-    this.setState({isLoading:true});
-    axios.get('/get-items')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        let items = {};
-        resp.data.forEach(item=>{
-          items[item.itemId] = item;
-        })
-        this.setState({
-          itemsById:items
-        });
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
   getActiveCalls(){
-    axios.get('/get-active-calls')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        console.log('active calls updating...');
-        this.setState({queueItems:resp.data}, this.checkActiveRecordExists);
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
+    helpers.getActiveCalls().then(data=>{
+      this.setState({queueItems:data}, this.checkActiveRecordExists);
+    }).catch(err=>{
       this.addToErrorArray(err);
-    })
-    .finally(()=>{
+    }).finally(()=>{
       clearInterval(this.updateTimer);
       this.setState({lastUpdate:0}, ()=>{
         this.updateTimer = setInterval(this.timerTick, 1000);
@@ -399,20 +324,27 @@ export default class Home extends Component{
   }
 
   getCompletedCalls(){
-    axios.get('/get-completed-calls')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        console.log('completed calls updating...');
-        this.setState({completedCalls:resp.data});
+    helpers.getCompletedCalls().then(data=>{
+      let calls = data;
+      for(let i = 0; i < calls.length; i++){
+        //add nurse name to call for sorting
+        if(calls[i].completedBy !== null){
+          calls[i].completedByName = this.state.usersById[calls[i].completedBy].fullname;
+        } else {
+          calls[i].completedByName = null;
+        }
+        //add hospital name to call for sorting
+        if(calls[i].hospital !== null){
+          calls[i].hospitalName = this.state.hospitalsById[calls[i].hospital].name;
+        } else {
+          calls[i].hospitalName = null;
+        }
+
       }
-    })
-    .catch((err)=>{
-      console.log(err);
+      this.setState({completedCalls:calls});
+    }).catch((err)=>{
       this.addToErrorArray(err);
-    })
-    .finally(()=>{
+    }).finally(()=>{
       clearInterval(this.updateTimer);
       this.setState({lastUpdate:0}, ()=>{
         this.updateTimer = setInterval(this.timerTick, 1000);

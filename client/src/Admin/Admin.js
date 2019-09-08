@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Login from '../Widgets/Login/Login';
 import Modal from '../Widgets/Modal/Modal';
 import EditProcedure from '../Widgets/EditProcedure/EditProcedure';
+import helpers from '../helpers';
 import './Admin.css';
 import axios from 'axios';
 import moment from 'moment';
@@ -25,9 +26,9 @@ export default class Admin extends Component {
       addUserName:'',
       addPassword:'',
       addAdminAccess:false,
-      allUsers:[],
       procedures:[],
       allItems:[],
+      allUsers:[],
       usersById:null,
       referenceObj:null,
       hospitalsById:null,
@@ -163,124 +164,57 @@ export default class Admin extends Component {
   }
 
   stateLoadCalls(){
-    this.getAllUsers();
-    this.getProcedureData();
-    this.getOptionsData();
-    this.getItemsData();
-  }
-
-  getProcedureData(){
-    axios.get('/get-procedures')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        this.setState({
-          procedures:resp.data.procedures,
-          referenceObj:resp.data.referenceObj
-        });
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-  }
-
-  getOptionsData(){
-    this.setState({isLoading:true});
-    axios.get('/get-options')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        let hospitals = {};
-        resp.data[0].options.forEach(hospital=>{
-          hospitals[hospital.id] = hospital;
-        });
-        let orders = {};
-        resp.data[3].options.forEach(order=>{
-          orders[order.id] = order;
-        });
-        let status = {};
-        resp.data[6].options.forEach(status=>{
-          status[status.id] = status;
-        })
-        this.setState({
-          allOptions:resp.data,
-          hospitalsById:hospitals,
-          orderChangeById:orders,
-          statusById:status
-        });
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  getItemsData(){
-    this.setState({isLoading:true});
-    axios.get('/get-items')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        let items = {};
-        resp.data.forEach(item=>{
-          items[item.itemId] = item;
-        })
-        this.setState({
-          itemsById:items
-        });
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  getAllUsers(){
-    axios.get('/get-all-users')
-    .then((resp)=>{
-      let usersObj = {};
-      for(let i = 0; i < resp.data.length; i++){
-        usersObj[resp.data[i].userId] = resp.data[i]
-      }
+    helpers.getProcedureData().then(data=>{
       this.setState({
-        allUsers:resp.data,
-        usersById:usersObj
-      });
-    }).catch((err)=>{
+        procedures:data.procedures,
+        referenceObj:data.referenceObj
+      })
+    }).catch(err=>{
+      this.addToErrorArray(err);
+    })
+    
+    helpers.getOptionsData().then(data=>{
+      this.setState({
+        allOptions:data.options,
+        hospitalsById:data.hospitals,
+        orderChangeById:data.orders,
+        statusById:data.statuses
+      })
+    }).catch(err=>{
+      this.addToErrorArray()
+    })
+    
+    helpers.getItemsData().then(data=>{
+      this.setState({itemsById:data});
+    }).catch(err=>{
       console.log(err);
     })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
+
+    this.getAllUsers();
+  }
+  
+  getAllUsers(){
+    helpers.getAllUsers().then(data=>{
+      this.setState({
+        allUsers:data.usersArr,
+        usersById:data.usersById
+      })
+    }).catch(err=>{
+      console.log(err);
+    });
   }
 
   seedProcedures(){
     this.setState({isLoading:true});
-    axios.get('/seed-procedures')
-    .then((resp)=>{
+    axios.get('/seed-procedures').then((resp)=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
         this.setState({allProcedures:resp.data});
       }
-    })
-    .catch((err)=>{
+    }).catch((err)=>{
       console.log(err);
-    })
-    .finally(()=>{
+    }).finally(()=>{
       this.setState({isLoading:false});
     })
   }
@@ -449,14 +383,26 @@ export default class Admin extends Component {
     axios.post('/get-calls-date-range', {
       startDate:moment(this.state.startDate).startOf('day').toISOString(),
       endDate:moment(this.state.endDate).endOf('day').toISOString()
-    })
-    .then(resp=>{
-      this.setState({queriedCalls:resp.data});
-    })
-    .catch(err=>{
+    }).then(resp=>{
+      let calls = resp.data;
+      //add nurse name to call for sorting
+      for(let i = 0; i < calls.length; i++){
+        if(calls[i].completedBy !== null){
+          calls[i].completedByName = this.state.usersById[calls[i].completedBy].fullname;
+        } else {
+          calls[i].completedByName = null;
+        }
+        //add hospital name to call for sorting
+        if(calls[i].hospital !== null){
+          calls[i].hospitalName = this.state.hospitalsById[calls[i].hospital].name;
+        } else {
+          calls[i].hospitalName = null;
+        }
+      }
+      this.setState({queriedCalls:calls});
+    }).catch(err=>{
       console.log(err);
-    })
-    .finally(()=>{
+    }).finally(()=>{
       this.setState({isLoading:false});
     })
   }

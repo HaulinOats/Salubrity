@@ -43,8 +43,8 @@ export default class ReturnedProcedures extends Component {
         <div className='vas-table-thead-row vas-home-completed-thead'>
           <select className='vas-select vas-returned-procedures-sortby-select' onChange={this.sortByOnChange}>
             <option value='default'>Select Sort Field</option>
-            <option value='hospital'>Hospital ID</option>
-            <option value='completedBy'>Nurse ID</option>
+            <option value='hospitalName'>Hospital</option>
+            <option value='completedByName'>Nurse</option>
             <option value='completedAt'>Completion Time</option>
             <option value='responseTime'>Response Time</option>
             <option value='procedureTime'>Procedure Time</option>
