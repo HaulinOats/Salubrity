@@ -262,6 +262,10 @@ exports.referencesObject = {
     '18':{
       seq:18,
       name:'Insertion Length'
+    },
+    '19':{
+      seq:19,
+      name:'Hospital Staff Obtained'
     }
   }
 };
@@ -388,6 +392,13 @@ exports.itemSeed = [
     isCustom:false
   },
   {
+    itemId:71,
+    procedureId:1,
+    groupId:19,
+    value:'Hospital Staff Obtained',
+    isCustom:false
+  },
+  {
     itemId:18,
     procedureId:2,
     groupId:1,
@@ -413,6 +424,13 @@ exports.itemSeed = [
     procedureId:2,
     groupId:5,
     value:'US Used',
+    isCustom:false
+  },
+  {
+    itemId:72,
+    procedureId:1,
+    groupId:19,
+    value:'Hospital Staff Obtained',
     isCustom:false
   },
   {
@@ -804,6 +822,12 @@ exports.procedureSeed = [
         groupId:4,
         inputType:'checkbox',
         groupItems:[10,11,12,13,14,15],
+      },
+      {
+        seq:7,
+        group:19,
+        inputType:'checkbox',
+        groupItems:[71]
       }
     ]
   },
@@ -829,6 +853,12 @@ exports.procedureSeed = [
         groupId:5,
         inputType:'checkbox',
         groupItems:[21]
+      },
+      {
+        seq:4,
+        group:19,
+        inputType:'checkbox',
+        groupItems:[72]
       }
     ]
   },

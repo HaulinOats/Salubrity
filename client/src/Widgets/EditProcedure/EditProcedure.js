@@ -529,6 +529,8 @@ export default class EditProcedure extends Component {
                 </header>
                 <div className="vas-edit-procedure-inner-container-main">
                   {procedure.groups.map((group, idx2)=>{
+                    console.log(group.groupId);
+                    console.log(this.props.referenceObj.groups);
                     return(
                       <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + group.groupId}>
                         {/* Cathflow: groupId = 14 */}

@@ -510,7 +510,8 @@ export default class Home extends Component{
                 <button className='vas-button vas-home-add-call' onClick={this.addCall}>Add Call</button>
               </div>
               <div className='vas-header-right-container'>
-                <span className={"vas-status-dot " + (this.state.errorArr.length > 0 ? 'vas-status-bad' : '')} onClick={this.sendErrorsToAdmin}></span>
+                {/* <span className={"vas-status-dot " + (this.state.errorArr.length > 0 ? 'vas-status-bad' : '')} onClick={this.sendErrorsToAdmin}></span> */}
+                <span className={"vas-status-dot"} onClick={this.sendErrorsToAdmin}></span>
                 <p className='vas-home-main-header-user vas-nowrap'>{this.state.currentUser.fullname}</p>
                 <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
               </div>

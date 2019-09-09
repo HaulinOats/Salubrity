@@ -127,10 +127,10 @@ app.post('/delete-call', (req, res)=>{
 app.get('/get-active-calls', (req, res)=>{
   Call.find({completedAt:null}, (err, calls)=>{
     if(err) return res.send(err);
-    if(calls.length){
+    if(calls){
       res.send(calls);
     } else {
-      res.send({'error':'there are no calls to return', 'placeholderData':[]});
+      res.send({'error':'there are no calls to return'});
     }
   })
 });
