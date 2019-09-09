@@ -19,8 +19,7 @@ export default class EditProcedure extends Component {
       modalTitle:'',
       modalMessage:'',
       modalConfirmation:false,
-      confirmationType:null,
-      lastUpdate:0
+      confirmationType:null
     }
     this.saveCurrentRecord = this.saveCurrentRecord.bind(this);
     this.hospitalChange = this.hospitalChange.bind(this);
@@ -49,13 +48,6 @@ export default class EditProcedure extends Component {
   
   componentDidMount(){
     // console.log(this.state);
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if(nextProps.lastUpdate !== nextState.lastUpdate) {
-      return false;
-    }
-    return true;
   }
 
   componentWillReceiveProps(nextProps){

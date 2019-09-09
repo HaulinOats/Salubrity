@@ -571,8 +571,7 @@ export default class Home extends Component{
                     referenceObj={this.state.referenceObj}
                     itemsById={this.state.itemsById}
                     editCompletedCall={this.editCompletedCall} 
-                    orderChangeById={this.state.orderChangeById}
-                    lastUpdate={this.state.lastUpdate}/>
+                    orderChangeById={this.state.orderChangeById}/>
                 }
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
@@ -586,8 +585,7 @@ export default class Home extends Component{
                     referenceObj={this.state.referenceObj}
                     refreshUserSession={this.refreshUserSession}
                     closeRecordCallback={this.closeRecordCallback}
-                    currentUser={this.state.currentUser}
-                    lastUpdate={this.state.lastUpdate}/>
+                    currentUser={this.state.currentUser}/>
                 }
               </div>
             </div>

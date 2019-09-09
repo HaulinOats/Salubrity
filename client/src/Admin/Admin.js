@@ -79,14 +79,6 @@ export default class Admin extends Component {
         this.stateLoadCalls();
       });
     }
-
-    if(ls('activeHomeTab')){
-      this.setState({activeHomeTab:ls('activeHomeTab')}, ()=>{
-        if(this.state.activeHomeTab === 'active'){
-          this.setState({lastUpdateHide:true});
-        }
-      });
-    }
   }
 
   componentDidMount(){
@@ -843,8 +835,7 @@ export default class Admin extends Component {
                   referenceObj={this.state.referenceObj}
                   itemsById={this.state.itemsById}
                   editCompletedCall={this.editCompletedCall} 
-                  orderChangeById={this.state.orderChangeById}
-                  lastUpdate={0}/>
+                  orderChangeById={this.state.orderChangeById}/>
                 }
               </div>
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
@@ -858,8 +849,7 @@ export default class Admin extends Component {
                     referenceObj={this.state.referenceObj}
                     refreshUserSession={this.refreshUserSession}
                     closeRecordCallback={this.closeRecordCallback}
-                    currentUser={this.state.currentUser}
-                    lastUpdateHide={0}/>
+                    currentUser={this.state.currentUser}/>
                 }
               </div>
               <div className='vas-admin-page-container vas-admin-users-container' data-isactive={this.state.activePage === 'users' ? true : false}>
