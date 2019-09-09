@@ -110,6 +110,7 @@
   width: 87%;
   padding: 1%;
   font-size: 85%;
+  clear:left;
 }
 .vas-call-consultation-container{
   padding: 1%;
@@ -132,7 +133,7 @@
     padding: .5% 0 .5% .5%;
     margin: 0;
     width: 39%;
-    display: inline-block;
+    display: inline-flex;
   }
   .vas-call-comments-container,
   .vas-call-consultation-container {

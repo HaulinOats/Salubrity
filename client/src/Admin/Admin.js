@@ -27,7 +27,6 @@ export default class Admin extends Component {
       addPassword:'',
       addAdminAccess:false,
       procedures:[],
-      allItems:[],
       allUsers:[],
       usersById:null,
       referenceObj:null,
@@ -92,7 +91,6 @@ export default class Admin extends Component {
 
   componentDidMount(){
     this.startSessionInterval();
-    console.log(this.state);
   }
 
   closeRecordCallback(type){
@@ -164,15 +162,6 @@ export default class Admin extends Component {
   }
 
   stateLoadCalls(){
-    helpers.getProcedureData().then(data=>{
-      this.setState({
-        procedures:data.procedures,
-        referenceObj:data.referenceObj
-      })
-    }).catch(err=>{
-      this.addToErrorArray(err);
-    })
-    
     helpers.getOptionsData().then(data=>{
       this.setState({
         allOptions:data.options,
@@ -181,7 +170,20 @@ export default class Admin extends Component {
         statusById:data.statuses
       })
     }).catch(err=>{
-      this.addToErrorArray()
+      console.log(err);
+    })
+
+    helpers.getProcedureData().then(data=>{
+      this.setState({
+        procedures:data.procedures,
+        referenceObj:data.referenceObj
+      }, ()=>{
+        setTimeout(()=>{
+          console.log(this.state);
+        },1000)
+      })
+    }).catch(err=>{
+      console.log(err);
     })
     
     helpers.getItemsData().then(data=>{
@@ -246,7 +248,7 @@ export default class Admin extends Component {
       if(resp.data.error || resp.data._message){
         alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
-        this.setState({allItems:resp.data});
+        console.log(resp.data);
       }
     })
     .catch(err=>{
@@ -429,11 +431,12 @@ export default class Admin extends Component {
           filterArr = this.state.allUsers;
         }
         if(e.target.value === 'procedureId'){
-          filterArr = this.state.allProcedures;
+          filterArr = this.state.procedures;
         }
         if(e.target.value === 'hospital'){
           filterArr = this.state.allOptions[0].options;
         }
+        console.log(this.state.procedures);
         this.setState({
           firstFilterValue:e.target.value,
           secondFilterValue:'',
@@ -810,13 +813,13 @@ export default class Admin extends Component {
                       <input type='text' value={this.state.secondFilterValue} onKeyUp={e=>{this.customInputKeyUp(e)}} onChange={e=>{this.setState({secondFilterValue:e.target.value})}}/>
                     </div>
                   }
-                  {this.state.firstFilterValue === 'procedureId' &&
+                  {this.state.referenceObj && this.state.firstFilterValue === 'procedureId' &&
                     <div className='vas-admin-filter-container'>
                       <p>Procedure:</p>
                       <select className='vas-select' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
                         <option value='default'>Select Procedure</option>
                         {this.state.secondDropdownArr.map((procedure, idx)=>{
-                          return <option key={procedure.procedureId} value={procedure.procedureId}>{procedure.name}</option>
+                          return <option key={procedure.procedureId} value={procedure.procedureId}>{this.state.referenceObj.procedures[procedure.procedureId].name}</option>
                         })
                         }
                       </select>
