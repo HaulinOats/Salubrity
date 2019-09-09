@@ -301,6 +301,7 @@ export default class Home extends Component{
       }
       if(this.state.activeHomeTab === 'active'){
         this.setState({lastUpdateHide:true});
+        clearInterval(this.updateTimer);
       }
       this.refreshUserSession();
     });
@@ -570,7 +571,8 @@ export default class Home extends Component{
                     referenceObj={this.state.referenceObj}
                     itemsById={this.state.itemsById}
                     editCompletedCall={this.editCompletedCall} 
-                    orderChangeById={this.state.orderChangeById}/>
+                    orderChangeById={this.state.orderChangeById}
+                    lastUpdate={this.state.lastUpdate}/>
                 }
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
@@ -584,7 +586,8 @@ export default class Home extends Component{
                     referenceObj={this.state.referenceObj}
                     refreshUserSession={this.refreshUserSession}
                     closeRecordCallback={this.closeRecordCallback}
-                    currentUser={this.state.currentUser}/>
+                    currentUser={this.state.currentUser}
+                    lastUpdate={this.state.lastUpdate}/>
                 }
               </div>
             </div>

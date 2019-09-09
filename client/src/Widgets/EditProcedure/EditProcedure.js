@@ -19,7 +19,8 @@ export default class EditProcedure extends Component {
       modalTitle:'',
       modalMessage:'',
       modalConfirmation:false,
-      confirmationType:null
+      confirmationType:null,
+      lastUpdate:0
     }
     this.saveCurrentRecord = this.saveCurrentRecord.bind(this);
     this.hospitalChange = this.hospitalChange.bind(this);
@@ -47,8 +48,14 @@ export default class EditProcedure extends Component {
   };
   
   componentDidMount(){
-    console.log(this.state);
-    this.setRecordStateItems();
+    // console.log(this.state);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if(nextProps.lastUpdate !== nextState.lastUpdate) {
+      return false;
+    }
+    return true;
   }
 
   componentWillReceiveProps(nextProps){
@@ -62,7 +69,7 @@ export default class EditProcedure extends Component {
           proceduresDoneIdArr.push(itemId);
         })
       });
-      this.setState({proceduresDoneIdArr})
+      this.setState({proceduresDoneIdArr}, this.setRecordStateItems)
     })
   }
 
@@ -425,9 +432,7 @@ export default class EditProcedure extends Component {
         }
       });
     }
-    this.setState(stateObj, ()=>{
-      console.log(this.state);
-    });
+    this.setState(stateObj);
   }
 
   showHiddenButtons(procedureId, groupId, elClass){

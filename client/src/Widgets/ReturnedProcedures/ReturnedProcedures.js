@@ -7,7 +7,8 @@ export default class ReturnedProcedures extends Component {
   constructor(props){
     super(props);
     this.state = {
-      queriedProcedures:null
+      queriedProcedures:null,
+      lastUpdate:0
     }
     this.toggleSort = this.toggleSort.bind(this);
     this.sortByOnChange = this.sortByOnChange.bind(this);
@@ -15,6 +16,13 @@ export default class ReturnedProcedures extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({ queriedProcedures: nextProps.queriedProcedures });  
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if(nextProps.lastUpdate !== nextState.lastUpdate) {
+      return false;
+    }
+    return true;
   }
 
   sortByOnChange(e){
