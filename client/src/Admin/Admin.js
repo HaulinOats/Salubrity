@@ -903,7 +903,7 @@ export default class Admin extends Component {
                             </td>
                             <td>{user.role}</td>
                             <td className='vas-admin-delete-user'>
-                              {user.role !== 'admin' &&
+                              {user.role !== 'admin' && user.role !== 'super' &&
                                 <p data-id={user._id} data-index={idx} onClick={e=>{this.deleteUser(user._id)}}>&times;</p>
                               }
                             </td>
