@@ -7,7 +7,7 @@ export default class ReturnedProcedures extends Component {
   constructor(props){
     super(props);
     this.state = {
-      queriedProcedures:null,
+      queriedProcedures:[],
       lastUpdate:0
     }
     this.toggleSort = this.toggleSort.bind(this);

@@ -35,7 +35,7 @@ export default class Admin extends Component {
       proceduresById:null,
       orderChangeById:null,
       allOptions:[],
-      queriedCalls:null,
+      queriedCalls:[],
       firstFilterValue:'',
       secondFilterValue:'',
       secondDropdownArr:[],
@@ -835,7 +835,7 @@ export default class Admin extends Component {
                     <button className='vas-admin-date-range-submit d-inline' onClick={this.submitDateRange}>Submit</button>
                   }
                 </div>
-                {this.state.queriedCalls &&
+                {this.state.queriedCalls.length > 0 &&
                 <ReturnedProcedures 
                   queriedProcedures={this.state.queriedCalls}
                   hospitalsById={this.state.hospitalsById}
@@ -843,7 +843,8 @@ export default class Admin extends Component {
                   referenceObj={this.state.referenceObj}
                   itemsById={this.state.itemsById}
                   editCompletedCall={this.editCompletedCall} 
-                  orderChangeById={this.state.orderChangeById}/>
+                  orderChangeById={this.state.orderChangeById}
+                  lastUpdate={0}/>
                 }
               </div>
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
@@ -857,7 +858,8 @@ export default class Admin extends Component {
                     referenceObj={this.state.referenceObj}
                     refreshUserSession={this.refreshUserSession}
                     closeRecordCallback={this.closeRecordCallback}
-                    currentUser={this.state.currentUser}/>
+                    currentUser={this.state.currentUser}
+                    lastUpdateHide={0}/>
                 }
               </div>
               <div className='vas-admin-page-container vas-admin-users-container' data-isactive={this.state.activePage === 'users' ? true : false}>
