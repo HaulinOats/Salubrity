@@ -894,7 +894,7 @@ export default class Admin extends Component {
                             <td className='vas-capitalize'>{user.fullname}</td>
                             <td>{user.username}</td>
                             <td>
-                              {user.role !== 'admin' &&
+                              {user.role !== 'admin' && user.role !== 'super' &&
                                 <span className='vas-admin-manage-users-pw'>
                                   <p onClick={e=>{this.togglePassword(e, true)}}>********</p>
                                   <p style={{'display':'none'}} onClick={e=>{this.togglePassword(e, false)}}>{user.password}</p>
