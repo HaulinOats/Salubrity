@@ -825,7 +825,7 @@ exports.procedureSeed = [
       },
       {
         seq:7,
-        group:19,
+        groupId:19,
         inputType:'checkbox',
         groupItems:[71]
       }
@@ -856,7 +856,7 @@ exports.procedureSeed = [
       },
       {
         seq:4,
-        group:19,
+        groupId:19,
         inputType:'checkbox',
         groupItems:[72]
       }

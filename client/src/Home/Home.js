@@ -89,9 +89,7 @@ export default class Home extends Component{
 
     if(ls('activeHomeTab')){
       this.setState({activeHomeTab:ls('activeHomeTab')}, ()=>{
-        if(this.state.activeHomeTab === 'active'){
-          this.setState({lastUpdateHide:true});
-        }
+        this.setTab(this.state.activeHomeTab)
       });
     }
 
@@ -296,8 +294,7 @@ export default class Home extends Component{
       }
       if(this.state.activeHomeTab === 'complete'){
         this.setState({
-          lastUpdateHide:false,
-          completedCalls:[]
+          lastUpdateHide:false
         }, ()=>{
           this.getCompletedCalls();
         });
@@ -350,7 +347,6 @@ export default class Home extends Component{
         } else {
           calls[i].hospitalName = null;
         }
-
       }
       this.setState({completedCalls:calls});
     }).catch((err)=>{
@@ -494,9 +490,6 @@ export default class Home extends Component{
   }
 
   render(){
-    let lastUpdateMin = Math.floor(this.state.lastUpdate/60);
-    let lastUpdateSec = this.state.lastUpdate - lastUpdateMin * 60;
-
     return(
       <div>
         {!this.state.currentUser &&
@@ -534,7 +527,7 @@ export default class Home extends Component{
               {!this.state.lastUpdateHide &&
                 <div className='vas-home-last-update-container'>
                   <p className='vas-home-last-update-label'>Last Update:</p>
-                  <p className='vas-home-last-update-timer'>{lastUpdateMin > 0 ? lastUpdateMin : '0'}:{lastUpdateSec < 10 ? '0' + lastUpdateSec : lastUpdateSec}</p>
+                  <p className='vas-home-last-update-timer'>{(Math.floor(this.state.lastUpdate/60)) > 0 ? (Math.floor(this.state.lastUpdate/60)) : '0'}:{(this.state.lastUpdate - (Math.floor(this.state.lastUpdate/60) * 60)) < 10 ? '0' + (this.state.lastUpdate - (Math.floor(this.state.lastUpdate/60) * 60)) : (this.state.lastUpdate - (Math.floor(this.state.lastUpdate/60) * 60))}</p>
                 </div>
               }
             </ul>

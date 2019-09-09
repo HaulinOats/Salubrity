@@ -321,7 +321,7 @@ app.get('/get-completed-calls', (req, res)=>{
 
   Call.find({completedAt: {$gte: start, $lt: end}}).sort({completedAt:-1}).exec((err, calls)=>{
     if(err) return res.send(err);
-    if(calls.length){
+    if(calls){
       res.send(calls);
     } else {
       res.send({'error':'no completed calls for today, yet'});

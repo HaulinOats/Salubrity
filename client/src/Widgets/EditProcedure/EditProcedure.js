@@ -9,8 +9,8 @@ export default class EditProcedure extends Component {
   constructor(props){
     super(props);
     this.state = {
-      currentRecord:this.props.activeRecord,
-      isPostEdit:this.props.activeRecord.completedAt ? true : false,
+      currentRecord:null,
+      isPostEdit:false,
       insertionLength:'',
       insertionTypeSelected:false,
       proceduresDoneIdArr:null,
@@ -45,22 +45,25 @@ export default class EditProcedure extends Component {
     this.showHiddenButtons = this.showHiddenButtons.bind(this);
     this.setRecordStateItems = this.setRecordStateItems.bind(this);
   };
-
-  componentWillMount(){
-    let proceduresDoneIdArr = [];
-    this.state.currentRecord.proceduresDone.forEach(procedureArr=>{
-      procedureArr.itemIds.forEach(itemId=>{
-        proceduresDoneIdArr.push(itemId);
-      })
-    });
-    this.setState({
-      proceduresDoneIdArr
-    });
-  }
   
   componentDidMount(){
     console.log(this.state);
     this.setRecordStateItems();
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.setState({
+      currentRecord:nextProps.activeRecord,
+      isPostEdit:nextProps.activeRecord.completedAt ? true : false
+    }, ()=>{
+      let proceduresDoneIdArr = [];
+      this.state.currentRecord.proceduresDone.forEach(procedureArr=>{
+        procedureArr.itemIds.forEach(itemId=>{
+          proceduresDoneIdArr.push(itemId);
+        })
+      });
+      this.setState({proceduresDoneIdArr})
+    })
   }
 
   //NON-LIFECYCLE METHODS
@@ -529,8 +532,6 @@ export default class EditProcedure extends Component {
                 </header>
                 <div className="vas-edit-procedure-inner-container-main">
                   {procedure.groups.map((group, idx2)=>{
-                    console.log(group.groupId);
-                    console.log(this.props.referenceObj.groups);
                     return(
                       <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + group.groupId}>
                         {/* Cathflow: groupId = 14 */}

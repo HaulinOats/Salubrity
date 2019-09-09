@@ -130,7 +130,7 @@ export default class ReturnedProcedures extends Component {
                                 procedure.itemIds.map((id, idx)=>{
                                   let isCustom = this.props.itemsById[id].isCustom;
                                   return (
-                                    <p key={id + idx} className='vas-admin-query-item'>{!isCustom ? this.props.itemsById[id].value : this.props.itemsById[id].valuePrefix + procedure.customValues[id] + this.props.itemsById[id].valueSuffix}</p>
+                                    <p key={id + '_' +  idx} className='vas-admin-query-item'>{!isCustom ? this.props.itemsById[id].value : this.props.itemsById[id].valuePrefix + procedure.customValues[id] + this.props.itemsById[id].valueSuffix}</p>
                                   )
                                 })
                               }
