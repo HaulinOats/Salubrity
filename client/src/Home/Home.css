@@ -382,12 +382,10 @@
   font-size: 80%;
 }
 .vas-status-3
-.vas-home-table-job-name{
-  border-color:darkslategray;
-}
+.vas-home-table-job-name,
 .vas-status-3 
 .vas-home-table-tr-inner p {
-  border-color:darkslategray;
+  border-color:white;
 }
 .vas-home-table-open-status {
   margin:0 auto;

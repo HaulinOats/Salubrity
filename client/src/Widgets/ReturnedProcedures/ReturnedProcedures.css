@@ -117,6 +117,16 @@
   width: 87%;
   margin-left: 11%;
 }
+.vas-returned-procedures-no-calls-container {
+  height: 35px;
+  background: cadetblue;
+  padding: 2%;
+}
+.vas-returned-procedures-no-calls-container p {
+  font-size:110%;
+  margin-top:10px;
+  color:white;
+}
 
 @media (min-width: 650px) {
   .vas-home-custom-table-column-1 {

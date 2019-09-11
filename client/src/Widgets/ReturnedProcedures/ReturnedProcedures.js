@@ -44,7 +44,12 @@ export default class ReturnedProcedures extends Component {
   render(){
     return(
     <div className="vas-table vas-returned-procedures-table">
-      {this.state.queriedProcedures &&
+      {this.state.queriedProcedures.length < 1 &&
+        <div className='vas-returned-procedures-no-calls-container'>
+          <p>There are no completed calls yet today</p>
+        </div>
+      }
+      {this.state.queriedProcedures.length > 0 &&
       <span className="vas-returned-procedures-outer">
         <div className='vas-table-thead-row vas-home-completed-thead'>
           <select className='vas-select vas-returned-procedures-sortby-select' onChange={this.sortByOnChange}>
@@ -112,7 +117,7 @@ export default class ReturnedProcedures extends Component {
                         </span>
                       </div>
                       <div className='vas-home-custom-table-column-3'>
-                        <div className='vas-call-times-row'><p className='vas-call-times-left'>Call Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{helpers.getDateFromObjectId(call._id)}</Moment></p></div>
+                        <div className='vas-call-times-row'><p className='vas-call-times-left'>Call Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{call.createdAt}</Moment></p></div>
                         <div className='vas-call-times-row'><p className='vas-call-times-left'>Start Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{call.startTime}</Moment></p></div>
                         <div className='vas-call-times-row'><p className='vas-call-times-left'>End Time:</p><p className='vas-call-times-right'><Moment format='HH:mm'>{call.completedAt}</Moment></p></div>
                         <div className='vas-call-times-row'><p className='vas-call-times-left'>Response Time:</p><p className='vas-call-times-right'>{responseTimeHr > 0 ? responseTimeHr + ' Hr ' : ''}{responseTimeMin + ' Min'}</p></div>

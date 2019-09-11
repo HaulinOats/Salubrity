@@ -679,6 +679,34 @@ exports.itemSeed = [
     isCustom:false
   },
   {
+    itemId:73,
+    procedureId:7,
+    groupId:14,
+    value:'PICC: Initiated',
+    isCustom:false
+  },
+  {
+    itemId:74,
+    procedureId:7,
+    groupId:14,
+    value:'PICC: Completed',
+    isCustom:false
+  },
+  {
+    itemId:75,
+    procedureId:7,
+    groupId:14,
+    value:'CVL: Initiated',
+    isCustom:false
+  },
+  {
+    itemId:76,
+    procedureId:7,
+    groupId:14,
+    value:'CVL: Completed',
+    isCustom:false
+  },
+  {
     itemId:57,
     procedureId:8,
     groupId:1,
@@ -876,7 +904,7 @@ exports.procedureSeed = [
       {
         seq:2,
         groupId:8,
-        inputType:'radio',
+        inputType:'checkbox',
         groupItems:[23,24,25,26,27,28]
       },
       {
@@ -949,9 +977,9 @@ exports.procedureSeed = [
       {
         seq:3,
         groupId:14,
-        inputType:'checkbox',
+        inputType:'radio',
         hideHeader:true,
-        groupItems:[55,56]
+        groupItems:[55,56,73,74,75,76]
       }
     ]
   },

@@ -30,6 +30,7 @@ userSchema.plugin(uniqueValidator, {message: `Could not insert user based on uni
 let User = mongoose.model('User', userSchema);
 
 let callSchema = new Schema({
+  createdAt:{type:Date, default:Date.now()},
   hospital:{type:Number, default:null},
   room:{type:String, default:null, lowercase:true},
   provider:{type:String, lowercase:true},

@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import './EditProcedure.css';
 import Modal from '../../Widgets/Modal/Modal';
 import axios from 'axios';
-import helpers from '../../helpers';
 import {DebounceInput} from 'react-debounce-input';
 
 export default class EditProcedure extends Component {
@@ -47,7 +46,9 @@ export default class EditProcedure extends Component {
   };
   
   componentDidMount(){
-    // console.log(this.state);
+    setTimeout(()=>{
+      console.log(this.state);
+    }, 1000)
   }
 
   componentWillReceiveProps(nextProps){
@@ -87,7 +88,11 @@ export default class EditProcedure extends Component {
 
   changeStatus(e){
     let activeRecord = this.state.currentRecord;
-    activeRecord.status = e.target.value;
+    if(activeRecord.status === 3){//Currently On Hold
+      activeRecord.createdAt = new Date().toISOString();
+      activeRecord.startTime = new Date().toISOString();
+    }
+    activeRecord.status = Number(e.target.value);
     this.setState({activeRecord}, this.saveCurrentRecord);
   }
 
@@ -264,6 +269,10 @@ export default class EditProcedure extends Component {
     if(!this.state.currentRecord.room || !this.state.currentRecord.room.length){
       errors += '- Room number field cannot be empty\n';
     }
+
+    if(this.state.currentRecord.status === 3){
+      errors += "- Cannot submit a call that is 'on hold'. Change status from dropdown menu at start of form.";
+    }
     
     if(errors.length && !this.state.currentRecord.wasConsultation){
       this.setState({
@@ -364,7 +373,7 @@ export default class EditProcedure extends Component {
       proceduresArr = this.addCustomValuesToProceduresArr(proceduresArr);
 
       let completionTime = new Date();
-      let callTime = helpers.getDateFromObjectId(this.state.currentRecord._id);
+      let callTime = new Date(this.state.currentRecord.createdAt);
       let startTime = new Date(this.state.currentRecord.startTime);
 
       axios.post('/procedure-completed', {
