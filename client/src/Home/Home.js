@@ -130,14 +130,17 @@ export default class Home extends Component{
     this.resetModal();
   }
 
-  editCompletedCall(completedCall){
+  editCompletedCall(callId, callCompletedBy){
     let isAdmin = this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super';
-    if(isAdmin || this.state.currentUser.userId === completedCall.completedBy){
-      this.setState({
-        activeRecord:completedCall
-      }, ()=>{
+    if(isAdmin || this.state.currentUser.userId === callCompletedBy){
+      helpers.getCallById(callId).then(resp=>{
         this.setTab('active');
-      });
+        this.setState({
+          activeRecord:resp
+        })
+      }).catch(err=>{
+        console.log(err);
+      })
     } else {
       this.setState({
         modalTitle:"Not Allowed To Edit",

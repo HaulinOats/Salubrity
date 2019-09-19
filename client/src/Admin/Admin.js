@@ -82,7 +82,7 @@ export default class Admin extends Component {
   }
 
   componentDidMount(){
-    this.startSessionInterval();
+    // this.startSessionInterval();
   }
 
   closeRecordCallback(type){
@@ -114,7 +114,7 @@ export default class Admin extends Component {
 
   refreshUserSession(){
     let currentUser = this.state.currentUser;
-    currentUser.lastLogin = Math.floor(Date.now() / 1000);
+    // currentUser.lastLogin = Math.floor(Date.now() / 1000);
     this.setState({currentUser}, ()=>{
       ls('currentUser', this.state.currentUser);
     });
@@ -124,37 +124,37 @@ export default class Admin extends Component {
     this.setState({
       currentUser:user
     }, ()=>{
-      this.startSessionInterval();
+      // this.startSessionInterval();
       this.refreshUserSession();
       this.stateLoadCalls();
     });
   }
 
   startSessionInterval(){
-    console.log('starting intervals...');
-    this.sessionInterval = setInterval(()=>{
-      if(this.state.currentUser){
-        this.checkUserSession();
-      }
-    }, 180000);//check session every 3 minutes (180000)ms
+    // console.log('starting intervals...');
+    // this.sessionInterval = setInterval(()=>{
+    //   if(this.state.currentUser){
+    //     this.checkUserSession();
+    //   }
+    // }, 180000);//check session every 3 minutes (180000)ms
   }
 
   checkUserSession(){
-    let currentTime = Math.floor(Date.now() / 1000);
-    let timeDiff = currentTime - this.state.currentUser.lastLogin;
-    console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 60)`);
-    if(timeDiff > 1800){
-      console.log('Logging user out due to inactivity');
-      this.logout();
-    }
-    if(timeDiff > 1620){
-      this.setState({
-        modalTitle:'Session Is About To End',
-        modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
-        modalIsOpen:true,
-        modalConfirmation:true
-      })
-    }
+    // let currentTime = Math.floor(Date.now() / 1000);
+    // let timeDiff = currentTime - this.state.currentUser.lastLogin;
+    // console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 30)`);
+    // if(timeDiff > 1800){
+    //   console.log('Logging user out due to inactivity');
+    //   this.logout();
+    // }
+    // if(timeDiff > 1620){
+    //   this.setState({
+    //     modalTitle:'Session Is About To End',
+    //     modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
+    //     modalIsOpen:true,
+    //     modalConfirmation:true
+    //   })
+    // }
   }
 
   stateLoadCalls(){
@@ -359,7 +359,7 @@ export default class Admin extends Component {
   }
 
   logout(){
-    clearInterval(this.sessionInterval);
+    // clearInterval(this.sessionInterval);
     this.setState({currentUser:null}, this.resetState);
     ls.clear();
   }
@@ -690,14 +690,15 @@ export default class Admin extends Component {
     })
   }
 
-  editCompletedCall(completedCall){
-    let isAdmin = this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super';
-    if(isAdmin || this.state.currentUser.userId === completedCall.completedBy){
+  editCompletedCall(callId){
+    helpers.getCallById(callId).then(resp=>{
       this.setState({
-        activeRecord:completedCall,
+        activeRecord:resp,
         activePage:'active'
-      });
-    }
+      })
+    }).catch(err=>{
+      console.log(err);
+    })
   }
 
   closeModal(){

@@ -78,7 +78,7 @@ export default class ReturnedProcedures extends Component {
             let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
             let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
             return(
-              <div className='vas-admin-custom-table-item-outer-container' key={call._id} onClick={e=>{this.props.editCompletedCall(call)}}>
+              <div className='vas-admin-custom-table-item-outer-container' key={call._id} onClick={e=>{this.props.editCompletedCall(call._id, call.completedBy)}}>
                 <div className='vas-admin-custom-table-item-outer'>
                   <div className='vas-admin-custom-table-item-outer'>
                     <div className='vas-admin-custom-table-item vas-call-table-item'>

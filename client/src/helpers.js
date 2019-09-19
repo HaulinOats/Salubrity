@@ -106,6 +106,19 @@ const helpers = {
         reject(err)
       })
     })
+  },
+  getCallById:function(callId){
+    return new Promise((resolve, reject)=>{
+      axios.post('/get-call-by-id', {_id:callId}).then(resp=>{
+        if(resp.data.error || resp.data._message){
+          reject(resp.data);
+        } else {
+          resolve(resp.data);
+        }
+      }).catch((err)=>{
+        reject(err)
+      })
+    })
   }
 }
 

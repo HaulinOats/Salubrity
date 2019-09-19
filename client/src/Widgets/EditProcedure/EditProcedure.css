@@ -149,10 +149,10 @@
 .vas-edit-procedure-is-post-edit {
 
 }
-.vas-edit-procedure-is-post-edit 
+/* .vas-edit-procedure-is-post-edit 
 .vas-edit-procedure-record-header {
   background:darkslategray !important;
-}
+} */
 .vas-edit-procedure-edit-title {
   font-size: 165%;
   border-bottom: solid 2px white;

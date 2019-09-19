@@ -8,8 +8,8 @@ export default class EditProcedure extends Component {
   constructor(props){
     super(props);
     this.state = {
-      currentRecord:null,
-      isPostEdit:false,
+      currentRecord:props.activeRecord,
+      isPostEdit:props.activeRecord.completedAt ? true : false,
       insertionLength:'',
       insertionTypeSelected:false,
       proceduresDoneIdArr:null,
@@ -46,12 +46,21 @@ export default class EditProcedure extends Component {
   };
   
   componentDidMount(){
+    console.log('component did mount');
+    let proceduresDoneIdArr = [];
+    this.state.currentRecord.proceduresDone.forEach(procedureArr=>{
+      procedureArr.itemIds.forEach(itemId=>{
+        proceduresDoneIdArr.push(itemId);
+      })
+    });
+    this.setState({proceduresDoneIdArr}, this.setRecordStateItems)
     setTimeout(()=>{
       console.log(this.state);
     }, 1000)
   }
-
+  
   componentWillReceiveProps(nextProps){
+    console.log('component recieved props');
     this.setState({
       currentRecord:nextProps.activeRecord,
       isPostEdit:nextProps.activeRecord.completedAt ? true : false
@@ -510,12 +519,12 @@ export default class EditProcedure extends Component {
           }
           {!this.state.isPostEdit &&
             <span>
-              <button className="vas-edit-procedure-record-header-btn" onClick={this.resetForm}>Reset Form</button>
+              <button className="vas-edit-procedure-record-header-btn" onClick={this.props.closeRecordCallback}>Reset Form</button>
               <button className="vas-edit-procedure-record-header-btn" onClick={this.returnToQueue}>Return To Queue</button>
             </span>
           }
           {this.state.isPostEdit &&
-            <button className="vas-edit-procedure-record-header-btn" onClick={this.resetForm}>Cancel Editing</button>
+            <button className="vas-edit-procedure-record-header-btn" onClick={this.props.closeRecordCallback}>Cancel Editing</button>
           }
           <button className='vas-edit-procedure-record-header-btn vas-warn-btn' onClick={this.deleteCall}>Delete Call</button>
         </header>
