@@ -121,9 +121,13 @@ export default class Admin extends Component {
   }
 
   loginCallback(user){
-    let currentUser = user;
-    currentUser.lastLogin = Math.floor(Date.now() / 1000);
-    this.setState({currentUser:user}, this.stateLoadCalls);
+    this.setState({
+      currentUser:user
+    }, ()=>{
+      this.startSessionInterval();
+      this.refreshUserSession();
+      this.stateLoadCalls();
+    });
   }
 
   startSessionInterval(){
@@ -139,11 +143,11 @@ export default class Admin extends Component {
     let currentTime = Math.floor(Date.now() / 1000);
     let timeDiff = currentTime - this.state.currentUser.lastLogin;
     console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 60)`);
-    if(timeDiff > 3600){
+    if(timeDiff > 1800){
       console.log('Logging user out due to inactivity');
       this.logout();
     }
-    if(timeDiff > 3419){
+    if(timeDiff > 1620){
       this.setState({
         modalTitle:'Session Is About To End',
         modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
@@ -707,7 +711,7 @@ export default class Admin extends Component {
   }
 
   render(){
-    let isAdmin = false;
+    let isAdmin;
     if(this.state.currentUser){
       isAdmin = (this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super') ? true : false;
     }
@@ -740,7 +744,7 @@ export default class Admin extends Component {
                 }
               </div>
               <div className='vas-header-right-container'>
-                <p className='vas-admin-username'>{this.state.currentUser.fullname}</p>
+                <p className='vas-admin-username vas-capitalize'>{this.state.currentUser.fullname}</p>
                 <p className='vas-admin-logout' onClick={this.logout}>Logout</p>
               </div>
             </header>
