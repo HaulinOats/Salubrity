@@ -32,9 +32,9 @@ export default class Home extends Component{
       usersById:null,
       itemsById:null,
       hospitalsById:null,
-      referenceObj:null,
       statusById:null,
       orderChangeById:null,
+      proceduresById:null,
       selectedProcedures:[],
       lastUpdate:0,
       lastUpdateHide:false
@@ -126,7 +126,7 @@ export default class Home extends Component{
     }
   }
 
-  getModalConfirmation(isConfirmed){
+  getModalConfirmation(){
     this.resetModal();
   }
 
@@ -152,7 +152,9 @@ export default class Home extends Component{
 
   componentDidMount(){
     this.startSessionInterval();
-    console.log(this.state);
+    setTimeout(()=>{
+      console.log(this.state);
+    }, 1000);
   }
 
   startSessionInterval(){
@@ -250,9 +252,13 @@ export default class Home extends Component{
     });
 
     helpers.getProcedureData().then(data=>{
+      let proceduresById = {};
+      for(let i = 0; i < data.procedures.length; i++){
+        proceduresById[data.procedures[i].procedureId] = data.procedures[i];
+      }
       this.setState({
-        procedures:data.procedures,
-        referenceObj:data.referenceObj
+        proceduresById,
+        procedures:data.procedures
       })
     }).catch(err=>{
       this.addToErrorArray(err);
@@ -570,20 +576,19 @@ export default class Home extends Component{
                   queriedProcedures={this.state.completedCalls}
                   hospitalsById={this.state.hospitalsById}
                   usersById={this.state.usersById}
-                  referenceObj={this.state.referenceObj}
                   itemsById={this.state.itemsById}
+                  proceduresById={this.state.proceduresById}
                   editCompletedCall={this.editCompletedCall} 
                   orderChangeById={this.state.orderChangeById}/>
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
-                {this.state.activeRecord && this.state.procedures && this.state.referenceObj && this.state.itemsById && this.state.allOptions.length > 0 &&
+                {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
                     activeRecord={this.state.activeRecord}
                     allOptions={this.state.allOptions}
                     procedures={this.state.procedures}
                     usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
-                    referenceObj={this.state.referenceObj}
                     refreshUserSession={this.refreshUserSession}
                     closeRecordCallback={this.closeRecordCallback}
                     currentUser={this.state.currentUser}/>

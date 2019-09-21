@@ -72,7 +72,7 @@ export default class ReturnedProcedures extends Component {
           {this.state.queriedProcedures.length < 1 &&
             <div><p className='vas-queue-no-items'>There are no completed items yet for today</p></div>
           }
-          {this.state.queriedProcedures.length > 0 && this.props.hospitalsById && this.props.referenceObj && this.props.itemsById && this.state.queriedProcedures.map((call)=>{
+          {this.state.queriedProcedures.length > 0 && this.props.hospitalsById && this.props.proceduresById && this.props.itemsById && this.state.queriedProcedures.map((call)=>{
             let responseTimeHr = Math.floor(call.responseTime/3600000) % 24;
             let responseTimeMin = Math.floor(call.responseTime/60000) % 60;
             let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
@@ -129,7 +129,7 @@ export default class ReturnedProcedures extends Component {
                         {call.proceduresDone.map((procedure, idx)=>{
                           return (
                             <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
-                              <p className='vas-admin-query-procedure-names'>{this.props.referenceObj.procedures[procedure.procedureId].name}</p>
+                              <p className='vas-admin-query-procedure-names'>{this.props.proceduresById[procedure.procedureId].name}</p>
                               <div className='vas-admin-query-item-container'>
                               {procedure.itemIds && procedure.itemIds.length > 0 &&
                                 procedure.itemIds.map((id, idx)=>{

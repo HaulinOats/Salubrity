@@ -155,652 +155,536 @@ exports.optionSeed = [
   }
 ];
 
-exports.referencesObject = {
-  procedures:{
-    '1':{
-      seq:1,
-      name:'PIV'
-    },
-    '2':{
-      seq:2,
-      name:'Lab Draw'
-    },
-    '3':{
-      seq:3,
-      name:'Blood Culture'
-    },
-    '4':{
-      seq:4,
-      name:'Port-A-Cath'
-    },
-    '5':{
-      seq:5,
-      name:'PICC Line'
-    },
-    '6':{
-      seq:6,
-      name:'Dressing Change'
-    },
-    '7':{
-      seq:7,
-      name:'Troubleshoot'
-    },
-    '8':{
-      seq:8,
-      name:'Insertion Procedure'
-    }
-  },
-  groups:{
-    '1':{
-      seq:1,
-      name:'Patient Refused'
-    },
-    '2':{
-      seq:2,
-      name:'Size'
-    },
-    '3':{
-      seq:3,
-      name:'Care Type'
-    },
-    '4':{
-      seq:4,
-      name:'DC IV'
-    },
-    '5':{
-      seq:5,
-      name:'Ultrasound'
-    },
-    '6':{
-      seq:6,
-      name:'Blood Drawn'
-    },
-    '7':{
-      seq:7,
-      name:'Draw Type'
-    },
-    '8':{
-      seq:8,
-      name:'From'
-    },
-    '9':{
-      seq:9,
-      name:'Type'
-    },
-    '10':{
-      seq:10,
-      name:'Removal'
-    },
-    '11':{
-      seq:11,
-      name:'What'
-    },
-    '12':{
-      seq:12,
-      name:'Why'
-    },
-    '13':{
-      seq:13,
-      name:'Intervention'
-    },
-    '14':{
-      seq:14,
-      name:'Cathflow'
-    },
-    '15':{
-      seq:15,
-      name:'Insertion Type'
-    },
-    '16':{
-      seq:16,
-      name:'Vessel'
-    },
-    '17':{
-      seq:17,
-      name:'Laterality'
-    },
-    '18':{
-      seq:18,
-      name:'Insertion Length'
-    },
-    '19':{
-      seq:19,
-      name:'Hospital Staff Obtained'
-    }
-  }
-};
-
-
 exports.itemSeed = [
   {
     itemId:1,
-    procedureId:1,
-    groupId:1,
+    procedureName:'PIV',
+    groupName:'Patient Refused',
     value:'Patient Refused',
     isCustom:false
   },
   {
     itemId:2,
-    procedureId:1,
-    groupId:2,
+    procedureName:'PIV',
+    groupName:'Size',
     value:'24g',
     isCustom:false
   },
   {
     itemId:3,
-    procedureId:1,
-    groupId:2,
+    procedureName:'PIV',
+    groupName:'Size',
     value:'22g',
     isCustom:false
   },
   {
     itemId:4,
-    procedureId:1,
-    groupId:2,
+    procedureName:'PIV',
+    groupName:'Size',
     value:'20g',
     isCustom:false
   },
   {
     itemId:5,
-    procedureId:1,
-    groupId:2,
+    procedureName:'PIV',
+    groupName:'Size',
     value:'18g',
     isCustom:false
   },
   {
     itemId:6,
-    procedureId:1,
-    groupId:3,
+    procedureName:'PIV',
+    groupName:'Care Type',
     value:'IV Flushed',
     isCustom:false
   },
   {
     itemId:7,
-    procedureId:1,
-    groupId:3,
+    procedureName:'PIV',
+    groupName:'Care Type',
     value:'Saline Locked',
     isCustom:false
   },
   {
     itemId:8,
-    procedureId:1,
-    groupId:3,
+    procedureName:'PIV',
+    groupName:'Care Type',
     value:'Dressing Changed',
     isCustom:false
   },
   {
     itemId:9,
-    procedureId:1,
-    groupId:3,
+    procedureName:'PIV',
+    groupName:'Care Type',
     value:'Dressing Reinforced',
     isCustom:false
   },
   {
     itemId:10,
-    procedureId:1,
-    groupId:4,
+    procedureName:'PIV',
+    groupName:'DC IV',
     value:'Inflitration',
     isCustom:false
   },
   {
     itemId:11,
-    procedureId:1,
-    groupId:4,
+    procedureName:'PIV',
+    groupName:'DC IV',
     value:'Phlebitis',
     isCustom:false
   },
   {
     itemId:12,
-    procedureId:1,
-    groupId:4,
+    procedureName:'PIV',
+    groupName:'DC IV',
     value:'PT Removal',
     isCustom:false
   },
   {
     itemId:13,
-    procedureId:1,
-    groupId:4,
+    procedureName:'PIV',
+    groupName:'DC IV',
     value:'Leaking',
     isCustom:false
   },
   {
     itemId:14,
-    procedureId:1,
-    groupId:4,
+    procedureName:'PIV',
+    groupName:'DC IV',
     value:'Painful',
     isCustom:false
   },
   {
     itemId:15,
-    procedureId:1,
-    groupId:4,
+    procedureName:'PIV',
+    groupName:'DC IV',
     value:'Per Protocol',
     isCustom:false
   },
   {
     itemId:16,
-    procedureId:1,
-    groupId:5,
+    procedureName:'PIV',
+    groupName:'Ultrasound',
     value:'US Used',
     isCustom:false
   },
   {
     itemId:17,
-    procedureId:1,
-    groupId:6,
+    procedureName:'PIV',
+    groupName:'Blood Drawn',
     value:'Blood Was Drawn',
     isCustom:false
   },
   {
     itemId:71,
-    procedureId:1,
-    groupId:19,
+    procedureName:'PIV',
+    groupName:'Hospital Staff Obtained',
     value:'Hospital Staff Obtained',
     isCustom:false
   },
   {
     itemId:18,
-    procedureId:2,
-    groupId:1,
+    procedureName:'Lab Draw',
+    groupName:'Patient Refused',
     value:'Patient Refused',
     isCustom:false
   },
   {
     itemId:19,
-    procedureId:2,
-    groupId:7,
+    procedureName:'Lab Draw',
+    groupName:'Draw Type',
     value:'From IV',
     isCustom:false
   },
   {
     itemId:20,
-    procedureId:2,
-    groupId:7,
+    procedureName:'Lab Draw',
+    groupName:'Draw Type',
     value:'Labs Only',
     isCustom:false
   },
   {
     itemId:21,
-    procedureId:2,
-    groupId:5,
+    procedureName:'Lab Draw',
+    groupName:'Ultrasound',
     value:'US Used',
     isCustom:false
   },
   {
     itemId:72,
-    procedureId:1,
-    groupId:19,
+    procedureName:'PIV',
+    groupName:'Hospital Staff Obtained',
     value:'Hospital Staff Obtained',
     isCustom:false
   },
   {
     itemId:22,
-    procedureId:3,
-    groupId:1,
+    procedureName:'Blood Culture',
+    groupName:'Patient Refused',
     value:'Patient Refused',
     isCustom:false
   },
   {
     itemId:23,
-    procedureId:3,
-    groupId:8,
+    procedureName:'Blood Culture',
+    groupName:'From',
     value:'PICC',
     isCustom:false
   },
   {
     itemId:24,
-    procedureId:3,
-    groupId:8,
+    procedureName:'Blood Culture',
+    groupName:'From',
     value:'ML',
     isCustom:false
   },
   {
     itemId:25,
-    procedureId:3,
-    groupId:8,
+    procedureName:'Blood Culture',
+    groupName:'From',
     value:'Central Line',
     isCustom:false
   },
   {
     itemId:26,
-    procedureId:3,
-    groupId:8,
+    procedureName:'Blood Culture',
+    groupName:'From',
     value:'IV',
     isCustom:false
   },
   {
     itemId:27,
-    procedureId:3,
-    groupId:8,
+    procedureName:'Blood Culture',
+    groupName:'From',
     value:'Peripheral Stick x 1',
     isCustom:false
   },
   {
     itemId:28,
-    procedureId:3,
-    groupId:8,
+    procedureName:'Blood Culture',
+    groupName:'From',
     value:'Peripheral Stick x 2',
     isCustom:false
   },
   {
     itemId:29,
-    procedureId:3,
-    groupId:5,
+    procedureName:'Blood Culture',
+    groupName:'Ultrasound',
     value:'US Used',
     isCustom:false
   },
   {
     itemId:30,
-    procedureId:4,
-    groupId:9,
+    procedureName:'Port-A-Cath',
+    groupName:'Type',
     value:'Access',
     isCustom:false
   },
   {
     itemId:31,
-    procedureId:4,
-    groupId:9,
+    procedureName:'Port-A-Cath',
+    groupName:'Type',
     value:'De-Access',
     isCustom:false
   },
   {
     itemId:32,
-    procedureId:5,
-    groupId:10,
+    procedureName:'PICC Line',
+    groupName:'Removal',
     value:'Therapy Complete',
     isCustom:false
   },
   {
     itemId:33,
-    procedureId:5,
-    groupId:10,
+    procedureName:'PICC Line',
+    groupName:'Removal',
     value:'Discharge',
     isCustom:false
   },
   {
     itemId:34,
-    procedureId:5,
-    groupId:10,
+    procedureName:'PICC Line',
+    groupName:'Removal',
     value:'Clotted',
     isCustom:false
   },
   {
     itemId:35,
-    procedureId:5,
-    groupId:10,
+    procedureName:'PICC Line',
+    groupName:'Removal',
     value:'Contaminated',
     isCustom:false
   },
   {
     itemId:36,
-    procedureId:5,
-    groupId:10,
+    procedureName:'PICC Line',
+    groupName:'Removal',
     value:'PT Removal',
     isCustom:false
   },
   {
     itemId:37,
-    procedureId:6,
-    groupId:11,
+    procedureName:'Dressing Change',
+    groupName:'What',
     value:'PICC',
     isCustom:false
   },
   {
     itemId:38,
-    procedureId:6,
-    groupId:11,
+    procedureName:'Dressing Change',
+    groupName:'What',
     value:'Port-A-Cath',
     isCustom:false
   },
   {
     itemId:39,
-    procedureId:6,
-    groupId:11,
+    procedureName:'Dressing Change',
+    groupName:'What',
     value:'Central Line',
     isCustom:false
   },
   {
     itemId:40,
-    procedureId:6,
-    groupId:11,
+    procedureName:'Dressing Change',
+    groupName:'What',
     value:'ML',
     isCustom:false
   },
   {
     itemId:41,
-    procedureId:6,
-    groupId:12,
+    procedureName:'Dressing Change',
+    groupName:'Why',
     value:'Per Protocol',
     isCustom:false
   },
   {
     itemId:42,
-    procedureId:6,
-    groupId:12,
+    procedureName:'Dressing Change',
+    groupName:'Why',
     value:'Bleeding',
     isCustom:false
   },
   {
     itemId:43,
-    procedureId:6,
-    groupId:12,
+    procedureName:'Dressing Change',
+    groupName:'Why',
     value:'Site Assessment',
     isCustom:false
   },
   {
     itemId:44,
-    procedureId:6,
-    groupId:12,
+    procedureName:'Dressing Change',
+    groupName:'Why',
     value:'Dressing Compromised',
     isCustom:false
   },
   {
     itemId:45,
-    procedureId:7,
-    groupId:11,
+    procedureName:'Troubleshoot',
+    groupName:'What',
     value:'ML',
     isCustom:false
   },
   {
     itemId:46,
-    procedureId:7,
-    groupId:11,
+    procedureName:'Troubleshoot',
+    groupName:'What',
     value:'PICC',
     isCustom:false
   },
   {
     itemId:47,
-    procedureId:7,
-    groupId:11,
+    procedureName:'Troubleshoot',
+    groupName:'What',
     value:'Central Line',
     isCustom:false
   },
   {
     itemId:48,
-    procedureId:7,
-    groupId:11,
+    procedureName:'Troubleshoot',
+    groupName:'What',
     value:'Port',
     isCustom:false
   },
   {
     itemId:49,
-    procedureId:7,
-    groupId:11,
+    procedureName:'Troubleshoot',
+    groupName:'What',
     value:'IV',
     isCustom:false
   },
   {
     itemId:50,
-    procedureId:7,
-    groupId:13,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
     value:'Power Flush',
     isCustom:false
   },
   {
     itemId:51,
-    procedureId:7,
-    groupId:13,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
     value:'Clave Change',
     isCustom:false
   },
   {
     itemId:52,
-    procedureId:7,
-    groupId:13,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
     value:'Recommend DC',
     isCustom:false
   },
   {
     itemId:53,
-    procedureId:7,
-    groupId:13,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
     value:'Line Retracted',
     isCustom:false
   },
   {
     itemId:54,
-    procedureId:7,
-    groupId:13,
+    procedureName:'Troubleshoot',
+    groupName:'Intervention',
     value:'Repositioned',
     isCustom:false
   },
   {
     itemId:55,
-    procedureId:7,
-    groupId:14,
+    procedureName:'Troubleshoot',
+    groupName:'Cathflow',
     value:'PAC: Initiated',
     isCustom:false
   },
   {
     itemId:56,
-    procedureId:7,
-    groupId:14,
+    procedureName:'Troubleshoot',
+    groupName:'Cathflow',
     value:'PAC: Completed',
     isCustom:false
   },
   {
     itemId:73,
-    procedureId:7,
-    groupId:14,
+    procedureName:'Troubleshoot',
+    groupName:'Cathflow',
     value:'PICC: Initiated',
     isCustom:false
   },
   {
     itemId:74,
-    procedureId:7,
-    groupId:14,
+    procedureName:'Troubleshoot',
+    groupName:'Cathflow',
     value:'PICC: Completed',
     isCustom:false
   },
   {
     itemId:75,
-    procedureId:7,
-    groupId:14,
+    procedureName:'Troubleshoot',
+    groupName:'Cathflow',
     value:'CVL: Initiated',
     isCustom:false
   },
   {
     itemId:76,
-    procedureId:7,
-    groupId:14,
+    procedureName:'Troubleshoot',
+    groupName:'Cathflow',
     value:'CVL: Completed',
     isCustom:false
   },
   {
     itemId:57,
-    procedureId:8,
-    groupId:1,
+    procedureName:'Insertion Procedure',
+    groupName:'Patient Refused',
     value:'Patient Refused',
     isCustom:false
   },
   {
     itemId:58,
-    procedureId:8,
-    groupId:15,
+    procedureName:'Insertion Procedure',
+    groupName:'Insertion Type',
     value:'SL PICC',
     isCustom:false
   },
   {
     itemId:59,
-    procedureId:8,
-    groupId:15,
+    procedureName:'Insertion Procedure',
+    groupName:'Insertion Type',
     value:'DL PICC',
     isCustom:false
   },
   {
     itemId:60,
-    procedureId:8,
-    groupId:15,
+    procedureName:'Insertion Procedure',
+    groupName:'Insertion Type',
     value:'TL PICC',
     isCustom:false
   },
   {
     itemId:61,
-    procedureId:8,
-    groupId:15,
+    procedureName:'Insertion Procedure',
+    groupName:'Insertion Type',
     value:'ML',
     isCustom:false
   },
   {
     itemId:62,
-    procedureId:8,
-    groupId:15,
+    procedureName:'Insertion Procedure',
+    groupName:'Insertion Type',
     value:'PG',
     isCustom:false
   },
   {
     itemId:63,
-    procedureId:8,
-    groupId:16,
+    procedureName:'Insertion Procedure',
+    groupName:'Vessel',
     value:'Basilic',
     isCustom:false
   },
   {
     itemId:64,
-    procedureId:8,
-    groupId:16,
+    procedureName:'Insertion Procedure',
+    groupName:'Vessel',
     value:'Brachial',
     isCustom:false
   },
   {
     itemId:65,
-    procedureId:8,
-    groupId:16,
+    procedureName:'Insertion Procedure',
+    groupName:'Vessel',
     value:'Cephalic',
     isCustom:false
   },
   {
     itemId:66,
-    procedureId:8,
-    groupId:16,
+    procedureName:'Insertion Procedure',
+    groupName:'Vessel',
     value:'Internal Jugular',
     isCustom:false
   },
   {
     itemId:67,
-    procedureId:8,
-    groupId:16,
+    procedureName:'Insertion Procedure',
+    groupName:'Vessel',
     value:'Femoral',
     isCustom:false
   },
   {
     itemId:68,
-    procedureId:8,
-    groupId:17,
+    procedureName:'Insertion Procedure',
+    groupName:'Laterality',
     value:'Left',
     isCustom:false
   },
   {
     itemId:69,
-    procedureId:8,
-    groupId:17,
+    procedureName:'Insertion Procedure',
+    groupName:'Laterality',
     value:'Right',
     isCustom:false
   },
   {
     itemId:70,
-    procedureId:8,
-    groupId:18,
+    procedureName:'Insertion Procedure',
+    groupName:'Insertion Length',
     value:'in CM',
     isCustom:true,
     fieldAbbr:'Len',
@@ -812,48 +696,49 @@ exports.itemSeed = [
 exports.procedureSeed = [
   {
     procedureId:1,
+    name:'PIV',
     seq:1,
     groups:[
       {
         seq:1,
-        groupId:1,
+        groupName:'Patient Refused',
         inputType:'checkbox',
         hideHeader:true,
         groupItems:[1]
       },
       {
         seq:2,
-        groupId:2,
+        groupName:'Size',
         inputType:'radio',
         groupItems:[2,3,4,5]
       },
       {
         seq:3,
-        groupId:5,
+        groupName:'Care Type',
         inputType:'checkbox',
         groupItems:[16]
       },
       {
         seq:4,
-        groupId:6,
+        groupName:'DC IV',
         inputType:'checkbox',
         groupItems:[17]
       },
       {
         seq:5,
-        groupId:3,
+        groupName:'Ultrasound',
         inputType:'checkbox',
         groupItems:[6,7,8,9]
       },
       {
         seq:6,
-        groupId:4,
+        groupName:'Blood Drawn',
         inputType:'checkbox',
         groupItems:[10,11,12,13,14,15],
       },
       {
         seq:7,
-        groupId:19,
+        groupName:'Draw Type',
         inputType:'checkbox',
         groupItems:[71]
       }
@@ -861,30 +746,31 @@ exports.procedureSeed = [
   },
   {
     procedureId:2,
+    name:'Lab Draw',
     seq:2,
     groups:[
       {
         seq:1,
-        groupId:1,
+        groupName:'Patient Refused',
         inputType:'checkbox',
         hideHeader:true,
         groupItems:[18]
       },
       {
         seq:2,
-        groupId:7,
+        groupName:'Draw Type',
         inputType:'radio',
         groupItems:[19,20]
       },
       {
         seq:3,
-        groupId:5,
+        groupName:'Ultrasound',
         inputType:'checkbox',
         groupItems:[21]
       },
       {
         seq:4,
-        groupId:19,
+        groupName:'Hospital Staff Obtained',
         inputType:'checkbox',
         groupItems:[72]
       }
@@ -892,24 +778,25 @@ exports.procedureSeed = [
   },
   {
     procedureId:3,
+    name:'Blood Culture',
     seq:3,
     groups:[
       {
         seq:1,
-        groupId:1,
+        groupName:'Patient Refused',
         inputType:'checkbox',
         hideHeader:true,
         groupItems:[22]
       },
       {
         seq:2,
-        groupId:8,
+        groupName:'From',
         inputType:'checkbox',
         groupItems:[23,24,25,26,27,28]
       },
       {
         seq:3,
-        groupId:5,
+        groupName:'Ultrasound',
         inputType:'checkbox',
         groupItems:[29]
       }
@@ -917,11 +804,12 @@ exports.procedureSeed = [
   },
   {
     procedureId:4,
+    name:'Port-A-Cath',
     seq:4,
     groups:[
       {
         seq:1,
-        groupId:9,
+        groupName:'Type',
         hideHeader:true,
         inputType:'checkbox',
         groupItems:[30,31]
@@ -930,11 +818,12 @@ exports.procedureSeed = [
   },
   {
     procedureId:5,
+    name:'PICC Line',
     seq:5,
     groups:[
       {
         seq:1,
-        groupId:10,
+        groupName:'Removal',
         inputType:'radio',
         groupItems:[32,33,34,35,36]
       }
@@ -942,17 +831,18 @@ exports.procedureSeed = [
   },
   {
     procedureId:6,
+    name:'Dressing Change',
     seq:6,
     groups:[
       {
         seq:1,
-        groupId:11,
+        groupName:'What',
         inputType:'radio',
         groupItems:[37,38,39,40]
       },
       {
         seq:2,
-        groupId:12,
+        groupName:'Why',
         inputType:'radio',
         groupItems:[41,42,43,44]
       }
@@ -960,61 +850,64 @@ exports.procedureSeed = [
   },
   {
     procedureId:7,
+    name:'Troubleshoot',
     seq:7,
     groups:[
       {
         seq:1,
-        groupId:11,
+        groupName:'What',
         inputType:'radio',
         groupItems:[45,46,47,48,49]
       },
       {
         seq:2,
-        groupId:13,
+        groupName:'Intervention',
         inputType:'checkbox',
         groupItems:[50,51,52,53,54]
       },
       {
         seq:3,
-        groupId:14,
+        groupName:'Cathflow',
         inputType:'radio',
         hideHeader:true,
+        hideGroup:true,
         groupItems:[55,56,73,74,75,76]
       }
     ]
   },
   {
     procedureId:8,
+    name:'Insertion Procedure',
     seq:8,
     groups:[
       {
         seq:1,
-        groupId:1,
+        groupName:'Patient Refused',
         inputType:'checkbox',
         hideHeader:true,
         groupItems:[57]
       },
       {
         seq:2,
-        groupId:15,
+        groupName:'Insertion Type',
         inputType:'radio',
         groupItems:[58,59,60,61,62]
       },
       {
         seq:3,
-        groupId:16,
+        groupName:'Vessel',
         inputType:'radio',
         groupItems:[63,64,65,66,67]
       },
       {
         seq:4,
-        groupId:17,
+        groupName:'Laterality',
         inputType:'radio',
         groupItems:[68,69]
       },
       {
         seq:5,
-        groupId:18,
+        groupName:'Insertion Length',
         fieldName:'insertionLength',
         inputType:'number',
         groupItems:[70]

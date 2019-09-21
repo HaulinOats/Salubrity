@@ -8,8 +8,8 @@ export default class EditProcedure extends Component {
   constructor(props){
     super(props);
     this.state = {
-      currentRecord:props.activeRecord,
-      isPostEdit:props.activeRecord.completedAt ? true : false,
+      currentRecord:this.props.activeRecord,
+      isPostEdit:this.props.activeRecord.completedAt ? true : false,
       insertionLength:'',
       insertionTypeSelected:false,
       proceduresDoneIdArr:null,
@@ -18,7 +18,8 @@ export default class EditProcedure extends Component {
       modalTitle:'',
       modalMessage:'',
       modalConfirmation:false,
-      confirmationType:null
+      confirmationType:null,
+      showCathflow:false
     }
     this.saveCurrentRecord = this.saveCurrentRecord.bind(this);
     this.hospitalChange = this.hospitalChange.bind(this);
@@ -41,7 +42,7 @@ export default class EditProcedure extends Component {
     this.closeModal = this.closeModal.bind(this);
     this.resetModal = this.resetModal.bind(this);
     this.orderSelect = this.orderSelect.bind(this);
-    this.showHiddenButtons = this.showHiddenButtons.bind(this);
+    this.toggleSectionDisplay = this.toggleSectionDisplay.bind(this);
     this.setRecordStateItems = this.setRecordStateItems.bind(this);
   };
   
@@ -60,7 +61,6 @@ export default class EditProcedure extends Component {
   }
   
   componentWillReceiveProps(nextProps){
-    console.log('component recieved props');
     this.setState({
       currentRecord:nextProps.activeRecord,
       isPostEdit:nextProps.activeRecord.completedAt ? true : false
@@ -91,6 +91,7 @@ export default class EditProcedure extends Component {
   }
   
   changeCustomInput(e, fieldName){
+    console.log(fieldName);
     this.setState({[fieldName]:e.target.value});
     this.props.refreshUserSession();
   }
@@ -166,7 +167,8 @@ export default class EditProcedure extends Component {
         itemIds:procedureObj[key]
       })
     }
-
+    console.log('procedureArr: ');
+    console.log(procedureArr);
     return procedureArr
   }
 
@@ -255,6 +257,7 @@ export default class EditProcedure extends Component {
   }
 
   procedureVerified(proceduresList){
+    console.log('procedureVerified');
     let errors = '';
     if(!proceduresList.length){
       errors += '- You must select at least 1 procedure or confirm consultation\n';
@@ -406,12 +409,11 @@ export default class EditProcedure extends Component {
     }
   }
 
-  selectButton(e, groupId){
-    console.log('groupId: ', groupId);
-    if(Number(groupId) === 11){//What
+  selectButton(e, groupName){
+    if(groupName === 'What'){
       this.checkSiblings(e);
     }
-    if(Number(groupId) === 15){//Insertion Type
+    if(groupName === 'Insertion Type'){
       this.setState({insertionTypeSelected:true});
       document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="8"]').forEach((el)=>{
         el.style.display = 'inline';
@@ -425,10 +427,9 @@ export default class EditProcedure extends Component {
     let stateObj = {};
     //check which procedure items should updated state
     if(this.state.currentRecord.proceduresDone.length){
-      console.log(this.state.currentRecord.proceduresDone)
       this.state.currentRecord.proceduresDone.forEach(procedureArr=>{
         procedureArr.itemIds.forEach(itemId=>{
-          switch(this.props.itemsById[itemId].groupId){
+          switch(this.props.itemsById[itemId].groupName){
             case 18://Insertion Length
               stateObj.insertionTypeSelected = true;
               break;
@@ -445,18 +446,13 @@ export default class EditProcedure extends Component {
     this.setState(stateObj);
   }
 
-  showHiddenButtons(procedureId, groupId, elClass){
-    let className = `.vas-edit-procedure-${procedureId}-${groupId}`;
-    let container = document.querySelector(className);
-    if(container.classList.contains(elClass)){
-      container.classList.remove(elClass);
-      let containerInputs = document.querySelectorAll(`${className} input`);
-      containerInputs.forEach((el)=>{
-        el.checked = false;
-      });
-    } else {
-      container.classList.add(elClass)
-    }
+  toggleSectionDisplay(e){
+    let section = e.target.nextSibling;
+    let sectionButtons = section.querySelectorAll('input');
+    section.classList.toggle('vas-edit-procedure-important-hide');
+    sectionButtons.forEach(btn=>{
+      btn.checked = false;
+    });
   }
 
   toggleConsultation(){
@@ -538,26 +534,26 @@ export default class EditProcedure extends Component {
             </div>
           </div>
         </div>
-        {this.state.proceduresDoneIdArr && this.props.referenceObj && this.props.procedures.map((procedure, idx)=>{
+        {this.state.proceduresDoneIdArr && this.props.procedures.map((procedure, idx)=>{
             return (
               <div className="vas-edit-procedure-inner-container" key={procedure._id}>
                 <header className="vas-edit-procedure-inner-container-header">
-                  <p>{this.props.referenceObj.procedures[procedure.procedureId].name}</p>
+                  <p>{procedure.name}</p>
                   <button className='vas-edit-procedure-reset-buttons' onClick={this.resetSection}>Reset</button>
                 </header>
                 <div className="vas-edit-procedure-inner-container-main">
                   {procedure.groups.map((group, idx2)=>{
                     return(
-                      <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + group.groupId}>
-                        {/* Cathflow: groupId = 14 */}
-                        {group.groupId === '14' &&
-                          <button className='vas-edit-procedure-cathflow-btn' onClick={e=>{this.showHiddenButtons(procedure.procedureId, group.groupId, 'vas-edit-procedure-important-hide')}}>{this.props.referenceObj.groups[group.groupId].name}</button>
+                      <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + '_' + group.groupName}>
+                        {/* Cathflow: groupName = 14 */}
+                        {group.hideGroup &&
+                          <button className='vas-edit-procedure-toggle-section-btn' onClick={this.toggleSectionDisplay}>{group.groupName}</button>
                         }
                         {!group.hideHeader &&
-                          <h3>{this.props.referenceObj.groups[group.groupId].name}</h3>
+                          <h3>{group.groupName}</h3>
                         }
-                        {/* Cathflow: groupId = 14 */}
-                        <div className={'vas-edit-procedure-inner-container-row ' + (group.groupId === '14' && !this.state.isPostEdit ? 'vas-edit-procedure-important-hide vas-edit-procedure-' + procedure.procedureId + '-' + group.groupId : '')}>
+                        {/* Cathflow: groupName = 14 */}
+                        <div className={'vas-edit-procedure-inner-container-row ' + (group.hideGroup ? (this.state.isPostEdit ? '' : 'vas-edit-procedure-important-hide ') : '')}>
                           {group.groupItems.map((itemId)=>{
                               let customInput = (group.inputType === 'number' || group.inputType === 'text') ? true : false;
                               return(
@@ -568,9 +564,9 @@ export default class EditProcedure extends Component {
                                         type={group.inputType} 
                                         className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} 
                                         data-procedureid={procedure.procedureId} id={itemId} 
-                                        name={procedure.procedureId + "_" + group.groupId}
+                                        name={procedure.procedureId + "_" + group.groupName}
                                         defaultChecked={this.state.proceduresDoneIdArr.indexOf(itemId) > -1 ? true : false}/>
-                                      <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, group.groupId)}}>{this.props.itemsById[itemId].value}</label>
+                                      <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, group.groupName)}}>{this.props.itemsById[itemId].value}</label>
                                     </span>
                                   }
                                   {customInput &&

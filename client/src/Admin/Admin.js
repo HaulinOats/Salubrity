@@ -29,7 +29,6 @@ export default class Admin extends Component {
       procedures:[],
       allUsers:[],
       usersById:null,
-      referenceObj:null,
       hospitalsById:null,
       itemsById:null,
       proceduresById:null,
@@ -39,6 +38,7 @@ export default class Admin extends Component {
       firstFilterValue:'',
       secondFilterValue:'',
       secondDropdownArr:[],
+      thirdFilterValue:'',
       addHospitalName:'',
       addOrderChangeName:'',
       addNeedName:'',
@@ -82,7 +82,7 @@ export default class Admin extends Component {
   }
 
   componentDidMount(){
-    // this.startSessionInterval();
+    this.startSessionInterval();
   }
 
   closeRecordCallback(type){
@@ -114,7 +114,7 @@ export default class Admin extends Component {
 
   refreshUserSession(){
     let currentUser = this.state.currentUser;
-    // currentUser.lastLogin = Math.floor(Date.now() / 1000);
+    currentUser.lastLogin = Math.floor(Date.now() / 1000);
     this.setState({currentUser}, ()=>{
       ls('currentUser', this.state.currentUser);
     });
@@ -124,37 +124,37 @@ export default class Admin extends Component {
     this.setState({
       currentUser:user
     }, ()=>{
-      // this.startSessionInterval();
+      this.startSessionInterval();
       this.refreshUserSession();
       this.stateLoadCalls();
     });
   }
 
   startSessionInterval(){
-    // console.log('starting intervals...');
-    // this.sessionInterval = setInterval(()=>{
-    //   if(this.state.currentUser){
-    //     this.checkUserSession();
-    //   }
-    // }, 180000);//check session every 3 minutes (180000)ms
+    console.log('starting intervals...');
+    this.sessionInterval = setInterval(()=>{
+      if(this.state.currentUser){
+        this.checkUserSession();
+      }
+    }, 180000);//check session every 3 minutes (180000)ms
   }
 
   checkUserSession(){
-    // let currentTime = Math.floor(Date.now() / 1000);
-    // let timeDiff = currentTime - this.state.currentUser.lastLogin;
-    // console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 30)`);
-    // if(timeDiff > 1800){
-    //   console.log('Logging user out due to inactivity');
-    //   this.logout();
-    // }
-    // if(timeDiff > 1620){
-    //   this.setState({
-    //     modalTitle:'Session Is About To End',
-    //     modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
-    //     modalIsOpen:true,
-    //     modalConfirmation:true
-    //   })
-    // }
+    let currentTime = Math.floor(Date.now() / 1000);
+    let timeDiff = currentTime - this.state.currentUser.lastLogin;
+    console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 30)`);
+    if(timeDiff > 1800){
+      console.log('Logging user out due to inactivity');
+      this.logout();
+    }
+    if(timeDiff > 1620){
+      this.setState({
+        modalTitle:'Session Is About To End',
+        modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
+        modalIsOpen:true,
+        modalConfirmation:true
+      })
+    }
   }
 
   stateLoadCalls(){
@@ -170,9 +170,13 @@ export default class Admin extends Component {
     })
 
     helpers.getProcedureData().then(data=>{
+      let proceduresById = {};
+      for(let i = 0; i < data.procedures.length; i++){
+        proceduresById[data.procedures[i].procedureId] = data.procedures[i];
+      }
       this.setState({
         procedures:data.procedures,
-        referenceObj:data.referenceObj
+        proceduresById
       }, ()=>{
         setTimeout(()=>{
           console.log(this.state);
@@ -359,7 +363,7 @@ export default class Admin extends Component {
   }
 
   logout(){
-    // clearInterval(this.sessionInterval);
+    clearInterval(this.sessionInterval);
     this.setState({currentUser:null}, this.resetState);
     ls.clear();
   }
@@ -419,37 +423,51 @@ export default class Admin extends Component {
     })
   }
 
-  filterDropdown(e, whichDropdown){
-    if(whichDropdown === 1){
-      if(e.target.value !== 'default'){
-        let filterArr = [];
-        if(e.target.value === 'completedBy'){
-          filterArr = this.state.allUsers;
-        }
-        if(e.target.value === 'procedureId'){
-          filterArr = this.state.procedures;
-        }
-        if(e.target.value === 'hospital'){
-          filterArr = this.state.allOptions[0].options;
-        }
-        console.log(this.state.procedures);
+  filterDropdown(e, dropdownNumber, whichDropdown){
+    switch(dropdownNumber){
+      case 1:
         this.setState({
-          firstFilterValue:e.target.value,
-          secondFilterValue:'',
-          secondDropdownArr:filterArr
-        });
-      } else {
-        this.resetFilters();
-      }
+          thirdFilterValue:''
+        })
+        break;
+      default:
     }
-    if(whichDropdown === 2){
-      if(e.target.value !== 'default'){
-        this.setState({secondFilterValue:Number(e.target.value)});
-      } else {
-        this.setState({
-          secondFilterValue:''
-        });
-      }
+    switch(whichDropdown){
+      case 'hospital':
+        if(e.target.value !== ''){
+          this.setState({secondFilterValue:Number(e.target.value)});
+        } else {
+          this.setState({secondFilterValue:''});
+        }
+        break;
+      case 'hospital-procedure':
+        if(e.target.value !== ''){
+          this.setState({thirdFilterValue:Number(e.target.value)});
+        } else {
+          this.setState({thirdFilterValue:''});
+        }
+        break;
+      default:
+        if(e.target.value !== ''){
+          let filterArr = [];
+          if(e.target.value === 'completedBy'){
+            filterArr = this.state.allUsers;
+          }
+          if(e.target.value === 'procedureId'){
+            filterArr = this.state.procedures;
+          }
+          if(e.target.value === 'hospital'){
+            filterArr = this.state.allOptions[0].options;
+          }
+          this.setState({
+            firstFilterValue:e.target.value,
+            secondFilterValue:'',
+            secondDropdownArr:filterArr
+          });
+        } else {
+          this.resetFilters();
+        }
+        break;
     }
   }
 
@@ -577,10 +595,37 @@ export default class Admin extends Component {
       return this.queryCallsByString();
     }
 
+    if(this.state.thirdFilterValue !== ''){
+      return this.queryCallsByMultipleQueries();
+    }
+
     this.setState({isLoading:true});
     axios.post('/calls-by-single-criteria', query).then(resp=>{
       if(resp.data.error || resp.data._message){
         alert(resp.data.error ? resp.data.error : resp.data._message);
+      } else {
+        this.setState({queriedCalls:resp.data});
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+    .finally(()=>{
+      this.setState({isLoading:false});
+    })
+  }
+
+  queryCallsByMultipleQueries(){
+    axios.post('/get-calls-by-hospital-and-insertion-type', {
+      hospital:this.state.secondFilterValue,
+      itemIds:[this.state.thirdFilterValue],
+      dateQuery:{
+        startDate:moment(this.state.startDate).startOf('day').toISOString(),
+        endDate:moment(this.state.endDate).endOf('day').toISOString()
+      }
+    }).then(resp=>{
+      if(resp.data.error || resp.data._message){
+        alert(`no calls returned for that specific query. ${this.state.hospitalsById[this.state.secondFilterValue].name} & ${this.state.itemsById[this.state.thirdFilterValue].value}`);
       } else {
         this.setState({queriedCalls:resp.data});
       }
@@ -763,7 +808,7 @@ export default class Admin extends Component {
                   <div className='vas-admin-filter-container'>
                     <p>Filters:</p>
                     <select className='vas-select vas-admin-query-dropdown-1' value={this.state.firstFilterValue} onChange={e=>{this.filterDropdown(e, 1)}}>
-                      <option value="default">No Filter</option>
+                      <option value="">No Filter</option>
                       <option value="completedBy">Nurse</option>
                       <option value="hospital">Hospital</option>
                       <option value="mrn">MRN</option>
@@ -783,7 +828,7 @@ export default class Admin extends Component {
                     <div className='vas-admin-filter-container'>
                       <p>Nurse Name:</p>
                       <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
-                        <option value='default'>Select User</option>
+                        <option value=''>Select User</option>
                         {this.state.secondDropdownArr.map((user, idx)=>{
                           return <option className='vas-capitalize' key={user._id} value={user.userId}>{user.fullname}</option>
                         })}
@@ -791,15 +836,28 @@ export default class Admin extends Component {
                     </div>
                   }
                   {this.state.firstFilterValue === 'hospital' &&
-                    <div className='vas-admin-filter-container'>
-                      <p>Name:</p>
-                      <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
-                        <option value='default'>Select Hospital</option>
-                        {this.state.secondDropdownArr.map((hospital, idx)=>{
-                          return <option key={hospital.id} value={hospital.id}>{hospital.name}</option>
-                        })}
-                      </select>
-                    </div>
+                    <span>
+                      <div className='vas-admin-filter-container'>
+                        <p>Name:</p>
+                        <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2, 'hospital')}}>
+                          <option value=''>Select Hospital</option>
+                          {this.state.secondDropdownArr.map((hospital, idx)=>{
+                            return <option key={hospital.id} value={hospital.id}>{hospital.name}</option>
+                          })}
+                        </select>
+                      </div>
+                      {this.state.secondFilterValue !== '' &&
+                        <div className='vas-admin-filter-container'>
+                          <p>Insertion Type:</p>
+                          <select className='vas-select' onChange={e=>{this.filterDropdown(e, 3, 'hospital-procedure')}}>
+                            <option value=''>Select An Insertion Type</option>
+                            {this.state.proceduresById['8'].groups[1].groupItems.map(itemId => {
+                              return <option key={itemId} value={itemId}>{this.state.itemsById[itemId].value}</option>
+                            })}
+                          </select>
+                        </div>
+                      }
+                    </span>
                   }
                   {this.state.firstFilterValue === 'orderChange' &&
                     <button className='vas-admin-search-submit' onClick={e=>{this.getOrderChanges()}}>Submit</button>
@@ -810,15 +868,14 @@ export default class Admin extends Component {
                       <input type='text' value={this.state.secondFilterValue} onKeyUp={e=>{this.customInputKeyUp(e)}} onChange={e=>{this.setState({secondFilterValue:e.target.value})}}/>
                     </div>
                   }
-                  {this.state.referenceObj && this.state.firstFilterValue === 'procedureId' &&
+                  {this.state.firstFilterValue === 'procedureId' &&
                     <div className='vas-admin-filter-container'>
                       <p>Procedure:</p>
-                      <select className='vas-select' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
-                        <option value='default'>Select Procedure</option>
+                      <select className='vas-select' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2, 'procedure')}}>
+                        <option value=''>Select Procedure</option>
                         {this.state.secondDropdownArr.map((procedure, idx)=>{
-                          return <option key={procedure.procedureId} value={procedure.procedureId}>{this.state.referenceObj.procedures[procedure.procedureId].name}</option>
-                        })
-                        }
+                          return <option key={procedure.procedureId} value={procedure.procedureId}>{procedure.procedureName}</option>
+                        })}
                       </select>
                     </div>
                   }
@@ -837,21 +894,19 @@ export default class Admin extends Component {
                   queriedProcedures={this.state.queriedCalls}
                   hospitalsById={this.state.hospitalsById}
                   usersById={this.state.usersById}
-                  referenceObj={this.state.referenceObj}
                   itemsById={this.state.itemsById}
                   editCompletedCall={this.editCompletedCall} 
                   orderChangeById={this.state.orderChangeById}/>
                 }
               </div>
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
-                {this.state.activeRecord && this.state.procedures && this.state.referenceObj && this.state.itemsById && this.state.allOptions.length > 0 &&
+                {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
                     activeRecord={this.state.activeRecord}
                     allOptions={this.state.allOptions}
                     procedures={this.state.procedures}
                     usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
-                    referenceObj={this.state.referenceObj}
                     refreshUserSession={this.refreshUserSession}
                     closeRecordCallback={this.closeRecordCallback}
                     currentUser={this.state.currentUser}/>

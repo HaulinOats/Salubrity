@@ -56,8 +56,8 @@ let Call = mongoose.model('Call', callSchema);
 
 let itemSchema = new Schema({
   itemId:{type:Number, index:true, unique:true, required:true},
-  procedureId:{type:Number, required:true},
-  groupId:{type:Number, required:true},
+  procedureName:{type:String, required:true},
+  groupName:{type:String, required:true},
   value:{type:String, default:null},
   isCustom:{type:Boolean, required:true},
   fieldAbbr:String,
@@ -69,12 +69,14 @@ let Item = mongoose.model('Item', itemSchema);
 
 let procedureSchema = new Schema({
   procedureId:{type:Number, index:true, unique:true},
+  name:{type:String, required:true},
   seq:{type:Number, required:true},
   groups:[
     {
-      groupId:String,
-      fieldName:{type:String, default:null},
+      groupName:String,
       hideHeader:{type:Boolean, default:false},
+      hideGroup:{type:Boolean, default:false},
+      fieldName:{type:String},
       inputType:String,
       groupItems:[Number]
     }
@@ -243,6 +245,26 @@ app.post('/get-call-by-id', (req, res)=>{
   });
 })
 
+app.post('/get-calls-by-hospital-and-insertion-type', (req, res)=>{
+  Call.find({
+    completedAt: {
+      $gte: new Date(req.body.dateQuery.startDate),
+      $lt: new Date(req.body.dateQuery.endDate)
+    },
+    hospital:req.body.hospital,
+    'proceduresDone.itemIds':{
+      $in:req.body.itemIds
+    }
+  }, (err, calls)=>{
+    if(err) return res.send(err);
+    if(calls.length){
+      res.send(calls);
+    } else {
+      res.send({'error':`no calls returned for this query: procedureId = ${req.body.procedureId}`});
+    }
+  })
+})
+
 //ADMIN
 app.post('/add-user', (req, res)=>{
   let newUser = req.body;
@@ -282,8 +304,7 @@ app.get('/get-procedures', (req, res)=>{
     if(err) return res.send(err);
     if(procedures.length){
       res.send({
-        procedures,
-        referenceObj:seedData.referencesObject
+        procedures
       });
     } else {
       res.send({'error':'there were no procedures to return'});

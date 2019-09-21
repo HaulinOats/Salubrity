@@ -106,7 +106,7 @@
 .vas-edit-procedure-inner-span[data-procedure="8"][data-idx='1']{
   display:inline;
 }
-.vas-edit-procedure-cathflow-btn {
+.vas-edit-procedure-toggle-section-btn {
   background-color: darkorange;
   margin-left: auto;
   margin-right: 5px;
