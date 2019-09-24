@@ -133,14 +133,13 @@
   color:white;
 }
 .vas-returned-procedures-print {
-  color: white;
   padding: 5px;
-  font-size: 150%;
   box-shadow: 1px 1px 2px black;
   border-radius: 3px;
   background: teal;
   margin-left:10px;
   cursor:pointer;
+  width:25px;
 }
 .vas-returned-procedures-print:active {
   box-shadow: none;

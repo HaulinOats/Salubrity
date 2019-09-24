@@ -249,7 +249,7 @@ export default class Filters extends Component {
         </div>
         <div className='vas-filters-add-filter-container'>
           <select ref={(ref)=>{this.mainFilterSelect = ref}} className='vas-select vas-filters-main-filter-select' onChange={this.selectFilter}>
-            <option value=''>Select A Filter</option>
+            <option value=''>Add Filter</option>
             {this.state.filterFields.map((filterField)=>{
               return <option key={filterField.fieldName} value={filterField.fieldName}>{filterField.text}</option>
             })}

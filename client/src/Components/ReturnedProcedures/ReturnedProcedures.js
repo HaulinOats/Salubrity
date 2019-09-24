@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './ReturnedProcedures.css';
 import Moment from 'react-moment';
 import helpers from '../../helpers';
+import printIcon from '../../../public/print.svg';
 
 export default class ReturnedProcedures extends Component {
   constructor(props){
@@ -72,7 +73,8 @@ export default class ReturnedProcedures extends Component {
           </select>
           <button className='vas-btn-normal vas-home-reverse-sort-btn' onClick={this.toggleSort}>Reverse Sort</button>
           {this.props.isAdmin &&
-            <p className='vas-returned-procedures-print' onClick={e=>{window.print()}}>&#128438;</p>
+            // <p className='vas-returned-procedures-print' onClick={e=>{window.print()}}>&#128438;</p>
+            <img className='vas-returned-procedures-print' src={printIcon} alt='print' onClick={e=>{window.print()}}/>
           }
         </div>
         <div className='vas-home-table-body'>
