@@ -26,7 +26,6 @@ export default class Filters extends Component {
         {fieldName:'procedureTime', text:'Procedure Time'}
       ]    
     }
-    this.mainFilterSelect;
     this.childFilterOnChange = this.childFilterOnChange.bind(this);
     this.startDateChange = this.startDateChange.bind(this);
     this.endDateChange = this.endDateChange.bind(this);

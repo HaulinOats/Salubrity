@@ -13,6 +13,11 @@
 .vas-admin-custom-table {
   width:100%;
 }
+.vas-home-completed-thead {
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
 .vas-admin-custom-table-header {
   height: 40px;
   display: flex;

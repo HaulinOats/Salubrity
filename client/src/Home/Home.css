@@ -350,11 +350,6 @@
     color:rgb(255, 205, 80);
   }
 }
-.vas-home-completed-thead {
-  padding: 1%;
-  display: flex;
-  align-items: center;
-}
 .vas-home-reverse-sort-btn {
   margin: auto;
   margin-right: 0;
