@@ -66,13 +66,15 @@ const helpers = {
         if(resp.data.error || resp.data._message){
           reject(resp.data);
         } else {
-          let hospitals = {};
+          let hospitals = resp.data[0];
+          let hospitalsById = {};
           resp.data[0].options.forEach(hospital=>{
-            hospitals[hospital.id] = hospital;
+            hospitalsById[hospital.id] = hospital;
           });
-          let orders = {};
+          let orderChanges = resp.data[3];
+          let orderChangeById = {};
           resp.data[3].options.forEach(order=>{
-            orders[order.id] = order;
+            orderChangeById[order.id] = order;
           });
           let statuses = {};
           resp.data[6].options.forEach(status=>{
@@ -81,7 +83,9 @@ const helpers = {
           resolve({
             options:resp.data,
             hospitals,
-            orders,
+            hospitalsById,
+            orderChanges,
+            orderChangeById,
             statuses
           })
         }

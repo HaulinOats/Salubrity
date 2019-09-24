@@ -58,50 +58,13 @@
 }
 .vas-admin-main-content {
   margin-top:45px;
-  padding:10px;
+  padding:5px;
 }
 .vas-admin-page-container {
   display:none;
 }
 .vas-admin-page-container[data-isactive='true'] {
   display:block;
-}
-.vas-admin-filters-container {
-  margin-bottom:10px;
-}
-.vas-admin-date-range-inner {
-  display:inline-block;
-  margin-right:15px;
-}
-.vas-damin-date-label {
-  margin-bottom:5px;
-}
-.vas-admin-datepicker {
-  border: solid 2px darkgrey;
-  border-radius: 5px;
-  height: 35px;
-  padding-left: 5px;
-}
-.vas-admin-date-range-checkboxes{
-  display: inline-block;
-}
-.vas-admin-date-range-show-all {
-  margin-right: 9px;
-  transform: scale(1.7);
-}
-.vas-admin-date-range-submit {
-  display:inline-block;
-  border: none;
-  padding: 9px;
-  border-radius: 5px;
-  margin-top: 10px;
-  margin-left:10px;
-  box-shadow: 1px 1px 2px black;
-  background: cadetblue;
-  color: white;
-}
-.vas-admin-date-query-container {
-  margin-top:10px;
 }
 
 /* Users Page */
@@ -346,6 +309,10 @@
     display:inline-block;
   }
 }
-@media (min-width: 650px) {
-
+@media print {
+  .vas-main-header,
+  .vas-filters,
+  .vas-table-thead-row {
+    display:none !important;
+  }
 }

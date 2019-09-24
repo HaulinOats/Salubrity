@@ -258,6 +258,11 @@ select {
   min-height: 32px;
   text-transform: capitalize;
 }
+.vas-input {
+  min-height: 28px;
+  border-radius: 3px;
+  border:solid thin darkgrey;
+}
 .vas-table {
   margin-bottom:0;
   background-color:white;

@@ -351,9 +351,20 @@ app.get('/get-completed-calls', (req, res)=>{
   });
 });
 
-app.post('/get-calls-date-range', (req, res) =>{
-  // console.log(new Date(req.body.startDate));
-  // console.log(new Date(req.body.endDate));
+app.post('/get-calls-by-query', (req, res)=>{
+  Call.find(req.body, (err, calls)=>{
+    if(err) res.send(err);
+    if(calls.length){
+      res.send(calls);
+    } else {
+      res.send({'error':'no calls found matching that specific query'})
+    }
+  })
+})
+
+app.post('/get-calls-by-date-range', (req, res) =>{
+  console.log(new Date(req.body.startDate));
+  console.log(new Date(req.body.endDate));
   Call.find({completedAt: {
     $gte: new Date(req.body.startDate),
     $lt: new Date(req.body.endDate)

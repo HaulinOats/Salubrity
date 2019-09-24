@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import Modal from '../Widgets/Modal/Modal';
-import Login from '../Widgets/Login/Login';
-import EditProcedure from '../Widgets/EditProcedure/EditProcedure';
-import ReturnedProcedures from '../Widgets/ReturnedProcedures/ReturnedProcedures';
+import Modal from '../Components/Modal/Modal';
+import Login from '../Components/Login/Login';
+import EditProcedure from '../Components/EditProcedure/EditProcedure';
+import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedures';
 import helpers from '../helpers';
 import axios from 'axios';
 import Moment from 'react-moment';
@@ -31,8 +31,10 @@ export default class Home extends Component{
       allUsers:[],
       usersById:null,
       itemsById:null,
+      hospitals:[],
       hospitalsById:null,
       statusById:null,
+      orderChanges:[],
       orderChangeById:null,
       proceduresById:null,
       selectedProcedures:[],
@@ -277,8 +279,10 @@ export default class Home extends Component{
     helpers.getOptionsData().then(data=>{
       this.setState({
         allOptions:data.options,
-        hospitalsById:data.hospitals,
-        orderChangeById:data.orders,
+        hospitals:data.hospitals,
+        hospitalsById:data.hospitalsById,
+        orderChanges:data.orderChanges,
+        orderChangeById:data.orderChangeById,
         statusById:data.statuses
       }, this.getCompletedCalls)
     }).catch(err=>{

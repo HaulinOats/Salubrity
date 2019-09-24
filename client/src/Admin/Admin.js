@@ -1,15 +1,13 @@
 import React, {Component} from 'react';
-import Login from '../Widgets/Login/Login';
-import Modal from '../Widgets/Modal/Modal';
-import EditProcedure from '../Widgets/EditProcedure/EditProcedure';
+import Login from '../Components/Login/Login';
+import Modal from '../Components/Modal/Modal';
+import EditProcedure from '../Components/EditProcedure/EditProcedure';
+import Filters from '../Components/Filters/Filters';
 import helpers from '../helpers';
 import './Admin.css';
 import axios from 'axios';
-import moment from 'moment';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import loadingGif from '../../public/loading.gif';
-import ReturnedProcedures from '../Widgets/ReturnedProcedures/ReturnedProcedures';
+import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedures';
 import ls from 'local-storage';
 
 export default class Admin extends Component {
@@ -17,8 +15,6 @@ export default class Admin extends Component {
     super(props);
     this.state = {
       currentUser:null,
-      startDate:moment(),
-      endDate:moment(),
       isLoading:false,
       activePage:'date',
       activeRecord:null,
@@ -26,19 +22,18 @@ export default class Admin extends Component {
       addUserName:'',
       addPassword:'',
       addAdminAccess:false,
-      procedures:[],
-      allUsers:[],
+      procedures:null,
+      allUsers:null,
       usersById:null,
+      hospitals:null,
       hospitalsById:null,
       itemsById:null,
       proceduresById:null,
+      orderChanges:null,
       orderChangeById:null,
       allOptions:[],
       queriedCalls:[],
-      firstFilterValue:'',
-      secondFilterValue:'',
       secondDropdownArr:[],
-      thirdFilterValue:'',
       addHospitalName:'',
       addOrderChangeName:'',
       addNeedName:'',
@@ -49,15 +44,12 @@ export default class Admin extends Component {
       confirmationType:null,
       menuIsVisible:false
     }
-    this.submitDateRange = this.submitDateRange.bind(this);
     this.seedProcedures = this.seedProcedures.bind(this);
     this.seedOptions = this.seedOptions.bind(this);
     this.seedItems = this.seedItems.bind(this);
     this.addUser = this.addUser.bind(this);
     this.logout = this.logout.bind(this);
     this.loginCallback = this.loginCallback.bind(this);
-    this.startDateChange = this.startDateChange.bind(this);
-    this.endDateChange = this.endDateChange.bind(this);
     this.addHospital = this.addHospital.bind(this);
     this.addOrderChange = this.addOrderChange.bind(this);
     this.addNeed = this.addNeed.bind(this);
@@ -68,6 +60,7 @@ export default class Admin extends Component {
     this.closeMenu = this.closeMenu.bind(this);
     this.editCompletedCall = this.editCompletedCall.bind(this);
     this.closeRecordCallback = this.closeRecordCallback.bind(this);
+    this.returnedCalls = this.returnedCalls.bind(this);
   }
 
   componentWillMount(){
@@ -79,10 +72,6 @@ export default class Admin extends Component {
         this.stateLoadCalls();
       });
     }
-  }
-
-  componentDidMount(){
-    this.startSessionInterval();
   }
 
   closeRecordCallback(type){
@@ -161,8 +150,10 @@ export default class Admin extends Component {
     helpers.getOptionsData().then(data=>{
       this.setState({
         allOptions:data.options,
-        hospitalsById:data.hospitals,
-        orderChangeById:data.orders,
+        hospitals:data.hospitals,
+        hospitalsById:data.hospitalsById,
+        orderChanges:data.orderChanges,
+        orderChangeById:data.orderChangeById,
         statusById:data.statuses
       })
     }).catch(err=>{
@@ -368,47 +359,6 @@ export default class Admin extends Component {
     ls.clear();
   }
 
-  startDateChange(date){
-    this.setState({
-      startDate: date
-    });
-  }
-  
-  endDateChange(date){
-    this.setState({
-      endDate: date
-    });
-  }
-
-  submitDateRange(){
-    this.setState({isLoading:true});
-    axios.post('/get-calls-date-range', {
-      startDate:moment(this.state.startDate).startOf('day').toISOString(),
-      endDate:moment(this.state.endDate).endOf('day').toISOString()
-    }).then(resp=>{
-      let calls = resp.data;
-      //add nurse name to call for sorting
-      for(let i = 0; i < calls.length; i++){
-        if(calls[i].completedBy !== null){
-          calls[i].completedByName = this.state.usersById[calls[i].completedBy].fullname;
-        } else {
-          calls[i].completedByName = null;
-        }
-        //add hospital name to call for sorting
-        if(calls[i].hospital !== null){
-          calls[i].hospitalName = this.state.hospitalsById[calls[i].hospital].name;
-        } else {
-          calls[i].hospitalName = null;
-        }
-      }
-      this.setState({queriedCalls:calls});
-    }).catch(err=>{
-      console.log(err);
-    }).finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
   seedSuper(){
     this.setState({isLoading:true});
     axios.get('/seed-super')
@@ -423,246 +373,22 @@ export default class Admin extends Component {
     })
   }
 
-  filterDropdown(e, dropdownNumber, whichDropdown){
-    switch(dropdownNumber){
-      case 1:
-        this.setState({
-          thirdFilterValue:''
-        })
-        break;
-      default:
-    }
-    switch(whichDropdown){
-      case 'hospital':
-        if(e.target.value !== ''){
-          this.setState({secondFilterValue:Number(e.target.value)});
-        } else {
-          this.setState({secondFilterValue:''});
-        }
-        break;
-      case 'hospital-procedure':
-        if(e.target.value !== ''){
-          this.setState({thirdFilterValue:Number(e.target.value)});
-        } else {
-          this.setState({thirdFilterValue:''});
-        }
-        break;
-      default:
-        if(e.target.value !== ''){
-          let filterArr = [];
-          if(e.target.value === 'completedBy'){
-            filterArr = this.state.allUsers;
-          }
-          if(e.target.value === 'procedureId'){
-            filterArr = this.state.procedures;
-          }
-          if(e.target.value === 'hospital'){
-            filterArr = this.state.allOptions[0].options;
-          }
-          this.setState({
-            firstFilterValue:e.target.value,
-            secondFilterValue:'',
-            secondDropdownArr:filterArr
-          });
-        } else {
-          this.resetFilters();
-        }
-        break;
-    }
-  }
-
-  resetFilters(){
-    this.setState({
-      firstFilterValue:'',
-      secondFilterValue:'',
-      secondDropdownArr:''
-    });
-  }
-
-  getOpenCalls(){
-    this.setState({isLoading:true});
-    axios.post('/get-open-calls-in-range', {
-      startDate:moment(this.state.startDate).startOf('day').toISOString(),
-      endDate:moment(this.state.endDate).endOf('day').toISOString()
-    })
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
+  returnedCalls(calls){
+    let queriedCalls = calls;
+    for(let i = 0; i < queriedCalls.length; i++){
+      if(queriedCalls[i].completedBy !== null){
+        queriedCalls[i].completedByName = this.state.usersById[queriedCalls[i].completedBy].fullname;
       } else {
-        this.setState({queriedCalls:resp.data});
+        queriedCalls[i].completedByName = null;
       }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  getOrderChanges(){
-    this.setState({isLoading:true});
-    axios.post('/get-order-changes-in-range', {
-      startDate:moment(this.state.startDate).startOf('day').toISOString(),
-      endDate:moment(this.state.endDate).endOf('day').toISOString()
-    })
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
+      //add hospital name to call for sorting
+      if(queriedCalls[i].hospital !== null){
+        queriedCalls[i].hospitalName = this.state.hospitalsById[queriedCalls[i].hospital].name;
       } else {
-        this.setState({queriedCalls:resp.data});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  queryCallsByProcedure(){
-    this.setState({isLoading:true});
-    axios.post('/calls-by-procedure-id', {
-      procedureId:Number(this.state.secondFilterValue),
-      dateQuery:{
-        startDate:moment(this.state.startDate).startOf('day').toISOString(),
-        endDate:moment(this.state.endDate).endOf('day').toISOString()
-      }
-    }).then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
-      } else {
-        this.setState({queriedCalls:resp.data});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  queryCallsByString(){
-    this.setState({isLoading:true});
-    axios.post('/calls-containing-value', {
-      query:{
-        key:this.state.firstFilterValue,
-        value:this.state.secondFilterValue
-      },
-      dateQuery:{
-        startDate:moment(this.state.startDate).startOf('day').toISOString(),
-        endDate:moment(this.state.endDate).endOf('day').toISOString()
-      }
-    })
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
-      } else {
-        this.setState({queriedCalls:resp.data});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  queryCalls(){
-    let query = {
-      query: {
-        key:this.state.firstFilterValue,
-        value:this.state.secondFilterValue
-      },
-      dateQuery:{
-        startDate:moment(this.state.startDate).startOf('day').toISOString(),
-        endDate:moment(this.state.endDate).endOf('day').toISOString()
+        queriedCalls[i].hospitalName = null;
       }
     }
-    //modify query based on selection
-    if(this.state.firstFilterValue === 'completedBy' || this.state.firstFilterValue === 'mrn'){
-      query.query.value = Number(query.query.value);
-    }
-
-    if(this.state.firstFilterValue === 'procedureId'){
-      return this.queryCallsByProcedure();
-    }
-
-    if(this.state.firstFilterValue === 'provider' || this.state.firstFilterValue === 'room'){
-      return this.queryCallsByString();
-    }
-
-    if(this.state.thirdFilterValue !== ''){
-      return this.queryCallsByMultipleQueries();
-    }
-
-    this.setState({isLoading:true});
-    axios.post('/calls-by-single-criteria', query).then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
-      } else {
-        this.setState({queriedCalls:resp.data});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  queryCallsByMultipleQueries(){
-    axios.post('/get-calls-by-hospital-and-insertion-type', {
-      hospital:this.state.secondFilterValue,
-      itemIds:[this.state.thirdFilterValue],
-      dateQuery:{
-        startDate:moment(this.state.startDate).startOf('day').toISOString(),
-        endDate:moment(this.state.endDate).endOf('day').toISOString()
-      }
-    }).then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(`no calls returned for that specific query. ${this.state.hospitalsById[this.state.secondFilterValue].name} & ${this.state.itemsById[this.state.thirdFilterValue].value}`);
-      } else {
-        this.setState({queriedCalls:resp.data});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  sortQuery(){
-    this.setState({isLoading:true});
-    axios.post('/sort-by-field', {[this.state.firstFilterValue]:1})
-    .then(resp=>{
-      console.log(resp.data);
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
-      } else {
-        this.setState({queriedCalls:resp.data});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
-  customInputKeyUp(e){
-    if(e.which === 13){//Enter
-      if(this.state.secondFilterValue.length){
-        document.querySelector('.vas-admin-search-submit').click();
-      }
-    }
+    this.setState({queriedCalls});
   }
 
   addInputChange(fieldName, e){
@@ -761,8 +487,7 @@ export default class Admin extends Component {
     if(this.state.currentUser){
       isAdmin = (this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super') ? true : false;
     }
-    let isSortable = this.state.firstFilterValue === 'responseTime' || this.state.firstFilterValue === 'procedureTime';
-    let isCustomSearch = this.state.firstFilterValue === 'mrn' || this.state.firstFilterValue === 'provider' || this.state.firstFilterValue === 'room';
+
     return(
       <div className='vas-admin-container'>
         {!isAdmin &&
@@ -796,102 +521,22 @@ export default class Admin extends Component {
             </header>
             <div className='vas-admin-main-content'>
               <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'date' ? true : false}>
-                <div className='vas-admin-filters-container'>
-                  <div className='vas-admin-date-range-inner'>
-                    <p className='vas-damin-date-label'>From:</p>
-                    <DatePicker className='vas-admin-datepicker' selected={this.state.startDate} onChange={this.startDateChange} />
-                  </div>  
-                  <div className='vas-admin-date-range-inner'>
-                    <p className='vas-damin-date-label'>To:</p>
-                    <DatePicker className='vas-admin-datepicker' selected={this.state.endDate} onChange={this.endDateChange} />
-                  </div>
-                  <div className='vas-admin-filter-container'>
-                    <p>Filters:</p>
-                    <select className='vas-select vas-admin-query-dropdown-1' value={this.state.firstFilterValue} onChange={e=>{this.filterDropdown(e, 1)}}>
-                      <option value="">No Filter</option>
-                      <option value="completedBy">Nurse</option>
-                      <option value="hospital">Hospital</option>
-                      <option value="mrn">MRN</option>
-                      <option value='provider'>Provider</option>
-                      <option value='room'>Room</option>
-                      <option value='procedureId'>Procedure</option>
-                      <option value='orderChange'>Order Change</option>
-                      <option value='responseTime'>Response Time</option>
-                      <option value='procedureTime'>Procedure Time</option>
-                      {/* <option value='openBy'>Open Calls</option> */}
-                    </select>
-                  </div>
-                  {this.state.firstFilterValue === 'openBy' &&
-                    <button className='vas-admin-search-submit' onClick={e=>{this.getOpenCalls()}}>Submit</button>
-                  }
-                  {this.state.firstFilterValue === 'completedBy' &&
-                    <div className='vas-admin-filter-container'>
-                      <p>Nurse Name:</p>
-                      <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2)}}>
-                        <option value=''>Select User</option>
-                        {this.state.secondDropdownArr.map((user, idx)=>{
-                          return <option className='vas-capitalize' key={user._id} value={user.userId}>{user.fullname}</option>
-                        })}
-                      </select>
-                    </div>
-                  }
-                  {this.state.firstFilterValue === 'hospital' &&
-                    <span>
-                      <div className='vas-admin-filter-container'>
-                        <p>Name:</p>
-                        <select className='vas-select vas-admin-query-dropdown-2' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2, 'hospital')}}>
-                          <option value=''>Select Hospital</option>
-                          {this.state.secondDropdownArr.map((hospital, idx)=>{
-                            return <option key={hospital.id} value={hospital.id}>{hospital.name}</option>
-                          })}
-                        </select>
-                      </div>
-                      {this.state.secondFilterValue !== '' &&
-                        <div className='vas-admin-filter-container'>
-                          <p>Insertion Type:</p>
-                          <select className='vas-select' onChange={e=>{this.filterDropdown(e, 3, 'hospital-procedure')}}>
-                            <option value=''>Select An Insertion Type</option>
-                            {this.state.proceduresById['8'].groups[1].groupItems.map(itemId => {
-                              return <option key={itemId} value={itemId}>{this.state.itemsById[itemId].value}</option>
-                            })}
-                          </select>
-                        </div>
-                      }
-                    </span>
-                  }
-                  {this.state.firstFilterValue === 'orderChange' &&
-                    <button className='vas-admin-search-submit' onClick={e=>{this.getOrderChanges()}}>Submit</button>
-                  }
-                  {isCustomSearch &&
-                    <div className='vas-admin-filter-container'>
-                      <p>Search:</p>
-                      <input type='text' value={this.state.secondFilterValue} onKeyUp={e=>{this.customInputKeyUp(e)}} onChange={e=>{this.setState({secondFilterValue:e.target.value})}}/>
-                    </div>
-                  }
-                  {this.state.firstFilterValue === 'procedureId' &&
-                    <div className='vas-admin-filter-container'>
-                      <p>Procedure:</p>
-                      <select className='vas-select' value={this.state.secondFilterValue} onChange={e=>{this.filterDropdown(e, 2, 'procedure')}}>
-                        <option value=''>Select Procedure</option>
-                        {this.state.secondDropdownArr.map((procedure, idx)=>{
-                          return <option key={procedure.procedureId} value={procedure.procedureId}>{procedure.procedureName}</option>
-                        })}
-                      </select>
-                    </div>
-                  }
-                  {isSortable &&
-                    <button onClick={e=>{this.sortQuery()}}>Submit</button>
-                  }
-                  {this.state.secondFilterValue.length !== 0 &&
-                    <button className='vas-admin-search-submit' onClick={e=>{this.queryCalls()}}>Submit</button>
-                  }
-                  {!this.state.firstFilterValue &&
-                    <button className='vas-admin-date-range-submit d-inline' onClick={this.submitDateRange}>Submit</button>
-                  }
-                </div>
+                {this.state.orderChanges && this.state.procedures && this.state.hospitals && this.state.allUsers && this.state.usersById && this.state.hospitalsById && this.state.itemsById &&
+                  <Filters 
+                    orderChanges={this.state.orderChanges.options}
+                    procedures={this.state.procedures}
+                    hospitals={this.state.hospitals.options}
+                    allUsers={this.state.allUsers}
+                    usersById={this.state.usersById} 
+                    itemsById={this.state.itemsById}
+                    hospitalsById={this.state.hospitalsById}
+                    returnedCalls={this.returnedCalls}/>
+                }
                 {this.state.queriedCalls.length > 0 &&
                 <ReturnedProcedures 
+                  isAdmin={isAdmin}
                   queriedProcedures={this.state.queriedCalls}
+                  proceduresById={this.state.proceduresById}
                   hospitalsById={this.state.hospitalsById}
                   usersById={this.state.usersById}
                   itemsById={this.state.itemsById}
@@ -942,7 +587,7 @@ export default class Admin extends Component {
                         <th onClick={e=>{this.sortColumn('role')}}>role</th>
                         <th className='vas-admin-delete-user'>Delete?</th>
                       </tr>
-                      {this.state.allUsers.map((user, idx)=>{
+                      {this.state.allUsers && this.state.allUsers.map((user, idx)=>{
                         return(
                           <tr key={user._id}>
                             <td>{user.userId}</td>
