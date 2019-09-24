@@ -71,7 +71,9 @@ export default class ReturnedProcedures extends Component {
             <option value='mrn'>MRN</option>
           </select>
           <button className='vas-btn-normal vas-home-reverse-sort-btn' onClick={this.toggleSort}>Reverse Sort</button>
-          <p className='vas-returned-procedures-print' onClick={e=>{window.print()}}>&#128438;</p>
+          {this.props.isAdmin &&
+            <p className='vas-returned-procedures-print' onClick={e=>{window.print()}}>&#128438;</p>
+          }
         </div>
         <div className='vas-home-table-body'>
           {this.state.queriedProcedures.length < 1 &&
