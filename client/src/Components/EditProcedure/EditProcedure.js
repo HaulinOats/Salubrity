@@ -385,7 +385,6 @@ export default class EditProcedure extends Component {
 
   saveNewProcedure(){
     let proceduresObj = this.createProcedureObject();
-    console.log(proceduresObj);
     let proceduresArr = proceduresObj.procedureArr;
     if(this.procedureVerified(proceduresArr)){
       proceduresArr = this.addCustomValuesToProceduresArr(proceduresArr);
@@ -473,7 +472,6 @@ export default class EditProcedure extends Component {
 
   updateProcedure(){
     let proceduresObj = this.createProcedureObject();
-    console.log(proceduresObj);
     let proceduresArr = proceduresObj.procedureArr;
     if(this.procedureVerified(proceduresArr)){
       let updatedRecord = this.state.currentRecord;
