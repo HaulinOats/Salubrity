@@ -159,6 +159,7 @@ exports.itemSeed = [
   {
     itemId:1,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Patient Refused',
     value:'Patient Refused',
     isCustom:false
@@ -166,6 +167,7 @@ exports.itemSeed = [
   {
     itemId:2,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Size',
     value:'24g',
     isCustom:false
@@ -173,6 +175,7 @@ exports.itemSeed = [
   {
     itemId:3,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Size',
     value:'22g',
     isCustom:false
@@ -180,6 +183,7 @@ exports.itemSeed = [
   {
     itemId:4,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Size',
     value:'20g',
     isCustom:false
@@ -187,6 +191,7 @@ exports.itemSeed = [
   {
     itemId:5,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Size',
     value:'18g',
     isCustom:false
@@ -194,6 +199,7 @@ exports.itemSeed = [
   {
     itemId:6,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Care Type',
     value:'IV Flushed',
     isCustom:false
@@ -201,6 +207,7 @@ exports.itemSeed = [
   {
     itemId:7,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Care Type',
     value:'Saline Locked',
     isCustom:false
@@ -208,6 +215,7 @@ exports.itemSeed = [
   {
     itemId:8,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Care Type',
     value:'Dressing Changed',
     isCustom:false
@@ -215,6 +223,7 @@ exports.itemSeed = [
   {
     itemId:9,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Care Type',
     value:'Dressing Reinforced',
     isCustom:false
@@ -222,6 +231,7 @@ exports.itemSeed = [
   {
     itemId:10,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'DC IV',
     value:'Inflitration',
     isCustom:false
@@ -229,6 +239,7 @@ exports.itemSeed = [
   {
     itemId:11,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'DC IV',
     value:'Phlebitis',
     isCustom:false
@@ -236,6 +247,7 @@ exports.itemSeed = [
   {
     itemId:12,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'DC IV',
     value:'PT Removal',
     isCustom:false
@@ -243,6 +255,7 @@ exports.itemSeed = [
   {
     itemId:13,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'DC IV',
     value:'Leaking',
     isCustom:false
@@ -250,6 +263,7 @@ exports.itemSeed = [
   {
     itemId:14,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'DC IV',
     value:'Painful',
     isCustom:false
@@ -257,6 +271,7 @@ exports.itemSeed = [
   {
     itemId:15,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'DC IV',
     value:'Per Protocol',
     isCustom:false
@@ -264,6 +279,7 @@ exports.itemSeed = [
   {
     itemId:16,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Ultrasound',
     value:'US Used',
     isCustom:false
@@ -271,6 +287,7 @@ exports.itemSeed = [
   {
     itemId:17,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Blood Drawn',
     value:'Blood Was Drawn',
     isCustom:false
@@ -278,6 +295,7 @@ exports.itemSeed = [
   {
     itemId:71,
     procedureName:'PIV',
+    procedureId:1,
     groupName:'Hospital Staff Obtained',
     value:'Hospital Staff Obtained',
     isCustom:false
@@ -285,6 +303,7 @@ exports.itemSeed = [
   {
     itemId:18,
     procedureName:'Lab Draw',
+    procedureId:2,
     groupName:'Patient Refused',
     value:'Patient Refused',
     isCustom:false
@@ -292,6 +311,7 @@ exports.itemSeed = [
   {
     itemId:19,
     procedureName:'Lab Draw',
+    procedureId:2,
     groupName:'Draw Type',
     value:'From IV',
     isCustom:false
@@ -299,6 +319,7 @@ exports.itemSeed = [
   {
     itemId:20,
     procedureName:'Lab Draw',
+    procedureId:2,
     groupName:'Draw Type',
     value:'Labs Only',
     isCustom:false
@@ -306,13 +327,15 @@ exports.itemSeed = [
   {
     itemId:21,
     procedureName:'Lab Draw',
+    procedureId:2,
     groupName:'Ultrasound',
     value:'US Used',
     isCustom:false
   },
   {
     itemId:72,
-    procedureName:'PIV',
+    procedureName:'Lab Draw',
+    procedureId:2,
     groupName:'Hospital Staff Obtained',
     value:'Hospital Staff Obtained',
     isCustom:false
@@ -320,6 +343,7 @@ exports.itemSeed = [
   {
     itemId:22,
     procedureName:'Blood Culture',
+    procedureId:3,
     groupName:'Patient Refused',
     value:'Patient Refused',
     isCustom:false
@@ -327,6 +351,7 @@ exports.itemSeed = [
   {
     itemId:23,
     procedureName:'Blood Culture',
+    procedureId:3,
     groupName:'From',
     value:'PICC',
     isCustom:false
@@ -334,6 +359,7 @@ exports.itemSeed = [
   {
     itemId:24,
     procedureName:'Blood Culture',
+    procedureId:3,
     groupName:'From',
     value:'ML',
     isCustom:false
@@ -341,6 +367,7 @@ exports.itemSeed = [
   {
     itemId:25,
     procedureName:'Blood Culture',
+    procedureId:3,
     groupName:'From',
     value:'Central Line',
     isCustom:false
@@ -348,6 +375,7 @@ exports.itemSeed = [
   {
     itemId:26,
     procedureName:'Blood Culture',
+    procedureId:3,
     groupName:'From',
     value:'IV',
     isCustom:false
@@ -355,6 +383,7 @@ exports.itemSeed = [
   {
     itemId:27,
     procedureName:'Blood Culture',
+    procedureId:3,
     groupName:'From',
     value:'Peripheral Stick x 1',
     isCustom:false
@@ -362,6 +391,7 @@ exports.itemSeed = [
   {
     itemId:28,
     procedureName:'Blood Culture',
+    procedureId:3,
     groupName:'From',
     value:'Peripheral Stick x 2',
     isCustom:false
@@ -369,6 +399,7 @@ exports.itemSeed = [
   {
     itemId:29,
     procedureName:'Blood Culture',
+    procedureId:3,
     groupName:'Ultrasound',
     value:'US Used',
     isCustom:false
@@ -376,6 +407,7 @@ exports.itemSeed = [
   {
     itemId:30,
     procedureName:'Port-A-Cath',
+    procedureId:4,
     groupName:'Type',
     value:'Access',
     isCustom:false
@@ -383,6 +415,7 @@ exports.itemSeed = [
   {
     itemId:31,
     procedureName:'Port-A-Cath',
+    procedureId:4,
     groupName:'Type',
     value:'De-Access',
     isCustom:false
@@ -390,6 +423,7 @@ exports.itemSeed = [
   {
     itemId:32,
     procedureName:'PICC Line',
+    procedureId:5,
     groupName:'Removal',
     value:'Therapy Complete',
     isCustom:false
@@ -397,6 +431,7 @@ exports.itemSeed = [
   {
     itemId:33,
     procedureName:'PICC Line',
+    procedureId:5,
     groupName:'Removal',
     value:'Discharge',
     isCustom:false
@@ -404,6 +439,7 @@ exports.itemSeed = [
   {
     itemId:34,
     procedureName:'PICC Line',
+    procedureId:5,
     groupName:'Removal',
     value:'Clotted',
     isCustom:false
@@ -411,6 +447,7 @@ exports.itemSeed = [
   {
     itemId:35,
     procedureName:'PICC Line',
+    procedureId:5,
     groupName:'Removal',
     value:'Contaminated',
     isCustom:false
@@ -418,6 +455,7 @@ exports.itemSeed = [
   {
     itemId:36,
     procedureName:'PICC Line',
+    procedureId:5,
     groupName:'Removal',
     value:'PT Removal',
     isCustom:false
@@ -425,6 +463,7 @@ exports.itemSeed = [
   {
     itemId:37,
     procedureName:'Dressing Change',
+    procedureId:6,
     groupName:'What',
     value:'PICC',
     isCustom:false
@@ -432,6 +471,7 @@ exports.itemSeed = [
   {
     itemId:38,
     procedureName:'Dressing Change',
+    procedureId:6,
     groupName:'What',
     value:'Port-A-Cath',
     isCustom:false
@@ -439,6 +479,7 @@ exports.itemSeed = [
   {
     itemId:39,
     procedureName:'Dressing Change',
+    procedureId:6,
     groupName:'What',
     value:'Central Line',
     isCustom:false
@@ -446,6 +487,7 @@ exports.itemSeed = [
   {
     itemId:40,
     procedureName:'Dressing Change',
+    procedureId:6,
     groupName:'What',
     value:'ML',
     isCustom:false
@@ -453,6 +495,7 @@ exports.itemSeed = [
   {
     itemId:41,
     procedureName:'Dressing Change',
+    procedureId:6,
     groupName:'Why',
     value:'Per Protocol',
     isCustom:false
@@ -460,6 +503,7 @@ exports.itemSeed = [
   {
     itemId:42,
     procedureName:'Dressing Change',
+    procedureId:6,
     groupName:'Why',
     value:'Bleeding',
     isCustom:false
@@ -467,6 +511,7 @@ exports.itemSeed = [
   {
     itemId:43,
     procedureName:'Dressing Change',
+    procedureId:6,
     groupName:'Why',
     value:'Site Assessment',
     isCustom:false
@@ -474,6 +519,7 @@ exports.itemSeed = [
   {
     itemId:44,
     procedureName:'Dressing Change',
+    procedureId:6,
     groupName:'Why',
     value:'Dressing Compromised',
     isCustom:false
@@ -481,6 +527,7 @@ exports.itemSeed = [
   {
     itemId:45,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'What',
     value:'ML',
     isCustom:false
@@ -488,6 +535,7 @@ exports.itemSeed = [
   {
     itemId:46,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'What',
     value:'PICC',
     isCustom:false
@@ -495,6 +543,7 @@ exports.itemSeed = [
   {
     itemId:47,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'What',
     value:'Central Line',
     isCustom:false
@@ -502,6 +551,7 @@ exports.itemSeed = [
   {
     itemId:48,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'What',
     value:'Port',
     isCustom:false
@@ -509,6 +559,7 @@ exports.itemSeed = [
   {
     itemId:49,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'What',
     value:'IV',
     isCustom:false
@@ -516,6 +567,7 @@ exports.itemSeed = [
   {
     itemId:50,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Intervention',
     value:'Power Flush',
     isCustom:false
@@ -523,6 +575,7 @@ exports.itemSeed = [
   {
     itemId:51,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Intervention',
     value:'Clave Change',
     isCustom:false
@@ -530,6 +583,7 @@ exports.itemSeed = [
   {
     itemId:52,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Intervention',
     value:'Recommend DC',
     isCustom:false
@@ -537,6 +591,7 @@ exports.itemSeed = [
   {
     itemId:53,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Intervention',
     value:'Line Retracted',
     isCustom:false
@@ -544,6 +599,7 @@ exports.itemSeed = [
   {
     itemId:54,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Intervention',
     value:'Repositioned',
     isCustom:false
@@ -551,6 +607,7 @@ exports.itemSeed = [
   {
     itemId:55,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Cathflow',
     value:'PAC: Initiated',
     isCustom:false
@@ -558,6 +615,7 @@ exports.itemSeed = [
   {
     itemId:56,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Cathflow',
     value:'PAC: Completed',
     isCustom:false
@@ -565,6 +623,7 @@ exports.itemSeed = [
   {
     itemId:73,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Cathflow',
     value:'PICC: Initiated',
     isCustom:false
@@ -572,6 +631,7 @@ exports.itemSeed = [
   {
     itemId:74,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Cathflow',
     value:'PICC: Completed',
     isCustom:false
@@ -579,6 +639,7 @@ exports.itemSeed = [
   {
     itemId:75,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Cathflow',
     value:'CVL: Initiated',
     isCustom:false
@@ -586,6 +647,7 @@ exports.itemSeed = [
   {
     itemId:76,
     procedureName:'Troubleshoot',
+    procedureId:7,
     groupName:'Cathflow',
     value:'CVL: Completed',
     isCustom:false
@@ -593,6 +655,7 @@ exports.itemSeed = [
   {
     itemId:57,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Patient Refused',
     value:'Patient Refused',
     isCustom:false
@@ -600,6 +663,7 @@ exports.itemSeed = [
   {
     itemId:58,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Insertion Type',
     value:'SL PICC',
     isCustom:false
@@ -607,6 +671,7 @@ exports.itemSeed = [
   {
     itemId:59,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Insertion Type',
     value:'DL PICC',
     isCustom:false
@@ -614,6 +679,7 @@ exports.itemSeed = [
   {
     itemId:60,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Insertion Type',
     value:'TL PICC',
     isCustom:false
@@ -621,6 +687,7 @@ exports.itemSeed = [
   {
     itemId:61,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Insertion Type',
     value:'ML',
     isCustom:false
@@ -628,6 +695,7 @@ exports.itemSeed = [
   {
     itemId:62,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Insertion Type',
     value:'PG',
     isCustom:false
@@ -635,6 +703,7 @@ exports.itemSeed = [
   {
     itemId:63,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Vessel',
     value:'Basilic',
     isCustom:false
@@ -642,6 +711,7 @@ exports.itemSeed = [
   {
     itemId:64,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Vessel',
     value:'Brachial',
     isCustom:false
@@ -649,6 +719,7 @@ exports.itemSeed = [
   {
     itemId:65,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Vessel',
     value:'Cephalic',
     isCustom:false
@@ -656,6 +727,7 @@ exports.itemSeed = [
   {
     itemId:66,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Vessel',
     value:'Internal Jugular',
     isCustom:false
@@ -663,6 +735,7 @@ exports.itemSeed = [
   {
     itemId:67,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Vessel',
     value:'Femoral',
     isCustom:false
@@ -670,6 +743,7 @@ exports.itemSeed = [
   {
     itemId:68,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Laterality',
     value:'Left',
     isCustom:false
@@ -677,6 +751,7 @@ exports.itemSeed = [
   {
     itemId:69,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Laterality',
     value:'Right',
     isCustom:false
@@ -684,6 +759,7 @@ exports.itemSeed = [
   {
     itemId:70,
     procedureName:'Insertion Procedure',
+    procedureId:8,
     groupName:'Insertion Length',
     value:'in CM',
     isCustom:true,
@@ -716,29 +792,29 @@ exports.procedureSeed = [
         seq:3,
         groupName:'Care Type',
         inputType:'checkbox',
-        groupItems:[16]
+        groupItems:[6,7,8,9]
       },
       {
         seq:4,
         groupName:'DC IV',
         inputType:'checkbox',
-        groupItems:[17]
+        groupItems:[10,11,12,13,14,15]
       },
       {
         seq:5,
         groupName:'Ultrasound',
         inputType:'checkbox',
-        groupItems:[6,7,8,9]
+        groupItems:[16]
       },
       {
         seq:6,
         groupName:'Blood Drawn',
         inputType:'checkbox',
-        groupItems:[10,11,12,13,14,15],
+        groupItems:[17],
       },
       {
         seq:7,
-        groupName:'Draw Type',
+        groupName:'Hospital Staff Obtained',
         inputType:'checkbox',
         groupItems:[71]
       }

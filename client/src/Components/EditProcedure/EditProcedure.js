@@ -148,10 +148,12 @@ export default class EditProcedure extends Component {
 
   createProcedureObject(){
     let procedureObj = {};
+    let itemIds = [];
     let selectedTasks = document.querySelectorAll('.vas-edit-procedure-select-input:checked');
     selectedTasks.forEach((el)=>{
       let itemId = Number(el.id);
       let procedureId = Number(el.getAttribute('data-procedureid'));
+      itemIds.push(itemId);
       if(!procedureObj.hasOwnProperty(procedureId)){
         procedureObj[procedureId] = []
       }
@@ -159,14 +161,20 @@ export default class EditProcedure extends Component {
     });
 
     let procedureArr = [];
+    let procedureIds = [];
     let procedureObjKeys = Object.keys(procedureObj);
     for(let key of procedureObjKeys){
+      procedureIds.push(Number(key));
       procedureArr.push({
         procedureId:Number(key),
         itemIds:procedureObj[key]
       })
     }
-    return procedureArr
+    return {
+      procedureArr,
+      procedureIds,
+      itemIds
+    }
   }
 
   deleteCall(){
@@ -376,7 +384,9 @@ export default class EditProcedure extends Component {
   }
 
   saveNewProcedure(){
-    let proceduresArr = this.createProcedureObject();
+    let proceduresObj = this.createProcedureObject();
+    console.log(proceduresObj);
+    let proceduresArr = proceduresObj.procedureArr;
     if(this.procedureVerified(proceduresArr)){
       proceduresArr = this.addCustomValuesToProceduresArr(proceduresArr);
 
@@ -386,6 +396,8 @@ export default class EditProcedure extends Component {
 
       axios.post('/procedure-completed', {
         _id:this.state.currentRecord._id,
+        procedureIds:proceduresObj.procedureIds,
+        itemIds:proceduresObj.itemIds,
         proceduresDone:proceduresArr,
         completedBy:Number(this.props.currentUser.userId),
         completedAt:completionTime.toISOString(),
@@ -406,6 +418,7 @@ export default class EditProcedure extends Component {
   }
 
   selectButton(e, groupName){
+    //UPDATE
     if(groupName === 'What'){
       this.checkSiblings(e);
     }
@@ -421,12 +434,13 @@ export default class EditProcedure extends Component {
 
   setRecordStateItems(){
     let stateObj = {};
+    //UPDATE
     //check which procedure items should updated state
     if(this.state.currentRecord.proceduresDone.length){
       this.state.currentRecord.proceduresDone.forEach(procedureArr=>{
         procedureArr.itemIds.forEach(itemId=>{
           switch(this.props.itemsById[itemId].groupName){
-            case 18://Insertion Length
+            case 'Insertion Length':
               stateObj.insertionTypeSelected = true;
               break;
             default:
@@ -458,10 +472,14 @@ export default class EditProcedure extends Component {
   }
 
   updateProcedure(){
-    let proceduresArr = this.createProcedureObject();
+    let proceduresObj = this.createProcedureObject();
+    console.log(proceduresObj);
+    let proceduresArr = proceduresObj.procedureArr;
     if(this.procedureVerified(proceduresArr)){
       let updatedRecord = this.state.currentRecord;
       updatedRecord.proceduresDone = this.addCustomValuesToProceduresArr(proceduresArr);
+      updatedRecord.procedureIds = proceduresObj.procedureIds;
+      updatedRecord.itemIds = proceduresObj.itemIds;
       this.setState({currentRecord:updatedRecord}, ()=>{
         this.saveCurrentRecord();
         this.procedureSaved(true);

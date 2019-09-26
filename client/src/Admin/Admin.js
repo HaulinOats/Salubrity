@@ -16,7 +16,7 @@ export default class Admin extends Component {
     this.state = {
       currentUser:null,
       isLoading:false,
-      activePage:'date',
+      activePage:'query',
       activeRecord:null,
       addFullName:'',
       addUserName:'',
@@ -95,7 +95,7 @@ export default class Admin extends Component {
         break;
     }
     this.setState({
-      activePage:'date',
+      activePage:'query',
       activeRecord:null,
       queriedCalls
     })
@@ -500,7 +500,8 @@ export default class Admin extends Component {
                 <h2 className='vas-admin-main-title'>VAS Admin</h2>
                 <p className='vas-admin-menu-toggle' onClick={this.toggleMainMenu}>Menu &#9660;</p>
                 <ul className={'vas-admin-menu ' + (this.state.menuIsVisible ? 'vas-admin-menu-visible' : '')} onClick={this.closeMenu}>
-                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'date' ? true : false} onClick={e=>{this.setState({activePage:'date'})}}>Query Database</li>
+                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'query' ? true : false} onClick={e=>{this.setState({activePage:'query'})}}>Query</li>
+                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'aggregate' ? true : false} onClick={e=>{this.setState({activePage:'aggregate'})}}>Aggregate</li>
                   {this.state.activeRecord &&
                     <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'active' ? true : false} onClick={e=>{this.setState({activePage:'active'})}}>Active</li>
                   }
@@ -520,7 +521,7 @@ export default class Admin extends Component {
               </div>
             </header>
             <div className='vas-admin-main-content'>
-              <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'date' ? true : false}>
+              <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'query' ? true : false}>
                 {this.state.orderChanges && this.state.procedures && this.state.hospitals && this.state.allUsers && this.state.usersById && this.state.hospitalsById && this.state.itemsById &&
                   <Filters 
                     orderChanges={this.state.orderChanges.options}
@@ -543,6 +544,9 @@ export default class Admin extends Component {
                   editCompletedCall={this.editCompletedCall} 
                   orderChangeById={this.state.orderChangeById}/>
                 }
+              </div>
+              <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'aggregate' ? true : false}>
+                <h1>Aggregate</h1>
               </div>
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&

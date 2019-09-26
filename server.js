@@ -41,6 +41,8 @@ let callSchema = new Schema({
   contact:{type:Number, default:null},
   startTime:{type:Date, default:null},
   openBy:{type:Number, default:null},
+  procedureIds:{type:Array, default:null},
+  itemIds:{type:Array, default:null},
   proceduresDone:[Object],
   mrn:{type:Number, default:null},
   completedAt:{type:Date, default:null, index:true},
@@ -57,6 +59,7 @@ let Call = mongoose.model('Call', callSchema);
 let itemSchema = new Schema({
   itemId:{type:Number, index:true, unique:true, required:true},
   procedureName:{type:String, required:true},
+  procedureId:{type:Number, required:true},
   groupName:{type:String, required:true},
   value:{type:String, default:null},
   isCustom:{type:Boolean, required:true},
@@ -178,6 +181,8 @@ app.post('/procedure-completed', (req, res)=>{
   Call.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return res.send(err);
     if(call){
+      call.procedureIds = req.body.procedureIds;
+      call.itemIds = req.body.itemIds;
       call.proceduresDone = req.body.proceduresDone;
       call.completedBy = Number(req.body.completedBy);
       call.completedAt = new Date(Date.now()).toISOString();
