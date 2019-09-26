@@ -322,6 +322,7 @@ export default class EditProcedure extends Component {
   }
   
   resetSection(e){
+    //UPDATE
     let isInsertionProcedure = false;
     let sectionInputs = e.target.closest('.vas-edit-procedure-inner-container').querySelectorAll('input');
     sectionInputs.forEach(el=>{
