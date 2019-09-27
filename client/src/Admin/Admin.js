@@ -9,11 +9,17 @@ import axios from 'axios';
 import loadingGif from '../../public/loading.gif';
 import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedures';
 import ls from 'local-storage';
+import moment from 'moment';
+import DatePicker from "react-datepicker";
 
 export default class Admin extends Component {
   constructor(props){
     super(props);
     this.state = {
+      aggregateStartDate:moment(),
+      aggregateEndDate:moment(),
+      aggregateData:[],
+      aggregateInsertionTypes:[],
       currentUser:null,
       isLoading:false,
       activePage:'query',
@@ -61,6 +67,9 @@ export default class Admin extends Component {
     this.editCompletedCall = this.editCompletedCall.bind(this);
     this.closeRecordCallback = this.closeRecordCallback.bind(this);
     this.returnedCalls = this.returnedCalls.bind(this);
+    this.aggregateData = this.aggregateData.bind(this);
+    this.aggregateStartDateOnChange = this.aggregateStartDateOnChange.bind(this);
+    this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
   }
 
   componentWillMount(){
@@ -72,6 +81,48 @@ export default class Admin extends Component {
         this.stateLoadCalls();
       });
     }
+  }
+
+  aggregateStartDateOnChange(date){
+    this.setState({aggregateStartDate:date})
+  }
+  
+  aggregateEndDateOnChange(date){
+    this.setState({aggregateEndDate:date})
+  }
+
+  aggregateData(){
+    axios.post('/get-aggregation', {
+      completedAt:{
+        startDate: moment(this.state.aggregateStartDate).startOf('day').toISOString(),
+        endDate: moment(this.state.aggregateEndDate).endOf('day').toISOString()
+      }
+    }).then(resp=>{
+      let insertionTypes = [];
+      for(let i = 0; i < resp.data.length; i++){
+        switch(resp.data[i]._id){
+          case 58:
+          case 59:
+          case 60:
+          case 61:
+          case 62:
+            insertionTypes.push({
+              itemId:resp.data[i]._id,
+              count:resp.data[i].count
+            })
+            break;
+          default:
+        }
+      }
+      console.log(resp.data);
+      console.log(insertionTypes);
+      this.setState({
+        aggregateData:resp.data,
+        aggregateInsertionTypes:insertionTypes
+      })
+    }).catch(err=>{
+      console.log('error: ', err);
+    })
   }
 
   closeRecordCallback(type){
@@ -546,7 +597,36 @@ export default class Admin extends Component {
                 }
               </div>
               <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'aggregate' ? true : false}>
-                <h1>Aggregate</h1>
+                <div className='vas-filters-date-range-container'>
+                  <div className='vas-filters-date-range-inner'>
+                    <p className='vas-filters-date-label'>From:</p>
+                    <DatePicker className='vas-filters-datepicker' selected={this.state.aggregateStartDate} onChange={this.aggregateStartDateOnChange} />
+                  </div>  
+                  <div className='vas-filters-date-range-inner'>
+                    <p className='vas-filters-date-label'>To:</p>
+                    <DatePicker className='vas-filters-datepicker' selected={this.state.aggregateEndDate} onChange={this.aggregateEndDateOnChange} />
+                  </div>
+                </div>
+                <button onClick={this.aggregateData}>Aggregate</button>
+                {this.state.aggregateData.length > 0 &&
+                  <div className='vas-admin-aggregation-container'>
+                    {this.state.aggregateInsertionTypes.length > 0 &&
+                      <div className='vas-admin-aggregation-section'>
+                        <h2>Aggregate Of Insertion Types</h2>
+                        <div>
+                          {this.state.aggregateInsertionTypes.map(insertion=>{
+                            return (
+                              <div key={insertion.itemId + insertion.count} className='vas-admin-aggregation-inner-container'>
+                                <p className='vas-admin-aggregation-inner-container-left'>{this.state.itemsById[insertion.itemId].value}:</p>
+                                <p className='vas-admin-aggregation-inner-container-right'>{insertion.count}</p>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&

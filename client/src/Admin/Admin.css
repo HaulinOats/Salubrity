@@ -301,6 +301,30 @@
   background: black;
   opacity:.1;
 }
+.vas-admin-aggregation-container {
+  margin-top:15px;
+}
+.vas-admin-aggregation-section {
+
+}
+.vas-admin-aggregation-section h2 {
+  font-weight: bold;
+  margin-bottom:5px;
+  text-decoration:underline;
+  font-size:115%;
+}
+.vas-admin-aggregation-inner-container {
+  width: 100px;
+  display: flex;
+  font-size:110%;
+}
+.vas-admin-aggregation-inner-container-left{
+  font-weight: bold;
+}
+.vas-admin-aggregation-inner-container-right{
+  margin:0 auto;
+  margin-right:0;
+}
 @media (max-width: 650px) {
   .vas-admin-menu {
     display:none;

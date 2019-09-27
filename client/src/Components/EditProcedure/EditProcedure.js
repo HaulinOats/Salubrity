@@ -18,8 +18,7 @@ export default class EditProcedure extends Component {
       modalTitle:'',
       modalMessage:'',
       modalConfirmation:false,
-      confirmationType:null,
-      showCathflow:false
+      confirmationType:null
     }
     this.saveCurrentRecord = this.saveCurrentRecord.bind(this);
     this.hospitalChange = this.hospitalChange.bind(this);

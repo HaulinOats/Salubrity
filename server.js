@@ -542,6 +542,22 @@ app.post('/save-call', (req, res)=>{
   });
 })
 
+app.post('/get-aggregation', (req, res)=>{
+  Call.aggregate([
+    {$match:{
+      completedAt:{
+        $gte:new Date(req.body.completedAt.startDate),
+        $lte:new Date(req.body.completedAt.endDate)
+      }
+    }},
+    {$project : {'itemIds' : 1, _id :0}}, {$unwind : '$itemIds'}, 
+    {$group : {'_id': '$itemIds', count :{$sum :1}}}
+  ]).exec((err, calls)=>{
+    if(err) return res.send(err);
+    res.send(calls)
+  });
+})
+
 //SUPER
 app.post('/send-errors-to-admin', (req,res)=>{
   fs.writeFile('vas-errors.json', JSON.stringify(req.body), (err)=>{
