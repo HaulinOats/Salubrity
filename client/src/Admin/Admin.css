@@ -314,9 +314,10 @@
   font-size:115%;
 }
 .vas-admin-aggregation-inner-container {
-  width: 100px;
+  width: 130px;
   display: flex;
   font-size:110%;
+  border-bottom: dashed 1px grey;
 }
 .vas-admin-aggregation-inner-container-left{
   font-weight: bold;

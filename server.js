@@ -44,13 +44,14 @@ let callSchema = new Schema({
   procedureIds:{type:Array, default:null},
   itemIds:{type:Array, default:null},
   proceduresDone:[Object],
+  insertionLength:{type:Number, default:0},
   mrn:{type:Number, default:null},
   completedAt:{type:Date, default:null, index:true},
   responseTime:{type:Number, default:null},
   procedureTime:{type:Number, default:null},
   completedBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
-  wasConsultation:{type:Boolean, default:null},
+  wasConsultation:{type:Boolean, default:false},
   status:{type:Number, default:1}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
@@ -61,6 +62,7 @@ let itemSchema = new Schema({
   procedureName:{type:String, required:true},
   procedureId:{type:Number, required:true},
   groupName:{type:String, required:true},
+  fieldName:{type:String, default:null},
   value:{type:String, default:null},
   isCustom:{type:Boolean, required:true},
   fieldAbbr:String,
@@ -178,24 +180,9 @@ app.post('/set-call-as-unopen', (req, res)=>{
 });
 
 app.post('/procedure-completed', (req, res)=>{
-  Call.findOne({_id:req.body._id}, (err, call)=>{
+  Call.findOneAndUpdate({_id:req.body._id},{$set:req.body}, (err, call)=>{
     if(err) return res.send(err);
-    if(call){
-      call.procedureIds = req.body.procedureIds;
-      call.itemIds = req.body.itemIds;
-      call.proceduresDone = req.body.proceduresDone;
-      call.completedBy = Number(req.body.completedBy);
-      call.completedAt = new Date(Date.now()).toISOString();
-      call.procedureTime = req.body.procedureTime;
-      call.responseTime = req.body.responseTime;
-
-      call.save((err2)=>{
-        if(err2) return res.send(err2);
-        res.send(call);
-      })
-    } else {
-      res.send({'error':'could not find procedure to mark as complete'});
-    }
+    res.send(call);
   })
 });
 
@@ -617,6 +604,17 @@ app.get('/seed-items', (req, res)=>{
       res.send({'error':'no items exist'})
     }
   });
+})
+
+app.get('/add-field-to-model-documents', (req, res)=>{
+  // Call.updateMany({},{
+  //   $set:{
+  //     insertionLength:0
+  //   }},
+  //   {upsert:false, multi:true}).exec((err, documents)=>{
+  //     if(err) return res.send(err);
+  //     res.send(true);
+  //   });
 })
 
 app.use(((req, res) => res.sendFile(path.join(__dirname, './client/build/index.html'))));

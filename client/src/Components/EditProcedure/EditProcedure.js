@@ -10,10 +10,7 @@ export default class EditProcedure extends Component {
     this.state = {
       currentRecord:this.props.activeRecord,
       isPostEdit:this.props.activeRecord.completedAt ? true : false,
-      insertionLength:'',
-      insertionTypeSelected:false,
       proceduresDoneIdArr:null,
-      procedureVerified:false,
       modalIsOpen:false,
       modalTitle:'',
       modalMessage:'',
@@ -42,7 +39,7 @@ export default class EditProcedure extends Component {
     this.resetModal = this.resetModal.bind(this);
     this.orderSelect = this.orderSelect.bind(this);
     this.toggleSectionDisplay = this.toggleSectionDisplay.bind(this);
-    this.setRecordStateItems = this.setRecordStateItems.bind(this);
+    // this.setRecordStateItems = this.setRecordStateItems.bind(this);
   };
   
   componentDidMount(){
@@ -53,7 +50,7 @@ export default class EditProcedure extends Component {
         proceduresDoneIdArr.push(itemId);
       })
     });
-    this.setState({proceduresDoneIdArr}, this.setRecordStateItems)
+    this.setState({proceduresDoneIdArr})
     setTimeout(()=>{
       console.log(this.state);
     }, 1000)
@@ -70,27 +67,22 @@ export default class EditProcedure extends Component {
           proceduresDoneIdArr.push(itemId);
         })
       });
-      this.setState({proceduresDoneIdArr}, this.setRecordStateItems)
+      this.setState({proceduresDoneIdArr})
     })
   }
-
-  //NON-LIFECYCLE METHODS
-
-  addCustomValuesToProceduresArr(proceduresArr){
-    for(let i = 0; i < proceduresArr.length; i++){
-      //Insertion Procedure
-      if(proceduresArr[i].procedureId === 8){
-        proceduresArr[i].itemIds.push(70);
-        proceduresArr[i].customValues = {
-          '70': Number(this.state.insertionLength)
-        }
-      }
-    }
-    return proceduresArr;
-  }
   
-  changeCustomInput(e, fieldName){
-    this.setState({[fieldName]:e.target.value});
+  changeCustomInput(e, fieldName, type){
+    let fieldValue;
+    let currentRecord = this.state.currentRecord;
+    switch(type){
+      case 'number':
+        fieldValue = Number(e.target.value);
+        break;
+      default:
+        fieldValue = e.target.value;
+    }
+    currentRecord[fieldName] = fieldValue;
+    this.setState({currentRecord});
     this.props.refreshUserSession();
   }
 
@@ -158,6 +150,12 @@ export default class EditProcedure extends Component {
       }
       procedureObj[procedureId].push(itemId);
     });
+    
+    //UPDATE
+    if(this.state.currentRecord.insertionLength > 0){
+      //push insertion length itemId (70) into procedure's object IDs
+      procedureObj[8].push(70);
+    }
 
     let procedureArr = [];
     let procedureIds = [];
@@ -169,6 +167,7 @@ export default class EditProcedure extends Component {
         itemIds:procedureObj[key]
       })
     }
+
     return {
       procedureArr,
       procedureIds,
@@ -260,15 +259,17 @@ export default class EditProcedure extends Component {
     });
   }
 
-  procedureVerified(proceduresList){
+  procedureVerified(proceduresObj){
     let errors = '';
-    if(!proceduresList.length){
+    let insertionTypesArr = [58,59,60,61,62];
+    let isInsertionProcedure = insertionTypesArr.some(r=> proceduresObj.itemIds.includes(r));
+    if(!proceduresObj.itemIds.length && !this.state.currentRecord.wasConsultation){
       errors += '- You must select at least 1 procedure or confirm consultation\n';
     }
 
-    if(this.state.insertionTypeSelected){
-      if(!this.state.insertionLength.length || this.state.insertionLength === '0'){
-        errors += '- You must enter an insertion length (cannot be 0)\n';
+    if(isInsertionProcedure){
+      if(this.state.currentRecord.insertionLength < 1){
+        errors += '- You must enter an insertion length > 0 if selecting an insertion type\n';
       }
       if(!this.state.currentRecord.hospital || this.state.currentRecord.hospital < 1){
         errors += '- You must select a hospital\n';
@@ -289,7 +290,7 @@ export default class EditProcedure extends Component {
       errors += "- Cannot submit a call that is 'on hold'. Change status from dropdown menu at start of form.";
     }
     
-    if(errors.length && !this.state.currentRecord.wasConsultation){
+    if(errors.length){
       this.setState({
         modalIsOpen:true, 
         modalTitle:'Cannot Submit Procedure',
@@ -341,10 +342,6 @@ export default class EditProcedure extends Component {
           el.style.display = 'none';
         }
       });
-      this.setState({
-        insertionTypeSelected:false,
-        insertionLength:''
-      });
     }
   
     this.saveCurrentRecord();
@@ -385,19 +382,17 @@ export default class EditProcedure extends Component {
 
   saveNewProcedure(){
     let proceduresObj = this.createProcedureObject();
-    let proceduresArr = proceduresObj.procedureArr;
-    if(this.procedureVerified(proceduresArr)){
-      proceduresArr = this.addCustomValuesToProceduresArr(proceduresArr);
-
+    console.log(proceduresObj);
+    if(this.procedureVerified(proceduresObj)){
       let completionTime = new Date();
       let callTime = new Date(this.state.currentRecord.createdAt);
       let startTime = new Date(this.state.currentRecord.startTime);
 
       axios.post('/procedure-completed', {
         _id:this.state.currentRecord._id,
+        proceduresDone:proceduresObj.procedureArr,
         procedureIds:proceduresObj.procedureIds,
         itemIds:proceduresObj.itemIds,
-        proceduresDone:proceduresArr,
         completedBy:Number(this.props.currentUser.userId),
         completedAt:completionTime.toISOString(),
         procedureTime:completionTime - startTime,
@@ -431,30 +426,6 @@ export default class EditProcedure extends Component {
     this.props.refreshUserSession();
   }
 
-  setRecordStateItems(){
-    let stateObj = {};
-    //UPDATE
-    //check which procedure items should updated state
-    if(this.state.currentRecord.proceduresDone.length){
-      this.state.currentRecord.proceduresDone.forEach(procedureArr=>{
-        procedureArr.itemIds.forEach(itemId=>{
-          switch(this.props.itemsById[itemId].groupName){
-            case 'Insertion Length':
-              stateObj.insertionTypeSelected = true;
-              break;
-            default:
-          }
-        });
-
-        //find and set custom values, if they exist
-        if(procedureArr.hasOwnProperty('customValues')){
-          stateObj.insertionLength = String(procedureArr.customValues['70']);
-        }
-      });
-    }
-    this.setState(stateObj);
-  }
-
   toggleSectionDisplay(e){
     let section = e.target.nextSibling;
     let sectionButtons = section.querySelectorAll('input');
@@ -472,10 +443,10 @@ export default class EditProcedure extends Component {
 
   updateProcedure(){
     let proceduresObj = this.createProcedureObject();
-    let proceduresArr = proceduresObj.procedureArr;
-    if(this.procedureVerified(proceduresArr)){
+    console.log(proceduresObj);
+    if(this.procedureVerified(proceduresObj)){
       let updatedRecord = this.state.currentRecord;
-      updatedRecord.proceduresDone = this.addCustomValuesToProceduresArr(proceduresArr);
+      updatedRecord.proceduresDone = proceduresObj.procedureArr;
       updatedRecord.procedureIds = proceduresObj.procedureIds;
       updatedRecord.itemIds = proceduresObj.itemIds;
       this.setState({currentRecord:updatedRecord}, ()=>{
@@ -522,7 +493,7 @@ export default class EditProcedure extends Component {
           </div>
           {this.props.usersById && this.props.usersById[this.state.currentRecord.completedBy] &&
             <div className='vas-edit-procedure-completed-by-container'>
-              <p><b>Completed By: </b>{this.props.usersById[this.state.currentRecord.completedBy].fullname}</p>
+              <p><b>Completed By: </b>{this.props.usersById[this.state.currentRecord.completedBy] ? this.props.usersById[this.state.currentRecord.completedBy].fullname : 'N/A'}</p>
             </div>
           }
           {!this.state.isPostEdit &&
@@ -586,10 +557,10 @@ export default class EditProcedure extends Component {
                                       <input 
                                         type={group.inputType} 
                                         className={"vas-custom-input vas-"+ group.inputType +"-select"} 
-                                        onChange={e=>{this.changeCustomInput(e, group.fieldName)}} 
+                                        onChange={e=>{this.changeCustomInput(e, group.fieldName, group.inputType)}} 
                                         data-procedureid={procedure.procedureId} 
                                         placeholder={this.props.itemsById[itemId].value}
-                                        value={this.state.insertionLength}
+                                        value={this.state.currentRecord[group.fieldName]}
                                         id={itemId} />
                                     </span>
                                   }

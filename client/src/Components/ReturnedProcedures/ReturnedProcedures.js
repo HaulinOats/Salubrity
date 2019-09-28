@@ -49,11 +49,11 @@ export default class ReturnedProcedures extends Component {
   render(){
     return(
     <div className="vas-table vas-returned-procedures-table">
-      {/* {this.state.queriedProcedures.length < 1 &&
+      {this.state.queriedProcedures.length < 1 &&
         <div className='vas-returned-procedures-no-calls-container'>
-          <p>There are no completed calls yet today</p>
+          <p>No completed calls for that query</p>
         </div>
-      } */}
+      }
       {this.state.queriedProcedures.length > 0 &&
       <span className="vas-returned-procedures-outer">
         <div className='vas-table-thead-row vas-home-completed-thead'>
@@ -142,9 +142,10 @@ export default class ReturnedProcedures extends Component {
                               <div className='vas-admin-query-item-container'>
                               {procedure.itemIds && procedure.itemIds.length > 0 &&
                                 procedure.itemIds.map((id, idx)=>{
+                                  console.log(this.props.itemsById[id])
                                   let isCustom = this.props.itemsById[id].isCustom;
                                   return (
-                                    <p key={id + '_' +  idx} className='vas-admin-query-item'>{!isCustom ? this.props.itemsById[id].value : this.props.itemsById[id].valuePrefix + procedure.customValues[id] + this.props.itemsById[id].valueSuffix}</p>
+                                    <p key={id + '_' +  idx} className='vas-admin-query-item'>{!isCustom ? this.props.itemsById[id].value : this.props.itemsById[id].valuePrefix + call[this.props.itemsById[id].fieldName] + this.props.itemsById[id].valueSuffix}</p>
                                   )
                                 })
                               }

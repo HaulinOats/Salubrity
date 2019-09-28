@@ -70,6 +70,7 @@ export default class Admin extends Component {
     this.aggregateData = this.aggregateData.bind(this);
     this.aggregateStartDateOnChange = this.aggregateStartDateOnChange.bind(this);
     this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
+    this.addField = this.addField.bind(this);
   }
 
   componentWillMount(){
@@ -81,6 +82,18 @@ export default class Admin extends Component {
         this.stateLoadCalls();
       });
     }
+  }
+
+  addField(){
+    axios.get('/add-field-to-model-documents').then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        console.log('field added to model')
+      }
+    }).catch(err=>{
+      console.log(err);
+    })
   }
 
   aggregateStartDateOnChange(date){
@@ -616,7 +629,7 @@ export default class Admin extends Component {
                         <div>
                           {this.state.aggregateInsertionTypes.map(insertion=>{
                             return (
-                              <div key={insertion.itemId + insertion.count} className='vas-admin-aggregation-inner-container'>
+                              <div key={insertion.itemId} className='vas-admin-aggregation-inner-container'>
                                 <p className='vas-admin-aggregation-inner-container-left'>{this.state.itemsById[insertion.itemId].value}:</p>
                                 <p className='vas-admin-aggregation-inner-container-right'>{insertion.count}</p>
                               </div>
@@ -781,6 +794,7 @@ export default class Admin extends Component {
                   <button onClick={this.seedProcedures}>Seed Procedures</button>
                   <button onClick={this.seedOptions}>Seed Options</button>
                   <button onClick={this.seedItems}>Seed Items</button>
+                  <button onClick={this.addField}>Add Field</button>
                 </div>
               }
             </div>

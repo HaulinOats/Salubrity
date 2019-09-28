@@ -761,6 +761,7 @@ exports.itemSeed = [
     procedureName:'Insertion Procedure',
     procedureId:8,
     groupName:'Insertion Length',
+    fieldName:'insertionLength',
     value:'in CM',
     isCustom:true,
     fieldAbbr:'Len',
