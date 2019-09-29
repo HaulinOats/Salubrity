@@ -277,6 +277,54 @@ exports.itemSeed = [
     isCustom:false
   },
   {
+    itemId:77,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Inflitration',
+    isCustom:false
+  },
+  {
+    itemId:78,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Phlebitis',
+    isCustom:false
+  },
+  {
+    itemId:79,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'PT Removal',
+    isCustom:false
+  },
+  {
+    itemId:80,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Leaking',
+    isCustom:false
+  },
+  {
+    itemId:81,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Painful',
+    isCustom:false
+  },
+  {
+    itemId:82,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Per Protocol',
+    isCustom:false
+  },
+  {
     itemId:16,
     procedureName:'PIV',
     procedureId:1,
@@ -803,18 +851,24 @@ exports.procedureSeed = [
       },
       {
         seq:5,
+        groupName:'DC ML',
+        inputType:'checkbox',
+        groupItems:[77,78,79,80,81,82]
+      },
+      {
+        seq:6,
         groupName:'Ultrasound',
         inputType:'checkbox',
         groupItems:[16]
       },
       {
-        seq:6,
+        seq:7,
         groupName:'Blood Drawn',
         inputType:'checkbox',
         groupItems:[17],
       },
       {
-        seq:7,
+        seq:8,
         groupName:'Hospital Staff Obtained',
         inputType:'checkbox',
         groupItems:[71]

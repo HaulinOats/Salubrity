@@ -43,16 +43,18 @@
   padding: 1%;
   font-size: 125%;
 }
-.vas-home-custom-table-column-2 {
-  width:43%;
-  padding:1%;
+.vas-home-custom-table-column-2,
+.vas-home-custom-table-column-3 {
+  padding:1% 0 0 1%;
 }
-.vas-admin-custom-table-procedures {
-  width:100%;
+.vas-home-custom-table-column-2 {
+  width:44%;
 }
 .vas-home-custom-table-column-3 {
   width:47%;
-  padding:1%;
+}
+.vas-admin-custom-table-procedures {
+  width:100%;
 }
 .vas-admin-custom-table-item-column {
   display:inline-block;
@@ -124,6 +126,38 @@
   padding: 1%;
   width: 87%;
   margin-left: 11%;
+}
+.vas-admin-query-procedure-container {
+  width: 49%;
+  padding-right: 1%;
+  display: inline-table;
+}
+.vas-admin-query-item-container {
+  font-size:80%;
+}
+.vas-admin-query-item {
+  margin-bottom: 2px;
+  display: flex;
+  border-bottom:dotted 1px black;
+  margin-bottom: 1px;
+  padding-bottom: 1px;
+}
+.vas-admin-query-item:last-child {
+  border:none;
+}
+.vas-returned-procedures-query-item-left {
+  /* font-weight:bold; */
+}
+.vas-returned-procedures-query-item-right {
+  margin:0 auto;
+  margin-right:0;
+}
+.vas-admin-query-procedure-names {
+  font-size: 80%;
+  font-weight: bold;
+  margin-bottom: 3px;
+  padding: 2px;
+  background:lightgrey;
 }
 .vas-returned-procedures-no-calls-container {
   height: 35px;

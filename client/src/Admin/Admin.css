@@ -173,29 +173,6 @@
   color: midnightblue;
   font-weight: bold;
 }
-.vas-admin-query-procedure-names {
-  font-size: 80%;
-  border-bottom: dotted 1px black;
-  width: 95%;
-  font-weight: bold;
-  margin-bottom: 3px;
-  padding-bottom: 2px;
-  white-space: nowrap;
-}
-.vas-admin-query-item {
-  margin-bottom: 2px;
-  display: list-item;
-  list-style-position: inside;
-  white-space: nowrap;
-}
-.vas-admin-query-procedure-container {
-  width: 32%;
-  padding-left: 1%;
-  display: inline-table;
-}
-.vas-admin-query-item-container {
-  font-size:80%;
-}
 .vas-admin-filter-container {
   display:inline-block;
   margin-right:15px;
