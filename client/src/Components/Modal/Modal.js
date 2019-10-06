@@ -72,23 +72,28 @@ export default class Modal extends Component {
   }
 
   handleNeedSelect(e){
-    if(e.target.value === 'default'){
-      this.setState({need:'', customSelected:false}, this.validateAddCall);
-    } else if(e.target.value.toLowerCase() === 'custom'){ 
-      this.setState({
-        need:e.target.value,
-        customSelected:true
-      }, this.validateAddCall);
-    } else {
-      this.setState({need:e.target.value, customSelected:false, custom:''}, this.validateAddCall);
+    switch(e.target.value.toLowerCase()){
+      case 'default':
+        this.setState({need:'', customSelected:false}, this.validateAddCall);
+        break;
+      case 'custom':
+        this.setState({
+          need:e.target.value,
+          customSelected:true
+        }, this.validateAddCall);
+        break;
+      default:
+        this.setState({need:e.target.value, customSelected:false, custom:''}, this.validateAddCall);
     }
   }
 
   hospitalSelect(e){
-    if(e.target.value === 'default'){
-      this.setState({hospital:''});
-    } else {
-      this.setState({hospital:e.target.value});
+    switch(e.target.value){
+      case "default":
+        this.setState({hospital:''});
+        break;
+      default:
+        this.setState({hospital:e.target.value});
     }
   }
 

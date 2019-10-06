@@ -285,7 +285,7 @@ app.get('/get-all-users', (req, res)=>{
   User.find().sort({userId:1}).exec((err, users)=>{
     if(err) return res.send(err);
     users.forEach((user, idx)=>{
-      delete users[idx].password;
+      users[idx].password = undefined;
     })
     res.send(users);
   });
@@ -574,7 +574,7 @@ app.get('/seed-super',(req,res)=>{
 });
 
 app.get('/seed-procedures', (req, res)=>{
-  Procedure.insertMany(seedData.procedureSeed, (err, procedures) => {
+  Procedure.insertMany(seedData.procedureSeed,{ordered:false}, (err, procedures) => {
     if(err) return res.send(err);
     if(procedures){
       res.send(procedures);
@@ -585,7 +585,7 @@ app.get('/seed-procedures', (req, res)=>{
 })
 
 app.get('/seed-options', (req, res)=>{
-  Option.insertMany(seedData.optionSeed, (err, options) => {
+  Option.insertMany(seedData.optionSeed,{ordered:false}, (err, options) => {
     if(err) return res.send(err);
     if(options){
       res.send(options);
@@ -596,7 +596,7 @@ app.get('/seed-options', (req, res)=>{
 })
 
 app.get('/seed-items', (req, res)=>{
-  Item.insertMany(seedData.itemSeed, (err, items) => {
+  Item.insertMany(seedData.itemSeed,{ordered:false}, (err, items) => {
     if(err) return res.send({'error':err});
     if(items){
       res.send(items);

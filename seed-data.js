@@ -815,6 +815,54 @@ exports.itemSeed = [
     fieldAbbr:'Len',
     valuePrefix:'',
     valueSuffix:'cm'
+  },
+  {
+    itemId:83,
+    procedureName:'Line Check',
+    procedureId:9,
+    groupName:'What',
+    value:'CL',
+    isCustom:false
+  },
+  {
+    itemId:84,
+    procedureName:'Line Check',
+    procedureId:9,
+    groupName:'What',
+    value:'PICC',
+    isCustom:false
+  },
+  {
+    itemId:85,
+    procedureName:'Line Check',
+    procedureId:9,
+    groupName:'What',
+    value:'IV',
+    isCustom:false
+  },
+  {
+    itemId:86,
+    procedureName:'Line Check',
+    procedureId:9,
+    groupName:'What',
+    value:'ML',
+    isCustom:false
+  },
+  {
+    itemId:87,
+    procedureName:'Line Check',
+    procedureId:9,
+    groupName:'What',
+    value:'PG',
+    isCustom:false
+  },
+  {
+    itemId:88,
+    procedureName:'Line Check',
+    procedureId:9,
+    groupName:'What',
+    value:'PORT',
+    isCustom:false
   }
 ];
 
@@ -1044,5 +1092,19 @@ exports.procedureSeed = [
         groupItems:[70]
       }
     ]
-  }
+  },
+  {
+    procedureId:9,
+    name:'Line Check',
+    seq:2.1,
+    groups:[
+      {
+        seq:1,
+        groupName:'What',
+        inputType:'checkbox',
+        hideHeader:true,
+        groupItems:[83,84,85,86,87,88]
+      }
+    ]
+  },
 ];
