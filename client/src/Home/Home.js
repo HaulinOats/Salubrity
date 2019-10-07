@@ -227,13 +227,17 @@ export default class Home extends Component{
   }
 
   loginCallback(user){
-    this.setState({
-      currentUser:user
-    }, ()=>{
-      this.startSessionInterval();
-      this.refreshUserSession();
-      this.stateLoadCalls();
-    });
+    if(user.isActive){
+      this.setState({
+        currentUser:user
+      }, ()=>{
+        this.startSessionInterval();
+        this.refreshUserSession();
+        this.stateLoadCalls();
+      });
+    } else {
+      alert('You are no longer an active user. Please contact admin.');
+    }
   }
 
   logout(){

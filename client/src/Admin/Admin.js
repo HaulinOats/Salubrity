@@ -48,7 +48,8 @@ export default class Admin extends Component {
       modalTitle:'',
       modalConfirmation:false,
       confirmationType:null,
-      menuIsVisible:false
+      menuIsVisible:false,
+      customRoute:''
     }
     this.seedProcedures = this.seedProcedures.bind(this);
     this.seedOptions = this.seedOptions.bind(this);
@@ -71,6 +72,7 @@ export default class Admin extends Component {
     this.aggregateStartDateOnChange = this.aggregateStartDateOnChange.bind(this);
     this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
     this.addField = this.addField.bind(this);
+    this.callRoute = this.callRoute.bind(this);
   }
 
   componentWillMount(){
@@ -85,7 +87,8 @@ export default class Admin extends Component {
   }
 
   addField(){
-    axios.get('/add-field-to-model-documents').then(resp=>{
+    axios.get('/backup-call-data-to-json').then(resp=>{
+    // axios.get('/add-field-to-model-documents').then(resp=>{
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
@@ -174,13 +177,17 @@ export default class Admin extends Component {
   }
 
   loginCallback(user){
-    this.setState({
-      currentUser:user
-    }, ()=>{
-      this.startSessionInterval();
-      this.refreshUserSession();
-      this.stateLoadCalls();
-    });
+    if(user.isActive){
+      this.setState({
+        currentUser:user
+      }, ()=>{
+        this.startSessionInterval();
+        this.refreshUserSession();
+        this.stateLoadCalls();
+      });
+    } else {
+      alert('You are not longer an active user. Please contact admin.')
+    }
   }
 
   startSessionInterval(){
@@ -251,7 +258,7 @@ export default class Admin extends Component {
   }
   
   getAllUsers(){
-    helpers.getAllUsers().then(data=>{
+    helpers.adminGetAllUsers().then(data=>{
       this.setState({
         allUsers:data.usersArr,
         usersById:data.usersById
@@ -546,6 +553,18 @@ export default class Admin extends Component {
     });
   }
 
+  callRoute(){
+    axios.get(this.state.customRoute).then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        console.log(resp.data);
+      }
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
+
   render(){
     let isAdmin;
     if(this.state.currentUser){
@@ -685,27 +704,31 @@ export default class Admin extends Component {
                         <th className='vas-admin-delete-user'>Delete?</th>
                       </tr>
                       {this.state.allUsers && this.state.allUsers.map((user, idx)=>{
-                        return(
-                          <tr key={user._id}>
-                            <td>{user.userId}</td>
-                            <td className='vas-capitalize'>{user.fullname}</td>
-                            <td>{user.username}</td>
-                            <td>
-                              {user.role !== 'admin' && user.role !== 'super' &&
-                                <span className='vas-admin-manage-users-pw'>
-                                  <p onClick={e=>{this.togglePassword(e, true)}}>********</p>
-                                  <p style={{'display':'none'}} onClick={e=>{this.togglePassword(e, false)}}>{user.password}</p>
-                                </span>
-                              }
-                            </td>
-                            <td>{user.role}</td>
-                            <td className='vas-admin-delete-user'>
-                              {user.role !== 'admin' && user.role !== 'super' &&
-                                <p data-id={user._id} data-index={idx} onClick={e=>{this.deleteUser(user._id)}}>&times;</p>
-                              }
-                            </td>
-                          </tr>
-                        )
+                        if(user.isActive){
+                          return(
+                            <tr key={user._id}>
+                              <td>{user.userId}</td>
+                              <td className='vas-capitalize'>{user.fullname}</td>
+                              <td>{user.username}</td>
+                              <td>
+                                {user.role !== 'admin' && user.role !== 'super' &&
+                                  <span className='vas-admin-manage-users-pw'>
+                                    <p onClick={e=>{this.togglePassword(e, true)}}>********</p>
+                                    <p style={{'display':'none'}} onClick={e=>{this.togglePassword(e, false)}}>{user.password}</p>
+                                  </span>
+                                }
+                              </td>
+                              <td>{user.role}</td>
+                              <td className='vas-admin-delete-user'>
+                                {user.role !== 'admin' && user.role !== 'super' &&
+                                  <p data-id={user._id} data-index={idx} onClick={e=>{this.deleteUser(user._id)}}>&times;</p>
+                                }
+                              </td>
+                            </tr>
+                          )
+                        } else {
+                          return <tr key={user._id}></tr>
+                        }
                       })
                       }
                     </tbody>
@@ -795,6 +818,10 @@ export default class Admin extends Component {
                   <button onClick={this.seedOptions}>Seed Options</button>
                   <button onClick={this.seedItems}>Seed Items</button>
                   <button onClick={this.addField}>Add Field</button>
+                  <div>
+                    <input value={this.state.customRoute} onChange={e=>{this.setState({customRoute:e.target.value})}} type="text" />
+                    <button onClick={this.callRoute}>Call Route</button>
+                  </div>
                 </div>
               }
             </div>

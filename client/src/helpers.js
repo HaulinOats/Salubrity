@@ -21,6 +21,23 @@ const helpers = {
       })
     })
   },
+  adminGetAllUsers:function(){
+    return new Promise((resolve, reject)=>{
+      axios.get('/admin-get-all-users').then((resp)=>{
+        let usersObj = {};
+        for(let i = 0; i < resp.data.length; i++){
+          let user = resp.data[i];
+          usersObj[resp.data[i].userId] = user;
+        }
+        resolve({
+          usersById:usersObj,
+          usersArr:resp.data
+        });
+      }).catch(err=>{
+        reject(err);
+      })
+    })
+  },
   getActiveCalls:function(){
     return new Promise((resolve, reject)=>{
       axios.get('/get-active-calls').then((resp)=>{

@@ -10,6 +10,7 @@ const seedData = require('./seed-data');
 //Mongoose
 const Schema = mongoose.Schema;
 mongoose.set('useFindAndModify', false);
+// mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnvv7pg3', {
 mongoose.connect('mongodb://brett84c:lisa8484@ds331798-a0.mlab.com:31798,ds331798-a1.mlab.com:31798/heroku_tbkgh512?replicaSet=rs-ds331798', {
   useNewUrlParser:true,
   autoIndex:false
@@ -26,6 +27,7 @@ let userSchema = new Schema({
   userId:{type:Number, index:true, unique:true},
   password:{type:String, lowercase:true},
   role:{type:String, default:'user', lowercase:true},
+  isActive:{type:Boolean, default:true}
 });
 userSchema.plugin(uniqueValidator, {message: `Could not insert user based on unique constraint: {PATH} {VALUE} {TYPE}`})
 let User = mongoose.model('User', userSchema);
@@ -192,7 +194,7 @@ app.post('/get-user-by-id', (req, res)=>{
     if(err) return res.send(err);
     if(user){
       let modifiedUser = user;
-      delete user.password;
+      modifiedUser.password = undefined;
       res.send(modifiedUser);
     } else {
       res.send({'error':'could not find user from id: ' + req.body._id});
@@ -276,10 +278,18 @@ app.post('/add-user', (req, res)=>{
 });
 
 app.post('/delete-user', (req, res)=>{
-  User.remove(req.body, (err)=>{
+  User.findOne(req.body, (err, user)=>{
     if(err) return res.send(err);
-    res.send(true);
-  });
+    if(user){
+      user.isActive = false;
+      user.save(err2=>{
+        if(err2) return res.send(err2);
+        res.send(user);
+      })
+    } else {
+      res.send({'error':'error deleting user'});
+    }
+  })
 });
 
 app.get('/get-all-users', (req, res)=>{
@@ -287,6 +297,18 @@ app.get('/get-all-users', (req, res)=>{
     if(err) return res.send(err);
     users.forEach((user, idx)=>{
       users[idx].password = undefined;
+    })
+    res.send(users);
+  });
+});
+
+app.get('/admin-get-all-users', (req, res)=>{
+  User.find().sort({userId:-1}).exec((err, users)=>{
+    if(err) return res.send(err);
+    users.forEach((user, idx)=>{
+      if(user.role !== 'user'){
+        users[idx].password = undefined;
+      }
     })
     res.send(users);
   });
@@ -616,6 +638,26 @@ app.get('/add-field-to-model-documents', (req, res)=>{
   //     if(err) return res.send(err);
   //     res.send(true);
   //   });
+})
+
+app.get('/backup-call-data-to-json', (req, res)=>{
+  Call.find({}, (err, calls)=>{
+    if(err) return res.send(err);
+    let callJSON = [];
+    calls.forEach(call=>{
+      callJSON.push(call);
+    })
+    fs.writeFileSync(`calls-${Date.now()}.json`, JSON.stringify(callJSON));
+    res.send({'fileName':`calls-${Date.now()}.json`});
+  })
+})
+
+app.get('/add-calls-from-json', (req, res)=>{
+  let callJSON = JSON.parse(fs.readFileSync('calls-1570472693097.json'));
+  Call.insertMany(callJSON, {ordered:false}, (err, calls) => {
+    if(err) return res.send(err)
+    res.send(true);
+  });
 })
 
 app.use(((req, res) => res.sendFile(path.join(__dirname, './client/build/index.html'))));
