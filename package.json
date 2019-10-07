@@ -1,6 +1,6 @@
 {
   "name": "salubrity-server",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "babel-core": "^6.26.3",
