@@ -9,7 +9,8 @@ const seedData = require('./seed-data');
 
 //Mongoose
 const Schema = mongoose.Schema;
-mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnvv7pg3', {
+mongoose.set('useFindAndModify', false);
+mongoose.connect('mongodb://brett84c:lisa8484@ds331798-a0.mlab.com:31798,ds331798-a1.mlab.com:31798/heroku_tbkgh512?replicaSet=rs-ds331798', {
   useNewUrlParser:true,
   autoIndex:false
 }, (err)=>{
@@ -560,18 +561,18 @@ app.get('/get-errors-json', (req, res)=>{
   });
 })
 
-app.get('/seed-super',(req,res)=>{
-  User.create({
-    fullname:'Brett Connolly',
-    username:'brett84c',
-    userId:1001,
-    password:'lisa8484',
-    role:'super'
-  }, (err, newUser)=>{
-    if(err) return res.send(err);
-    res.send(newUser);
-  })
-});
+// app.get('/seed-super',(req,res)=>{
+//   User.create({
+//     fullname:'Brett Connolly',
+//     username:'',
+//     userId:1001,
+//     password:'',
+//     role:'super'
+//   }, (err, newUser)=>{
+//     if(err) return res.send(err);
+//     res.send(newUser);
+//   })
+// });
 
 app.get('/seed-procedures', (req, res)=>{
   Procedure.insertMany(seedData.procedureSeed,{ordered:false}, (err, procedures) => {

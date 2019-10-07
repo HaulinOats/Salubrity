@@ -277,54 +277,6 @@ exports.itemSeed = [
     isCustom:false
   },
   {
-    itemId:77,
-    procedureName:'PIV',
-    procedureId:1,
-    groupName:'DC ML',
-    value:'Inflitration',
-    isCustom:false
-  },
-  {
-    itemId:78,
-    procedureName:'PIV',
-    procedureId:1,
-    groupName:'DC ML',
-    value:'Phlebitis',
-    isCustom:false
-  },
-  {
-    itemId:79,
-    procedureName:'PIV',
-    procedureId:1,
-    groupName:'DC ML',
-    value:'PT Removal',
-    isCustom:false
-  },
-  {
-    itemId:80,
-    procedureName:'PIV',
-    procedureId:1,
-    groupName:'DC ML',
-    value:'Leaking',
-    isCustom:false
-  },
-  {
-    itemId:81,
-    procedureName:'PIV',
-    procedureId:1,
-    groupName:'DC ML',
-    value:'Painful',
-    isCustom:false
-  },
-  {
-    itemId:82,
-    procedureName:'PIV',
-    procedureId:1,
-    groupName:'DC ML',
-    value:'Per Protocol',
-    isCustom:false
-  },
-  {
     itemId:16,
     procedureName:'PIV',
     procedureId:1,
@@ -338,14 +290,6 @@ exports.itemSeed = [
     procedureId:1,
     groupName:'Blood Drawn',
     value:'Blood Was Drawn',
-    isCustom:false
-  },
-  {
-    itemId:71,
-    procedureName:'PIV',
-    procedureId:1,
-    groupName:'Hospital Staff Obtained',
-    value:'Hospital Staff Obtained',
     isCustom:false
   },
   {
@@ -378,14 +322,6 @@ exports.itemSeed = [
     procedureId:2,
     groupName:'Ultrasound',
     value:'US Used',
-    isCustom:false
-  },
-  {
-    itemId:72,
-    procedureName:'Lab Draw',
-    procedureId:2,
-    groupName:'Hospital Staff Obtained',
-    value:'Hospital Staff Obtained',
     isCustom:false
   },
   {
@@ -669,38 +605,6 @@ exports.itemSeed = [
     isCustom:false
   },
   {
-    itemId:73,
-    procedureName:'Troubleshoot',
-    procedureId:7,
-    groupName:'Cathflow',
-    value:'PICC: Initiated',
-    isCustom:false
-  },
-  {
-    itemId:74,
-    procedureName:'Troubleshoot',
-    procedureId:7,
-    groupName:'Cathflow',
-    value:'PICC: Completed',
-    isCustom:false
-  },
-  {
-    itemId:75,
-    procedureName:'Troubleshoot',
-    procedureId:7,
-    groupName:'Cathflow',
-    value:'CVL: Initiated',
-    isCustom:false
-  },
-  {
-    itemId:76,
-    procedureName:'Troubleshoot',
-    procedureId:7,
-    groupName:'Cathflow',
-    value:'CVL: Completed',
-    isCustom:false
-  },
-  {
     itemId:57,
     procedureName:'Insertion Procedure',
     procedureId:8,
@@ -815,6 +719,102 @@ exports.itemSeed = [
     fieldAbbr:'Len',
     valuePrefix:'',
     valueSuffix:'cm'
+  },
+  {
+    itemId:71,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'Hospital Staff Obtained',
+    value:'Hospital Staff Obtained',
+    isCustom:false
+  },
+  {
+    itemId:72,
+    procedureName:'Lab Draw',
+    procedureId:2,
+    groupName:'Hospital Staff Obtained',
+    value:'Hospital Staff Obtained',
+    isCustom:false
+  },
+  {
+    itemId:73,
+    procedureName:'Troubleshoot',
+    procedureId:7,
+    groupName:'Cathflow',
+    value:'PICC: Initiated',
+    isCustom:false
+  },
+  {
+    itemId:74,
+    procedureName:'Troubleshoot',
+    procedureId:7,
+    groupName:'Cathflow',
+    value:'PICC: Completed',
+    isCustom:false
+  },
+  {
+    itemId:75,
+    procedureName:'Troubleshoot',
+    procedureId:7,
+    groupName:'Cathflow',
+    value:'CVL: Initiated',
+    isCustom:false
+  },
+  {
+    itemId:76,
+    procedureName:'Troubleshoot',
+    procedureId:7,
+    groupName:'Cathflow',
+    value:'CVL: Completed',
+    isCustom:false
+  },
+  {
+    itemId:77,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Inflitration',
+    isCustom:false
+  },
+  {
+    itemId:78,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Phlebitis',
+    isCustom:false
+  },
+  {
+    itemId:79,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'PT Removal',
+    isCustom:false
+  },
+  {
+    itemId:80,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Leaking',
+    isCustom:false
+  },
+  {
+    itemId:81,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Painful',
+    isCustom:false
+  },
+  {
+    itemId:82,
+    procedureName:'PIV',
+    procedureId:1,
+    groupName:'DC ML',
+    value:'Per Protocol',
+    isCustom:false
   },
   {
     itemId:83,
