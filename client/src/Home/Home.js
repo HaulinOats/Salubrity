@@ -513,7 +513,7 @@ export default class Home extends Component{
           <div className="vas-container-fluid vas-home-container">
             <header className='vas-main-header'>
               <div className='vas-header-left-container'>
-                <h1 className='vas-home-header-title vas-pointer' onClick={e=>{window.location.reload()}}>VAS Tracker</h1>
+                <h1 className='vas-home-header-title vas-pointer' onClick={e=>{window.location.reload()}}>Salubrity</h1>
                 <button className='vas-button vas-home-add-call' onClick={this.addCall}>Add Call</button>
               </div>
               <div className='vas-header-right-container'>
