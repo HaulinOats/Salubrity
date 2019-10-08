@@ -640,24 +640,26 @@ app.get('/add-field-to-model-documents', (req, res)=>{
   //   });
 })
 
-app.get('/backup-call-data-to-json', (req, res)=>{
+app.get('/create-call-data-json', (req, res)=>{
   Call.find({}, (err, calls)=>{
     if(err) return res.send(err);
+    let JSONFilePath = `./client/public/calls.json`;
     let callJSON = [];
     calls.forEach(call=>{
       callJSON.push(call);
     })
-    fs.writeFileSync(`calls-${Date.now()}.json`, JSON.stringify(callJSON));
-    res.send({'fileName':`calls-${Date.now()}.json`});
+    fs.writeFile(JSONFilePath, JSON.stringify(callJSON), err2=>{
+      if(err2) return res.send(err2);
+      res.send(true);
+    })
   })
 })
 
-app.get('/add-calls-from-json', (req, res)=>{
-  let callJSON = JSON.parse(fs.readFileSync('calls-1570472693097.json'));
-  Call.insertMany(callJSON, {ordered:false}, (err, calls) => {
-    if(err) return res.send(err)
+app.get('/delete-call-data-json', (req, res)=>{
+  fs.unlink('./client/public/calls.json', err=>{
+    if(err) return res.send(err);
     res.send(true);
-  });
+  })
 })
 
 app.use(((req, res) => res.sendFile(path.join(__dirname, './client/build/index.html'))));

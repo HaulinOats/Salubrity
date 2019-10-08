@@ -49,7 +49,8 @@ export default class Admin extends Component {
       modalConfirmation:false,
       confirmationType:null,
       menuIsVisible:false,
-      customRoute:''
+      customRoute:'',
+      JSONFileName:''
     }
     this.seedProcedures = this.seedProcedures.bind(this);
     this.seedOptions = this.seedOptions.bind(this);
@@ -555,11 +556,7 @@ export default class Admin extends Component {
 
   callRoute(){
     axios.get(this.state.customRoute).then(resp=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        console.log(resp.data);
-      }
+      console.log(resp.data);
     }).catch(err=>{
       console.log(err);
     })
@@ -818,8 +815,8 @@ export default class Admin extends Component {
                   <button onClick={this.seedOptions}>Seed Options</button>
                   <button onClick={this.seedItems}>Seed Items</button>
                   <button onClick={this.addField}>Add Field</button>
-                  <div>
-                    <input value={this.state.customRoute} onChange={e=>{this.setState({customRoute:e.target.value})}} type="text" />
+                  <div className='vas-admin-custom-route'>
+                    <input className='vas-input' value={this.state.customRoute} onChange={e=>{this.setState({customRoute:e.target.value})}} type="text" />
                     <button onClick={this.callRoute}>Call Route</button>
                   </div>
                 </div>

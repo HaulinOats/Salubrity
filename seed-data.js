@@ -129,6 +129,14 @@ exports.optionSeed = [
       },
       {
         id:11,
+        name:'DC PICC'
+      },
+      {
+        id:12,
+        name:'Line Check'
+      },
+      {
+        id:13,
         name:'Custom'
       }
     ]
