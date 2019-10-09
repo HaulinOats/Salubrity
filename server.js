@@ -41,7 +41,7 @@ let callSchema = new Schema({
   customJob:{type:String, default:null},
   preComments:{type:String, default:null},
   addComments:{type:String, default:null},
-  contact:{type:Number, default:null},
+  contact:{type:String, default:null},
   startTime:{type:Date, default:null},
   openBy:{type:Number, default:null},
   procedureIds:{type:Array, default:null},
@@ -566,6 +566,17 @@ app.post('/get-aggregation', (req, res)=>{
     if(err) return res.send(err);
     res.send(calls)
   });
+})
+
+app.post('/admin-update-user-data', (req,res)=>{
+  User.findOneAndUpdate({_id:req.body._id},{
+    $set:{
+      [req.body.field]:req.body.value
+    }
+  }, (err, user)=>{
+    if(err) return res.send(err);
+    res.send(user);
+  })
 })
 
 //SUPER

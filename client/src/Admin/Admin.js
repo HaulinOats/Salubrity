@@ -11,6 +11,7 @@ import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedu
 import ls from 'local-storage';
 import moment from 'moment';
 import DatePicker from "react-datepicker";
+import {DebounceInput} from 'react-debounce-input';
 
 export default class Admin extends Component {
   constructor(props){
@@ -562,6 +563,31 @@ export default class Admin extends Component {
     })
   }
 
+  updateUserData(userId, field, e){
+    let target = e.target;
+    if(field === 'username'){
+      target.value = target.value.replace(/\s/g, '')
+    }
+    axios.post('/admin-update-user-data', {
+      _id:userId,
+      field,
+      value:target.value
+    }).then(resp=>{
+      if(resp.data.error || resp.data._message){
+        console.log(resp.data);
+      } else {
+        console.log('user data updated');
+        target.classList.add('vas-input-success');
+        setTimeout((e)=>{
+          target.classList.remove('vas-input-success');
+        }, 1000);
+      }
+    }).catch(err=>{
+      alert('There was an error while trying to update user. Check developer console for details or contact admin.');
+      console.log(err);
+    })
+  }
+
   render(){
     let isAdmin;
     if(this.state.currentUser){
@@ -675,10 +701,10 @@ export default class Admin extends Component {
                   <h3 className="vas-admin-h3">Add User</h3>
                   <label>User's Full Name:</label>
                   <input type='text' placeholder="example: Brett Connolly" value={this.state.addFullName} onChange={e=>{this.setState({addFullName:e.target.value})}} />
-                  <label>Username:</label>
-                  <input type='text' placeholder="example: kitty453" value={this.state.addUserName} onChange={e=>{this.setState({addUserName:e.target.value})}}/>
-                  <label>Password or PIN</label>
-                  <input type='text' placeholder="example: hello123 or 1542" value={this.state.addPassword} onChange={e=>{this.setState({addPassword:e.target.value})}}/>
+                  <label>Username (No Spaces Allowed):</label>
+                  <input type='text' placeholder="example: kitty453" value={this.state.addUserName} onChange={e=>{this.setState({addUserName:e.target.value.replace(/\s/g, '')})}}/>
+                  <label>Password or PIN (No Spaces Allowed):</label>
+                  <input type='text' placeholder="example: hello123 or 1542" value={this.state.addPassword} onChange={e=>{this.setState({addPassword:e.target.value.replace(/\s/g, '')})}}/>
                   <label>Allow admin access?</label>
                   <select className='vas-admin-allow-admin-access-dropdown' value={this.state.addAdminAccess} onChange={e=>{this.setState({addAdminAccess:Boolean(e.target.value)})}}>
                     <option value='false'>No</option>
@@ -705,8 +731,34 @@ export default class Admin extends Component {
                           return(
                             <tr key={user._id}>
                               <td>{user.userId}</td>
-                              <td className='vas-capitalize'>{user.fullname}</td>
-                              <td>{user.username}</td>
+                              <td className='vas-capitalize'>
+                                {user.role === 'user' &&
+                                  <span>
+                                    <DebounceInput
+                                      className="vas-admin-update-fullname-input vas-input vas-capitalize"
+                                      debounceTimeout={300}
+                                      value={user.fullname}
+                                      onChange={e => {this.updateUserData(user._id, 'fullname', e)}} />
+                                  </span>
+                                }
+                                {user.role !== 'user' &&
+                                  <span>{user.fullname}</span>
+                                }
+                              </td>
+                              <td>
+                                {user.role === 'user' &&
+                                  <span>
+                                    <DebounceInput
+                                    className="vas-admin-update-username-input vas-input"
+                                    debounceTimeout={300}
+                                    value={user.username}
+                                    onChange={e =>{this.updateUserData(user._id, 'username', e)}}/>
+                                  </span>
+                                } 
+                                {user.role !== 'user' &&
+                                  <span>{user.username}</span>
+                                }
+                              </td>
                               <td>
                                 {user.role !== 'admin' && user.role !== 'super' &&
                                   <span className='vas-admin-manage-users-pw'>

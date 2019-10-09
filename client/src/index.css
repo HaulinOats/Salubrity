@@ -262,6 +262,14 @@ select {
   min-height: 28px;
   border-radius: 3px;
   border:solid thin darkgrey;
+  background-color:white;
+  transition:background-color 1s;
+}
+.vas-input-success {
+  background:lightgreen;
+}
+.vas-input-fail {
+  background:red;
 }
 .vas-table {
   margin-bottom:0;

@@ -21,7 +21,7 @@ export default class Modal extends Component {
       roomNumber:null,
       need:'',
       needSelected:false,
-      contactNumber:'',
+      contact:'',
       inputsValidated:false,
       addedCall:null,
       status:1,
@@ -118,7 +118,7 @@ export default class Modal extends Component {
     let addQuery = {
       room:this.state.roomNumber,
       job:this.state.need,
-      contact:this.state.contactNumber,
+      contact:this.state.contact,
       createdAt:new Date().toISOString(),
       createdBy:this.state.currentUser.userId,
       customJob:this.state.custom.trim().length ? this.state.custom : null,
@@ -209,7 +209,7 @@ export default class Modal extends Component {
                     </div>
                     <div className="vas-modal-add-call-row-inner">
                       <p>Contact:</p>
-                      <input type='text' className='vas-modal-add-call-input' value={this.state.contactNumber} onChange={e => {this.setState({contactNumber: e.target.value}, this.validateAddCall)}} />
+                      <input type='text' className='vas-modal-add-call-input' value={this.state.contact} onChange={e => {this.setState({contact: e.target.value}, this.validateAddCall)}} />
                     </div>
                     <div className='vas-modal-add-call-row-block'>
                       <p>Pre-Procedure Notes:</p>
