@@ -814,7 +814,7 @@ export default class Admin extends Component {
                               {user.role !== 'admin' && user.role !== 'super' &&
                                 <span>
                                   <input type="checkbox" id={user.username} className="vas-checkbox-select" defaultChecked={user.isActive} onChange={e=>{this.toggleActive(user)}}/>
-                                  <label className='vas-btn vas-admin-active-btn' htmlFor={user.username}>{user.isActive ? 'Active' : 'Inactive'}</label>
+                                  <label className={'vas-btn vas-admin-active-btn ' + (!user.isActive ? 'vas-admin-active-btn-inactive' : '')} htmlFor={user.username}>{user.isActive ? 'Active' : 'Inactive'}</label>
                                 </span>
                               }
                             </td>
