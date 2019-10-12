@@ -40,6 +40,7 @@ export default class EditProcedure extends Component {
     this.orderSelect = this.orderSelect.bind(this);
     this.toggleSectionDisplay = this.toggleSectionDisplay.bind(this);
     // this.setRecordStateItems = this.setRecordStateItems.bind(this);
+    this.handleNeedSelect = this.handleNeedSelect.bind(this);
   };
   
   componentDidMount(){
@@ -456,6 +457,17 @@ export default class EditProcedure extends Component {
     }
   }
 
+  handleNeedSelect(e){
+    let currentRecord = this.state.currentRecord;
+    if(e.target.value.toLowerCase() === 'custom'){
+      currentRecord.customJob = 'Custom Job';
+    } else {
+      currentRecord.customJob = null;
+    }
+    currentRecord.job = e.target.value;
+    this.setState({currentRecord}, this.saveCurrentRecord);
+  }
+
   render(){
     return(
       <div className={'vas-edit-procedure-page-record-container ' + (this.state.isPostEdit ? 'vas-edit-procedure-is-post-edit' : '')}>
@@ -466,13 +478,19 @@ export default class EditProcedure extends Component {
             <h2 className='vas-edit-procedure-edit-title'>POST PROCEDURE EDIT</h2>
           }
           <p className="vas-edit-procedure-record-header-text">
-            <b className="vas-edit-procedure-live-edit-input vas-edit-procedure-job-input vas-block">{this.state.currentRecord.job}</b>
-            <DebounceInput
-              type="text"
-              className="vas-edit-procedure-live-edit-input vas-edit-procedure-custom-job-input vas-inline-block"
-              debounceTimeout={750}
-              value={this.state.currentRecord.customJob ? this.state.currentRecord.customJob : ''}
-              onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
+            <select className="vas-modal-add-call-input" defaultValue={this.state.currentRecord.job} onChange={this.handleNeedSelect}>
+              {this.props.allOptions[5] && this.props.allOptions[5].options.map(option=>{
+                return <option key={option.id} value={option.name}>{option.name}</option>
+              })}
+            </select>
+            {this.state.currentRecord.customJob &&
+              <DebounceInput
+                type="text"
+                className="vas-edit-procedure-live-edit-input vas-edit-procedure-custom-job-input vas-inline-block"
+                debounceTimeout={750}
+                value={this.state.currentRecord.customJob ? this.state.currentRecord.customJob : ''}
+                onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
+            }
           </p>
           <p className="vas-edit-procedure-record-header-subtext vas-pointer">
             <b className='vas-edit-procedure-room-text'>Room:</b>
