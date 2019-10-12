@@ -75,6 +75,7 @@ export default class Admin extends Component {
     this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
     this.addField = this.addField.bind(this);
     this.callRoute = this.callRoute.bind(this);
+    this.togglePasswordVisibility = this.togglePasswordVisibility.bind(this);
   }
 
   componentWillMount(){
@@ -338,6 +339,7 @@ export default class Admin extends Component {
       })
       .then((resp)=>{
         if(resp.data.error || resp.data._message){
+          console.log(resp.data);
           alert(resp.data.error ? resp.data.error : resp.data._message);
         } else {
           let users = this.state.allUsers;
@@ -565,7 +567,7 @@ export default class Admin extends Component {
 
   updateUserData(userId, field, e){
     let target = e.target;
-    if(field === 'username'){
+    if(field === 'username' || field === 'password'){
       target.value = target.value.replace(/\s/g, '')
     }
     axios.post('/admin-update-user-data', {
@@ -586,6 +588,41 @@ export default class Admin extends Component {
       alert('There was an error while trying to update user. Check developer console for details or contact admin.');
       console.log(err);
     })
+  }
+
+  toggleActive(user){
+    axios.post('/toggle-user-is-active', {_id:user._id})
+    .then(resp=>{
+      if(resp.data.error || resp.data._message){
+        alert(resp.data);
+        console.log(resp.data);
+      } else {
+        let allUsers = this.state.allUsers;
+        allUsers.forEach((user, idx)=>{
+          if(user._id === resp.data._id){
+            user.isActive = !user.isActive;
+          }
+        })
+        this.setState({allUsers});
+        console.log('toggled user is active');
+      }
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
+
+  togglePasswordVisibility(e){
+    if(e.target.nextSibling.type === 'password'){
+      e.target.nextSibling.type = 'text';
+    } else {
+      e.target.nextSibling.type = 'password';
+    }
+  }
+
+  reverseUserSort(){
+    let allUsers = this.state.allUsers;
+    allUsers.reverse();
+    this.setState({allUsers})
   }
 
   render(){
@@ -716,6 +753,7 @@ export default class Admin extends Component {
                 <div className='vas-admin-remove-user-container'>
                   <h3 className="vas-admin-h3">Modify Users</h3>
                   <p className='vas-admin-add-user-notes'>Click on table header to sort by field</p>
+                  <button className="vas-admin-reverse-sort-users" onClick={e=>{this.reverseUserSort()}}>Reverse Sort</button>
                   <table className='vas-admin-table'>
                     <tbody>
                       <tr>
@@ -724,60 +762,64 @@ export default class Admin extends Component {
                         <th onClick={e=>{this.sortColumn('username')}}>username</th>
                         <th onClick={e=>{this.sortColumn('password')}}>password/pin</th>
                         <th onClick={e=>{this.sortColumn('role')}}>role</th>
-                        <th className='vas-admin-delete-user'>Delete?</th>
+                        <th onClick={e=>{this.sortColumn('isActive')}} className='vas-admin-delete-user'>Is Active?</th>
                       </tr>
                       {this.state.allUsers && this.state.allUsers.map((user, idx)=>{
-                        if(user.isActive){
-                          return(
-                            <tr key={user._id}>
-                              <td>{user.userId}</td>
-                              <td className='vas-capitalize'>
-                                {user.role === 'user' &&
-                                  <span>
-                                    <DebounceInput
-                                      className="vas-admin-update-fullname-input vas-input vas-capitalize"
-                                      debounceTimeout={300}
-                                      value={user.fullname}
-                                      onChange={e => {this.updateUserData(user._id, 'fullname', e)}} />
-                                  </span>
-                                }
-                                {user.role !== 'user' &&
-                                  <span>{user.fullname}</span>
-                                }
-                              </td>
-                              <td>
-                                {user.role === 'user' &&
-                                  <span>
-                                    <DebounceInput
-                                    className="vas-admin-update-username-input vas-input"
+                        return(
+                          <tr key={user._id}>
+                            <td>{user.userId}</td>
+                            <td className='vas-capitalize'>
+                              {user.role === 'user' &&
+                                <span>
+                                  <DebounceInput
+                                    className="vas-admin-update-fullname-input vas-input vas-capitalize"
                                     debounceTimeout={300}
-                                    value={user.username}
-                                    onChange={e =>{this.updateUserData(user._id, 'username', e)}}/>
-                                  </span>
-                                } 
-                                {user.role !== 'user' &&
-                                  <span>{user.username}</span>
-                                }
-                              </td>
-                              <td>
-                                {user.role !== 'admin' && user.role !== 'super' &&
-                                  <span className='vas-admin-manage-users-pw'>
-                                    <p onClick={e=>{this.togglePassword(e, true)}}>********</p>
-                                    <p style={{'display':'none'}} onClick={e=>{this.togglePassword(e, false)}}>{user.password}</p>
-                                  </span>
-                                }
-                              </td>
-                              <td>{user.role}</td>
-                              <td className='vas-admin-delete-user'>
-                                {user.role !== 'admin' && user.role !== 'super' &&
-                                  <p data-id={user._id} data-index={idx} onClick={e=>{this.deleteUser(user._id)}}>&times;</p>
-                                }
-                              </td>
-                            </tr>
-                          )
-                        } else {
-                          return <tr key={user._id}></tr>
-                        }
+                                    value={user.fullname}
+                                    onChange={e => {this.updateUserData(user._id, 'fullname', e)}} />
+                                </span>
+                              }
+                              {user.role !== 'user' &&
+                                <span>{user.fullname}</span>
+                              }
+                            </td>
+                            <td>
+                              {user.role === 'user' &&
+                                <span>
+                                  <DebounceInput
+                                  className="vas-admin-update-username-input vas-input"
+                                  debounceTimeout={300}
+                                  value={user.username}
+                                  onChange={e =>{this.updateUserData(user._id, 'username', e)}}/>
+                                </span>
+                              } 
+                              {user.role !== 'user' &&
+                                <span>{user.username}</span>
+                              }
+                            </td>
+                            <td>
+                              {user.role !== 'admin' && user.role !== 'super' &&
+                                <span className='vas-admin-manage-users-pw'>
+                                  <i onClick={this.togglePasswordVisibility}>&#128065;</i>
+                                  <DebounceInput
+                                    className="vas-admin-update-password-input vas-input"
+                                    type="password"
+                                    debounceTimeout={300}
+                                    value={user.password}
+                                    onChange={e =>{this.updateUserData(user._id, 'password', e)}}/>
+                                </span>
+                              }
+                            </td>
+                            <td>{user.role}</td>
+                            <td className='vas-admin-delete-user'>
+                              {user.role !== 'admin' && user.role !== 'super' &&
+                                <span>
+                                  <input type="checkbox" id={user.username} className="vas-checkbox-select" defaultChecked={user.isActive} onChange={e=>{this.toggleActive(user)}}/>
+                                  <label className='vas-btn vas-admin-active-btn' htmlFor={user.username}>{user.isActive ? 'Active' : 'Inactive'}</label>
+                                </span>
+                              }
+                            </td>
+                          </tr>
+                        )
                       })
                       }
                     </tbody>

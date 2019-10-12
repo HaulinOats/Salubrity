@@ -10,7 +10,6 @@ const seedData = require('./seed-data');
 //Mongoose
 const Schema = mongoose.Schema;
 mongoose.set('useFindAndModify', false);
-// mongoose.connect('mongodb://brett84c:lisa8484@ds343127.mlab.com:43127/heroku_fnvv7pg3', {
 mongoose.connect('mongodb://brett84c:lisa8484@ds331798-a0.mlab.com:31798,ds331798-a1.mlab.com:31798/heroku_tbkgh512?replicaSet=rs-ds331798', {
   useNewUrlParser:true,
   autoIndex:false
@@ -277,20 +276,20 @@ app.post('/add-user', (req, res)=>{
   });
 });
 
-app.post('/delete-user', (req, res)=>{
+app.post('/toggle-user-is-active', (req, res)=>{
   User.findOne(req.body, (err, user)=>{
     if(err) return res.send(err);
     if(user){
-      user.isActive = false;
+      user.isActive = !user.isActive;
       user.save(err2=>{
         if(err2) return res.send(err2);
         res.send(user);
       })
     } else {
-      res.send({'error':'error deleting user'});
+      res.send({'error':"Could not find that user"})
     }
   })
-});
+})
 
 app.get('/get-all-users', (req, res)=>{
   User.find().sort({userId:1}).exec((err, users)=>{

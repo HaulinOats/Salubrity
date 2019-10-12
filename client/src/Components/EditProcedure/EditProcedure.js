@@ -528,14 +528,12 @@ export default class EditProcedure extends Component {
                   {procedure.groups.map((group, idx2)=>{
                     return(
                       <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + '_' + group.groupName}>
-                        {/* Cathflow: groupName = 14 */}
                         {group.hideGroup &&
                           <button className='vas-edit-procedure-toggle-section-btn' onClick={this.toggleSectionDisplay}>{group.groupName}</button>
                         }
                         {!group.hideHeader &&
                           <h3>{group.groupName}</h3>
                         }
-                        {/* Cathflow: groupName = 14 */}
                         <div className={'vas-edit-procedure-inner-container-row ' + (group.hideGroup ? (this.state.isPostEdit ? '' : 'vas-edit-procedure-important-hide ') : '')}>
                           {group.groupItems.map((itemId)=>{
                               let customInput = (group.inputType === 'number' || group.inputType === 'text') ? true : false;
