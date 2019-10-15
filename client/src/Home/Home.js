@@ -3,6 +3,7 @@ import Modal from '../Components/Modal/Modal';
 import Login from '../Components/Login/Login';
 import EditProcedure from '../Components/EditProcedure/EditProcedure';
 import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedures';
+import UpdateTimer from '../Components/UpdateTimer/UpdateTimer';
 import helpers from '../helpers';
 import axios from 'axios';
 import Moment from 'react-moment';
@@ -38,7 +39,6 @@ export default class Home extends Component{
       orderChangeById:null,
       proceduresById:null,
       selectedProcedures:[],
-      lastUpdate:0,
       lastUpdateHide:false
     };
     this.toggleHandler = this.toggleHandler.bind(this);
@@ -54,7 +54,6 @@ export default class Home extends Component{
     this.checkActiveRecordExists = this.checkActiveRecordExists.bind(this);
     this.visibilityChange = this.visibilityChange.bind(this);
     this.editCompletedCall = this.editCompletedCall.bind(this);
-    this.timerTick = this.timerTick.bind(this);
     this.resetState = this.resetState.bind(this);
     this.closeRecordCallback = this.closeRecordCallback.bind(this);
     this.getCompletedCalls = this.getCompletedCalls.bind(this);
@@ -117,7 +116,7 @@ export default class Home extends Component{
 
   visibilityChange(){
     if(document[this.documentProps.hidden]){
-      this.stopUpdateTimer();
+      this.setState({lastUpdateHide:true});
     } else {
       if(this.state.activeHomeTab === 'queue'){
         this.getActiveCalls();
@@ -170,14 +169,6 @@ export default class Home extends Component{
 
   stopSessionInterval(){
     clearInterval(this.sessionInterval);
-  }
-
-  stopUpdateTimer(){
-    clearInterval(this.updateTimer);
-  }
-
-  componentWillUnmount(){
-    this.stopUpdateTimer();
   }
 
   closeRecordCallback(type){
@@ -241,7 +232,6 @@ export default class Home extends Component{
   }
 
   logout(){
-    this.stopUpdateTimer();
     this.stopSessionInterval();
     this.setState({currentUser:null}, this.resetState);
     ls.clear();
@@ -306,26 +296,24 @@ export default class Home extends Component{
       window.scrollTo(0,0);
       ls('activeHomeTab', this.state.activeHomeTab);
       if(this.state.activeHomeTab === 'queue'){
-        this.setState({lastUpdateHide:false});
+        //forces UpdateTimer component to re-render restarting timer
+        this.setState({lastUpdateHide:true}, ()=>{
+          this.setState({lastUpdateHide:false});
+        })
         this.getActiveCalls();
       }
       if(this.state.activeHomeTab === 'complete'){
-        this.setState({
-          lastUpdateHide:false
-        }, ()=>{
+        //forces UpdateTimer component to re-render restarting timer
+        this.setState({lastUpdateHide:true}, ()=>{
+          this.setState({lastUpdateHide:false});
           this.getCompletedCalls();
         });
       }
       if(this.state.activeHomeTab === 'active'){
         this.setState({lastUpdateHide:true});
-        clearInterval(this.updateTimer);
       }
       this.refreshUserSession();
     });
-  }
-
-  timerTick(){
-    this.setState({lastUpdate:this.state.lastUpdate + 1});
   }
 
   addCall(){
@@ -338,14 +326,15 @@ export default class Home extends Component{
 
   getActiveCalls(){
     helpers.getActiveCalls().then(data=>{
-      this.setState({queueItems:data}, this.checkActiveRecordExists);
+      this.setState({
+        queueItems:data,
+        lastUpdateHide:true
+      }, ()=>{
+        this.setState({lastUpdateHide:false})
+        this.checkActiveRecordExists()
+      });
     }).catch(err=>{
       this.addToErrorArray(err);
-    }).finally(()=>{
-      clearInterval(this.updateTimer);
-      this.setState({lastUpdate:0}, ()=>{
-        this.updateTimer = setInterval(this.timerTick, 1000);
-      })
     })
   }
 
@@ -366,15 +355,15 @@ export default class Home extends Component{
           calls[i].hospitalName = null;
         }
       }
-      this.setState({completedCalls:calls});
+      this.setState({
+        completedCalls:calls,
+        lastUpdateHide:true
+      }, ()=>{
+        this.setState({lastUpdateHide:false})
+      });
     }).catch((err)=>{
       this.addToErrorArray(err);
-    }).finally(()=>{
-      clearInterval(this.updateTimer);
-      this.setState({lastUpdate:0}, ()=>{
-        this.updateTimer = setInterval(this.timerTick, 1000);
-      })
-    });
+    })
   }
 
 
@@ -542,10 +531,7 @@ export default class Home extends Component{
                 </li>
               }
               {!this.state.lastUpdateHide &&
-                <div className='vas-home-last-update-container'>
-                  <p className='vas-home-last-update-label'>Last Update:</p>
-                  <p className='vas-home-last-update-timer'>{(Math.floor(this.state.lastUpdate/60)) > 0 ? (Math.floor(this.state.lastUpdate/60)) : '0'}:{(this.state.lastUpdate - (Math.floor(this.state.lastUpdate/60) * 60)) < 10 ? '0' + (this.state.lastUpdate - (Math.floor(this.state.lastUpdate/60) * 60)) : (this.state.lastUpdate - (Math.floor(this.state.lastUpdate/60) * 60))}</p>
-                </div>
+                <UpdateTimer />
               }
             </ul>
             <div className="vas-home-tabContent">
