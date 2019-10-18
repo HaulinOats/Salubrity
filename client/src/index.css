@@ -265,10 +265,12 @@ select {
   background-color:white;
   transition:background-color 1s;
 }
-.vas-input-success {
-  background:lightgreen;
+.vas-input-success,
+.vas-success{
+  background:green;
 }
-.vas-input-fail {
+.vas-input-fail,
+.vas-fail {
   background:red;
 }
 .vas-table {

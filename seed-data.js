@@ -871,6 +871,14 @@ exports.itemSeed = [
     groupName:'What',
     value:'PORT',
     isCustom:false
+  },
+  {
+    itemId:89,
+    procedureName:'Lab Draw',
+    procedureId:9,
+    groupName:'Draw Type',
+    value:'Port-A-Cath',
+    isCustom:false
   }
 ];
 
@@ -947,7 +955,7 @@ exports.procedureSeed = [
         seq:2,
         groupName:'Draw Type',
         inputType:'radio',
-        groupItems:[19,20]
+        groupItems:[19,20,89]
       },
       {
         seq:3,

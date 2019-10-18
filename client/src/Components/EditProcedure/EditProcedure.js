@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import './EditProcedure.css';
 import Modal from '../../Components/Modal/Modal';
 import axios from 'axios';
+import moment from 'moment';
+import DatePicker from "react-datepicker";
 import {DebounceInput} from 'react-debounce-input';
 
 export default class EditProcedure extends Component {
@@ -15,7 +17,10 @@ export default class EditProcedure extends Component {
       modalTitle:'',
       modalMessage:'',
       modalConfirmation:false,
-      confirmationType:null
+      confirmationType:null,
+      dressingChangeDate:this.props.activeRecord.dressingChangeDate ? moment(this.props.activeRecord.dressingChangeDate) : moment(),
+      willSetDressingChangeDate:this.props.activeRecord.dressingChangeDate ? true : false,
+      dressingChangeDateIsSet:false
     }
     this.saveCurrentRecord = this.saveCurrentRecord.bind(this);
     this.hospitalChange = this.hospitalChange.bind(this);
@@ -41,6 +46,7 @@ export default class EditProcedure extends Component {
     this.toggleSectionDisplay = this.toggleSectionDisplay.bind(this);
     // this.setRecordStateItems = this.setRecordStateItems.bind(this);
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
+    this.dressingChangeDateOnChange = this.dressingChangeDateOnChange.bind(this);
   };
   
   componentDidMount(){
@@ -69,6 +75,12 @@ export default class EditProcedure extends Component {
         })
       });
       this.setState({proceduresDoneIdArr})
+    })
+  }
+
+  dressingChangeDateOnChange(date){
+    this.setState({
+      dressingChangeDate:date
     })
   }
   
@@ -189,8 +201,9 @@ export default class EditProcedure extends Component {
 
   getConfirmation(isConfirmed){
     if(isConfirmed){
-      if(this.state.confirmationType){
-        if(this.state.confirmationType === 'delete-call'){
+      let currentRecord = this.state.currentRecord;
+      switch(this.state.confirmationType){
+        case 'delete-call':
           axios.post('/delete-call', {
             _id:this.state.currentRecord._id
           })
@@ -202,10 +215,22 @@ export default class EditProcedure extends Component {
           .catch(err=>{
             console.log(err);
           })
-        }
-        if(this.state.confirmationType === 'reset-page'){
-          window.location.reload();
-        }
+          break;
+        case 'reset-page':
+          location.reload();
+          break;
+        case 'set-dressing-change':
+          currentRecord.dressingChangeDate = this.state.dressingChangeDate;
+          this.setState({
+            dressingChangeDateIsSet:true,
+            currentRecord
+          }, this.saveCurrentRecord);
+          break;
+        case 'close-line-type':
+          currentRecord.dressingChangeDate = null;
+          this.setState({currentRecord}, this.saveCurrentRecord);
+          break;
+        default:
       }
     }
     this.props.refreshUserSession();
@@ -263,9 +288,17 @@ export default class EditProcedure extends Component {
   procedureVerified(proceduresObj){
     let errors = '';
     let insertionTypesArr = [58,59,60,61,62];
+    let lineTypesArr = [30,58,59,60,61,62];
     let isInsertionProcedure = insertionTypesArr.some(r=> proceduresObj.itemIds.includes(r));
+    let isLineType = lineTypesArr.some(r=> proceduresObj.itemIds.includes(r));
     if(!proceduresObj.itemIds.length && !this.state.currentRecord.wasConsultation){
       errors += '- You must select at least 1 procedure or confirm consultation\n';
+    }
+
+    if(isLineType){
+      if(!this.state.dressingChangeDateIsSet && !this.state.isPostEdit){
+        errors += '- You must select a dressing change date\n';
+      }
     }
 
     if(isInsertionProcedure){
@@ -412,17 +445,33 @@ export default class EditProcedure extends Component {
     }
   }
 
-  selectButton(e, groupName){
+  selectButton(e, groupName, itemId){
     //UPDATE
-    if(groupName === 'What'){
-      this.checkSiblings(e);
+    //handle group on select
+    switch(groupName){
+      case 'What':
+        this.checkSiblings(e);
+        break;
+      case 'Insertion Type':
+        this.setState({insertionTypeSelected:true});
+        document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="8"]').forEach((el)=>{
+          el.style.display = 'inline';
+        })
+        this.checkSiblings(e);
+        break;
+      default:
     }
-    if(groupName === 'Insertion Type'){
-      this.setState({insertionTypeSelected:true});
-      document.querySelectorAll('.vas-edit-procedure-inner-span[data-procedure="8"]').forEach((el)=>{
-        el.style.display = 'inline';
-      })
-      this.checkSiblings(e);
+
+    switch(itemId){
+      case 30://Port-A-Cath - Access
+      case 58://START - Insertion Procedures
+      case 59://
+      case 60://
+      case 61://
+      case 62://END - Insertion Procedures
+        this.setState({willSetDressingChangeDate:true})
+        break;
+      default:
     }
     this.props.refreshUserSession();
   }
@@ -444,7 +493,6 @@ export default class EditProcedure extends Component {
 
   updateProcedure(){
     let proceduresObj = this.createProcedureObject();
-    console.log(proceduresObj);
     if(this.procedureVerified(proceduresObj)){
       let updatedRecord = this.state.currentRecord;
       updatedRecord.proceduresDone = proceduresObj.procedureArr;
@@ -466,6 +514,28 @@ export default class EditProcedure extends Component {
     }
     currentRecord.job = e.target.value;
     this.setState({currentRecord}, this.saveCurrentRecord);
+  }
+
+  saveDressingChangeDate(e){
+    this.setState({
+      modalTitle:'Set Dressing Change Date?',
+      modalMessage:'This will set the dressing change date and move this item to the "Lines" tab if it is not already there.',
+      modalIsOpen:true,
+      modalConfirmation:true,
+      confirmationType:'set-dressing-change'
+    });
+    this.props.refreshUserSession();
+  }
+
+  closeLineType(){
+    this.setState({
+      modalTitle:'Close Line Type?',
+      modalMessage:'Are you sure you want to close this record? This will unset the dressing change date and thus remove this item from appearing in the "Lines" tab.',
+      modalIsOpen:true,
+      modalConfirmation:true,
+      confirmationType:'close-line-type'
+    });
+    this.props.refreshUserSession();
   }
 
   render(){
@@ -516,7 +586,7 @@ export default class EditProcedure extends Component {
           }
           {!this.state.isPostEdit &&
             <span>
-              <button className="vas-edit-procedure-record-header-btn" onClick={this.props.closeRecordCallback}>Reset Form</button>
+              <button className="vas-edit-procedure-record-header-btn" onClick={this.resetForm}>Reset Form</button>
               <button className="vas-edit-procedure-record-header-btn" onClick={this.returnToQueue}>Return To Queue</button>
             </span>
           }
@@ -565,7 +635,7 @@ export default class EditProcedure extends Component {
                                         data-procedureid={procedure.procedureId} id={itemId} 
                                         name={procedure.procedureId + "_" + group.groupName}
                                         defaultChecked={this.state.proceduresDoneIdArr.indexOf(itemId) > -1 ? true : false}/>
-                                      <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, group.groupName)}}>{this.props.itemsById[itemId].value}</label>
+                                      <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, group.groupName, itemId)}}>{this.props.itemsById[itemId].value}</label>
                                     </span>
                                   }
                                   {customInput &&
@@ -587,6 +657,14 @@ export default class EditProcedure extends Component {
                         </div>
                       </span>
                     )})
+                  }
+                  {/* Add Dressing Change datepicker for Port-a-Cath and Insertion Procedures*/}
+                  {(procedure.procedureId === 4 || procedure.procedureId === 8) && this.state.willSetDressingChangeDate &&
+                    <div className='vas-edit-procedure-inner-container-row'>
+                      <h3>Dressing Change Date</h3>
+                      <span className='vas-inline-block'><DatePicker className='vas-home-datepicker' selected={this.state.dressingChangeDate} onChange={this.dressingChangeDateOnChange} /></span>
+                      <button className='vas-home-save-date' onClick={e=>{this.saveDressingChangeDate(e)}}>Save</button>
+                    </div>
                   }
                   </div>
               </div>
@@ -649,6 +727,16 @@ export default class EditProcedure extends Component {
             <DebounceInput element='textarea' className='vas-edit-procedure-add-comments' debounceTimeout={750} value={this.state.currentRecord.addComments ? this.state.currentRecord.addComments : ''} onChange={e=>{this.inputLiveUpdate(e, 'addComments')}}/>
           </div>
         </div>
+        {this.state.currentRecord.dressingChangeDate &&
+          <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
+            <header className='vas-edit-procedure-inner-container-header'>
+              <p>Close Line Type</p>
+            </header>
+            <div className='vas-edit-procedure-inner-container-main'>
+              <button className='vas-btn-no' onClick={e=>{this.closeLineType()}}>Close Line Type</button>
+            </div>
+          </div>
+        }
         <div className="vas-edit-procedure-inner-container vas-edit-procedure-inner-container-final">
           <header className="vas-edit-procedure-inner-container-header vas-edit-procedure-inner-container-final-header">
             <p>Submit Procedure</p>

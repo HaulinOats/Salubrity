@@ -3,6 +3,7 @@ import Modal from '../Components/Modal/Modal';
 import Login from '../Components/Login/Login';
 import EditProcedure from '../Components/EditProcedure/EditProcedure';
 import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedures';
+import LineProcedures from '../Components/LineProcedures/LineProcedures';
 import UpdateTimer from '../Components/UpdateTimer/UpdateTimer';
 import helpers from '../helpers';
 import axios from 'axios';
@@ -39,7 +40,8 @@ export default class Home extends Component{
       orderChangeById:null,
       proceduresById:null,
       selectedProcedures:[],
-      lastUpdateHide:false
+      lastUpdateHide:false,
+      lineProcedures:[]
     };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -59,6 +61,7 @@ export default class Home extends Component{
     this.getCompletedCalls = this.getCompletedCalls.bind(this);
     this.getOptionsData = this.getOptionsData.bind(this);
     this.getModalConfirmation = this.getModalConfirmation.bind(this);
+    this.reverseSort = this.reverseSort.bind(this);
   }
 
   resetState(){
@@ -123,6 +126,9 @@ export default class Home extends Component{
       }
       if(this.state.activeHomeTab === 'complete'){
         this.getCompletedCalls();
+      }
+      if(this.state.activeHomeTab === 'lines'){
+        this.getOpenLineProcedures();
       }
     }
   }
@@ -309,6 +315,13 @@ export default class Home extends Component{
           this.getCompletedCalls();
         });
       }
+      if(this.state.activeHomeTab === 'lines'){
+        //forces UpdateTimer component to re-render restarting timer
+        this.setState({lastUpdateHide:true}, ()=>{
+          this.setState({lastUpdateHide:false});
+          this.getOpenLineProcedures();
+        });
+      }
       if(this.state.activeHomeTab === 'active'){
         this.setState({lastUpdateHide:true});
       }
@@ -332,6 +345,19 @@ export default class Home extends Component{
       }, ()=>{
         this.setState({lastUpdateHide:false})
         this.checkActiveRecordExists()
+      });
+    }).catch(err=>{
+      this.addToErrorArray(err);
+    })
+  }
+
+  getOpenLineProcedures(){
+    helpers.getOpenLineProcedures().then(data=>{
+      this.setState({
+        lineProcedures:data,
+        lastUpdateHide:true
+      }, ()=>{
+        this.setState({lastUpdateHide:false})
       });
     }).catch(err=>{
       this.addToErrorArray(err);
@@ -496,6 +522,16 @@ export default class Home extends Component{
     this.refreshUserSession();
   }
 
+  reverseSort(arrayToReverse){
+
+    switch(arrayToReverse){
+      case "lines":
+        this.setState({lineProcedures:this.state.lineProcedures.reverse()})
+        break;
+      default:
+    }
+  }
+
   render(){
     return(
       <div>
@@ -522,6 +558,10 @@ export default class Home extends Component{
               </li>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'complete' ? true : false} onClick={e=>{this.setTab('complete', e)}}>
                 <p className='vas-home-nav-item-text'>Completed</p>
+                <div className='vas-home-nav-item-refresh-bar'></div>
+              </li>
+              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'lines' ? true : false} onClick={e=>{this.setTab('lines', e)}}>
+                <p className='vas-home-nav-item-text'>Lines</p>
                 <div className='vas-home-nav-item-refresh-bar'></div>
               </li>
               {this.state.activeRecord &&
@@ -573,6 +613,16 @@ export default class Home extends Component{
                   proceduresById={this.state.proceduresById}
                   editCompletedCall={this.editCompletedCall} 
                   orderChangeById={this.state.orderChangeById}/>
+              </div>
+              <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'lines' ? true : false}>
+                {this.state.hospitalsById && this.state.itemsById &&
+                  <LineProcedures 
+                    lineProcedures={this.state.lineProcedures}
+                    hospitalsById={this.state.hospitalsById}
+                    itemsById={this.state.itemsById}
+                    editCompletedCall={this.editCompletedCall} 
+                    reverseSort={this.reverseSort}/>
+                }
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&

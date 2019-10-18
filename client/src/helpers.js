@@ -51,6 +51,19 @@ const helpers = {
       })
     });
   },
+  getOpenLineProcedures:function(){
+    return new Promise((resolve, reject)=>{
+      axios.get('/get-open-line-procedures').then((resp)=>{
+        if(resp.data.error || resp.data._message){
+          reject(resp.data);
+        } else {
+          resolve(resp.data);
+        }
+      }).catch((err)=>{
+        reject(err);
+      })
+    });
+  },
   getCompletedCalls:function(){
     return new Promise((resolve, reject)=>{
       axios.get('/get-completed-calls').then((resp)=>{

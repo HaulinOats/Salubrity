@@ -47,6 +47,7 @@ let callSchema = new Schema({
   itemIds:{type:Array, default:null},
   proceduresDone:[Object],
   insertionLength:{type:Number, default:0},
+  dressingChangeDate:{type:Date, default:null},
   mrn:{type:Number, default:null},
   completedAt:{type:Date, default:null, index:true},
   responseTime:{type:Number, default:null},
@@ -141,6 +142,17 @@ app.get('/get-active-calls', (req, res)=>{
       res.send(calls);
     } else {
       res.send({'error':'there are no calls to return'});
+    }
+  })
+});
+
+app.get('/get-open-line-procedures', (req, res)=>{
+  Call.find({dressingChangeDate:{$ne:null}}).sort({dressingChangeDate:1}).exec((err, calls)=>{
+    if(err) return res.send(err);
+    if(calls){
+      res.send(calls);
+    } else {
+      res.send({'error':'there are no open line procedures to return'});
     }
   })
 });
@@ -637,17 +649,6 @@ app.get('/seed-items', (req, res)=>{
       res.send({'error':'no items exist'})
     }
   });
-})
-
-app.get('/add-field-to-model-documents', (req, res)=>{
-  // Call.updateMany({},{
-  //   $set:{
-  //     insertionLength:0
-  //   }},
-  //   {upsert:false, multi:true}).exec((err, documents)=>{
-  //     if(err) return res.send(err);
-  //     res.send(true);
-  //   });
 })
 
 app.get('/create-call-data-json', (req, res)=>{
