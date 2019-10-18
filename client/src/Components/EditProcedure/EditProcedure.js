@@ -355,18 +355,45 @@ export default class EditProcedure extends Component {
     });
   }
   
-  resetSection(e){
+  resetSection(e, procedureId){
+    switch(procedureId){
+      case 2://Lab Draw
+        this.setState({
+          dressingChangeDateIsSet:false,
+          willSetDressingChangeDate:false
+        })
+        break;
+      case 8://Insertion Procedure
+        let currentRecord = this.state.currentRecord;
+        currentRecord.insertionLength = 0;
+        currentRecord.mrn = null;
+        currentRecord.provider = null;
+        this.setState({
+          dressingChangeDateIsSet:false,
+          willSetDressingChangeDate:false,
+          currentRecord
+        }, this.saveCurrentRecord);
+        break;
+      default:
+    }
     //UPDATE
     let isInsertionProcedure = false;
     let sectionInputs = e.target.closest('.vas-edit-procedure-inner-container').querySelectorAll('input');
     sectionInputs.forEach(el=>{
-      if(el.type === 'checkbox' || el.type === 'radio'){
-        el.checked = false;
+      switch(el.type){
+        case 'checkbox':
+        case 'radio':
+          el.checked = false;
+          break;
+        case 'text':
+          el.value = '';
+          break;
+        // case 'number':
+        //   el.value = '0';
+        //   break;
+        default:
       }
-      if(el.type === 'number' || el.type === 'text'){
-        el.value = '';
-      }
-      if(!isInsertionProcedure && el.getAttribute('data-procedureid') === '8'){
+      if(!isInsertionProcedure && procedureId === 8){
         isInsertionProcedure = true;
       }
     });
@@ -519,7 +546,7 @@ export default class EditProcedure extends Component {
   saveDressingChangeDate(e){
     this.setState({
       modalTitle:'Set Dressing Change Date?',
-      modalMessage:'This will set the dressing change date and move this item to the "Lines" tab if it is not already there.',
+      modalMessage:'This will set the next dressing change date and move this item to the "Lines" tab if it is not already there.',
       modalIsOpen:true,
       modalConfirmation:true,
       confirmationType:'set-dressing-change'
@@ -610,7 +637,7 @@ export default class EditProcedure extends Component {
               <div className="vas-edit-procedure-inner-container" key={procedure._id}>
                 <header className="vas-edit-procedure-inner-container-header">
                   <p>{procedure.name}</p>
-                  <button className='vas-edit-procedure-reset-buttons' onClick={this.resetSection}>Reset</button>
+                  <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.resetSection(e,procedure.procedureId)}}>Reset</button>
                 </header>
                 <div className="vas-edit-procedure-inner-container-main">
                   {procedure.groups.map((group, idx2)=>{
@@ -633,7 +660,7 @@ export default class EditProcedure extends Component {
                                         type={group.inputType} 
                                         className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} 
                                         data-procedureid={procedure.procedureId} id={itemId} 
-                                        name={procedure.procedureId + "_" + group.groupName}
+                                        name={procedure.procedureId + "_" + group.groupName.replace(/\s/g,'')}
                                         defaultChecked={this.state.proceduresDoneIdArr.indexOf(itemId) > -1 ? true : false}/>
                                       <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, group.groupName, itemId)}}>{this.props.itemsById[itemId].value}</label>
                                     </span>
@@ -712,7 +739,7 @@ export default class EditProcedure extends Component {
         <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
           <header className='vas-edit-procedure-inner-container-header'>
             <p>Consultation</p>
-            <button className='vas-edit-procedure-reset-buttons' onClick={this.resetSection}>Reset</button>
+            <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.resetSection(e)}}>Reset</button>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
             <input type='checkbox' className="vas-radio-select vas-edit-procedure-consultation-input" id='consultation' defaultChecked={this.state.currentRecord.wasConsultation} onChange={this.toggleConsultation} name='consultation'/>
@@ -728,7 +755,7 @@ export default class EditProcedure extends Component {
           </div>
         </div>
         {this.state.currentRecord.dressingChangeDate &&
-          <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
+          <div className='vas-edit-procedure-inner-container vas-edit-procedure-important'>
             <header className='vas-edit-procedure-inner-container-header'>
               <p>Close Line Type</p>
             </header>

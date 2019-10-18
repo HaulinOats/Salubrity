@@ -60,7 +60,7 @@
 }
 .vas-edit-procedure-inner-container-main-comment
 .vas-edit-procedure-inner-container-header {
-  background-color: darkgoldenrod;
+  background-color: goldenrod;
 }
 .vas-edit-procedure-inner-container-header {
   padding: 10px;
@@ -183,4 +183,12 @@
 .vas-home-save-date {
   margin-left:5px;
   transition:background-color 1s;
+}
+.vas-edit-procedure-important 
+.vas-edit-procedure-inner-container-header{
+  background:goldenrod;
+}
+.vas-edit-procedure-important 
+.vas-edit-procedure-inner-container-main {
+  background:moccasin;
 }
