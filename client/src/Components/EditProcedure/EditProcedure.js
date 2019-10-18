@@ -358,21 +358,11 @@ export default class EditProcedure extends Component {
   resetSection(e, procedureId){
     switch(procedureId){
       case 2://Lab Draw
+      case 8://Insertion Procedure      
         this.setState({
           dressingChangeDateIsSet:false,
           willSetDressingChangeDate:false
         })
-        break;
-      case 8://Insertion Procedure
-        let currentRecord = this.state.currentRecord;
-        currentRecord.insertionLength = 0;
-        currentRecord.mrn = null;
-        currentRecord.provider = null;
-        this.setState({
-          dressingChangeDateIsSet:false,
-          willSetDressingChangeDate:false,
-          currentRecord
-        }, this.saveCurrentRecord);
         break;
       default:
     }
