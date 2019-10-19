@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import './LineProcedures.css';
 import Moment from 'react-moment';
+import moment from 'moment';
 
 export default class LineProcedures extends Component{
   render(){
+    let today = moment();
     //UPDATE
     let lineTypes = [30,58,59,60,61,62];
     let lateralities = [68,69];
@@ -17,6 +19,7 @@ export default class LineProcedures extends Component{
             <p className='vas-line-procedures-no-calls'>There are no open lines types at this time</p>
           }
           {this.props.lineProcedures.map((lineProcedure, idx)=>{
+            let daysTilDressingDate = moment(lineProcedure.dressingChangeDate).diff(today, 'days');
             let lineType = 'N/A';
             let laterality = 'N/A';
             lineProcedure.itemIds.forEach(itemId=>{
@@ -28,7 +31,7 @@ export default class LineProcedures extends Component{
               }
             });
             return(
-            <div key={lineProcedure._id + idx} className='vas-line-procedures-line-item' onClick={e=>{this.props.editCompletedCall(lineProcedure._id, lineProcedure.completedBy)}}>
+            <div key={lineProcedure._id + idx} className={'vas-line-procedures-line-item ' + (daysTilDressingDate < 2 ? 'vas-line-procedure-line-item-attention' : '')} onClick={e=>{this.props.editCompletedCall(lineProcedure._id, lineProcedure.completedBy)}}>
               <div className='vas-line-procedures-line-item-left'>
                 <Moment className='vas-line-procedures-main-date' format='M/D'>{lineProcedure.dressingChangeDate}</Moment>
               </div>
