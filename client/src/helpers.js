@@ -57,6 +57,10 @@ const helpers = {
         if(resp.data.error || resp.data._message){
           reject(resp.data);
         } else {
+          let lineProcedures = resp.data;
+          lineProcedures.forEach((lineProcedure, idx)=>{
+            lineProcedures[idx].isHidden = false;
+          })
           resolve(resp.data);
         }
       }).catch((err)=>{

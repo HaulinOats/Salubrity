@@ -7,6 +7,7 @@ import LineProcedures from '../Components/LineProcedures/LineProcedures';
 import UpdateTimer from '../Components/UpdateTimer/UpdateTimer';
 import helpers from '../helpers';
 import axios from 'axios';
+import moment from 'moment';
 import Moment from 'react-moment';
 import ls from 'local-storage';
 import './Home.css';
@@ -62,6 +63,7 @@ export default class Home extends Component{
     this.getOptionsData = this.getOptionsData.bind(this);
     this.getModalConfirmation = this.getModalConfirmation.bind(this);
     this.reverseSort = this.reverseSort.bind(this);
+    this.linesChangeDaysOut = this.linesChangeDaysOut.bind(this);
   }
 
   resetState(){
@@ -532,6 +534,24 @@ export default class Home extends Component{
     }
   }
 
+  linesChangeDaysOut(e){
+    let lineProcedures = this.state.lineProcedures;
+    if(e.target.value === ''){
+      lineProcedures.forEach((lineProcedure, idx)=>{
+        lineProcedures[idx].isHidden = false;
+      })
+    } else {
+      lineProcedures.forEach((lineProcedure, idx)=>{
+        let daysDiff = moment(lineProcedure.dressingChangeDate).diff(moment(), 'days');
+        lineProcedures[idx].isHidden = false;
+        if(daysDiff > Number(e.target.value)){
+          lineProcedures[idx].isHidden = true;
+        }
+      });
+    }
+    this.setState({lineProcedures});
+  }
+
   render(){
     return(
       <div>
@@ -617,6 +637,7 @@ export default class Home extends Component{
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'lines' ? true : false}>
                 {this.state.hospitalsById && this.state.itemsById &&
                   <LineProcedures 
+                    linesChangeDaysOut={this.linesChangeDaysOut}
                     lineProcedures={this.state.lineProcedures}
                     hospitalsById={this.state.hospitalsById}
                     itemsById={this.state.itemsById}

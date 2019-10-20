@@ -6,6 +6,7 @@
   color:white;
   padding:5px;
   display:flex;
+  align-items:center;
 }
 .vas-line-procedures-no-calls {
   padding:10px;
@@ -64,4 +65,7 @@
 }
 .vas-line-procedure-line-item-attention {
   background:skyblue;
+}
+.vas-line-procedure-line-item-hidden {
+  display:none;
 }
