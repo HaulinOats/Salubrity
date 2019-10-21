@@ -47,7 +47,7 @@ export default class LineProcedures extends Component{
                 </div>
                 <div className='vas-line-procedures-line-item-right'>
                   <div className='vas-line-procedures-line-item-field-container'>
-                    <p className='vas-line-procedures-line-item-field-container-left'>Room:</p>
+                    <p className='vas-line-procedures-line-item-field-container-left vas-uppercase'>Room:</p>
                     <p className='vas-line-procedures-line-item-field-container-right'>{lineProcedure.room}</p>
                   </div>
                   <div className='vas-line-procedures-line-item-field-container'>
@@ -63,13 +63,17 @@ export default class LineProcedures extends Component{
                     <p className='vas-line-procedures-line-item-field-container-right'>{laterality}</p>
                   </div>
                   <div className='vas-line-procedures-line-item-field-container'>
+                    <p className='vas-line-procedures-line-item-field-container-left'>MRN:</p>
+                    <p className='vas-line-procedures-line-item-field-container-right'>{lineProcedure.mrn}</p>
+                  </div>
+                  <div className='vas-line-procedures-line-item-field-container'>
                     <p className='vas-line-procedures-line-item-field-container-left'>Insertion Date:</p>
                     <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D'>{lineProcedure.completedAt}</Moment></p>
                   </div>
-                  <div className='vas-line-procedures-line-item-field-container'>
+                  {/* <div className='vas-line-procedures-line-item-field-container'>
                     <p className='vas-line-procedures-line-item-field-container-left'>Dressing Date:</p>
                     <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D'>{lineProcedure.dressingChangeDate}</Moment></p>
-                  </div>
+                  </div> */}
                 </div>
               </div>)
           })}
