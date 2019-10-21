@@ -47,8 +47,8 @@ export default class LineProcedures extends Component{
                 </div>
                 <div className='vas-line-procedures-line-item-right'>
                   <div className='vas-line-procedures-line-item-field-container'>
-                    <p className='vas-line-procedures-line-item-field-container-left vas-uppercase'>Room:</p>
-                    <p className='vas-line-procedures-line-item-field-container-right'>{lineProcedure.room}</p>
+                    <p className='vas-line-procedures-line-item-field-container-left'>Room:</p>
+                    <p className='vas-line-procedures-line-item-field-container-right vas-uppercase'>{lineProcedure.room}</p>
                   </div>
                   <div className='vas-line-procedures-line-item-field-container'>
                     <p className='vas-line-procedures-line-item-field-container-left'>Hospital:</p>
