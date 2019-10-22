@@ -361,13 +361,14 @@ app.get('/get-items', (req, res)=>{
 });
 
 app.get('/get-completed-calls', (req, res)=>{
-  var start = new Date();
-  start.setHours(0,0,0,0);
+  // var start = new Date();
+  // start.setHours(0,0,0,0);
   
-  var end = new Date();
-  end.setHours(23,59,59,999);
+  // var end = new Date();
+  // end.setHours(23,59,59,999);
 
-  Call.find({completedAt: {$gte: start, $lt: end}}).sort({completedAt:-1}).exec((err, calls)=>{
+  // Call.find({completedAt: {$gte: start, $lt: end}}).sort({completedAt:-1}).exec((err, calls)=>{
+  Call.find({completedAt: {$gt:new Date(Date.now() - 12*60*60 * 1000)}}).sort({completedAt:-1}).exec((err, calls)=>{
     if(err) return res.send(err);
     if(calls){
       res.send(calls);
