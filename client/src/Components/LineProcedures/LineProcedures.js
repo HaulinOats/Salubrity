@@ -70,6 +70,14 @@ export default class LineProcedures extends Component{
                     <p className='vas-line-procedures-line-item-field-container-left'>Insertion Date:</p>
                     <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D'>{lineProcedure.completedAt}</Moment></p>
                   </div>
+                  <div className='vas-line-procedures-line-item-field-container'>
+                    <p className='vas-line-procedures-line-item-field-container-left'>Updated By:</p>
+                    <p className='vas-line-procedures-line-item-field-container-right vas-capitalize'>{lineProcedure.updatedBy ? this.props.usersById[lineProcedure.updatedBy].fullname : this.props.usersById[lineProcedure.completedBy].fullname}</p>
+                  </div>
+                  <div className='vas-line-procedures-line-item-field-container'>
+                    <p className='vas-line-procedures-line-item-field-container-left'>Updated At:</p>
+                    <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D HH:mm'>{lineProcedure.updatedAt ? lineProcedure.updatedAt : lineProcedure.completedAt}</Moment></p>
+                  </div>
                   {/* <div className='vas-line-procedures-line-item-field-container'>
                     <p className='vas-line-procedures-line-item-field-container-left'>Dressing Date:</p>
                     <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D'>{lineProcedure.dressingChangeDate}</Moment></p>

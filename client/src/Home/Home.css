@@ -35,12 +35,64 @@
 .vas-home-main-header-right {
   justify-content: flex-end;
 }
+.vas-home-main-header-user-container {
+  position:relative;
+}
+.vas-home-status-dot {
+  padding:1px;
+  width: 5px;
+  height: 5px;
+  background: chartreuse;
+  border-radius: 50px;
+  margin-right: 10px;
+  box-shadow: 0px 0px 3px yellow;
+  cursor:pointer;
+}
+.vas-user-offline {
+  background:red;
+  box-shadow:0px 0px 3px darkorange;
+}
 .vas-home-main-header-user{
   display:inline-block;
   text-transform: capitalize;
   margin-right:10px;
   padding-right:10px;
   border-right:solid 1px white;
+  cursor:pointer;
+  user-select:none;
+}
+.vas-home-main-header-user b{
+  font-size:70%;
+  margin-left:3px;
+}
+.vas-home-user-menu {
+    position: absolute;
+    background: white;
+    color: black;
+    margin-top: 15px;
+    box-shadow: 1px 1px 3px black;
+}
+.vas-home-clickguard {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  opacity:.2;
+}
+.vas-home-user-menu li{
+  white-space: nowrap;
+  cursor: pointer;
+  padding:14px 5px;
+  border-bottom: solid 1px black;
+}
+.vas-home-user-menu li:hover{
+  color:white;
+  background:cadetblue;
+}
+.vas-home-user-menu li:last-child{
+  border:none;
 }
 .vas-home-main-header-logout {
   background: darkcyan;
@@ -50,6 +102,45 @@
   margin-right:0;
 }
 .vas-home-main-header-logout:active {
+  border:none;
+}
+.vas-home-online-users {
+  position: absolute;
+  top: 45px;
+  width: 98%;
+  background: white;
+  transform: translatex(-115%);
+  z-index: 2;
+  transition:transform .5s;
+}
+.vas-home-show-online-users {
+  transform:translatex(0%);
+}
+.vas-home-hide-online-users {
+  float: right;
+  padding: 0px 15px 5px 12px;
+  font-size: 300%;
+  cursor: pointer;
+}
+.vas-home-online-users-list {
+  padding:5px;
+  box-shadow: 1px 1px 3px black;
+}
+.vas-home-online-users-title {
+  font-size: 130%;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: darkslategrey;
+}
+.vas-home-online-users-user {
+  font-size: 105%;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  display: list-item;
+  list-style-type: disc;
+  list-style-position: inside;
+}
+.vas-home-online-users-user:last-child {
   border:none;
 }
 .vas-home-nav-tabs {
@@ -393,16 +484,3 @@
   margin-right:0;
   font-weight: bold;
 }
-/* .vas-home-last-update-container {
-  margin: 0 auto;
-  margin-right: 0;
-}
-.vas-home-last-update-label {
-  display:inline-block;
-}
-.vas-home-last-update-timer {
-  display: inline-block;
-  font-size: 110%;
-  min-width: 45px;
-  text-align: right;
-} */

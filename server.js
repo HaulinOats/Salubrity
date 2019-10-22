@@ -26,6 +26,7 @@ let userSchema = new Schema({
   userId:{type:Number, index:true, unique:true},
   password:{type:String, lowercase:true},
   role:{type:String, default:'user', lowercase:true},
+  isAvailable:{type:Boolean, default:false},
   isActive:{type:Boolean, default:true}
 });
 userSchema.plugin(uniqueValidator, {message: `Could not insert user based on unique constraint: {PATH} {VALUE} {TYPE}`})
@@ -55,7 +56,9 @@ let callSchema = new Schema({
   completedBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
   wasConsultation:{type:Boolean, default:false},
-  status:{type:Number, default:1}
+  status:{type:Number, default:1},
+  updatedAt:{type:Date, default:null},
+  updatedBy:{type:Number, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -589,6 +592,37 @@ app.post('/admin-update-user-data', (req,res)=>{
     if(err) return res.send(err);
     res.send(user);
   })
+})
+
+app.post('/toggle-user-availability', (req,res)=>{
+  User.findOne({_id:req.body._id}, (err, user)=>{
+    if(err) return res.send(err);
+    user.isAvailable = !user.isAvailable;
+    user.save((err2, updateUser)=>{
+      if(err2) return res.send(err2);
+      updateUser.password = undefined;
+      res.send(updateUser);
+    })
+  })
+})
+
+app.get('/get-online-users', (req,res)=>{
+  User.find({isAvailable:true}, (err, users)=>{
+    if(err) return res.send(err);
+    let onlineUsers = [];
+    users.forEach(user=>{
+      onlineUsers.push(user.fullname);
+    })
+    res.send(onlineUsers);
+  })
+})
+
+app.get('/add-availability-to-users', (req,res)=>{
+  User.updateMany({}, {
+    $set:{
+      isAvailable:false
+    }
+  },{multi:true});
 })
 
 //SUPER

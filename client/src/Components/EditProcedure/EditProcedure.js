@@ -417,18 +417,23 @@ export default class EditProcedure extends Component {
   }
 
   saveCurrentRecord(){
-    axios.post('/save-call', this.state.currentRecord)
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        console.log('active call saved');
-      }
+    let currentRecord = this.state.currentRecord;
+    currentRecord.updatedBy = this.props.currentUser.userId;
+    currentRecord.updatedAt = new Date().toISOString();
+    this.setState({currentRecord}, ()=>{
+      axios.post('/save-call', this.state.currentRecord)
+      .then(resp=>{
+        if(resp.data.error || resp.data._message){
+          console.log(resp.data);
+        } else {
+          console.log('active call saved');
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+      this.props.refreshUserSession();
     })
-    .catch(err=>{
-      console.log(err);
-    })
-    this.props.refreshUserSession();
   }
 
   saveNewProcedure(){
@@ -598,7 +603,12 @@ export default class EditProcedure extends Component {
           </div>
           {this.props.usersById && this.props.usersById[this.state.currentRecord.completedBy] &&
             <div className='vas-edit-procedure-completed-by-container'>
-              <p><b>Completed By: </b>{this.props.usersById[this.state.currentRecord.completedBy] ? this.props.usersById[this.state.currentRecord.completedBy].fullname : 'N/A'}</p>
+              <p><b>Completed By: </b>{this.state.currentRecord.completedBy ? this.props.usersById[this.state.currentRecord.completedBy].fullname : 'N/A'}</p>
+            </div>
+          }
+          {this.props.usersById && this.props.usersById[this.state.currentRecord.updatedBy] &&
+            <div className='vas-edit-procedure-completed-by-container'>
+              <p><b>Updated By: </b>{this.state.currentRecord.updatedBy ? this.props.usersById[this.state.currentRecord.updatedBy].fullname : 'N/A'}</p>
             </div>
           }
           {!this.state.isPostEdit &&

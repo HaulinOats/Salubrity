@@ -198,16 +198,6 @@ select {
   align-items: center;
   justify-content: center;
 }
-.vas-status-dot {
-  padding:1px;
-  width: 5px;
-  height: 5px;
-  background: chartreuse;
-  border-radius: 50px;
-  margin-right: 10px;
-  box-shadow: 0px 0px 3px yellow;
-  cursor:pointer;
-}
 .vas-status-bad {
   box-shadow: none;
   background:red;

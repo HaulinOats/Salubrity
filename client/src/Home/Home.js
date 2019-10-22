@@ -42,7 +42,10 @@ export default class Home extends Component{
       proceduresById:null,
       selectedProcedures:[],
       lastUpdateHide:false,
-      lineProcedures:[]
+      lineProcedures:[],
+      userMenuVisible:false,
+      onlineUsersVisible:false,
+      onlineUsers:[]
     };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -53,7 +56,6 @@ export default class Home extends Component{
     this.reverseCompletedSort = this.reverseCompletedSort.bind(this);
     this.stateLoadCalls = this.stateLoadCalls.bind(this);
     this.addToErrorArray = this.addToErrorArray.bind(this);
-    this.sendErrorsToAdmin = this.sendErrorsToAdmin.bind(this);
     this.checkActiveRecordExists = this.checkActiveRecordExists.bind(this);
     this.visibilityChange = this.visibilityChange.bind(this);
     this.editCompletedCall = this.editCompletedCall.bind(this);
@@ -64,6 +66,9 @@ export default class Home extends Component{
     this.getModalConfirmation = this.getModalConfirmation.bind(this);
     this.reverseSort = this.reverseSort.bind(this);
     this.linesChangeDaysOut = this.linesChangeDaysOut.bind(this);
+    this.toggleUserAvailability = this.toggleUserAvailability.bind(this);
+    this.showOnlineUsers = this.showOnlineUsers.bind(this);
+    this.hideOnlineUsers = this.hideOnlineUsers.bind(this);
   }
 
   resetState(){
@@ -133,6 +138,33 @@ export default class Home extends Component{
         this.getOpenLineProcedures();
       }
     }
+  }
+
+  toggleUserAvailability(){
+    axios.post('/toggle-user-availability', {_id:this.state.currentUser._id}).then(resp=>{
+      this.setState({
+        currentUser:resp.data,
+        userMenuVisible:false
+      }, this.refreshUserSession);
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
+
+  showOnlineUsers(){
+    helpers.getOnlineUsers().then(resp=>{
+      this.setState({
+        onlineUsersVisible:true,
+        userMenuVisible:false,
+        onlineUsers:resp
+      });
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
+
+  hideOnlineUsers(){
+    this.setState({onlineUsersVisible:false});
   }
 
   getModalConfirmation(){
@@ -335,8 +367,7 @@ export default class Home extends Component{
     this.setState({
       modalTitle:'Add Call',
       modalIsOpen:true
-    })
-    this.refreshUserSession();
+    }, this.refreshUserSession)
   }
 
   getActiveCalls(){
@@ -417,20 +448,6 @@ export default class Home extends Component{
     this.setState({errorArr:errArr});
   }
 
-  sendErrorsToAdmin(){
-    this.setState({isLoading:true});
-    axios.post('/send-errors-to-admin', this.state.errorArr)
-    .then(resp=>{
-      alert('Errors sent to admin');
-    })
-    .catch(err=>{
-      alert('Error sending errors to Admin (the irony)');
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
-  }
-
   reverseCompletedSort(){
     let items = this.state.completedCalls;
     this.setState({completedCalls:items.reverse()});
@@ -440,8 +457,7 @@ export default class Home extends Component{
   toggleHandler() {
     this.setState({
       modalIsOpen: !this.state.modalIsOpen
-    });
-    this.refreshUserSession();
+    }, this.refreshUserSession);
   }
 
   closeModal(callData){
@@ -525,7 +541,6 @@ export default class Home extends Component{
   }
 
   reverseSort(arrayToReverse){
-
     switch(arrayToReverse){
       case "lines":
         this.setState({lineProcedures:this.state.lineProcedures.reverse()})
@@ -566,11 +581,34 @@ export default class Home extends Component{
                 <button className='vas-button vas-home-add-call' onClick={this.addCall}>Add Call</button>
               </div>
               <div className='vas-header-right-container'>
-                <span className={"vas-status-dot"} onClick={this.sendErrorsToAdmin}></span>
-                <p className='vas-home-main-header-user vas-nowrap'>{this.state.currentUser.fullname}</p>
+                <span title={this.state.currentUser.isAvailable ? 'Available' : 'Offline'} className={"vas-home-status-dot " + (!this.state.currentUser.isAvailable ? 'vas-user-offline' : '')}></span>
+                <span className='vas-home-main-header-user-container'>
+                  <p className='vas-home-main-header-user vas-nowrap' onClick={e=>{this.setState({userMenuVisible:!this.state.userMenuVisible})}}>{this.state.currentUser.fullname}<b>&#9660;</b></p>
+                  {this.state.userMenuVisible &&
+                    <span>
+                      <div className='vas-home-clickguard' onClick={e=>{this.setState({userMenuVisible:false})}}></div>
+                      <ul className='vas-home-user-menu'>
+                        <li onClick={this.toggleUserAvailability}>{this.state.currentUser.isAvailable ? "Go 'Offline'" : "Go 'Online'"}</li>
+                        <li onClick={this.showOnlineUsers}>Show Online Users</li>
+                      </ul>
+                    </span>
+                  }
+                </span>
                 <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
               </div>
             </header>
+            <div className={'vas-home-online-users ' + (this.state.onlineUsersVisible ? 'vas-home-show-online-users' : '')}>
+              <p className='vas-home-hide-online-users' onClick={this.hideOnlineUsers}>&times;</p>
+              <div className='vas-home-online-users-list'>
+                <p className='vas-home-online-users-title'>Available Users:</p>
+                {this.state.onlineUsers.map((username, idx)=>{
+                  return <p key={username + idx} className='vas-capitalize vas-home-online-users-user'>{username}</p>
+                })}
+              </div>
+            </div>
+            {this.state.onlineUsersVisible &&
+              <div className='vas-home-clickguard' onClick={e=>{this.setState({onlineUsersVisible:false})}}></div>
+            }
             <ul className='vas-home-nav-tabs'>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setTab('queue', e)}}>
                 <p className='vas-home-nav-item-text'>Queue</p>
@@ -640,6 +678,7 @@ export default class Home extends Component{
                     linesChangeDaysOut={this.linesChangeDaysOut}
                     lineProcedures={this.state.lineProcedures}
                     hospitalsById={this.state.hospitalsById}
+                    usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
                     editCompletedCall={this.editCompletedCall} 
                     reverseSort={this.reverseSort}/>
