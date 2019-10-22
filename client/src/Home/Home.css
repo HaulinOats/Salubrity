@@ -203,7 +203,6 @@
   padding-bottom: 3px;
   font-size: 125%;
   color: darkcyan;
-  text-shadow: 0px 0px 3px white;
   display:flex;
   width:95%;
   font-weight: bold;
@@ -255,6 +254,8 @@
   color: white;
 }
 .vas-status-2
+.vas-home-table-tr-inner p b,
+.vas-status-3
 .vas-home-table-tr-inner p b {
   color:white;
 }
@@ -371,6 +372,10 @@
 .vas-home-table-time {
   font-size:110%;
 }
+.vas-status-3
+.vas-home-table-time {
+  color:white;
+}
 .vas-home-table-time-date {
   display: block;
   margin-top: 3px;
@@ -380,7 +385,8 @@
 .vas-home-table-job-name,
 .vas-status-3 
 .vas-home-table-tr-inner p {
-  border-color:darkslategray;
+  border-color:white;
+  color:white;
 }
 .vas-home-table-open-status {
   margin:0 auto;
