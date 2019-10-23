@@ -139,6 +139,7 @@
   display: list-item;
   list-style-type: disc;
   list-style-position: inside;
+  color:black;
 }
 .vas-home-online-users-user:last-child {
   border:none;

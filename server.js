@@ -617,13 +617,13 @@ app.get('/get-online-users', (req,res)=>{
   })
 })
 
-app.get('/add-availability-to-users', (req,res)=>{
-  User.updateMany({}, {
-    $set:{
-      isAvailable:false
-    }
-  },{multi:true});
-})
+// app.get('/add-availability-to-users', (req,res)=>{
+//   User.updateMany({}, {
+//     $set:{
+//       isAvailable:false
+//     }
+//   },{multi:true});
+// })
 
 //SUPER
 app.post('/send-errors-to-admin', (req,res)=>{

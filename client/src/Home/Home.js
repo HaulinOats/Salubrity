@@ -596,19 +596,19 @@ export default class Home extends Component{
                 </span>
                 <button className='vas-home-main-header-logout' onClick={this.logout}>Logout</button>
               </div>
-            </header>
-            <div className={'vas-home-online-users ' + (this.state.onlineUsersVisible ? 'vas-home-show-online-users' : '')}>
-              <p className='vas-home-hide-online-users' onClick={this.hideOnlineUsers}>&times;</p>
-              <div className='vas-home-online-users-list'>
-                <p className='vas-home-online-users-title'>Available Users:</p>
-                {this.state.onlineUsers.map((username, idx)=>{
-                  return <p key={username + idx} className='vas-capitalize vas-home-online-users-user'>{username}</p>
-                })}
+              <div className={'vas-home-online-users ' + (this.state.onlineUsersVisible ? 'vas-home-show-online-users' : '')}>
+                <p className='vas-home-hide-online-users' onClick={this.hideOnlineUsers}>&times;</p>
+                <div className='vas-home-online-users-list'>
+                  <p className='vas-home-online-users-title'>Available Users:</p>
+                  {this.state.onlineUsers.map((username, idx)=>{
+                    return <p key={username + idx} className='vas-capitalize vas-home-online-users-user'>{username}</p>
+                  })}
+                </div>
               </div>
-            </div>
-            {this.state.onlineUsersVisible &&
-              <div className='vas-home-clickguard' onClick={e=>{this.setState({onlineUsersVisible:false})}}></div>
-            }
+              {this.state.onlineUsersVisible &&
+                <div className='vas-home-clickguard' onClick={e=>{this.setState({onlineUsersVisible:false})}}></div>
+              }
+            </header>
             <ul className='vas-home-nav-tabs'>
               <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'queue' ? true : false} onClick={e=>{this.setTab('queue', e)}}>
                 <p className='vas-home-nav-item-text'>Queue</p>
