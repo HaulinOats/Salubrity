@@ -192,3 +192,11 @@
 .vas-edit-procedure-inner-container-main {
   background:moccasin;
 }
+.vas-edit-procedure-insertedBy {
+  font-weight:bold;
+}
+.vas-edit-procedure-insertedBy b{
+  display: block;
+  font-weight: 100;
+  margin-top: 6px;
+}

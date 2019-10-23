@@ -58,7 +58,8 @@ let callSchema = new Schema({
   wasConsultation:{type:Boolean, default:false},
   status:{type:Number, default:1},
   updatedAt:{type:Date, default:null},
-  updatedBy:{type:Number, default:null}
+  updatedBy:{type:Number, default:null},
+  insertedBy:{type:String, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);

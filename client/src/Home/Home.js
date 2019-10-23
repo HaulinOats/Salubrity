@@ -7,7 +7,6 @@ import LineProcedures from '../Components/LineProcedures/LineProcedures';
 import UpdateTimer from '../Components/UpdateTimer/UpdateTimer';
 import helpers from '../helpers';
 import axios from 'axios';
-import moment from 'moment';
 import Moment from 'react-moment';
 import ls from 'local-storage';
 import './Home.css';
@@ -45,7 +44,8 @@ export default class Home extends Component{
       lineProcedures:[],
       userMenuVisible:false,
       onlineUsersVisible:false,
-      onlineUsers:[]
+      onlineUsers:[],
+      linesSortBy:'dressingChangeDate'
     };
     this.toggleHandler = this.toggleHandler.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -65,7 +65,7 @@ export default class Home extends Component{
     this.getOptionsData = this.getOptionsData.bind(this);
     this.getModalConfirmation = this.getModalConfirmation.bind(this);
     this.reverseSort = this.reverseSort.bind(this);
-    this.linesChangeDaysOut = this.linesChangeDaysOut.bind(this);
+    this.linesSortByOnChange = this.linesSortByOnChange.bind(this);
     this.toggleUserAvailability = this.toggleUserAvailability.bind(this);
     this.showOnlineUsers = this.showOnlineUsers.bind(this);
     this.hideOnlineUsers = this.hideOnlineUsers.bind(this);
@@ -386,8 +386,15 @@ export default class Home extends Component{
 
   getOpenLineProcedures(){
     helpers.getOpenLineProcedures().then(data=>{
+      let lineProcedures = data;
+      let sortByField = this.state.linesSortBy;
+      lineProcedures.sort((a,b)=>{
+        if(a[sortByField] > b[sortByField]) return 1;
+        if(a[sortByField] < b[sortByField]) return -1;
+        return 0;
+      })
       this.setState({
-        lineProcedures:data,
+        lineProcedures,
         lastUpdateHide:true
       }, ()=>{
         this.setState({lastUpdateHide:false})
@@ -460,16 +467,21 @@ export default class Home extends Component{
     }, this.refreshUserSession);
   }
 
-  closeModal(callData){
+  closeModal(callDataReturned){
+    let callData = callDataReturned;
     if(callData){
       let queueItems = this.state.queueItems;
       queueItems.push(callData);
       this.setState({
         queueItems,
         modalTitle:'Call Was Added',
-        modalMessage:'Your call was added to the queue!'
+        modalMessage:'Your call was added to the queue!',
+        activeRecord:callData.openBy ? callData : this.state.activeRecord
       }, ()=>{
         setTimeout(()=>{
+          if(callData.openBy){
+            this.setTab('active');
+          }
           this.resetModal();
         }, 2000);
       });
@@ -549,22 +561,20 @@ export default class Home extends Component{
     }
   }
 
-  linesChangeDaysOut(e){
+  linesSortByOnChange(e){
+    let sortField = e.target.value;
     let lineProcedures = this.state.lineProcedures;
-    if(e.target.value === ''){
-      lineProcedures.forEach((lineProcedure, idx)=>{
-        lineProcedures[idx].isHidden = false;
-      })
-    } else {
-      lineProcedures.forEach((lineProcedure, idx)=>{
-        let daysDiff = moment(lineProcedure.dressingChangeDate).diff(moment(), 'days');
-        lineProcedures[idx].isHidden = false;
-        if(daysDiff > Number(e.target.value)){
-          lineProcedures[idx].isHidden = true;
-        }
-      });
-    }
-    this.setState({lineProcedures});
+    lineProcedures.sort((a,b)=>{
+      if(a[sortField] > b[sortField]) return 1;
+      if(a[sortField] < b[sortField]) return -1;
+      return 0;
+    })
+    this.setState({
+      linesSortBy:e.target.value,
+      lineProcedures
+    }, ()=>{
+      console.log(this.state.linesSortBy)
+    });
   }
 
   render(){
@@ -675,7 +685,7 @@ export default class Home extends Component{
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'lines' ? true : false}>
                 {this.state.hospitalsById && this.state.itemsById &&
                   <LineProcedures 
-                    linesChangeDaysOut={this.linesChangeDaysOut}
+                    linesSortByOnChange={this.linesSortByOnChange}
                     lineProcedures={this.state.lineProcedures}
                     hospitalsById={this.state.hospitalsById}
                     usersById={this.state.usersById}

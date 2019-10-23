@@ -13,15 +13,12 @@ export default class LineProcedures extends Component{
       <div className='vas-line-procedures'>
         <div className='vas-line-procedures-table'>
           <header className='vas-line-procedures-table-header'>
-            <label>Days Out: </label>
-            <select className='vas-select' onChange={this.props.linesChangeDaysOut}>
-              <option value=''>&gt; 7 Days</option>
-              <option value='5'>6 Days</option>
-              <option value='4'>5 Days</option>
-              <option value='3'>4 Days</option>
-              <option value='2'>3 Days</option>
-              <option value='1'>2 Days</option>
-              <option value='0'>1 Day</option>
+            <label>Sort By: </label>
+            <select className='vas-select' onChange={this.props.linesSortByOnChange}>
+              <option value='dressingChangeDate'>Dressing Change Date</option>
+              <option value='createdAt'>Insertion Date</option>
+              <option value='mrn'>MRN</option>
+              <option value='room'>Room</option>
             </select>
             <button className='vas-line-procedures-table-header-reverse' onClick={e=>{this.props.reverseSort('lines')}}>Reverse Sort</button>
           </header>

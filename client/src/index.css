@@ -214,6 +214,10 @@ select {
     background:none;
   }
 }
+.vas-danger {
+  color:red;
+  font-weight:bold;
+}
 .vas-radio-select,
 .vas-checkbox-select {
   display:none;

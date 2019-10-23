@@ -693,6 +693,9 @@ export default class EditProcedure extends Component {
                       <button className='vas-home-save-date' onClick={e=>{this.saveDressingChangeDate(e)}}>Save</button>
                     </div>
                   }
+                  {procedure.procedureId === 8 && this.state.currentRecord.insertedBy &&
+                    <p className='vas-edit-procedure-insertedBy'>Placement Inserted By:<b>{this.state.currentRecord.insertedBy}</b></p>
+                  }
                   </div>
               </div>
             )

@@ -25,11 +25,14 @@ export default class Modal extends Component {
       inputsValidated:false,
       addedCall:null,
       status:1,
-      hospital:''
+      hospital:'',
+      isExternalPlacement:false,
+      insertedBy:''
     }
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
     this.hospitalSelect = this.hospitalSelect.bind(this);
     this.toggleStat = this.toggleStat.bind(this);
+    this.toggleExternalPlacement = this.toggleExternalPlacement.bind(this);
   };
 
   componentWillMount(){
@@ -50,6 +53,10 @@ export default class Modal extends Component {
     } else {
       this.setState({status:1});
     }
+  }
+
+  toggleExternalPlacement(){
+    this.setState({isExternalPlacement:!this.state.isExternalPlacement}, this.validateAddCall);
   }
 
   getOptionsData(){
@@ -98,8 +105,7 @@ export default class Modal extends Component {
   }
 
   validateAddCall(){
-    if(this.state.roomNumber && this.state.roomNumber.length && 
-      this.state.need){
+    if(this.state.roomNumber && this.state.roomNumber.length && this.state.need){
       if(this.state.customSelected){
         if(this.state.custom.length){
           this.setState({inputsValidated:true});
@@ -111,6 +117,11 @@ export default class Modal extends Component {
       }
     } else {
       this.setState({inputsValidated:false});
+    }
+    if(this.state.isExternalPlacement){
+      if(!this.state.insertedBy.trim().length){
+        this.setState({inputsValidated:false});
+      }
     }
   }
 
@@ -125,7 +136,9 @@ export default class Modal extends Component {
       preComments:this.state.preComments.trim().length ? this.state.preComments : null,
       hospital:this.state.hospital.length ? Number(this.state.hospital) : null,
       status:this.state.status,
-      isOpen:false
+      isOpen:false,
+      insertedBy:this.state.insertedBy.length ? this.state.insertedBy : null,
+      openBy:this.state.insertedBy.length ? this.props.currentUser.userId : null
     };
 
     axios.post('/add-call', addQuery)
@@ -135,15 +148,13 @@ export default class Modal extends Component {
         saveConfirmed:true,
         customSelected:false,
         addedCall:resp.data
-      }, this.closeModal);
+      }, ()=>{
+        this.props.closeModal(this.state.addedCall);
+      });
     })
     .catch((err)=>{
       console.log(err);
     })
-  }
-
-  closeModal(){
-    this.props.closeModal(this.state.addedCall);
   }
 
   getConfirmation(isConfirmed){
@@ -173,7 +184,22 @@ export default class Modal extends Component {
                 <div className='vas-modal-add-call-row-block'>
                   <input type='checkbox' checked={this.state.status === 2 ? true : false} className="vas-checkbox-select vas-modal-is-important-input" id='is-important' name='is-important'/>
                   <label className="vas-btn" htmlFor='is-important' onClick={this.toggleStat}>Needed Stat</label>
+                  <input type='checkbox' checked={this.state.isExternalPlacement} className="vas-checkbox-select" id='external-placement' name='external-placement'/>
+                  <label className="vas-btn" htmlFor='external-placement' onClick={this.toggleExternalPlacement}>External Placement</label>
                 </div>
+                {this.state.isExternalPlacement &&
+                  <div className="vas-modal-add-call-row">
+                    <div className="vas-modal-add-call-row-inner">
+                      <p>Placement Inserted By:</p>
+                      <DebounceInput
+                        className="vas-modal-add-call-input"
+                        minLength={1}
+                        debounceTimeout={300}
+                        value={this.state.insertedBy}
+                        onChange={e => {this.setState({insertedBy: e.target.value}, this.validateAddCall)}} />
+                    </div>
+                  </div>
+                }
                 <div className="vas-modal-add-call-row">
                   <div className="vas-modal-add-call-row-inner">
                     <p>Room:</p>
