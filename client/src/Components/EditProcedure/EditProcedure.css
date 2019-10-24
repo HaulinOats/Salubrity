@@ -30,6 +30,7 @@
   border: none;
   color: white;
   display: block;
+  transition:background-color 1s;
 }
 .vas-edit-procedure-live-edit-input-room {
   display:inline;
@@ -192,11 +193,10 @@
 .vas-edit-procedure-inner-container-main {
   background:moccasin;
 }
-.vas-edit-procedure-insertedBy {
+.vas-edit-procedure-insertedBy-label {
   font-weight:bold;
+  margin-bottom:5px;
 }
-.vas-edit-procedure-insertedBy b{
-  display: block;
-  font-weight: 100;
-  margin-top: 6px;
+.vas-edit-procedure-insertedBy-input {
+  min-width:240px;
 }

@@ -261,7 +261,7 @@ select {
 }
 .vas-input-success,
 .vas-success{
-  background:green;
+  background:lightgreen;
 }
 .vas-input-fail,
 .vas-fail {
@@ -290,6 +290,7 @@ select {
   height:40px;
   padding-left:5px;
   box-shadow: inset 1px 1px 1px black;
+  transition:background-color 1s;
 }
 /* loading container */
 .vas-loading-container {
@@ -405,11 +406,6 @@ select {
 .vas-positive {
   font-weight: bold;
   color:green;
-}
-.vas-call-consultation {
-  font-size: 85%;
-  font-weight: bold;
-  color: green;
 }
 .vas-edit-icon {
   margin-left: 5px;

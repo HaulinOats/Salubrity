@@ -247,6 +247,9 @@ export default class EditProcedure extends Component {
   }
 
   inputLiveUpdate(e, field){
+    let inputEl = e.target;
+    inputEl.classList.add('vas-input-success');
+
     let targetValue = e.target.value;
     let currentRecord = this.state.currentRecord;
 
@@ -259,7 +262,13 @@ export default class EditProcedure extends Component {
     if(targetValue.length < 1){
       currentRecord[field] = null;
     }
-    this.setState({currentRecord}, this.saveCurrentRecord);
+    this.setState({currentRecord}, ()=>{
+      setTimeout(()=>{
+        inputEl.classList.remove('vas-input-success');
+      }, 1000);
+      // inputEl.classList.remove('vas-input-success');
+      this.saveCurrentRecord();
+    });
   }
 
   orderSelect(e){
@@ -694,7 +703,15 @@ export default class EditProcedure extends Component {
                     </div>
                   }
                   {procedure.procedureId === 8 && this.state.currentRecord.insertedBy &&
-                    <p className='vas-edit-procedure-insertedBy'>Placement Inserted By:<b>{this.state.currentRecord.insertedBy}</b></p>
+                    <span>
+                      <p className='vas-edit-procedure-insertedBy-label'>Placement Inserted By:</p>
+                      <DebounceInput
+                        type="text"
+                        className="vas-input vas-custom-input vas-edit-procedure-insertedBy-input"
+                        debounceTimeout={500}
+                        value={this.state.currentRecord.insertedBy}
+                        onChange={e=>{this.inputLiveUpdate(e, 'insertedBy')}} />
+                    </span>
                   }
                   </div>
               </div>

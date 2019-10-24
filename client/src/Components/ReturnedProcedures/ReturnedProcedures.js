@@ -163,6 +163,11 @@ export default class ReturnedProcedures extends Component {
                       <p className='vas-call-consultation'>Consultation Done</p>
                     </div>
                   }
+                  {call.insertedBy &&
+                    <div className='vas-call-insertedBy-container'>
+                      <p className='vas-call-insertedBy'>External Insertion By: <b>{call.insertedBy}</b></p>
+                    </div>
+                  }
                   {(call.addComments || call.preComments) &&
                     <div className='vas-call-comments-container'>
                       {call.preComments &&

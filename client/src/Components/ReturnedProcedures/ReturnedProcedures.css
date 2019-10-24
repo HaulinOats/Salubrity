@@ -122,10 +122,20 @@
   font-size: 85%;
   clear:left;
 }
-.vas-call-consultation-container{
+.vas-call-consultation-container,
+.vas-call-insertedBy-container{
   padding: 1%;
   width: 87%;
   margin-left: 11%;
+}
+.vas-call-insertedBy,
+.vas-call-consultation {
+  font-size: 85%;
+  font-weight: bold;
+  color: green;
+}
+.vas-call-insertedBy b{
+  color:darkgreen;
 }
 .vas-admin-query-procedure-container {
   width: 49%;
