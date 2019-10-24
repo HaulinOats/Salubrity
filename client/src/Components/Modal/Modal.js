@@ -138,7 +138,8 @@ export default class Modal extends Component {
       status:this.state.status,
       isOpen:false,
       insertedBy:this.state.insertedBy.length ? this.state.insertedBy : null,
-      openBy:this.state.insertedBy.length ? this.props.currentUser.userId : null
+      openBy:this.state.insertedBy.length ? this.props.currentUser.userId : null,
+      startTime:this.state.insertedBy.length ? new Date().toISOString() : null
     };
 
     axios.post('/add-call', addQuery)

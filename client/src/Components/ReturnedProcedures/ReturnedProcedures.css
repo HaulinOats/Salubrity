@@ -134,8 +134,8 @@
   font-weight: bold;
   color: green;
 }
-.vas-call-insertedBy b{
-  color:darkgreen;
+.vas-call-insertedBy{
+  color:teal;
 }
 .vas-admin-query-procedure-container {
   width: 49%;
@@ -151,9 +151,13 @@
   border-bottom:dotted 1px black;
   margin-bottom: 1px;
   padding-bottom: 1px;
+  margin-top:1px;
 }
 .vas-admin-query-item:last-child {
   border:none;
+}
+.vas-admin-query-item-insertedBy {
+
 }
 .vas-returned-procedures-query-item-left {
   /* font-weight:bold; */
@@ -162,12 +166,20 @@
   margin:0 auto;
   margin-right:0;
 }
+.vas-admin-query-procedure-header {
+  background:lightgrey;
+  padding:2px;
+  display:flex;
+  align-items: center;
+}
 .vas-admin-query-procedure-names {
   font-size: 80%;
   font-weight: bold;
-  margin-bottom: 3px;
-  padding: 2px;
-  background:lightgrey;
+}
+.vas-returned-procedures-external {
+  width: 10px;
+  margin: 0 auto;
+  margin-right: 0;
 }
 .vas-returned-procedures-no-calls-container {
   height: 35px;

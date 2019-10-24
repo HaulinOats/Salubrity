@@ -3,6 +3,7 @@ import './ReturnedProcedures.css';
 import Moment from 'react-moment';
 import helpers from '../../helpers';
 import printIcon from '../../../public/print.svg';
+import externalIcon from '../../../public/external.svg';
 
 export default class ReturnedProcedures extends Component {
   constructor(props){
@@ -138,7 +139,12 @@ export default class ReturnedProcedures extends Component {
                         {call.proceduresDone.map((procedure, idx)=>{
                           return (
                             <div className='vas-admin-query-procedure-container' key={procedure.procedureId}>
-                              <p className='vas-admin-query-procedure-names'>{this.props.proceduresById[procedure.procedureId].name}</p>
+                              <div className='vas-admin-query-procedure-header'>
+                                <p className='vas-admin-query-procedure-names'>{this.props.proceduresById[procedure.procedureId].name}</p>
+                                {call.insertedBy &&
+                                  <img className='vas-returned-procedures-external' src={externalIcon} alt='external'/>
+                                }
+                              </div>
                               <div className='vas-admin-query-item-container'>
                               {procedure.itemIds && procedure.itemIds.length > 0 &&
                                 procedure.itemIds.map((id, idx)=>{
@@ -151,6 +157,12 @@ export default class ReturnedProcedures extends Component {
                                   )
                                 })
                               }
+                              {call.insertedBy &&
+                                <div className='vas-admin-query-item vas-admin-query-item-insertedBy'>
+                                  <p className='vas-returned-procedures-query-item-left'>Inserted By:</p>
+                                  <p className='vas-returned-procedures-query-item-right'>{call.insertedBy}</p>
+                                </div>
+                              }
                               </div>
                             </div>
                           )
@@ -161,11 +173,6 @@ export default class ReturnedProcedures extends Component {
                   {call.wasConsultation &&
                     <div className='vas-call-consultation-container'>
                       <p className='vas-call-consultation'>Consultation Done</p>
-                    </div>
-                  }
-                  {call.insertedBy &&
-                    <div className='vas-call-insertedBy-container'>
-                      <p className='vas-call-insertedBy'>External Insertion By: <b>{call.insertedBy}</b></p>
                     </div>
                   }
                   {(call.addComments || call.preComments) &&
