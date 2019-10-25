@@ -6,7 +6,6 @@ import Filters from '../Components/Filters/Filters';
 import helpers from '../helpers';
 import './Admin.css';
 import axios from 'axios';
-import loadingGif from '../../public/loading.gif';
 import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedures';
 import ls from 'local-storage';
 import moment from 'moment';
@@ -22,7 +21,6 @@ export default class Admin extends Component {
       aggregateData:[],
       aggregateInsertionTypes:[],
       currentUser:null,
-      isLoading:false,
       activePage:'query',
       activeRecord:null,
       addFullName:'',
@@ -272,7 +270,6 @@ export default class Admin extends Component {
   }
 
   seedProcedures(){
-    this.setState({isLoading:true});
     axios.get('/seed-procedures').then((resp)=>{
       if(resp.data.error || resp.data._message){
         alert(resp.data.error ? resp.data.error : resp.data._message);
@@ -281,13 +278,10 @@ export default class Admin extends Component {
       }
     }).catch((err)=>{
       console.log(err);
-    }).finally(()=>{
-      this.setState({isLoading:false});
     })
   }
   
   seedOptions(){
-    this.setState({isLoading:true});
     axios.get('/seed-options')
     .then(resp=>{
       console.log(resp.data);
@@ -300,13 +294,9 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
   }
 
   seedItems(){
-    this.setState({isLoading:true});
     axios.get('/seed-items')
     .then(resp=>{
       console.log(resp.data);
@@ -319,9 +309,6 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
   }
 
   closeMenu(){
@@ -330,7 +317,6 @@ export default class Admin extends Component {
 
   addUser(){
     if(this.userIsValidated()){
-      this.setState({isLoading:true});
       axios.post('/add-user', {
         fullname:this.state.addFullName,
         username:this.state.addUserName.toLowerCase(),
@@ -355,9 +341,6 @@ export default class Admin extends Component {
       })
       .catch((err)=>{
         console.log(err);
-      })
-      .finally(()=>{
-        this.setState({isLoading:false});
       })
     }
   }
@@ -393,7 +376,6 @@ export default class Admin extends Component {
   }
 
   deleteUser(id){
-    this.setState({isLoading:true});
     axios.post('/delete-user', {_id:id})
     .then((resp)=>{
       console.log('user deleted');
@@ -405,9 +387,6 @@ export default class Admin extends Component {
     })
     .catch((err)=>{
       console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
     })
   }
 
@@ -435,16 +414,12 @@ export default class Admin extends Component {
   }
 
   seedSuper(){
-    this.setState({isLoading:true});
     axios.get('/seed-super')
     .then(resp=>{
       console.log(resp.data);
     })
     .catch(err=>{
       console.log(err)
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
     })
   }
 
@@ -471,7 +446,6 @@ export default class Admin extends Component {
   }
 
   addHospital(){
-    this.setState({isLoading:true});
     axios.post('/add-hospital', {
       hospitalName:this.state.addHospitalName
     })
@@ -487,13 +461,9 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
   }
 
   addOrderChange(){
-    this.setState({isLoading:true});
     axios.post('/add-order-change', {
       orderChangeName:this.state.addOrderChangeName
     })
@@ -509,13 +479,9 @@ export default class Admin extends Component {
     .catch(err=>{
       console.log(err);
     })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
   }
 
   addNeed(){
-    this.setState({isLoading:true});
     axios.post('/add-need-option', {
       addNeedName:this.state.addNeedName
     })
@@ -530,9 +496,6 @@ export default class Admin extends Component {
     })
     .catch(err=>{
       console.log(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
     })
   }
 
@@ -916,12 +879,6 @@ export default class Admin extends Component {
                 </div>
               }
             </div>
-          </div>
-        }
-        {this.state.isLoading && 
-          <div className='vas-loading-container'>
-            <img className='vas-loading-img' src={loadingGif} alt='loading'/>
-            <p className='vas-loading-text'>Loading...</p>
           </div>
         }
         {this.state.modalIsOpen && 

@@ -13,18 +13,7 @@ export default class Filters extends Component {
       startDate:moment(),
       endDate:moment(),
       activeFilters:[],
-      filterFields:[
-        {fieldName:'completedBy', text:'Nurse'},
-        {fieldName:'hospital', text:'Hospital'},
-        {fieldName:'mrn', text:'MRN'},
-        {fieldName:'provider', text:'Provider'},
-        {fieldName:'room', text:'Room'},
-        {fieldName:'procedureId', text:'Procedure'},
-        {fieldName:'insertionType', text:'Insertion Type'},
-        {fieldName:'orderChange', text:'Order Change'},
-        {fieldName:'responseTime', text:'Response Time'},
-        {fieldName:'procedureTime', text:'Procedure Time'}
-      ]    
+      filterFields:[]    
     }
     this.childFilterOnChange = this.childFilterOnChange.bind(this);
     this.startDateChange = this.startDateChange.bind(this);
@@ -98,7 +87,8 @@ export default class Filters extends Component {
         {fieldName:'insertionType', text:'Insertion Type', options:insertionTypeOptions},
         {fieldName:'orderChange', text:'Order Change', options:orderChangeOptions},
         {fieldName:'responseTime', text:'Response Time'},
-        {fieldName:'procedureTime', text:'Procedure Time'}
+        {fieldName:'procedureTime', text:'Procedure Time'},
+        {fieldName:'insertedBy', text:'External Insertion'}
       ].sort((a,b)=>{
         if(a.text > b.text) return 1;
         if(a.text < b.text) return -1;
@@ -172,6 +162,9 @@ export default class Filters extends Component {
             queryObject[filter.fieldName] = filter.value;
         }
       }
+      if(filter.fieldName === 'insertedBy'){
+        queryObject['insertedBy'] = {$ne:null}
+      }
     })
 
     console.log(queryObject);
@@ -235,11 +228,15 @@ export default class Filters extends Component {
                       </select>
                     }
                     {!filter.options && filter.fieldName &&
-                      <DebounceInput
-                        className="vas-input vas-filters-child-filter"
-                        minLength={1}
-                        debounceTimeout={300}
-                        onChange={e=>{this.childFilterOnChange(e, idx, true)}} />
+                      <span>
+                        {filter.fieldName !== 'insertedBy' &&
+                          <DebounceInput
+                            className="vas-input vas-filters-child-filter"
+                            minLength={1}
+                            debounceTimeout={300}
+                            onChange={e=>{this.childFilterOnChange(e, idx, true)}} />
+                        }
+                      </span>
                     }
                   </div>
                 </div>

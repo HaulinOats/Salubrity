@@ -10,7 +10,6 @@ import axios from 'axios';
 import Moment from 'react-moment';
 import ls from 'local-storage';
 import './Home.css';
-import loadingGif from '../../public/loading.gif';
 
 export default class Home extends Component{
   constructor(props){
@@ -19,7 +18,6 @@ export default class Home extends Component{
       currentUser:null,
       errorArr:[],
       activeHomeTab:'queue',
-      isLoading:false,
       modalIsOpen:false,
       modalTitle:'',
       modalMessage:'',
@@ -510,7 +508,6 @@ export default class Home extends Component{
           modalMessage:'This record is currently opened by someone else'
         });
       } else {
-        this.setState({isLoading:true});
         axios.post('/set-call-as-open', {
           _id:job._id,
           userId:this.state.currentUser.userId
@@ -529,9 +526,6 @@ export default class Home extends Component{
         .catch((err)=>{
           console.log(err);
           this.addToErrorArray(err);
-        })
-        .finally(()=>{
-          this.setState({isLoading:false});
         })
       }
     } else {
@@ -718,12 +712,6 @@ export default class Home extends Component{
                 modalMessage={this.state.modalMessage}
                 toggleModal={this.toggleHandler}/>
             }
-          </div>
-        }
-        {this.state.isLoading && 
-          <div className='vas-loading-container'>
-            <img className='vas-loading-img' src={loadingGif} alt='loading'/>
-            <p className='vas-loading-text'>Loading...</p>
           </div>
         }
       </div>
