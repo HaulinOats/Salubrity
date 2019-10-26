@@ -5,9 +5,9 @@ import EditProcedure from '../Components/EditProcedure/EditProcedure';
 import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedures';
 import LineProcedures from '../Components/LineProcedures/LineProcedures';
 import UpdateTimer from '../Components/UpdateTimer/UpdateTimer';
+import Queue from '../Components/Queue/Queue';
 import helpers from '../helpers';
 import axios from 'axios';
-import Moment from 'react-moment';
 import ls from 'local-storage';
 import './Home.css';
 
@@ -67,6 +67,7 @@ export default class Home extends Component{
     this.toggleUserAvailability = this.toggleUserAvailability.bind(this);
     this.showOnlineUsers = this.showOnlineUsers.bind(this);
     this.hideOnlineUsers = this.hideOnlineUsers.bind(this);
+    this.selectJob = this.selectJob.bind(this);
   }
 
   resetState(){
@@ -499,7 +500,6 @@ export default class Home extends Component{
   }
 
   selectJob(job){
-    console.log(job);
     if(!this.state.activeRecord){
       if(job.openBy){
         this.setState({
@@ -638,33 +638,11 @@ export default class Home extends Component{
             </ul>
             <div className="vas-home-tabContent">
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'queue' ? true : false}>
-                <div className="vas-home-table vas-table">
-                  <div className='vas-table-thead-row'></div>
-                  <div className='vas-home-table-body'>
-                    {this.state.queueItems.length > 0 && this.state.hospitalsById && this.state.queueItems.map((item, idx)=>{
-                      return(
-                        <div key={item._id} className={'vas-home-table-tr vas-status-' + item.status + (item.openBy ? ' vas-home-table-row-is-open' : '')} onClick={(e)=>{this.selectJob(item)}}>
-                          <div className='vas-home-table-time vas-width-10'>
-                            <Moment format='HH:mm'>{helpers.getDateFromObjectId(item._id)}</Moment>
-                            <Moment className='vas-home-table-time-date' format='M/D'>{helpers.getDateFromObjectId(item._id)}</Moment>
-                          </div>
-                          <div className='vas-width-90'>
-                            <p className='vas-home-table-job-name'>{item.job}{item.customJob ? ' - ' + item.customJob : ''}<b className={'vas-home-table-open-status ' + (item.openBy ? 'vas-home-open-label-blink' : '' )}>{item.openBy ? 'OPEN' : ''}</b></p>
-                            <div className='vas-home-table-tr-inner'>
-                              <p><b>Room:</b><i className='vas-uppercase'>{item.room}</i></p>
-                              <p><b>Hospital:</b><i className='vas-capitalize'>{this.state.hospitalsById[item.hospital] ? this.state.hospitalsById[item.hospital].name : 'N/A'}</i></p>
-                              <p><b>Contact:</b><i>{item.contact ? item.contact : 'N/A'}</i></p>
-                              <p><b>Nurse:</b><i className='vas-capitalize'>{this.state.usersById[item.openBy] ? this.state.usersById[item.openBy].fullname : (item.openBy ? item.openBy : 'N/A')}</i></p>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                    {this.state.queueItems.length < 1 &&
-                      <div><p className='vas-queue-no-items'>There are no items currently in the queue</p></div>
-                    }
-                  </div>
-                </div>
+                <Queue 
+                  queueItems={this.state.queueItems}
+                  hospitalsById={this.state.hospitalsById} 
+                  usersById={this.state.usersById}
+                  selectJob={this.selectJob}/>
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'complete' ? true : false}>
                 <ReturnedProcedures 
