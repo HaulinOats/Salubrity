@@ -90,7 +90,7 @@
   margin: 15px 0;
 }
 .vas-admin-add-user-notes{
-  float:left;
+  
   margin-top:10px;
   color:darkgrey;
   font-style: italic;
@@ -323,6 +323,9 @@
   color: white !important;
   border: none !important;
   text-shadow: none !important;
+}
+.vas-admin-allow-admin-access-dropdown {
+  display:block;
 }
 @media (max-width: 650px) {
   .vas-admin-menu {

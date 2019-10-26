@@ -71,7 +71,6 @@ export default class Admin extends Component {
     this.aggregateData = this.aggregateData.bind(this);
     this.aggregateStartDateOnChange = this.aggregateStartDateOnChange.bind(this);
     this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
-    this.addField = this.addField.bind(this);
     this.callRoute = this.callRoute.bind(this);
     this.togglePasswordVisibility = this.togglePasswordVisibility.bind(this);
   }
@@ -85,19 +84,6 @@ export default class Admin extends Component {
         this.stateLoadCalls();
       });
     }
-  }
-
-  addField(){
-    axios.get('/backup-call-data-to-json').then(resp=>{
-    // axios.get('/add-field-to-model-documents').then(resp=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        console.log('field added to model')
-      }
-    }).catch(err=>{
-      console.log(err);
-    })
   }
 
   aggregateStartDateOnChange(date){
@@ -871,7 +857,6 @@ export default class Admin extends Component {
                   <button onClick={this.seedProcedures}>Seed Procedures</button>
                   <button onClick={this.seedOptions}>Seed Options</button>
                   <button onClick={this.seedItems}>Seed Items</button>
-                  <button onClick={this.addField}>Add Field</button>
                   <div className='vas-admin-custom-route'>
                     <input className='vas-input' value={this.state.customRoute} onChange={e=>{this.setState({customRoute:e.target.value})}} type="text" />
                     <button onClick={this.callRoute}>Call Route</button>

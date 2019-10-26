@@ -383,7 +383,32 @@ app.get('/get-completed-calls', (req, res)=>{
 });
 
 app.post('/get-calls-by-query', (req, res)=>{
-  Call.find(req.body, (err, calls)=>{
+  let queryObj = {
+    completedAt: {
+      $gte: req.body.startDate,
+      $lt: req.body.endDate
+    }
+  };
+
+  req.body.filtersArr.forEach(filter=>{
+    fieldName = filter[0];
+    filterValue = filter[1];
+    switch(fieldName){
+      case 'insertionType':
+        queryObj['proceduresDone.itemIds'] = {$in:[Number(filterValue)]}
+        break;
+      case 'procedureId':
+        queryObj['proceduresDone.procedureId'] = Number(filter.value)
+        break;
+      case 'insertedBy':
+        queryObj['insertedBy'] = {$ne:null}
+        break;
+      default:
+        queryObj[filter.fieldName] = filter.value;
+    }
+  })
+
+  Call.find(queryObj, (err, calls)=>{
     if(err) res.send(err);
     if(calls.length){
       res.send(calls);

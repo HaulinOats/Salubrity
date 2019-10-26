@@ -143,32 +143,15 @@ export default class Filters extends Component {
 
   submitQuery(){
     let queryObject = {
-      completedAt: {
-        $gte: moment(this.state.startDate).startOf('day').toISOString(),
-        $lt: moment(this.state.endDate).endOf('day').toISOString()
-      }
-    };
+      startDate:moment(this.state.startDate).startOf('day').toISOString(),
+      endDate:moment(this.state.endDate).endOf('day').toISOString(),
+      filtersArr:[]
+    }
 
     this.state.activeFilters.forEach(filter=>{
-      if(filter.value && filter.value.length){
-        switch(filter.fieldName){
-          case "insertionType":
-            queryObject['proceduresDone.itemIds'] = {$in:[Number(filter.value)]}
-            break;
-          case "procedureId":
-            queryObject['proceduresDone.procedureId'] = Number(filter.value)
-            break;
-          default:
-            queryObject[filter.fieldName] = filter.value;
-        }
-      }
-      if(filter.fieldName === 'insertedBy'){
-        queryObject['insertedBy'] = {$ne:null}
-      }
+      queryObject.filtersArr.push([filter.fieldName, filter.value]);
     })
 
-    console.log(queryObject);
-    this.setState({isLoading:true});
     axios.post('/get-calls-by-query', queryObject).then(resp=>{
       if(!resp.data.length){
         alert('no calls returned for that specific query')
@@ -177,8 +160,6 @@ export default class Filters extends Component {
       }
     }).catch(err=>{
       console.log(err);
-    }).finally(()=>{
-      this.setState({isLoading:false});
     })
   }
 
@@ -251,7 +232,6 @@ export default class Filters extends Component {
               return <option key={filterField.fieldName} value={filterField.fieldName}>{filterField.text}</option>
             })}
           </select>
-          {/* <div className='vas-filters-add-filter' onClick={this.addFilter}>+</div> */}
         </div>
         <button className='vas-filters-submit-query' onClick={this.submitQuery}>Submit</button>
       </div>
