@@ -200,3 +200,19 @@
 .vas-edit-procedure-insertedBy-input {
   min-width:240px;
 }
+.vas-edit-procedure-current-user {
+  font-size: 105%;
+  font-weight: bold;
+  text-transform: capitalize;
+  margin-bottom: 10px;
+}
+.vas-edit-procedure-current-user b {
+  font-weight: 100;
+}
+.vas-edit-procedure-current-user-disclaimer{
+  font-style: italic;
+  color: dimgrey;
+  font-size: 90%;
+  line-height: 115%;
+  margin-bottom: 10px;
+}

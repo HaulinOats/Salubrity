@@ -790,6 +790,8 @@ export default class EditProcedure extends Component {
           </header>
           <div className='vas-edit-procedure-final-container'>
             <div>
+              <p className='vas-edit-procedure-current-user'>Current User: <b>{this.props.currentUser.fullname}</b></p>
+              <p className='vas-edit-procedure-current-user-disclaimer'>If this is not you, please ensure you have logged the current user out and logged back in with your own credentials</p>
               <button className='vas-button vas-edit-procedure-complete-procedure-btn' onClick={this.completeProcedure}>{this.state.isPostEdit ? 'Save Record' : 'Submit Procedure'}</button>
             </div>
           </div>
