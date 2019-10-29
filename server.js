@@ -398,13 +398,13 @@ app.post('/get-calls-by-query', (req, res)=>{
         queryObj['proceduresDone.itemIds'] = {$in:[Number(filterValue)]}
         break;
       case 'procedureId':
-        queryObj['proceduresDone.procedureId'] = Number(filter.value)
+        queryObj['proceduresDone.procedureId'] = Number(filterValue)
         break;
       case 'insertedBy':
         queryObj['insertedBy'] = {$ne:null}
         break;
       default:
-        queryObj[filter.fieldName] = filter.value;
+        queryObj[fieldName] = filterValue;
     }
   })
 
@@ -419,8 +419,6 @@ app.post('/get-calls-by-query', (req, res)=>{
 })
 
 app.post('/get-calls-by-date-range', (req, res) =>{
-  console.log(new Date(req.body.startDate));
-  console.log(new Date(req.body.endDate));
   Call.find({completedAt: {
     $gte: new Date(req.body.startDate),
     $lt: new Date(req.body.endDate)
@@ -642,14 +640,6 @@ app.get('/get-online-users', (req,res)=>{
     res.send(onlineUsers);
   })
 })
-
-// app.get('/add-availability-to-users', (req,res)=>{
-//   User.updateMany({}, {
-//     $set:{
-//       isAvailable:false
-//     }
-//   },{multi:true});
-// })
 
 //SUPER
 app.post('/send-errors-to-admin', (req,res)=>{
