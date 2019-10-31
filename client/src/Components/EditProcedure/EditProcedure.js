@@ -167,7 +167,7 @@ export default class EditProcedure extends Component {
     //UPDATE
     if(this.state.currentRecord.insertionLength > 0){
       //push insertion length itemId (70) into procedure's object IDs
-      procedureObj[8].push(70);
+      procedureObj['8'].push(70);
     }
 
     let procedureArr = [];

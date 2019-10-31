@@ -641,6 +641,14 @@ app.get('/get-online-users', (req,res)=>{
   })
 })
 
+app.get('/close-all-open-lines', (req,res)=>{
+  Call.update({dressingChangeDate:{$ne:null}}, 
+    {$set:{dressingChangeDate:null}}, {multi:true},(err, calls)=>{
+    if(err) return res.send(err);
+    res.send(true);
+  })
+})
+
 //SUPER
 app.post('/send-errors-to-admin', (req,res)=>{
   fs.writeFile('vas-errors.json', JSON.stringify(req.body), (err)=>{
