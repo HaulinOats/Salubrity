@@ -284,7 +284,7 @@
   margin-top:15px;
 }
 .vas-admin-aggregation-section {
-
+  margin-bottom:15px;
 }
 .vas-admin-aggregation-section h2 {
   font-weight: bold;
@@ -292,11 +292,12 @@
   text-decoration:underline;
   font-size:115%;
 }
-.vas-admin-aggregation-inner-container {
-  width: 130px;
+.vas-admin-aggregation-inner-container-insertion,
+.vas-admin-aggregation-inner-container-hospitals {
   display: flex;
   font-size:110%;
   border-bottom: dashed 1px grey;
+  width:230px;
 }
 .vas-admin-aggregation-inner-container-left{
   font-weight: bold;

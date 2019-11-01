@@ -19,6 +19,8 @@ export default class Admin extends Component {
       aggregateStartDate:moment(),
       aggregateEndDate:moment(),
       aggregateData:[],
+      aggregateType:'insertionTypes',
+      aggregateHospitals:[],
       aggregateInsertionTypes:[],
       currentUser:null,
       activePage:'query',
@@ -73,6 +75,7 @@ export default class Admin extends Component {
     this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
     this.callRoute = this.callRoute.bind(this);
     this.togglePasswordVisibility = this.togglePasswordVisibility.bind(this);
+    this.aggregateTypeOnChange = this.aggregateTypeOnChange.bind(this);
   }
 
   componentWillMount(){
@@ -94,38 +97,61 @@ export default class Admin extends Component {
     this.setState({aggregateEndDate:date})
   }
 
+  aggregateTypeOnChange(e){
+    console.log(e.target.value);
+    this.setState({aggregateType:e.target.value})
+  }
+
   aggregateData(){
-    axios.post('/get-aggregation', {
+    let dateQuery = {
       completedAt:{
         startDate: moment(this.state.aggregateStartDate).startOf('day').toISOString(),
         endDate: moment(this.state.aggregateEndDate).endOf('day').toISOString()
       }
-    }).then(resp=>{
-      let insertionTypes = [];
-      for(let i = 0; i < resp.data.length; i++){
-        switch(resp.data[i]._id){
-          case 58:
-          case 59:
-          case 60:
-          case 61:
-          case 62:
-            insertionTypes.push({
-              itemId:resp.data[i]._id,
-              count:resp.data[i].count
-            })
-            break;
-          default:
-        }
-      }
-      console.log(resp.data);
-      console.log(insertionTypes);
-      this.setState({
-        aggregateData:resp.data,
-        aggregateInsertionTypes:insertionTypes
-      })
-    }).catch(err=>{
-      console.log('error: ', err);
-    })
+    };
+    switch(this.state.aggregateType){
+      case 'insertionTypes':
+        axios.post('/get-insertion-types-aggregation', dateQuery).then(resp=>{
+          let insertionTypes = [];
+          for(let i = 0; i < resp.data.length; i++){
+            switch(resp.data[i]._id){
+              case 58:
+              case 59:
+              case 60:
+              case 61:
+              case 62:
+                insertionTypes.push({
+                  itemId:resp.data[i]._id,
+                  count:resp.data[i].count
+                })
+                break;
+              default:
+            }
+          }
+          this.setState({
+            aggregateData:resp.data,
+            aggregateInsertionTypes:insertionTypes
+          })
+        }).catch(err=>{
+          console.log('error: ', err);
+        })
+        break;
+      case 'hospitals':
+        axios.post('/get-hospitals-aggregation', dateQuery).then(resp=>{
+          let hospitalsArr = resp.data;
+          hospitalsArr.forEach((hospital, idx)=>{
+            if(!hospitalsArr[idx]._id){
+              delete hospitalsArr[idx];
+            }
+          });
+          this.setState({aggregateHospitals:hospitalsArr})
+          console.log(resp.data)
+        }).catch(err=>{
+          console.log('error: ', err);
+        })
+        break;
+      default:
+    }
   }
 
   closeRecordCallback(type){
@@ -648,26 +674,43 @@ export default class Admin extends Component {
                     <DatePicker className='vas-filters-datepicker' selected={this.state.aggregateEndDate} onChange={this.aggregateEndDateOnChange} />
                   </div>
                 </div>
+                <select className='vas-select' onChange={this.aggregateTypeOnChange}>
+                  <option value='insertionTypes'>Insertion Types</option>
+                  <option value='hospitals'>Hospitals</option>
+                </select>
                 <button onClick={this.aggregateData}>Aggregate</button>
-                {this.state.aggregateData.length > 0 &&
-                  <div className='vas-admin-aggregation-container'>
-                    {this.state.aggregateInsertionTypes.length > 0 &&
-                      <div className='vas-admin-aggregation-section'>
-                        <h2>Aggregate Of Insertion Types</h2>
-                        <div>
-                          {this.state.aggregateInsertionTypes.map(insertion=>{
-                            return (
-                              <div key={insertion.itemId} className='vas-admin-aggregation-inner-container'>
-                                <p className='vas-admin-aggregation-inner-container-left'>{this.state.itemsById[insertion.itemId].value}:</p>
-                                <p className='vas-admin-aggregation-inner-container-right'>{insertion.count}</p>
-                              </div>
-                            )
-                          })}
-                        </div>
+                <div className='vas-admin-aggregation-container'>
+                  {this.state.aggregateInsertionTypes.length > 0 &&
+                    <div className='vas-admin-aggregation-section'>
+                      <h2>Aggregate Of Insertion Types</h2>
+                      <div>
+                        {this.state.aggregateInsertionTypes.map(insertion=>{
+                          return (
+                            <div key={insertion.itemId} className='vas-admin-aggregation-inner-container-insertion'>
+                              <p className='vas-admin-aggregation-inner-container-left'>{this.state.itemsById[insertion.itemId].value}:</p>
+                              <p className='vas-admin-aggregation-inner-container-right'>{insertion.count}</p>
+                            </div>
+                          )
+                        })}
                       </div>
-                    }
-                  </div>
-                }
+                    </div>
+                  }
+                  {this.state.aggregateHospitals.length > 0 &&
+                    <div className='vas-admin-aggregation-section'>
+                      <h2>Aggregate Of Hospitals</h2>
+                      <div>
+                        {this.state.aggregateHospitals.map(hospital=>{
+                          return (
+                            <div key={hospital._id} className='vas-admin-aggregation-inner-container-hospitals'>
+                              <p className='vas-admin-aggregation-inner-container-left'>{this.state.hospitalsById[hospital._id].name}:</p>
+                              <p className='vas-admin-aggregation-inner-container-right'>{hospital.count}</p>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&

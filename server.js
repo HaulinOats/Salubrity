@@ -593,7 +593,7 @@ app.post('/save-call', (req, res)=>{
   });
 })
 
-app.post('/get-aggregation', (req, res)=>{
+app.post('/get-insertion-types-aggregation', (req, res)=>{
   Call.aggregate([
     {$match:{
       completedAt:{
@@ -607,6 +607,21 @@ app.post('/get-aggregation', (req, res)=>{
     if(err) return res.send(err);
     res.send(calls)
   });
+})
+
+app.post('/get-hospitals-aggregation', (req, res)=>{
+  Call.aggregate([
+    {$match:{
+      completedAt:{
+        $gte:new Date(req.body.completedAt.startDate),
+        $lte:new Date(req.body.completedAt.endDate)
+      }
+    }},
+    {$group : { _id : '$hospital', count : {$sum : 1}}}
+  ], (err, calls)=>{
+    if(err) return res.send(err);
+    res.send(calls);    
+  })
 })
 
 app.post('/admin-update-user-data', (req,res)=>{
