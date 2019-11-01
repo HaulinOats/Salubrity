@@ -204,7 +204,7 @@ export default class Home extends Component{
       if(this.state.currentUser){
         this.checkUserSession();
       }
-    }, 10000);//check session every 3 minutes (180000)ms
+    }, 180000);//check session every 3 minutes (180000)ms
   }
 
   stopSessionInterval(){
@@ -235,8 +235,7 @@ export default class Home extends Component{
     let currentTime = Math.floor(Date.now() / 1000);
     let timeDiff = currentTime - this.state.currentUser.lastLogin;
     console.log(`${Math.floor(timeDiff/60)} minutes inactive (ends session at 60)`);
-    // if(timeDiff > 3419){
-    if(timeDiff > 9){
+    if(timeDiff > 3419){
       this.setState({
         modalTitle:'Session Is About To End',
         modalMessage:'You are about to be logged out due to inactivity. Click "OK" to continue session.',
