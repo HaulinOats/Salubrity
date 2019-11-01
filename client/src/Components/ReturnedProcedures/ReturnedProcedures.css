@@ -203,6 +203,14 @@
 .vas-returned-procedures-print:active {
   box-shadow: none;
 }
+.vas-returned-procedures-aggregations {
+  display: flex;
+  padding: 5px 0;
+}
+.vas-returned-procedures-records-returned {
+  margin:0 auto;
+  margin-right:0;
+}
 
 @media (min-width: 650px) {
   .vas-home-custom-table-column-1 {

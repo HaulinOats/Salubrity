@@ -170,9 +170,9 @@ export default class Home extends Component{
     this.resetModal();
   }
 
-  editCompletedCall(callId, callCompletedBy){
+  editCompletedCall(callId, completedBy, dressingChangeDate){
     let isAdmin = this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super';
-    if(isAdmin || this.state.currentUser.userId === callCompletedBy){
+    if(isAdmin || this.state.currentUser.userId === completedBy || dressingChangeDate !== null){
       helpers.getCallById(callId).then(resp=>{
         this.setTab('active');
         this.setState({

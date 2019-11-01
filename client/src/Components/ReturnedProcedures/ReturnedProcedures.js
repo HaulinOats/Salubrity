@@ -9,18 +9,73 @@ export default class ReturnedProcedures extends Component {
   constructor(props){
     super(props);
     this.state = {
-      queriedProcedures:this.props.queriedProcedures
+      queriedProcedures:this.props.queriedProcedures,
+      aggregateHospitals:null,
+      aggregateInsertionTypes:null
     }
     this.toggleSort = this.toggleSort.bind(this);
     this.sortByOnChange = this.sortByOnChange.bind(this);
+    this.aggregateData = this.aggregateData.bind(this);
   };
 
   componentDidMount(){
-    console.log(this.state);
+    console.log(this.props);
+    this.aggregateData();
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ queriedProcedures: nextProps.queriedProcedures });  
+    this.setState({ queriedProcedures: nextProps.queriedProcedures }, this.aggregateData);  
+  }
+
+  aggregateData(){
+    let queriedProcedures = this.state.queriedProcedures;
+    let hospitalObj = {};
+    //UPDATE
+    let insertionObj = {
+      '58':{
+        text:'SL PICC',
+        count:0
+      },
+      '59':{
+        text:'DL PICC',
+        count:0
+      },
+      '60':{
+        text:'TL PICC',
+        count:0
+      },
+      '61':{
+        text:'ML',
+        count:0
+      },
+      '62':{
+        text:'PG',
+        count:0
+      }
+    };
+    
+    queriedProcedures.forEach((procedure, idx)=>{
+      //aggregate hospitals
+      if(hospitalObj.hasOwnProperty(procedure.hospital)){
+        hospitalObj[procedure.hospital].count += 1;
+      } else {
+        hospitalObj[procedure.hospital] = {
+          text:procedure.hospitalName,
+          count:0
+        };
+      }
+      //aggregate insertion procedures
+      queriedProcedures[idx].itemIds.forEach((itemId, idx2)=>{
+        if(insertionObj[itemId]){
+          insertionObj[itemId].count += 1;
+        }
+      })
+    })
+    
+    this.setState({
+      aggregateHospitals:hospitalObj,
+      aggregateInsertionTypes:insertionObj
+    })
   }
 
   sortByOnChange(e){
@@ -55,7 +110,19 @@ export default class ReturnedProcedures extends Component {
           <p>No completed calls for that query</p>
         </div>
       }
-      {this.state.queriedProcedures.length > 0 &&
+      {this.props.isAdmin &&
+        <span>
+          <div className='vas-returned-procedures-aggregations'>
+            <p className='vas-returned-procedures-records-returned'>{this.state.queriedProcedures.length} Records Returned</p>
+          </div>
+          <div>
+            {this.state.aggregateHospitals && this.state.aggregateHospitals.map((hospital)=>{
+              return <p key={hospital.text + hospital.count}>{hospital.text}:{hospital.count}</p>
+            })}
+          </div>
+        </span>
+      }
+      {!this.props.hideUI && this.state.queriedProcedures.length > 0 &&
       <span className="vas-returned-procedures-outer">
         <div className='vas-table-thead-row vas-home-completed-thead'>
           <select className='vas-select vas-returned-procedures-sortby-select' onChange={this.sortByOnChange}>
@@ -74,7 +141,6 @@ export default class ReturnedProcedures extends Component {
           </select>
           <button className='vas-btn-normal vas-home-reverse-sort-btn' onClick={this.toggleSort}>Reverse Sort</button>
           {this.props.isAdmin &&
-            // <p className='vas-returned-procedures-print' onClick={e=>{window.print()}}>&#128438;</p>
             <img className='vas-returned-procedures-print' src={printIcon} alt='print' onClick={e=>{window.print()}}/>
           }
         </div>
@@ -88,7 +154,7 @@ export default class ReturnedProcedures extends Component {
             let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
             let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
             return(
-              <div className='vas-admin-custom-table-item-outer-container' key={call._id} onClick={e=>{this.props.editCompletedCall(call._id, call.completedBy)}}>
+              <div className='vas-admin-custom-table-item-outer-container' key={call._id} onClick={e=>{this.props.editCompletedCall(call._id, call.completedBy, call.dressingChangeDate)}}>
                 <div className='vas-admin-custom-table-item-outer'>
                   <div className='vas-admin-custom-table-item-outer'>
                     <div className='vas-admin-custom-table-item vas-call-table-item'>

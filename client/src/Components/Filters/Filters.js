@@ -43,7 +43,10 @@ export default class Filters extends Component {
       })
     }
 
-    let hospitalOptions = [];
+    let hospitalOptions = [{
+      value:'Erlanger',
+      text:'Erlanger (All)'
+    }];
     for(let i = 0; i < this.props.hospitals.length; i++){
       hospitalOptions.push({
         value:this.props.hospitals[i].id,
@@ -233,6 +236,10 @@ export default class Filters extends Component {
             })}
           </select>
         </div>
+        <span>
+          <input type="checkbox" id='hide-ui' className='vas-checkbox-select' checked={this.props.hideUI} />
+          <label className='vas-btn vas-filters-hide-ui' htmlFor='hide-ui' onClick={this.props.toggleHideUI}>Hide UI</label>
+        </span>
         <button className='vas-filters-submit-query' onClick={this.submitQuery}>Submit</button>
       </div>
     )

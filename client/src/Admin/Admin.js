@@ -8,20 +8,20 @@ import './Admin.css';
 import axios from 'axios';
 import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedures';
 import ls from 'local-storage';
-import moment from 'moment';
-import DatePicker from "react-datepicker";
+// import moment from 'moment';
+// import DatePicker from "react-datepicker";
 import {DebounceInput} from 'react-debounce-input';
 
 export default class Admin extends Component {
   constructor(props){
     super(props);
     this.state = {
-      aggregateStartDate:moment(),
-      aggregateEndDate:moment(),
-      aggregateData:[],
-      aggregateType:'insertionTypes',
-      aggregateHospitals:[],
-      aggregateInsertionTypes:[],
+      // aggregateStartDate:moment(),
+      // aggregateEndDate:moment(),
+      // aggregateData:[],
+      // aggregateType:'insertionTypes',
+      // aggregateHospitals:[],
+      // aggregateInsertionTypes:[],
       currentUser:null,
       activePage:'query',
       activeRecord:null,
@@ -51,7 +51,8 @@ export default class Admin extends Component {
       confirmationType:null,
       menuIsVisible:false,
       customRoute:'',
-      JSONFileName:''
+      JSONFileName:'',
+      hideUI:false
     }
     this.seedProcedures = this.seedProcedures.bind(this);
     this.seedOptions = this.seedOptions.bind(this);
@@ -70,12 +71,13 @@ export default class Admin extends Component {
     this.editCompletedCall = this.editCompletedCall.bind(this);
     this.closeRecordCallback = this.closeRecordCallback.bind(this);
     this.returnedCalls = this.returnedCalls.bind(this);
-    this.aggregateData = this.aggregateData.bind(this);
-    this.aggregateStartDateOnChange = this.aggregateStartDateOnChange.bind(this);
-    this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
+    // this.aggregateData = this.aggregateData.bind(this);
+    // this.aggregateStartDateOnChange = this.aggregateStartDateOnChange.bind(this);
+    // this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
     this.callRoute = this.callRoute.bind(this);
     this.togglePasswordVisibility = this.togglePasswordVisibility.bind(this);
-    this.aggregateTypeOnChange = this.aggregateTypeOnChange.bind(this);
+    // this.aggregateTypeOnChange = this.aggregateTypeOnChange.bind(this);
+    this.toggleHideUI = this.toggleHideUI.bind(this);
   }
 
   componentWillMount(){
@@ -89,69 +91,75 @@ export default class Admin extends Component {
     }
   }
 
-  aggregateStartDateOnChange(date){
-    this.setState({aggregateStartDate:date})
-  }
+  // aggregateStartDateOnChange(date){
+  //   this.setState({aggregateStartDate:date})
+  // }
   
-  aggregateEndDateOnChange(date){
-    this.setState({aggregateEndDate:date})
-  }
+  // aggregateEndDateOnChange(date){
+  //   this.setState({aggregateEndDate:date})
+  // }
 
-  aggregateTypeOnChange(e){
-    console.log(e.target.value);
-    this.setState({aggregateType:e.target.value})
-  }
+  // aggregateTypeOnChange(e){
+  //   console.log(e.target.value);
+  //   this.setState({aggregateType:e.target.value})
+  // }
 
-  aggregateData(){
-    let dateQuery = {
-      completedAt:{
-        startDate: moment(this.state.aggregateStartDate).startOf('day').toISOString(),
-        endDate: moment(this.state.aggregateEndDate).endOf('day').toISOString()
-      }
-    };
-    switch(this.state.aggregateType){
-      case 'insertionTypes':
-        axios.post('/get-insertion-types-aggregation', dateQuery).then(resp=>{
-          let insertionTypes = [];
-          for(let i = 0; i < resp.data.length; i++){
-            switch(resp.data[i]._id){
-              case 58:
-              case 59:
-              case 60:
-              case 61:
-              case 62:
-                insertionTypes.push({
-                  itemId:resp.data[i]._id,
-                  count:resp.data[i].count
-                })
-                break;
-              default:
-            }
-          }
-          this.setState({
-            aggregateData:resp.data,
-            aggregateInsertionTypes:insertionTypes
-          })
-        }).catch(err=>{
-          console.log('error: ', err);
-        })
-        break;
-      case 'hospitals':
-        axios.post('/get-hospitals-aggregation', dateQuery).then(resp=>{
-          let hospitalsArr = resp.data;
-          hospitalsArr.forEach((hospital, idx)=>{
-            if(!hospitalsArr[idx]._id){
-              delete hospitalsArr[idx];
-            }
-          });
-          this.setState({aggregateHospitals:hospitalsArr})
-          console.log(resp.data)
-        }).catch(err=>{
-          console.log('error: ', err);
-        })
-        break;
-      default:
-    }
+  // aggregateData(){
+  //   let dateQuery = {
+  //     completedAt:{
+  //       startDate: moment(this.state.aggregateStartDate).startOf('day').toISOString(),
+  //       endDate: moment(this.state.aggregateEndDate).endOf('day').toISOString()
+  //     }
+  //   };
+  //   switch(this.state.aggregateType){
+  //     case 'insertionTypes':
+  //       axios.post('/get-insertion-types-aggregation', dateQuery).then(resp=>{
+  //         let insertionTypes = [];
+  //         for(let i = 0; i < resp.data.length; i++){
+  //           switch(resp.data[i]._id){
+  //             case 58:
+  //             case 59:
+  //             case 60:
+  //             case 61:
+  //             case 62:
+  //               insertionTypes.push({
+  //                 itemId:resp.data[i]._id,
+  //                 count:resp.data[i].count
+  //               })
+  //               break;
+  //             default:
+  //           }
+  //         }
+  //         this.setState({
+  //           aggregateData:resp.data,
+  //           aggregateInsertionTypes:insertionTypes
+  //         })
+  //       }).catch(err=>{
+  //         console.log('error: ', err);
+  //       })
+  //       break;
+  //     case 'hospitals':
+  //       axios.post('/get-hospitals-aggregation', dateQuery).then(resp=>{
+  //         let hospitalsArr = resp.data;
+  //         hospitalsArr.forEach((hospital, idx)=>{
+  //           if(!hospitalsArr[idx]._id){
+  //             delete hospitalsArr[idx];
+  //           }
+  //         });
+  //         this.setState({aggregateHospitals:hospitalsArr})
+  //         console.log(resp.data)
+  //       }).catch(err=>{
+  //         console.log('error: ', err);
+  //       })
+  //       break;
+  //     default:
+  //   }
+  // }
+
+  toggleHideUI(){
+    this.setState({hideUI:!this.state.hideUI}, ()=>{
+      console.log(this.state.hideUI);
+    });    
   }
 
   closeRecordCallback(type){
@@ -619,7 +627,7 @@ export default class Admin extends Component {
                 <p className='vas-admin-menu-toggle' onClick={this.toggleMainMenu}>Menu &#9660;</p>
                 <ul className={'vas-admin-menu ' + (this.state.menuIsVisible ? 'vas-admin-menu-visible' : '')} onClick={this.closeMenu}>
                   <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'query' ? true : false} onClick={e=>{this.setState({activePage:'query'})}}>Query</li>
-                  <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'aggregate' ? true : false} onClick={e=>{this.setState({activePage:'aggregate'})}}>Aggregate</li>
+                  {/* <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'aggregate' ? true : false} onClick={e=>{this.setState({activePage:'aggregate'})}}>Aggregate</li> */}
                   {this.state.activeRecord &&
                     <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'active' ? true : false} onClick={e=>{this.setState({activePage:'active'})}}>Active</li>
                   }
@@ -649,7 +657,8 @@ export default class Admin extends Component {
                     usersById={this.state.usersById} 
                     itemsById={this.state.itemsById}
                     hospitalsById={this.state.hospitalsById}
-                    returnedCalls={this.returnedCalls}/>
+                    returnedCalls={this.returnedCalls}
+                    toggleHideUI={this.toggleHideUI}/>
                 }
                 {this.state.queriedCalls.length > 0 &&
                 <ReturnedProcedures 
@@ -660,10 +669,11 @@ export default class Admin extends Component {
                   usersById={this.state.usersById}
                   itemsById={this.state.itemsById}
                   editCompletedCall={this.editCompletedCall} 
-                  orderChangeById={this.state.orderChangeById}/>
+                  orderChangeById={this.state.orderChangeById}
+                  hideUI={this.state.hideUI}/>
                 }
               </div>
-              <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'aggregate' ? true : false}>
+              {/* <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'aggregate' ? true : false}>
                 <div className='vas-filters-date-range-container'>
                   <div className='vas-filters-date-range-inner'>
                     <p className='vas-filters-date-label'>From:</p>
@@ -711,7 +721,7 @@ export default class Admin extends Component {
                     </div>
                   }
                 </div>
-              </div>
+              </div> */}
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 

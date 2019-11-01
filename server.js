@@ -405,10 +405,19 @@ app.post('/get-calls-by-query', (req, res)=>{
       case 'insertedBy':
         queryObj['insertedBy'] = {$ne:null}
         break;
+      case 'hospital':
+        if(filterValue.toLowerCase() === 'erlanger'){
+          queryObj['hospital'] = {$in:[1,2,3,4,5]};
+        } else {
+          queryObj['hospital'] = filterValue;
+        }
+        break;
       default:
         queryObj[fieldName] = filterValue;
     }
   })
+
+  console.log(queryObj)
 
   Call.find(queryObj, (err, calls)=>{
     if(err) res.send(err);
