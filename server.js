@@ -1,3 +1,4 @@
+const forceSecure = require("force-secure-express");
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
@@ -110,6 +111,7 @@ let optionSchema = new Schema({
 optionSchema.plugin(uniqueValidator, {message: `Could not insert option based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Option = mongoose.model('Option', optionSchema);
 
+app.use(forceSecure(['salubrity-vas.herokuapp.com']));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.set("port", process.env.PORT || 3001);
