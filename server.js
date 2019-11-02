@@ -385,12 +385,15 @@ app.get('/get-completed-calls', (req, res)=>{
 });
 
 app.post('/get-calls-by-query', (req, res)=>{
+  
+  //normal query
   let queryObj = {
     completedAt: {
-      $gte: req.body.startDate,
-      $lt: req.body.endDate
+      $gte: new Date(req.body.startDate),
+      $lt: new Date(req.body.endDate)
     }
   };
+  let dataObj = {};
 
   req.body.filtersArr.forEach(filter=>{
     fieldName = filter[0];
@@ -409,7 +412,7 @@ app.post('/get-calls-by-query', (req, res)=>{
         if(filterValue.toLowerCase() === 'erlanger'){
           queryObj['hospital'] = {$in:[1,2,3,4,5]};
         } else {
-          queryObj['hospital'] = filterValue;
+          queryObj['hospital'] = Number(filterValue);
         }
         break;
       default:
@@ -417,15 +420,18 @@ app.post('/get-calls-by-query', (req, res)=>{
     }
   })
 
-  console.log(queryObj)
-
   Call.find(queryObj, (err, calls)=>{
-    if(err) res.send(err);
-    if(calls.length){
-      res.send(calls);
-    } else {
-      res.send({'error':'no calls found matching that specific query'})
-    }
+    if(err) return res.send(err);
+    dataObj.calls = calls;
+    Call.aggregate([
+      {$match:queryObj},
+      {$project : {'itemIds' : 1, _id :0}}, {$unwind : '$itemIds'}, 
+      {$group : {'_id': '$itemIds', count :{$sum :1}}}
+    ]).exec((err2, agg)=>{
+      if(err2) return res.send(err2);
+      dataObj.aggregation = agg;
+      res.send(dataObj);
+    })
   })
 })
 

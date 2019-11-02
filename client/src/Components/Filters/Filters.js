@@ -156,7 +156,7 @@ export default class Filters extends Component {
     })
 
     axios.post('/get-calls-by-query', queryObject).then(resp=>{
-      if(!resp.data.length){
+      if(!resp.data.calls){
         alert('no calls returned for that specific query')
       } else {
         this.props.returnedCalls(resp.data);

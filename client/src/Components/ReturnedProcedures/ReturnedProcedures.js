@@ -10,8 +10,8 @@ export default class ReturnedProcedures extends Component {
     super(props);
     this.state = {
       queriedProcedures:this.props.queriedProcedures,
-      aggregateHospitals:null,
-      aggregateInsertionTypes:null
+      hospitalAgg:this.props.hospitalAgg,
+      insertionAgg:this.props.insertionAgg
     }
     this.toggleSort = this.toggleSort.bind(this);
     this.sortByOnChange = this.sortByOnChange.bind(this);
@@ -24,35 +24,16 @@ export default class ReturnedProcedures extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ queriedProcedures: nextProps.queriedProcedures }, this.aggregateData);  
+    this.setState({ 
+      insertionAgg:nextProps.insertionAgg,
+      hospitalAgg:nextProps.hospitalAgg,
+      queriedProcedures: nextProps.queriedProcedures 
+    }, this.aggregateData);  
   }
 
   aggregateData(){
     let queriedProcedures = this.state.queriedProcedures;
     let hospitalObj = {};
-    //UPDATE
-    let insertionObj = {
-      '58':{
-        text:'SL PICC',
-        count:0
-      },
-      '59':{
-        text:'DL PICC',
-        count:0
-      },
-      '60':{
-        text:'TL PICC',
-        count:0
-      },
-      '61':{
-        text:'ML',
-        count:0
-      },
-      '62':{
-        text:'PG',
-        count:0
-      }
-    };
     
     queriedProcedures.forEach((procedure, idx)=>{
       //aggregate hospitals
@@ -64,17 +45,6 @@ export default class ReturnedProcedures extends Component {
           count:0
         };
       }
-      //aggregate insertion procedures
-      queriedProcedures[idx].itemIds.forEach((itemId, idx2)=>{
-        if(insertionObj[itemId]){
-          insertionObj[itemId].count += 1;
-        }
-      })
-    })
-    
-    this.setState({
-      aggregateHospitals:hospitalObj,
-      aggregateInsertionTypes:insertionObj
     })
   }
 
@@ -114,11 +84,16 @@ export default class ReturnedProcedures extends Component {
         <span>
           <div className='vas-returned-procedures-aggregations'>
             <p className='vas-returned-procedures-records-returned'>{this.state.queriedProcedures.length} Records Returned</p>
-          </div>
-          <div>
-            {this.state.aggregateHospitals && this.state.aggregateHospitals.map((hospital)=>{
-              return <p key={hospital.text + hospital.count}>{hospital.text}:{hospital.count}</p>
-            })}
+            <div className='vas-returned-procedures-aggregations-insertions-container'>
+              {this.state.insertionAgg.map(insertion=>{
+                return(
+                  <div key={insertion.itemId + insertion.count} className='vas-returned-procedures-aggregations-insertions-item'>
+                    <p className='vas-returned-procedures-aggregations-insertions-item-left'>{this.props.itemsById[insertion.itemId].value}</p>
+                    <p className='vas-returned-procedures-aggregations-insertions-item-right'>{insertion.count}</p>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </span>
       }

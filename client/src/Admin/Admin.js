@@ -16,12 +16,6 @@ export default class Admin extends Component {
   constructor(props){
     super(props);
     this.state = {
-      // aggregateStartDate:moment(),
-      // aggregateEndDate:moment(),
-      // aggregateData:[],
-      // aggregateType:'insertionTypes',
-      // aggregateHospitals:[],
-      // aggregateInsertionTypes:[],
       currentUser:null,
       activePage:'query',
       activeRecord:null,
@@ -52,7 +46,9 @@ export default class Admin extends Component {
       menuIsVisible:false,
       customRoute:'',
       JSONFileName:'',
-      hideUI:false
+      hideUI:false,
+      insertionAgg:[],
+      hospitalAgg:[]
     }
     this.seedProcedures = this.seedProcedures.bind(this);
     this.seedOptions = this.seedOptions.bind(this);
@@ -71,12 +67,8 @@ export default class Admin extends Component {
     this.editCompletedCall = this.editCompletedCall.bind(this);
     this.closeRecordCallback = this.closeRecordCallback.bind(this);
     this.returnedCalls = this.returnedCalls.bind(this);
-    // this.aggregateData = this.aggregateData.bind(this);
-    // this.aggregateStartDateOnChange = this.aggregateStartDateOnChange.bind(this);
-    // this.aggregateEndDateOnChange = this.aggregateEndDateOnChange.bind(this);
     this.callRoute = this.callRoute.bind(this);
     this.togglePasswordVisibility = this.togglePasswordVisibility.bind(this);
-    // this.aggregateTypeOnChange = this.aggregateTypeOnChange.bind(this);
     this.toggleHideUI = this.toggleHideUI.bind(this);
   }
 
@@ -90,71 +82,6 @@ export default class Admin extends Component {
       });
     }
   }
-
-  // aggregateStartDateOnChange(date){
-  //   this.setState({aggregateStartDate:date})
-  // }
-  
-  // aggregateEndDateOnChange(date){
-  //   this.setState({aggregateEndDate:date})
-  // }
-
-  // aggregateTypeOnChange(e){
-  //   console.log(e.target.value);
-  //   this.setState({aggregateType:e.target.value})
-  // }
-
-  // aggregateData(){
-  //   let dateQuery = {
-  //     completedAt:{
-  //       startDate: moment(this.state.aggregateStartDate).startOf('day').toISOString(),
-  //       endDate: moment(this.state.aggregateEndDate).endOf('day').toISOString()
-  //     }
-  //   };
-  //   switch(this.state.aggregateType){
-  //     case 'insertionTypes':
-  //       axios.post('/get-insertion-types-aggregation', dateQuery).then(resp=>{
-  //         let insertionTypes = [];
-  //         for(let i = 0; i < resp.data.length; i++){
-  //           switch(resp.data[i]._id){
-  //             case 58:
-  //             case 59:
-  //             case 60:
-  //             case 61:
-  //             case 62:
-  //               insertionTypes.push({
-  //                 itemId:resp.data[i]._id,
-  //                 count:resp.data[i].count
-  //               })
-  //               break;
-  //             default:
-  //           }
-  //         }
-  //         this.setState({
-  //           aggregateData:resp.data,
-  //           aggregateInsertionTypes:insertionTypes
-  //         })
-  //       }).catch(err=>{
-  //         console.log('error: ', err);
-  //       })
-  //       break;
-  //     case 'hospitals':
-  //       axios.post('/get-hospitals-aggregation', dateQuery).then(resp=>{
-  //         let hospitalsArr = resp.data;
-  //         hospitalsArr.forEach((hospital, idx)=>{
-  //           if(!hospitalsArr[idx]._id){
-  //             delete hospitalsArr[idx];
-  //           }
-  //         });
-  //         this.setState({aggregateHospitals:hospitalsArr})
-  //         console.log(resp.data)
-  //       }).catch(err=>{
-  //         console.log('error: ', err);
-  //       })
-  //       break;
-  //     default:
-  //   }
-  // }
 
   toggleHideUI(){
     this.setState({hideUI:!this.state.hideUI}, ()=>{
@@ -443,8 +370,10 @@ export default class Admin extends Component {
     })
   }
 
-  returnedCalls(calls){
-    let queriedCalls = calls;
+  returnedCalls(callsAndAggObj){
+    console.log(callsAndAggObj);
+    let queriedCalls = callsAndAggObj.calls;
+    let itemsAggregation = callsAndAggObj.aggregation;
     for(let i = 0; i < queriedCalls.length; i++){
       if(queriedCalls[i].completedBy !== null){
         queriedCalls[i].completedByName = this.state.usersById[queriedCalls[i].completedBy].fullname;
@@ -458,7 +387,31 @@ export default class Admin extends Component {
         queriedCalls[i].hospitalName = null;
       }
     }
-    this.setState({queriedCalls});
+
+    //UPDATE
+    let insertionAgg = [];
+    itemsAggregation.forEach((item, idx)=>{
+      switch(item._id){
+        case 58:
+        case 59:
+        case 60:
+        case 61:
+        case 62:
+          insertionAgg.push({
+            itemId:item._id,
+            count:itemsAggregation[idx].count
+          })
+          break;
+        default:
+      }
+    })
+  
+    this.setState({
+      queriedCalls,
+      insertionAgg
+    }, ()=>{
+      console.log(this.state.insertionAgg);
+    });
   }
 
   addInputChange(fieldName, e){
@@ -627,7 +580,6 @@ export default class Admin extends Component {
                 <p className='vas-admin-menu-toggle' onClick={this.toggleMainMenu}>Menu &#9660;</p>
                 <ul className={'vas-admin-menu ' + (this.state.menuIsVisible ? 'vas-admin-menu-visible' : '')} onClick={this.closeMenu}>
                   <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'query' ? true : false} onClick={e=>{this.setState({activePage:'query'})}}>Query</li>
-                  {/* <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'aggregate' ? true : false} onClick={e=>{this.setState({activePage:'aggregate'})}}>Aggregate</li> */}
                   {this.state.activeRecord &&
                     <li className='vas-admin-menu-item' data-isactive={this.state.activePage === 'active' ? true : false} onClick={e=>{this.setState({activePage:'active'})}}>Active</li>
                   }
@@ -663,6 +615,8 @@ export default class Admin extends Component {
                 {this.state.queriedCalls.length > 0 &&
                 <ReturnedProcedures 
                   isAdmin={isAdmin}
+                  insertionAgg={this.state.insertionAgg}
+                  hospitalAgg={this.state.hospitalAgg}
                   queriedProcedures={this.state.queriedCalls}
                   proceduresById={this.state.proceduresById}
                   hospitalsById={this.state.hospitalsById}
@@ -673,55 +627,6 @@ export default class Admin extends Component {
                   hideUI={this.state.hideUI}/>
                 }
               </div>
-              {/* <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'aggregate' ? true : false}>
-                <div className='vas-filters-date-range-container'>
-                  <div className='vas-filters-date-range-inner'>
-                    <p className='vas-filters-date-label'>From:</p>
-                    <DatePicker className='vas-filters-datepicker' selected={this.state.aggregateStartDate} onChange={this.aggregateStartDateOnChange} />
-                  </div>  
-                  <div className='vas-filters-date-range-inner'>
-                    <p className='vas-filters-date-label'>To:</p>
-                    <DatePicker className='vas-filters-datepicker' selected={this.state.aggregateEndDate} onChange={this.aggregateEndDateOnChange} />
-                  </div>
-                </div>
-                <select className='vas-select' onChange={this.aggregateTypeOnChange}>
-                  <option value='insertionTypes'>Insertion Types</option>
-                  <option value='hospitals'>Hospitals</option>
-                </select>
-                <button onClick={this.aggregateData}>Aggregate</button>
-                <div className='vas-admin-aggregation-container'>
-                  {this.state.aggregateInsertionTypes.length > 0 &&
-                    <div className='vas-admin-aggregation-section'>
-                      <h2>Aggregate Of Insertion Types</h2>
-                      <div>
-                        {this.state.aggregateInsertionTypes.map(insertion=>{
-                          return (
-                            <div key={insertion.itemId} className='vas-admin-aggregation-inner-container-insertion'>
-                              <p className='vas-admin-aggregation-inner-container-left'>{this.state.itemsById[insertion.itemId].value}:</p>
-                              <p className='vas-admin-aggregation-inner-container-right'>{insertion.count}</p>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  }
-                  {this.state.aggregateHospitals.length > 0 &&
-                    <div className='vas-admin-aggregation-section'>
-                      <h2>Aggregate Of Hospitals</h2>
-                      <div>
-                        {this.state.aggregateHospitals.map(hospital=>{
-                          return (
-                            <div key={hospital._id} className='vas-admin-aggregation-inner-container-hospitals'>
-                              <p className='vas-admin-aggregation-inner-container-left'>{this.state.hospitalsById[hospital._id].name}:</p>
-                              <p className='vas-admin-aggregation-inner-container-right'>{hospital.count}</p>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div> */}
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 

@@ -204,14 +204,24 @@
   box-shadow: none;
 }
 .vas-returned-procedures-aggregations {
-  display: flex;
   padding: 5px 0;
 }
 .vas-returned-procedures-records-returned {
+  margin-bottom:8px;
+}
+.vas-returned-procedures-aggregations-insertions-item {
+  display: flex;
+  width: 200px;
+  border-bottom: 1px dotted black;
+  margin: 3px 0px;
+}
+.vas-returned-procedures-aggregations-insertions-item-left {
+
+}
+.vas-returned-procedures-aggregations-insertions-item-right {
   margin:0 auto;
   margin-right:0;
 }
-
 @media (min-width: 650px) {
   .vas-home-custom-table-column-1 {
     width:6%;
