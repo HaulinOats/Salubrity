@@ -13,13 +13,14 @@ export default class Filters extends Component {
       startDate:moment(),
       endDate:moment(),
       activeFilters:[],
-      filterFields:[]    
+      filterFields:[],
     }
     this.childFilterOnChange = this.childFilterOnChange.bind(this);
     this.startDateChange = this.startDateChange.bind(this);
     this.endDateChange = this.endDateChange.bind(this);
     this.submitQuery = this.submitQuery.bind(this);
     this.selectFilter = this.selectFilter.bind(this);
+    this.queryRangeDiff = this.queryRangeDiff.bind(this);
   }
 
   componentDidMount(){
@@ -27,7 +28,7 @@ export default class Filters extends Component {
       console.log(this.state)
     },1000)
   }
-  
+
   componentWillMount(){
     let userOptions = [];
     let users = this.props.allUsers;
@@ -36,6 +37,8 @@ export default class Filters extends Component {
       if(a.fullname < b.fullname) return -1;
       return 0;
     });
+
+    //Build dropdowns for filters
     for(let i = 0; i < users.length; i++){
       userOptions.push({
         value:users[i].userId,
@@ -155,6 +158,7 @@ export default class Filters extends Component {
       queryObject.filtersArr.push([filter.fieldName, filter.value]);
     })
 
+    document.querySelector('html').style.cursor = 'wait';
     axios.post('/get-calls-by-query', queryObject).then(resp=>{
       if(!resp.data.calls){
         alert('no calls returned for that specific query')
@@ -163,19 +167,29 @@ export default class Filters extends Component {
       }
     }).catch(err=>{
       console.log(err);
+    }).finally(()=>{
+      document.querySelector('html').style.cursor = 'initial';
     })
   }
 
   startDateChange(date){
     this.setState({
       startDate: date
-    });
+    }, this.queryRangeDiff);
   }
   
   endDateChange(date){
     this.setState({
       endDate: date
-    });
+    }, this.queryRangeDiff);
+  }
+
+  queryRangeDiff(){
+    let dayRange = Math.abs(this.state.startDate.diff(this.state.endDate, 'days'));
+    console.log(dayRange);
+    if(dayRange > 45){
+      this.props.hidingUI();
+    }
   }
 
   render(){

@@ -70,6 +70,7 @@ export default class Admin extends Component {
     this.callRoute = this.callRoute.bind(this);
     this.togglePasswordVisibility = this.togglePasswordVisibility.bind(this);
     this.toggleHideUI = this.toggleHideUI.bind(this);
+    this.hidingUI = this.hidingUI.bind(this);
   }
 
   componentWillMount(){
@@ -84,9 +85,12 @@ export default class Admin extends Component {
   }
 
   toggleHideUI(){
-    this.setState({hideUI:!this.state.hideUI}, ()=>{
-      console.log(this.state.hideUI);
-    });    
+    this.setState({hideUI:!this.state.hideUI});
+  }
+
+  hidingUI(){
+    console.log('hiding ui')
+    this.setState({hideUI:true})
   }
 
   closeRecordCallback(type){
@@ -610,6 +614,8 @@ export default class Admin extends Component {
                     itemsById={this.state.itemsById}
                     hospitalsById={this.state.hospitalsById}
                     returnedCalls={this.returnedCalls}
+                    hidingUI={this.hidingUI}
+                    hideUI={this.state.hideUI}
                     toggleHideUI={this.toggleHideUI}/>
                 }
                 {this.state.queriedCalls.length > 0 &&
