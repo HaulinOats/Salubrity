@@ -518,13 +518,15 @@ export default class EditProcedure extends Component {
       default:
     }
 
+    //UPDATE
     switch(itemId){
       case 30://Port-A-Cath - Access
       case 58://START - Insertion Procedures
       case 59://
       case 60://
       case 61://
-      case 62://END - Insertion Procedures
+      case 62://
+      case 90://END - Insertion Procedures
         this.setState({willSetDressingChangeDate:true})
         break;
       default:

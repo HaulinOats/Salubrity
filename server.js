@@ -701,21 +701,21 @@ app.get('/get-online-users', (req,res)=>{
   })
 })
 
-app.get('/close-all-open-lines', (req,res)=>{
-  Call.updateMany({dressingChangeDate:{$ne:null}}, 
-    {$set:{dressingChangeDate:null}}, {multi:true},(err, calls)=>{
-    if(err) return res.send(err);
-    res.send(true);
-  })
-})
+// app.get('/close-all-open-lines', (req,res)=>{
+//   Call.updateMany({dressingChangeDate:{$ne:null}}, 
+//     {$set:{dressingChangeDate:null}}, {multi:true},(err, calls)=>{
+//     if(err) return res.send(err);
+//     res.send(true);
+//   })
+// })
 
-app.get('/set-as-unopen', (req,res)=>{
-  Call.updateMany({completedBy:{$ne:null}},
-    {$set:{openBy:null}}, {multi:true},(err, calls)=>{
-    if(err) return res.send(err);
-    res.send(true);
-  })
-})
+// app.get('/set-as-unopen', (req,res)=>{
+//   Call.updateMany({completedBy:{$ne:null}},
+//     {$set:{openBy:null}}, {multi:true},(err, calls)=>{
+//     if(err) return res.send(err);
+//     res.send(true);
+//   })
+// })
 
 //SUPER
 app.post('/send-errors-to-admin', (req,res)=>{
