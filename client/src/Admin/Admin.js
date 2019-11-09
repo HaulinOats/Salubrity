@@ -401,6 +401,7 @@ export default class Admin extends Component {
         case 60:
         case 61:
         case 62:
+        case 90:
           insertionAgg.push({
             itemId:item._id,
             count:itemsAggregation[idx].count
