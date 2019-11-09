@@ -17,7 +17,7 @@ export default class Queue extends Component{
                   <Moment className='vas-home-table-time-date' format='M/D'>{helpers.getDateFromObjectId(item._id)}</Moment>
                 </div>
                 <div className='vas-width-90'>
-                  <p className='vas-home-table-job-name'>{item.job}{item.customJob ? ' - ' + item.customJob : ''}<b className={'vas-home-table-open-status ' + (item.openBy ? 'vas-home-open-label-blink' : '' )}>{item.openBy ? 'OPEN' : ''}</b></p>
+                  <p className='vas-home-table-job-name'>{item.job}{item.customJob ? ' - ' + item.customJob : ''}<b className={'vas-open-status ' + (item.openBy ? 'vas-open-label-blink' : '' )}>{item.openBy ? 'OPEN' : ''}</b></p>
                   <div className='vas-home-table-tr-inner'>
                     <p><b>Room:</b><i className='vas-uppercase'>{item.room}</i></p>
                     <p><b>Hospital:</b><i className='vas-capitalize'>{this.props.hospitalsById[item.hospital] ? this.props.hospitalsById[item.hospital].name : 'N/A'}</i></p>

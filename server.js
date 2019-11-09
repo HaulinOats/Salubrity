@@ -60,7 +60,8 @@ let callSchema = new Schema({
   status:{type:Number, default:1},
   updatedAt:{type:Date, default:null},
   updatedBy:{type:Number, default:null},
-  insertedBy:{type:String, default:null}
+  insertedBy:{type:String, default:null},
+  dob:{type:Date, default:null}
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -86,6 +87,7 @@ let procedureSchema = new Schema({
   seq:{type:Number, required:true},
   groups:[
     {
+      seq:Number,
       groupName:String,
       hideHeader:{type:Boolean, default:false},
       hideGroup:{type:Boolean, default:false},
@@ -199,6 +201,21 @@ app.post('/set-call-as-unopen', (req, res)=>{
   });
 });
 
+app.post('/set-as-done-editing', (req, res)=>{
+  Call.findOne(req.body, (err, call)=>{
+    if(err) return res.send(err);
+    if(call){
+      call.openBy = null;
+      call.save((err2)=>{
+        if(err2) return res.send(err2);
+        res.send(call);
+      })
+    } else {
+      res.send({'error':'could not find call to set as unopen'});
+    }
+  });
+});
+
 app.post('/procedure-completed', (req, res)=>{
   Call.findOneAndUpdate({_id:req.body._id},{$set:req.body}, (err, call)=>{
     if(err) return res.send(err);
@@ -247,10 +264,21 @@ app.post('/login', (req, res)=>{
 });
 
 app.post('/get-call-by-id', (req, res)=>{
-  Call.findOne(req.body, (err, call)=>{
+  Call.findOne({_id:req.body._id}, (err, call)=>{
     if(err) return res.send(err);
     if(call){
-      res.send(call);
+      if(call.openBy && call.openBy !== req.body.userId){
+        res.send({
+          'isOpen':'Record is already open by:',
+          'userId':call.openBy
+        })
+      } else {
+        call.openBy = req.body.userId;
+        call.save(err2=>{
+          if(err2) return res.send(err2);
+          res.send(call);
+        })
+      }
     } else {
       res.send({'error':'could not find a call with that id' + req.body._id});
     }
@@ -674,8 +702,16 @@ app.get('/get-online-users', (req,res)=>{
 })
 
 app.get('/close-all-open-lines', (req,res)=>{
-  Call.update({dressingChangeDate:{$ne:null}}, 
+  Call.updateMany({dressingChangeDate:{$ne:null}}, 
     {$set:{dressingChangeDate:null}}, {multi:true},(err, calls)=>{
+    if(err) return res.send(err);
+    res.send(true);
+  })
+})
+
+app.get('/set-lines-as-unopen', (req,res)=>{
+  Call.updateMany({dressingChangeDate:{$ne:null}}, 
+    {$set:{openBy:null}}, {multi:true},(err, calls)=>{
     if(err) return res.send(err);
     res.send(true);
   })

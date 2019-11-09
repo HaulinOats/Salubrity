@@ -7,7 +7,7 @@ export default class LineProcedures extends Component{
   render(){
     let today = moment();
     //UPDATE
-    let lineTypes = [30,58,59,60,61,62];
+    let lineTypes = [30,58,59,60,61,62,90];
     let lateralities = [68,69];
     return(
       <div className='vas-line-procedures'>
@@ -41,6 +41,7 @@ export default class LineProcedures extends Component{
               <div key={lineProcedure._id + idx} className={'vas-line-procedures-line-item ' + (daysTilDressingDate < 2 ? 'vas-line-procedure-line-item-attention ' : '') + (lineProcedure.isHidden ? 'vas-line-procedure-line-item-hidden' : '')} onClick={e=>{this.props.editCompletedCall(lineProcedure._id, lineProcedure.completedBy)}}>
                 <div className='vas-line-procedures-line-item-left'>
                   <Moment className='vas-line-procedures-main-date' format='M/D'>{lineProcedure.dressingChangeDate}</Moment>
+                  <p className={'vas-line-procedures-open-status vas-open-status ' + (lineProcedure.openBy ? 'vas-open-label-blink' : '' )}>{lineProcedure.openBy ? 'OPEN' : ''}</p>
                 </div>
                 <div className='vas-line-procedures-line-item-right'>
                   <div className='vas-line-procedures-line-item-field-container'>

@@ -477,7 +477,7 @@ export default class Admin extends Component {
   }
 
   editCompletedCall(callId){
-    helpers.getCallById(callId).then(resp=>{
+    helpers.getCallById(callId, this.state.currentUser.userId).then(resp=>{
       this.setState({
         activeRecord:resp,
         activePage:'active'

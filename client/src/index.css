@@ -454,6 +454,37 @@ select {
 .vas-ml-10 {
   margin-left:10px;
 }
+.vas-mt-15 {
+  margin-top:15px;
+}
+.vas-mb-5 {
+  margin-bottom:5px;
+}
+.vas-ml-5 {
+  margin-left:5px;
+}
+.vas-open-status {
+  margin:0 auto;
+  margin-right:0;
+  font-weight: bold;
+}
+.vas-open-label-blink {
+  display:flex;
+  animation-name: openLabelBlink;
+  animation-duration: 2s;
+  color: white;
+  text-shadow: 0px 0px 2px transparent;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+.vas-open-label-blink:before {
+  content:'\2039';
+  margin-right:3px;
+}
+.vas-open-label-blink:after {
+  content:'\203A';
+  margin-left:3px;
+}
 
 @media (max-width: 650px) {
   body {

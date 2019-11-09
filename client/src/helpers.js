@@ -158,13 +158,17 @@ const helpers = {
       })
     })
   },
-  getCallById:function(callId){
+  getCallById:function(callId, userId){
     return new Promise((resolve, reject)=>{
-      axios.post('/get-call-by-id', {_id:callId}).then(resp=>{
+      axios.post('/get-call-by-id', {_id:callId, userId}).then(resp=>{
         if(resp.data.error || resp.data._message){
           reject(resp.data);
         } else {
-          resolve(resp.data);
+          if(resp.data.isOpen){
+            reject(resp.data);
+          } else {
+            resolve(resp.data);
+          }
         }
       }).catch((err)=>{
         reject(err)

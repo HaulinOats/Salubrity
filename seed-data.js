@@ -829,7 +829,7 @@ exports.itemSeed = [
     procedureName:'Line Check',
     procedureId:9,
     groupName:'What',
-    value:'CL',
+    value:'CVL',
     isCustom:false
   },
   {
@@ -879,6 +879,14 @@ exports.itemSeed = [
     groupName:'Draw Type',
     value:'Port-A-Cath',
     isCustom:false
+  },
+  {
+    itemId:90,
+    procedureName:'Insertion Procedure',
+    procedureId:8,
+    groupName:'Insertion Type',
+    value:'CVL',
+    isCustom:false
   }
 ];
 
@@ -897,39 +905,41 @@ exports.procedureSeed = [
       },
       {
         seq:2,
+        groupName:'Ultrasound',
+        inputType:'checkbox',
+        hideHeader:true,
+        groupItems:[16]
+      },
+      {
+        seq:3,
+        groupName:'Blood Drawn',
+        inputType:'checkbox',
+        hideHeader:true,
+        groupItems:[17],
+      },
+      {
+        seq:4,
         groupName:'Size',
         inputType:'radio',
         groupItems:[2,3,4,5]
       },
       {
-        seq:3,
+        seq:5,
         groupName:'Care Type',
         inputType:'checkbox',
         groupItems:[6,7,8,9]
       },
       {
-        seq:4,
+        seq:6,
         groupName:'DC IV',
         inputType:'checkbox',
         groupItems:[10,11,12,13,14,15]
       },
       {
-        seq:5,
+        seq:7,
         groupName:'DC ML',
         inputType:'checkbox',
         groupItems:[77,78,79,80,81,82]
-      },
-      {
-        seq:6,
-        groupName:'Ultrasound',
-        inputType:'checkbox',
-        groupItems:[16]
-      },
-      {
-        seq:7,
-        groupName:'Blood Drawn',
-        inputType:'checkbox',
-        groupItems:[17],
       },
       {
         seq:8,
@@ -1063,7 +1073,7 @@ exports.procedureSeed = [
       {
         seq:3,
         groupName:'Cathflow',
-        inputType:'radio',
+        inputType:'checkbox',
         hideHeader:true,
         hideGroup:true,
         groupItems:[55,56,73,74,75,76]
@@ -1086,7 +1096,7 @@ exports.procedureSeed = [
         seq:2,
         groupName:'Insertion Type',
         inputType:'radio',
-        groupItems:[58,59,60,61,62]
+        groupItems:[58,59,60,61,62,90]
       },
       {
         seq:3,

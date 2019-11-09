@@ -20,7 +20,9 @@ export default class EditProcedure extends Component {
       confirmationType:null,
       dressingChangeDate:this.props.activeRecord.dressingChangeDate ? moment(this.props.activeRecord.dressingChangeDate) : moment(),
       willSetDressingChangeDate:this.props.activeRecord.dressingChangeDate ? true : false,
-      dressingChangeDateIsSet:false
+      dressingChangeDateIsSet:false,
+      dob:this.props.activeRecord.dob ? moment(this.props.activeRecord.dob) : moment(),
+      dobIsSet:false
     }
     this.saveCurrentRecord = this.saveCurrentRecord.bind(this);
     this.hospitalChange = this.hospitalChange.bind(this);
@@ -47,6 +49,8 @@ export default class EditProcedure extends Component {
     // this.setRecordStateItems = this.setRecordStateItems.bind(this);
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
     this.dressingChangeDateOnChange = this.dressingChangeDateOnChange.bind(this);
+    this.dobOnChange = this.dobOnChange.bind(this);
+    this.toggleShowSection = this.toggleShowSection.bind(this);
   };
   
   componentDidMount(){
@@ -81,6 +85,12 @@ export default class EditProcedure extends Component {
   dressingChangeDateOnChange(date){
     this.setState({
       dressingChangeDate:date
+    })
+  }
+
+  dobOnChange(date){
+    this.setState({
+      dob:date
     })
   }
   
@@ -240,6 +250,9 @@ export default class EditProcedure extends Component {
     let currentRecord = this.state.currentRecord;
     if(e.target.value !== ''){
       currentRecord.hospital = Number(e.target.value);
+      if(currentRecord.hospital !== 6){
+        currentRecord.dob = null;
+      }
     } else {
       currentRecord.hospital = null;
     }
@@ -296,18 +309,29 @@ export default class EditProcedure extends Component {
 
   procedureVerified(proceduresObj){
     let errors = '';
-    let insertionTypesArr = [58,59,60,61,62];
-    let lineTypesArr = [30,58,59,60,61,62];
+    //UPDATE
+    let insertionTypesArr = [58,59,60,61,62,90];
+    let lineTypesArr = [30,58,59,60,61,62,90];
     let isInsertionProcedure = insertionTypesArr.some(r=> proceduresObj.itemIds.includes(r));
     let isLineType = lineTypesArr.some(r=> proceduresObj.itemIds.includes(r));
+    let isPortAccess = proceduresObj.itemIds.includes(30);
+
     if(!proceduresObj.itemIds.length && !this.state.currentRecord.wasConsultation){
       errors += '- You must select at least 1 procedure or confirm consultation\n';
+    }
+
+    if(this.state.currentRecord.hospital === 6 && this.state.currentRecord.dob === null){
+      errors += "- Please enter patient's date of birth in the 'hospital' section \n";
     }
 
     if(isLineType){
       if(!this.state.dressingChangeDateIsSet && !this.state.isPostEdit){
         errors += '- You must select a dressing change date\n';
       }
+    }
+
+    if(isPortAccess && !this.state.currentRecord.mrn){
+      errors += '- You must enter a Medical Record Number\n';
     }
 
     if(isInsertionProcedure){
@@ -332,7 +356,7 @@ export default class EditProcedure extends Component {
     if(this.state.currentRecord.status === 3){
       errors += "- Cannot submit a call that is 'on hold'. Change status from dropdown menu at start of form.";
     }
-    
+
     if(errors.length){
       this.setState({
         modalIsOpen:true, 
@@ -447,7 +471,7 @@ export default class EditProcedure extends Component {
 
   saveNewProcedure(){
     let proceduresObj = this.createProcedureObject();
-    console.log(proceduresObj);
+    // console.log(proceduresObj);
     if(this.procedureVerified(proceduresObj)){
       let completionTime = new Date();
       let callTime = new Date(this.state.currentRecord.createdAt);
@@ -461,7 +485,8 @@ export default class EditProcedure extends Component {
         completedBy:Number(this.props.currentUser.userId),
         completedAt:completionTime.toISOString(),
         procedureTime:completionTime - startTime,
-        responseTime:startTime - callTime
+        responseTime:startTime - callTime,
+        openBy:null
       })
       .then(resp=>{
         if(resp.data.error || resp.data._message){
@@ -529,6 +554,7 @@ export default class EditProcedure extends Component {
       updatedRecord.proceduresDone = proceduresObj.procedureArr;
       updatedRecord.procedureIds = proceduresObj.procedureIds;
       updatedRecord.itemIds = proceduresObj.itemIds;
+      updatedRecord.openBy = null;
       this.setState({currentRecord:updatedRecord}, ()=>{
         this.saveCurrentRecord();
         this.procedureSaved(true);
@@ -558,6 +584,14 @@ export default class EditProcedure extends Component {
     this.props.refreshUserSession();
   }
 
+  saveDobDate(){
+    let currentRecord = this.state.currentRecord;
+    currentRecord.dob = this.state.dob;
+    this.setState({
+      currentRecord
+    }, this.saveCurrentRecord);
+  }
+
   closeLineType(){
     this.setState({
       modalTitle:'Close Line Type?',
@@ -567,6 +601,10 @@ export default class EditProcedure extends Component {
       confirmationType:'close-line-type'
     });
     this.props.refreshUserSession();
+  }
+
+  toggleShowSection(e){
+    e.target.closest('.vas-edit-procedure-inner-container').querySelector('.vas-edit-procedure-inner-container-main').classList.toggle('vas-block');
   }
 
   render(){
@@ -587,7 +625,7 @@ export default class EditProcedure extends Component {
             {this.state.currentRecord.customJob &&
               <DebounceInput
                 type="text"
-                className="vas-edit-procedure-live-edit-input vas-edit-procedure-custom-job-input vas-inline-block"
+                className="vas-edit-procedure-live-edit-input vas-edit-procedure-custom-job-input vas-block"
                 debounceTimeout={750}
                 value={this.state.currentRecord.customJob ? this.state.currentRecord.customJob : ''}
                 onChange={e=>{this.inputLiveUpdate(e, 'customJob')}} />
@@ -633,7 +671,7 @@ export default class EditProcedure extends Component {
         </header>
         <div className="vas-edit-procedure-inner-container vas-edit-procedure-inner-container-main-comment">
           <header className="vas-edit-procedure-inner-container-header">
-            <p>Pre-Procedure Notes</p>
+            <p className='vas-ml-5'>Pre-Procedure Notes</p>
           </header>
           <div className="vas-edit-procedure-inner-container-main">
             <div className="vas-edit-procedure-inner-container-row">
@@ -645,7 +683,7 @@ export default class EditProcedure extends Component {
             return (
               <div className="vas-edit-procedure-inner-container" key={procedure._id}>
                 <header className="vas-edit-procedure-inner-container-header">
-                  <p>{procedure.name}</p>
+                  <p className='vas-edit-procedure-inner-container-section-name' onClick={this.toggleShowSection}>{procedure.name}</p>
                   <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.resetSection(e,procedure.procedureId)}}>Reset</button>
                 </header>
                 <div className="vas-edit-procedure-inner-container-main">
@@ -696,11 +734,21 @@ export default class EditProcedure extends Component {
                   }
                   {/* Add Dressing Change datepicker for Port-a-Cath and Insertion Procedures*/}
                   {(procedure.procedureId === 4 || procedure.procedureId === 8) && this.state.willSetDressingChangeDate &&
-                    <div className='vas-edit-procedure-inner-container-row'>
-                      <h3>Dressing Change Date</h3>
-                      <span className='vas-inline-block'><DatePicker className='vas-home-datepicker' selected={this.state.dressingChangeDate} onChange={this.dressingChangeDateOnChange} /></span>
-                      <button className='vas-home-save-date' onClick={e=>{this.saveDressingChangeDate(e)}}>Save</button>
-                    </div>
+                    <span>
+                      <div className='vas-edit-procedure-inner-container-row'>
+                        <h3>Dressing Change Date</h3>
+                        <span className='vas-inline-block'><DatePicker className='vas-home-datepicker' selected={this.state.dressingChangeDate} onChange={this.dressingChangeDateOnChange} /></span>
+                        <button className='vas-home-save-date' onClick={e=>{this.saveDressingChangeDate(e)}}>Save</button>
+                      </div>
+                      {/* Only show MRN in Port-A-Cath section since it's already at the bottom of the Insertion Procedure section by default */}
+                      {procedure.procedureId === 4 && 
+                        <div className='vas-edit-procedure-inner-container-row'>
+                          <label className='vas-mt-15 vas-mb-5 vas-block'>{this.props.allOptions[1].name}:</label>{/* Medical Record Number */}
+                          <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
+                        </div>
+                      }
+                    </span>
+
                   }
                   {procedure.procedureId === 8 && this.state.currentRecord.insertedBy &&
                     <span>
@@ -732,7 +780,7 @@ export default class EditProcedure extends Component {
         }
         <div className='vas-edit-procedure-inner-container'>
           <header className='vas-edit-procedure-inner-container-header'>
-            <p>Hospital</p>
+            <p className='vas-edit-procedure-inner-container-section-name' onClick={this.toggleShowSection}>Hospital</p>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
             <select className='vas-select' value={this.state.currentRecord.hospital ? this.state.currentRecord.hospital : ''} onChange={this.hospitalChange}>
@@ -741,11 +789,18 @@ export default class EditProcedure extends Component {
                 return <option key={subOption.id} value={subOption.id}>{subOption.name}</option>
               })}
             </select>
+            {this.state.currentRecord.hospital === 6 &&
+              <div className='vas-edit-procedure-dob-container'>
+                <h3>Patient Date of Birth (MM/DD/YYYY):</h3>
+                <span className='vas-inline-block'><DatePicker className='vas-home-datepicker' selected={this.state.dob} onChange={this.dobOnChange} /></span>
+                <button className='vas-home-save-date' onClick={e=>{this.saveDobDate(e)}}>Save</button>
+              </div>
+            }
           </div>
         </div>
         <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
           <header className='vas-edit-procedure-inner-container-header'>
-            <p>MD Order Change</p>
+            <p className='vas-edit-procedure-inner-container-section-name' onClick={this.toggleShowSection}>MD Order Change</p>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
             <select className='vas-select' value={this.state.currentRecord.orderChange ? this.state.currentRecord.orderChange : ''} onChange={this.orderSelect}>
@@ -758,7 +813,7 @@ export default class EditProcedure extends Component {
         </div>
         <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
           <header className='vas-edit-procedure-inner-container-header'>
-            <p>Consultation</p>
+            <p className='vas-edit-procedure-inner-container-section-name' onClick={this.toggleShowSection}>Consultation</p>
             <button className='vas-edit-procedure-reset-buttons' onClick={e=>{this.resetSection(e)}}>Reset</button>
           </header>
           <div className='vas-edit-procedure-inner-container-main'>
@@ -766,16 +821,16 @@ export default class EditProcedure extends Component {
             <label className="vas-btn" htmlFor='consultation'>Consultation Done</label>
           </div>
         </div>
-        <div className='vas-edit-procedure-inner-container'>
+        <div className='vas-edit-procedure-inner-container vas-edit-procedure-inner-container-main-comment'>
           <header className='vas-edit-procedure-inner-container-header'>
-            <p>Additional Comments</p>
+            <p className='vas-ml-5'>Additional Comments</p>
           </header>
-          <div className='vas-edit-procedure-inner-container-main'>
+          <div className='vas-edit-procedure-inner-container-main vas-block'>
             <DebounceInput element='textarea' className='vas-edit-procedure-add-comments' debounceTimeout={750} value={this.state.currentRecord.addComments ? this.state.currentRecord.addComments : ''} onChange={e=>{this.inputLiveUpdate(e, 'addComments')}}/>
           </div>
         </div>
         {this.state.currentRecord.dressingChangeDate &&
-          <div className='vas-edit-procedure-inner-container vas-edit-procedure-important'>
+          <div className='vas-edit-procedure-inner-container vas-edit-procedure-important vas-block'>
             <header className='vas-edit-procedure-inner-container-header'>
               <p>Close Line Type</p>
             </header>
@@ -786,7 +841,7 @@ export default class EditProcedure extends Component {
         }
         <div className="vas-edit-procedure-inner-container vas-edit-procedure-inner-container-final">
           <header className="vas-edit-procedure-inner-container-header vas-edit-procedure-inner-container-final-header">
-            <p>Submit Procedure</p>
+            <p className='vas-ml-5'>Submit Procedure</p>
           </header>
           <div className='vas-edit-procedure-final-container'>
             <div>

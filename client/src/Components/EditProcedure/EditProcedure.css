@@ -25,6 +25,10 @@
   font-size:110%;
   margin-bottom:10px;
 }
+.vas-edit-procedure-inner-container-section-name{
+  width: 100%;
+  padding: 18px 0 18px 5px;
+}
 .vas-edit-procedure-live-edit-input {
   background: none;
   border: none;
@@ -59,17 +63,34 @@
   margin-right: 10px;
   font-weight: bold;
 }
+.vas-edit-procedure-inner-container {
+  user-select:none;
+}
+.vas-edit-procedure-inner-container-main {
+  padding:10px;
+  background: #c5d5e6;
+  display:none;
+}
+.vas-edit-procedure-is-post-edit
+.vas-edit-procedure-inner-container-main {
+  display:block !important;
+}
+.vas-edit-procedure-inner-container-main-comment 
+.vas-edit-procedure-inner-container-main{
+  display:block;
+}
 .vas-edit-procedure-inner-container-main-comment
 .vas-edit-procedure-inner-container-header {
   background-color: goldenrod;
 }
 .vas-edit-procedure-inner-container-header {
-  padding: 10px;
   background-color: darkcyan;
   color: white;
   box-shadow: inset 0px -4px 8px -7px black;
   display:flex;
   align-items: center;
+  min-height:32px;
+  cursor:pointer;
 }
 .vas-edit-procedure-inner-container-main-comment
 .vas-edit-procedure-inner-container-main {
@@ -86,19 +107,15 @@
   background-color:darkorange;
   box-shadow: none;
 }
-.vas-edit-procedure-inner-container-main {
-  padding:10px;
-  background: #c5d5e6;
-}
 .vas-edit-procedure-inner-container-row {
   position: relative;
-  margin-bottom: 15px;
-  margin-top: 5px;
+  margin:5px 0;
 }
 .vas-edit-procedure-reset-buttons {
   margin: 0 auto;
-  margin-right: 0;
+  margin-right: 8px;
   padding: 5px;
+  user-select:none;
 }
 .vas-edit-procedure-inner-span[data-procedure="8"]{
   display:none;
@@ -215,4 +232,7 @@
   font-size: 90%;
   line-height: 115%;
   margin-bottom: 10px;
+}
+.vas-edit-procedure-dob-container {
+  margin-top:15px;
 }

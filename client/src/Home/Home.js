@@ -174,13 +174,17 @@ export default class Home extends Component{
   editCompletedCall(callId, completedBy, dressingChangeDate){
     let isAdmin = this.state.currentUser.role === 'admin' || this.state.currentUser.role === 'super';
     if(isAdmin || this.state.currentUser.userId === completedBy || dressingChangeDate !== null){
-      helpers.getCallById(callId).then(resp=>{
+      helpers.getCallById(callId, this.state.currentUser.userId).then(resp=>{
         this.setTab('active');
         this.setState({
           activeRecord:resp
         })
       }).catch(err=>{
-        console.log(err);
+        this.setState({
+          modalTitle:"Record Is Already Open",
+          modalMessage:`This record is currently open by ${this.state.usersById[err.userId].fullname}`,
+          modalIsOpen:true
+        })
       })
     } else {
       this.setState({
@@ -223,8 +227,17 @@ export default class Home extends Component{
         this.setState({queueItems});
         break;
       default:
+          axios.post('/set-as-done-editing', {
+            _id:this.state.activeRecord._id
+          }).then((resp)=>{
+            console.log(resp.data);
+          }).catch((err)=>{
+            console.log(err);
+          })
+          this.refreshUserSession();
         break;
     }
+    
     this.setTab('queue');
     this.setState({
       activeRecord:null
