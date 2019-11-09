@@ -88,56 +88,84 @@ exports.optionSeed = [
     callFieldName:'callNeeds',
     options:[
       {
+        seq:1,
         id:1,
         name:'New IV'
       },
       {
+        seq:2,
         id:2,
         name:'Lab Draw'
       },
       {
+        seq:3,
         id:3,
         name:'Labs + IV'
       },
       {
+        seq:4,
         id:4,
         name:'Blood Culture'
       },
       {
+        seq:5,
         id:5,
         name:'PICC Line'
       },
       {
+        seq:6,
         id:6,
         name:'ML'
       },
       {
+        seq:7,
         id:7,
         name:'Port Access'
       },
       {
+        seq:8,
         id:8,
         name:'Port De-Access'
       },
       {
+        seq:9,
         id:9,
         name:'Troubleshoot'
       },
       {
+        seq:10,
         id:10,
         name:'Dressing Change'
       },
       {
+        seq:11,
         id:11,
         name:'DC PICC'
       },
       {
+        seq:12,
         id:12,
         name:'Line Check'
       },
       {
+        seq:13,
         id:13,
+        name:'Labs + BC'
+      },
+      {
+        seq:1000,
+        id:14,
         name:'Custom'
+      },
+      {
+        seq: 15,
+        id: 15,
+        name: "From PICC"
+      },
+      {
+        seq: 16,
+        id: 16,
+        name: "From ML"
       }
     ]
   },

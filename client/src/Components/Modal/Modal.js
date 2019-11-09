@@ -66,7 +66,13 @@ export default class Modal extends Component {
       if(resp.data.error || resp.data._message){
         console.log(resp.data);
       } else {
-        this.setState({allOptions:resp.data});
+        let allOptions = resp.data;
+        allOptions[5].options.sort((a,b)=>{
+          if(a.seq > b.seq) return 1;
+          if(a.seq < b.seq) return -1;
+          return 0;
+        })
+        this.setState({allOptions});
       }
     })
     .catch((err)=>{
