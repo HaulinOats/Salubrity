@@ -709,8 +709,8 @@ app.get('/close-all-open-lines', (req,res)=>{
   })
 })
 
-app.get('/set-lines-as-unopen', (req,res)=>{
-  Call.updateMany({dressingChangeDate:{$ne:null}}, 
+app.get('/set-as-unopen', (req,res)=>{
+  Call.updateMany({completedBy:{$ne:null}},
     {$set:{openBy:null}}, {multi:true},(err, calls)=>{
     if(err) return res.send(err);
     res.send(true);

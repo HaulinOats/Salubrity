@@ -156,16 +156,6 @@ exports.optionSeed = [
         seq:1000,
         id:14,
         name:'Custom'
-      },
-      {
-        seq: 15,
-        id: 15,
-        name: "From PICC"
-      },
-      {
-        seq: 16,
-        id: 16,
-        name: "From ML"
       }
     ]
   },
@@ -915,6 +905,22 @@ exports.itemSeed = [
     groupName:'Insertion Type',
     value:'CVL',
     isCustom:false
+  },
+  {
+    itemId:91,
+    procedureName:'Lab Draw',
+    procedureId:2,
+    groupName:'Draw Type',
+    value:'From PICC',
+    isCustom:false
+  },
+  {
+    itemId:92,
+    procedureName:'Lab Draw',
+    procedureId:2,
+    groupName:'Draw Type',
+    value:'From ML',
+    isCustom:false
   }
 ];
 
@@ -993,7 +999,7 @@ exports.procedureSeed = [
         seq:2,
         groupName:'Draw Type',
         inputType:'radio',
-        groupItems:[19,20,89]
+        groupItems:[19,20,89,91,92]
       },
       {
         seq:3,

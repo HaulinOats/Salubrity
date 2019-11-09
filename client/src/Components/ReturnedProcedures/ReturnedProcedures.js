@@ -151,6 +151,12 @@ export default class ReturnedProcedures extends Component {
                             <p className='vas-admin-custom-item-subfield'>Hospital:</p>
                             <p className='vas-admin-custom-item-subvalue'>{call.hospital ? this.props.hospitalsById[call.hospital].name : 'N/A'}</p>
                           </div>
+                          {call.hospital === 6 && call.dob !== null && //if Siskin, and DOB exists
+                            <div className='vas-admin-custom-table-td vas-admin-custom-table-hospital'>
+                              <p className='vas-admin-custom-item-subfield'>Patient DOB:</p>
+                              <p className='vas-admin-custom-item-subvalue'><Moment format='MM/DD/YYYY'>{call.dob}</Moment></p>
+                            </div>
+                          }
                           <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
                             <p className='vas-admin-custom-item-subfield'>MRN:</p>
                             <p className='vas-admin-custom-item-subvalue'>{call.mrn ? call.mrn : 'N/A'}</p>
