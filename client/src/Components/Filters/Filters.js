@@ -59,11 +59,14 @@ export default class Filters extends Component {
 
     let procedureOptions = [];
     for(let i = 0; i < this.props.procedures.length; i++){
-      procedureOptions.push({
-        value:this.props.procedures[i].procedureId,
-        text:this.props.procedures[i].name
-      })
+      if(this.props.procedures[i].procedureId !== 10){//if PIV (2nd) procedure, don't add to options dropdown
+        procedureOptions.push({
+          value:this.props.procedures[i].procedureId,
+          text:this.props.procedures[i].name
+        })
+      }
     }
+    console.log(procedureOptions);
     let insertionTypeOptions = [];
     Object.keys(this.props.itemsById).forEach(itemId=>{
       if(this.props.itemsById[itemId].groupName === 'Insertion Type'){

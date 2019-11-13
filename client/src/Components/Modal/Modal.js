@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './Modal.css';
 import axios from 'axios';
 import {DebounceInput} from 'react-debounce-input';
+import helpers from '../../helpers';
 
 export default class Modal extends Component {
   constructor(props){
@@ -34,17 +35,19 @@ export default class Modal extends Component {
     this.toggleStat = this.toggleStat.bind(this);
     this.toggleExternalPlacement = this.toggleExternalPlacement.bind(this);
   };
-
-  componentWillMount(){
+  
+  componentDidMount(){
     if(this.state.modalTitle === "Add Call"){
       this.setState({isAddCall:true}, ()=>{
-        this.getOptionsData();
+        helpers.getOptionsData().then(resp=>{
+          this.setState({
+            allOptions:resp.options
+          })
+        }).catch(err=>{
+          console.log(err);
+        });
       });
     }
-  }
-
-  componentDidMount(){
-    console.log(this.state);
   }
 
   toggleStat(){
@@ -57,31 +60,6 @@ export default class Modal extends Component {
 
   toggleExternalPlacement(){
     this.setState({isExternalPlacement:!this.state.isExternalPlacement}, this.validateAddCall);
-  }
-
-  getOptionsData(){
-    this.setState({isLoading:true});
-    axios.get('/get-options')
-    .then((resp)=>{
-      if(resp.data.error || resp.data._message){
-        console.log(resp.data);
-      } else {
-        let allOptions = resp.data;
-        allOptions[5].options.sort((a,b)=>{
-          if(a.seq > b.seq) return 1;
-          if(a.seq < b.seq) return -1;
-          return 0;
-        })
-        this.setState({allOptions});
-      }
-    })
-    .catch((err)=>{
-      console.log(err);
-      this.addToErrorArray(err);
-    })
-    .finally(()=>{
-      this.setState({isLoading:false});
-    })
   }
 
   handleNeedSelect(e){

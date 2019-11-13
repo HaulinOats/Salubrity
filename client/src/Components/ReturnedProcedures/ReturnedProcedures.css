@@ -123,18 +123,23 @@
   clear:left;
 }
 .vas-call-consultation-container,
-.vas-call-insertedBy-container{
+.vas-call-insertedBy-container,
+.vas-call-dressing-change-container{
   padding: 1%;
   width: 87%;
   margin-left: 11%;
 }
 .vas-call-insertedBy,
-.vas-call-consultation {
+.vas-call-consultation,
+.vas-call-dressing-change {
   font-size: 85%;
   font-weight: bold;
   color: green;
 }
 .vas-call-insertedBy{
+  color:teal;
+}
+.vas-call-dressing-change {
   color:teal;
 }
 .vas-admin-query-procedure-container {
@@ -221,6 +226,13 @@
 .vas-returned-procedures-aggregations-insertions-item-right {
   margin:0 auto;
   margin-right:0;
+}
+.vas-returned-procedures-time-hour-min {
+  font-weight:bold;
+  display:block;
+}
+.vas-returned-procedures-time-month-day {
+
 }
 @media (min-width: 650px) {
   .vas-home-custom-table-column-1 {

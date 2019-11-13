@@ -134,8 +134,8 @@ export default class ReturnedProcedures extends Component {
                   <div className='vas-admin-custom-table-item-outer'>
                     <div className='vas-admin-custom-table-item vas-call-table-item'>
                       <div className='vas-home-custom-table-column-1'>
-                        <Moment format='HH:mm'>{helpers.getDateFromObjectId(call._id)}</Moment>
-                        <Moment className='vas-home-table-time-date' format='M/D'>{helpers.getDateFromObjectId(call._id)}</Moment>
+                        <Moment className='vas-returned-procedures-time-hour-min' format='HH:mm'>{helpers.getDateFromObjectId(call._id)}</Moment>
+                        <Moment className='vas-returned-procedures-time-month-day' format='M/D'>{helpers.getDateFromObjectId(call._id)}</Moment>
                       </div>
                       <div className={'vas-home-custom-table-column-2 ' + (call.orderChange ? 'vas-admin-order-change' : '')}>
                         <div className='vas-admin-custom-table-td vas-admin-custom-table-nurse'>
@@ -220,6 +220,11 @@ export default class ReturnedProcedures extends Component {
                   {call.wasConsultation &&
                     <div className='vas-call-consultation-container'>
                       <p className='vas-call-consultation'>Consultation Done</p>
+                    </div>
+                  }
+                  {call.dressingChangeDate &&
+                    <div className='vas-call-dressing-change-container'>
+                      <p className='vas-call-dressing-change'>Dressing Changed On: <Moment format='M/D'>{call.dressingChangeDate}</Moment></p>
                     </div>
                   }
                   {(call.addComments || call.preComments) &&

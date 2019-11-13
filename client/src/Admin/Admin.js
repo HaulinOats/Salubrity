@@ -395,7 +395,7 @@ export default class Admin extends Component {
     //UPDATE
     let insertionAgg = [];
     itemsAggregation.forEach((item, idx)=>{
-      switch(item._id){
+      switch(item._id){//Item IDs for Insertion Procedures
         case 58:
         case 59:
         case 60:
@@ -414,8 +414,6 @@ export default class Admin extends Component {
     this.setState({
       queriedCalls,
       insertionAgg
-    }, ()=>{
-      console.log(this.state.insertionAgg);
     });
   }
 

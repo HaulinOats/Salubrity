@@ -100,7 +100,20 @@ const helpers = {
         if(resp.data.error || resp.data._message){
           reject(resp.data);
         } else {
-          resolve(resp.data);
+          let proceduresById = {};
+          for(let i = 0; i < resp.data.procedures.length; i++){
+            proceduresById[resp.data.procedures[i].procedureId] = resp.data.procedures[i];
+          }
+          let procedures = resp.data.procedures;
+          procedures.sort((a,b)=>{
+            if(a.seq > b.seq) return 1;
+            if(a.seq < b.seq) return -1;
+            return 0;
+          })
+          resolve({
+            proceduresById,
+            procedures
+          });
         }
       }).catch((err)=>{
         reject(err);
@@ -113,22 +126,28 @@ const helpers = {
         if(resp.data.error || resp.data._message){
           reject(resp.data);
         } else {
-          let hospitals = resp.data[0];
+          let respData = resp.data;
+          let hospitals = respData[0];
           let hospitalsById = {};
-          resp.data[0].options.forEach(hospital=>{
+          respData[0].options.forEach(hospital=>{
             hospitalsById[hospital.id] = hospital;
           });
-          let orderChanges = resp.data[3];
+          let orderChanges = respData[3];
           let orderChangeById = {};
-          resp.data[3].options.forEach(order=>{
+          respData[3].options.forEach(order=>{
             orderChangeById[order.id] = order;
           });
           let statuses = {};
-          resp.data[6].options.forEach(status=>{
+          respData[6].options.forEach(status=>{
             statuses[status.id] = status;
           })
+          respData[5].options.sort((a,b)=>{
+            if(a.seq > b.seq) return 1;
+            if(a.seq < b.seq) return -1;
+            return 0;
+          })
           resolve({
-            options:resp.data,
+            options:respData,
             hospitals,
             hospitalsById,
             orderChanges,
@@ -172,6 +191,17 @@ const helpers = {
         }
       }).catch((err)=>{
         reject(err)
+      })
+    })
+  },
+  getOpenCallForUser:function(userId){
+    return new Promise((resolve, reject)=>{
+      axios.post('/get-open-call-for-user', {openBy:userId}).then(resp=>{
+        if(resp.data.error || resp.data._message){
+          reject(resp.data);
+        } else {
+          resolve(resp.data);
+        }
       })
     })
   }

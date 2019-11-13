@@ -38,7 +38,7 @@ export default class LineProcedures extends Component{
               }
             });
             return(
-              <div key={lineProcedure._id + idx} className={'vas-line-procedures-line-item ' + (daysTilDressingDate < 2 ? 'vas-line-procedure-line-item-attention ' : '') + (lineProcedure.isHidden ? 'vas-line-procedure-line-item-hidden' : '')} onClick={e=>{this.props.editCompletedCall(lineProcedure._id, lineProcedure.completedBy)}}>
+              <div key={lineProcedure._id + idx} className={'vas-line-procedures-line-item ' + (daysTilDressingDate < 2 ? 'vas-line-procedure-line-item-attention ' : '') + (lineProcedure.isHidden ? 'vas-line-procedure-line-item-hidden' : '')} onClick={e=>{this.props.editCompletedCall(lineProcedure._id, lineProcedure.completedBy, lineProcedure.dressingChangeDate)}}>
                 <div className='vas-line-procedures-line-item-left'>
                   <Moment className='vas-line-procedures-main-date' format='M/D'>{lineProcedure.dressingChangeDate}</Moment>
                   <p className={'vas-line-procedures-open-status vas-open-status ' + (lineProcedure.openBy ? 'vas-open-label-blink' : '' )}>{lineProcedure.openBy ? 'OPEN' : ''}</p>
@@ -66,16 +66,16 @@ export default class LineProcedures extends Component{
                   </div>
                   <div className='vas-line-procedures-line-item-field-container'>
                     <p className='vas-line-procedures-line-item-field-container-left'>Insertion Date:</p>
-                    <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D'>{lineProcedure.completedAt}</Moment></p>
+                    <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D'>{lineProcedure.createdAt}</Moment></p>
                   </div>
-                  <div className='vas-line-procedures-line-item-field-container'>
+                  {/* <div className='vas-line-procedures-line-item-field-container'>
                     <p className='vas-line-procedures-line-item-field-container-left'>Updated By:</p>
                     <p className='vas-line-procedures-line-item-field-container-right vas-capitalize'>{lineProcedure.updatedBy ? this.props.usersById[lineProcedure.updatedBy].fullname : this.props.usersById[lineProcedure.completedBy].fullname}</p>
                   </div>
                   <div className='vas-line-procedures-line-item-field-container'>
                     <p className='vas-line-procedures-line-item-field-container-left'>Updated At:</p>
                     <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D HH:mm'>{lineProcedure.updatedAt ? lineProcedure.updatedAt : lineProcedure.completedAt}</Moment></p>
-                  </div>
+                  </div> */}
                   {/* <div className='vas-line-procedures-line-item-field-container'>
                     <p className='vas-line-procedures-line-item-field-container-left'>Dressing Date:</p>
                     <p className='vas-line-procedures-line-item-field-container-right'><Moment format='M/D'>{lineProcedure.dressingChangeDate}</Moment></p>

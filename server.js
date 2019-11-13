@@ -34,34 +34,37 @@ userSchema.plugin(uniqueValidator, {message: `Could not insert user based on uni
 let User = mongoose.model('User', userSchema);
 
 let callSchema = new Schema({
-  createdAt:{type:Date, default:Date.now()},
-  hospital:{type:Number, default:null},
-  room:{type:String, default:null, lowercase:true},
-  provider:{type:String, lowercase:true},
-  job:String,
-  customJob:{type:String, default:null},
-  preComments:{type:String, default:null},
   addComments:{type:String, default:null},
-  contact:{type:String, default:null},
-  startTime:{type:Date, default:null},
-  openBy:{type:Number, default:null},
-  procedureIds:{type:Array, default:null},
-  itemIds:{type:Array, default:null},
-  proceduresDone:[Object],
-  insertionLength:{type:Number, default:0},
-  dressingChangeDate:{type:Date, default:null},
-  mrn:{type:Number, default:null},
   completedAt:{type:Date, default:null, index:true},
-  responseTime:{type:Number, default:null},
-  procedureTime:{type:Number, default:null},
   completedBy:{type:Number, default:null},
+  contact:{type:String, default:null},
+  createdAt:{type:Date, default:Date.now()},
+  createdBy:{type:Date, default:null},
+  customJob:{type:String, default:null},
+  dob:{type:Date, default:null},
+  dressingChangeDate:{type:Date, default:null},
+  hospital:{type:Number, default:null},
+  insertedBy:{type:String, default:null},
+  insertionLength:{type:Number, default:0},
+  itemIds:{type:Array, default:null},
+  job:String,
+  mrn:{type:Number, default:null},
+  openBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
-  wasConsultation:{type:Boolean, default:false},
+  preComments:{type:String, default:null},
+  procedureIds:{type:Array, default:null},
+  proceduresDone:[Object],
+  procedureTime:{type:Number, default:null},
+  provider:{type:String, lowercase:true},
+  responseTime:{type:Number, default:null},
+  room:{type:String, default:null, lowercase:true},
+  startTime:{type:Date, default:null},
   status:{type:Number, default:1},
   updatedAt:{type:Date, default:null},
   updatedBy:{type:Number, default:null},
-  insertedBy:{type:String, default:null},
-  dob:{type:Date, default:null}
+  wasConsultation:{type:Boolean, default:false}
+},{
+  versionKey: false
 })
 callSchema.plugin(uniqueValidator, {message: `Could not insert call based on unique constraint: {PATH} {VALUE} {TYPE}`});
 let Call = mongoose.model('Call', callSchema);
@@ -144,7 +147,10 @@ app.post('/delete-call', (req, res)=>{
 });
 
 app.get('/get-active-calls', (req, res)=>{
-  Call.find({completedAt:null}, (err, calls)=>{
+  Call.find({
+    completedAt:null,
+    dressingChangeDate:null
+  }, (err, calls)=>{
     if(err) return res.send(err);
     if(calls){
       res.send(calls);
@@ -154,8 +160,22 @@ app.get('/get-active-calls', (req, res)=>{
   })
 });
 
+app.post('/get-open-call-for-user', (req, res)=>{
+  Call.findOne(req.body, (err, call)=>{
+    if(err) return res.send(err);
+    if(call){
+      res.send(call);
+    } else {
+      res.send({'error':'no open records for user'});
+    }
+  })
+});
+
 app.get('/get-open-line-procedures', (req, res)=>{
-  Call.find({dressingChangeDate:{$ne:null}}).sort({dressingChangeDate:1}).exec((err, calls)=>{
+  Call.find({
+    dressingChangeDate:{$ne:null},
+    completedAt:null
+  }).sort({dressingChangeDate:1}).exec((err, calls)=>{
     if(err) return res.send(err);
     if(calls){
       res.send(calls);
@@ -217,9 +237,58 @@ app.post('/set-as-done-editing', (req, res)=>{
 });
 
 app.post('/procedure-completed', (req, res)=>{
-  Call.findOneAndUpdate({_id:req.body._id},{$set:req.body}, (err, call)=>{
+  // let updateObj = req.body;
+  // updateObj.completedAt = new Date(updateObj.completedAt);
+  Call.findOneAndUpdate({_id:req.body.newCallObj._id},{$set:req.body.newCallObj}, {new:true}, (err, call)=>{
     if(err) return res.send(err);
-    res.send(call);
+    //if a dressing change date was set, create new call record
+    //and populate with relevant line procedure data
+    if(req.body.dressingChangeDate){
+      let newCallObj = {};
+      newCallObj.completedAt = null;
+      newCallObj.hospital = call.hospital;
+      newCallObj.room = call.room;
+      newCallObj.provider = call.provider;
+      newCallObj.job = call.job;
+      newCallObj.customJob = call.customJob;
+      newCallObj.contact = call.contact;
+      newCallObj.insertionLength = call.insertionLength;
+      newCallObj.mrn = call.mrn;
+      newCallObj.orderChange = call.orderChange;
+      newCallObj.wasConsultation = call.wasConsultation;
+      newCallObj.createdBy = call.completedBy;
+      newCallObj.createdAt = new Date();
+      newCallObj.startTime = new Date();
+      newCallObj.dob = call.dob;
+      newCallObj.insertedBy = call.insertedBy;
+      newCallObj.dressingChangeDate = new Date(req.body.dressingChangeDate);
+
+      //carry over any line procedure selections (anything within Port-A-Cath and Insertion Procedures)
+      let itemIds = [];
+      let procedureIds = [];
+      let proceduresDone = call.proceduresDone;
+      var i = proceduresDone.length;
+      while (i--) {
+        if(proceduresDone[i].procedureId === 4 || proceduresDone[i].procedureId === 8){
+          procedureIds.push(proceduresDone[i].procedureId);
+          proceduresDone[i].itemIds.forEach(itemId=>{
+            itemIds.push(itemId);
+          })
+        } else {
+          proceduresDone.splice(i,1);
+        }
+      }
+      newCallObj.procedureIds = procedureIds;
+      newCallObj.itemIds = itemIds;
+      newCallObj.proceduresDone = proceduresDone;
+
+      Call.create(newCallObj, (err2, call2)=>{
+        if(err2) return res.send(err2);
+        res.send(call2);
+      })
+    } else {
+      res.send(call);
+    }
   })
 });
 
@@ -285,25 +354,25 @@ app.post('/get-call-by-id', (req, res)=>{
   });
 })
 
-app.post('/get-calls-by-hospital-and-insertion-type', (req, res)=>{
-  Call.find({
-    completedAt: {
-      $gte: new Date(req.body.dateQuery.startDate),
-      $lt: new Date(req.body.dateQuery.endDate)
-    },
-    hospital:req.body.hospital,
-    'proceduresDone.itemIds':{
-      $in:req.body.itemIds
-    }
-  }, (err, calls)=>{
-    if(err) return res.send(err);
-    if(calls.length){
-      res.send(calls);
-    } else {
-      res.send({'error':`no calls returned for this query: procedureId = ${req.body.procedureId}`});
-    }
-  })
-})
+// app.post('/get-calls-by-hospital-and-insertion-type', (req, res)=>{
+//   Call.find({
+//     completedAt: {
+//       $gte: new Date(req.body.dateQuery.startDate),
+//       $lt: new Date(req.body.dateQuery.endDate)
+//     },
+//     hospital:req.body.hospital,
+//     'proceduresDone.itemIds':{
+//       $in:req.body.itemIds
+//     }
+//   }, (err, calls)=>{
+//     if(err) return res.send(err);
+//     if(calls.length){
+//       res.send(calls);
+//     } else {
+//       res.send({'error':`no calls returned for this query: procedureId = ${req.body.procedureId}`});
+//     }
+//   })
+// })
 
 //ADMIN
 app.post('/add-user', (req, res)=>{
@@ -412,6 +481,14 @@ app.get('/get-completed-calls', (req, res)=>{
   });
 });
 
+app.post('/create-dressing-change-record', (req, res)=>{
+  console.log(req.body);
+  // Call.create(req.body, (err, call)=>{
+  //   if(err) return res.send(err);
+  //   call.dressingChangeDate = new Date(req.body.dressingChangeDate);
+  // });
+});
+
 app.post('/get-calls-by-query', (req, res)=>{
   
   //normal query
@@ -428,10 +505,15 @@ app.post('/get-calls-by-query', (req, res)=>{
     filterValue = filter[1];
     switch(fieldName){
       case 'insertionType':
-        queryObj['proceduresDone.itemIds'] = {$in:[Number(filterValue)]}
+        queryObj['itemIds'] = {$in:[Number(filterValue)]}
         break;
       case 'procedureId':
-        queryObj['proceduresDone.procedureId'] = Number(filterValue)
+        let fValue = Number(filterValue);
+        if(fValue === 1 || fValue === 10){
+          queryObj['procedureIds'] = {$in:[1,10]}
+        } else {
+          queryObj['procedureIds'] = Number(filterValue)
+        }
         break;
       case 'insertedBy':
         queryObj['insertedBy'] = {$ne:null}
@@ -492,24 +574,24 @@ app.post('/calls-containing-value', (req, res)=>{
   })
 })
 
-app.post('/calls-by-procedure-id', (req, res)=>{
-  Call.find({
-    completedAt: {
-      $gte: new Date(req.body.dateQuery.startDate),
-      $lt: new Date(req.body.dateQuery.endDate)
-    },
-    'proceduresDone.procedureId':{
-      $eq:req.body.procedureId
-    }
-  }, (err, calls)=>{
-    if(err) return res.send(err);
-    if(calls.length){
-      res.send(calls);
-    } else {
-      res.send({'error':`no calls returned for this query: procedureId = ${req.body.procedureId}`});
-    }
-  })
-});
+// app.post('/calls-by-procedure-id', (req, res)=>{
+//   Call.find({
+//     completedAt: {
+//       $gte: new Date(req.body.dateQuery.startDate),
+//       $lt: new Date(req.body.dateQuery.endDate)
+//     },
+//     'proceduresDone.procedureId':{
+//       $eq:req.body.procedureId
+//     }
+//   }, (err, calls)=>{
+//     if(err) return res.send(err);
+//     if(calls.length){
+//       res.send(calls);
+//     } else {
+//       res.send({'error':`no calls returned for this query: procedureId = ${req.body.procedureId}`});
+//     }
+//   })
+// });
 
 app.post('/calls-by-single-criteria', (req, res)=>{
   Call.find({

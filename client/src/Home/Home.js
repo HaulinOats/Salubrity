@@ -54,7 +54,7 @@ export default class Home extends Component{
     this.reverseCompletedSort = this.reverseCompletedSort.bind(this);
     this.stateLoadCalls = this.stateLoadCalls.bind(this);
     this.addToErrorArray = this.addToErrorArray.bind(this);
-    this.checkActiveRecordExists = this.checkActiveRecordExists.bind(this);
+    this.getOpenCallForUser = this.getOpenCallForUser.bind(this);
     this.visibilityChange = this.visibilityChange.bind(this);
     this.editCompletedCall = this.editCompletedCall.bind(this);
     this.resetState = this.resetState.bind(this);
@@ -302,12 +302,8 @@ export default class Home extends Component{
     });
 
     helpers.getProcedureData().then(data=>{
-      let proceduresById = {};
-      for(let i = 0; i < data.procedures.length; i++){
-        proceduresById[data.procedures[i].procedureId] = data.procedures[i];
-      }
       this.setState({
-        proceduresById,
+        proceduresById:data.proceduresById,
         procedures:data.procedures
       })
     }).catch(err=>{
@@ -391,7 +387,7 @@ export default class Home extends Component{
         lastUpdateHide:true
       }, ()=>{
         this.setState({lastUpdateHide:false})
-        this.checkActiveRecordExists()
+        this.getOpenCallForUser()
       });
     }).catch(err=>{
       this.addToErrorArray(err);
@@ -447,20 +443,14 @@ export default class Home extends Component{
   }
 
 
-  checkActiveRecordExists(){
-    if(!this.state.activeRecord){
-      let activeRecordExists = false;
-      for(let i = 0; i < this.state.queueItems.length; i++){
-        if(this.state.queueItems[i].openBy && this.state.queueItems[i].openBy === this.state.currentUser.userId){
-          activeRecordExists = true;
-          this.setState({activeRecord:this.state.queueItems[i]});
-          break;
-        }
-      }
-      if(!activeRecordExists){
-        this.setState({activeHomeTab:'queue'});
-      }
-    }
+  getOpenCallForUser(){
+    helpers.getOpenCallForUser(this.state.currentUser.userId).then(data=>{
+      this.setState({
+        activeRecord:data
+      })
+    }).catch(err=>{
+      // console.log(err);
+    })
   }
 
   addToErrorArray(err){

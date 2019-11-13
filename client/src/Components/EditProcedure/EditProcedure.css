@@ -71,6 +71,12 @@
   background: #c5d5e6;
   display:none;
 }
+.vas-edit-procedure-is-dressing-change
+.vas-edit-procedure-inner-span {
+  display:block !important;
+}
+.vas-edit-procedure-is-dressing-change
+.vas-edit-procedure-inner-container-main,
 .vas-edit-procedure-is-post-edit
 .vas-edit-procedure-inner-container-main {
   display:block !important;
@@ -177,6 +183,8 @@
   margin-bottom: 5px;
   padding-bottom: 5px;
 }
+.vas-edit-procedure-is-dressing-change
+.vas-edit-procedure-inner-span[data-procedure="8"],
 .vas-edit-procedure-is-post-edit 
 .vas-edit-procedure-inner-span[data-procedure="8"]{
   display:block;
