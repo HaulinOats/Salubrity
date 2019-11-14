@@ -44,6 +44,7 @@ let callSchema = new Schema({
   dob:{type:Date, default:null},
   dressingChangeDate:{type:Date, default:null},
   hospital:{type:Number, default:null},
+  initialExternalPlacement:{type:Boolean, default:false},
   insertedBy:{type:String, default:null},
   insertionLength:{type:Number, default:0},
   itemIds:{type:Array, default:null},
@@ -237,8 +238,6 @@ app.post('/set-as-done-editing', (req, res)=>{
 });
 
 app.post('/procedure-completed', (req, res)=>{
-  // let updateObj = req.body;
-  // updateObj.completedAt = new Date(updateObj.completedAt);
   Call.findOneAndUpdate({_id:req.body.newCallObj._id},{$set:req.body.newCallObj}, {new:true}, (err, call)=>{
     if(err) return res.send(err);
     //if a dressing change date was set, create new call record
@@ -284,7 +283,14 @@ app.post('/procedure-completed', (req, res)=>{
 
       Call.create(newCallObj, (err2, call2)=>{
         if(err2) return res.send(err2);
-        res.send(call2);
+        if(req.body.initialExternalPlacement){
+          Call.deleteOne({_id:req.body.newCallObj._id}, (err3)=>{
+            if(err3) return res.send(err3);
+            res.send(call2);
+          })
+        } else {
+          res.send(call2);
+        }
       })
     } else {
       res.send(call);

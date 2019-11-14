@@ -16,6 +16,7 @@ export default class ReturnedProcedures extends Component {
     this.toggleSort = this.toggleSort.bind(this);
     this.sortByOnChange = this.sortByOnChange.bind(this);
     this.aggregateData = this.aggregateData.bind(this);
+    this.toggleShowRecord = this.toggleShowRecord.bind(this);
   };
 
   componentDidMount(){
@@ -70,6 +71,12 @@ export default class ReturnedProcedures extends Component {
     let queriedProcedures = this.state.queriedProcedures;
     queriedProcedures.reverse();
     this.setState({queriedProcedures});
+  }
+
+  toggleShowRecord(e){
+    let showToggleContainer = e.target.closest('.vas-returned-procedures-show-hide-toggle-container');
+    showToggleContainer.querySelector('.vas-returned-procedures-show-hide-toggle-icon').classList.toggle('vas-rotate-180');
+    showToggleContainer.nextSibling.classList.toggle('vas-hide');
   }
 
   render(){
@@ -129,8 +136,13 @@ export default class ReturnedProcedures extends Component {
             let procedureTimeHr = Math.floor(call.procedureTime/3600000) % 24;
             let procedureTimeMin = Math.floor(call.procedureTime/60000) % 60;
             return(
-              <div className='vas-admin-custom-table-item-outer-container' key={call._id} onClick={e=>{this.props.editCompletedCall(call._id, call.completedBy, call.dressingChangeDate)}}>
-                <div className='vas-admin-custom-table-item-outer'>
+              <div className='vas-admin-custom-table-item-outer-container' key={call._id}>
+                {this.props.isAdmin &&
+                  <div className='vas-returned-procedures-show-hide-toggle-container'>
+                    <p className='vas-returned-procedures-show-hide-toggle-icon' onClick={this.toggleShowRecord}>&#9660;</p>
+                  </div>
+                }
+                <div className='vas-admin-custom-table-item-outer' onClick={e=>{this.props.editCompletedCall(call._id, call.completedBy, call.dressingChangeDate)}}>
                   <div className='vas-admin-custom-table-item-outer'>
                     <div className='vas-admin-custom-table-item vas-call-table-item'>
                       <div className='vas-home-custom-table-column-1'>

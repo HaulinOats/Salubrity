@@ -339,7 +339,8 @@
 @media print {
   .vas-main-header,
   .vas-filters,
-  .vas-table-thead-row {
+  .vas-table-thead-row
+  .vas-returned-procedures-show-hide-toggle-container {
     display:none !important;
   }
 }

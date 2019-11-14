@@ -477,6 +477,7 @@ export default class EditProcedure extends Component {
           responseTime:startTime - callTime,
           openBy:null
         },
+        initialExternalPlacement:this.state.currentRecord.initialExternalPlacement,
         dressingChangeDate:this.state.dressingChangeDateIsSet ? this.state.dressingChangeDate.toISOString() : null
       };
 

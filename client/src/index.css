@@ -440,6 +440,9 @@ select {
 .vas-block {
   display:block;
 }
+.vas-hide {
+  display:none;
+}
 .vas-inline-block {
   display:inline-block;
 }
@@ -484,6 +487,9 @@ select {
 .vas-open-label-blink:after {
   content:'\203A';
   margin-left:3px;
+}
+.vas-rotate-180 {
+  transform:rotate(180deg);
 }
 
 @media (max-width: 650px) {
