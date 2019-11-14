@@ -661,7 +661,7 @@ export default class EditProcedure extends Component {
           {!this.state.isPostEdit &&
             <span>
               <button className="vas-edit-procedure-record-header-btn" onClick={this.resetForm}>Reset Form</button>
-              <button className="vas-edit-procedure-record-header-btn" onClick={this.returnToQueue}>Return To Queue</button>
+              <button className="vas-edit-procedure-record-header-btn" onClick={this.returnToQueue}>{this.state.dressingChangeDate ? 'Return To Lines Tab' : 'Return To Queue'}</button>
             </span>
           }
           {this.state.isPostEdit &&
@@ -688,6 +688,10 @@ export default class EditProcedure extends Component {
                 </header>
                 <div className="vas-edit-procedure-inner-container-main">
                   {procedure.groups.map((group, idx2)=>{
+                    let disableButton = false;
+                    if((procedure.procedureId === 4 || procedure.procedureId === 8) && this.state.dressingChangeDate && this.props.currentUser.role === 'user'){
+                      disableButton = true;
+                    }
                     return(
                       <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + '_' + group.groupName}>
                         {group.hideGroup &&
@@ -708,7 +712,8 @@ export default class EditProcedure extends Component {
                                         className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} 
                                         data-procedureid={procedure.procedureId} id={itemId} 
                                         name={procedure.procedureId + "_" + group.groupName.replace(/\s/g,'')}
-                                        defaultChecked={this.state.currentRecord.itemIds.indexOf(itemId) > -1 ? true : false}/>
+                                        defaultChecked={this.state.currentRecord.itemIds.indexOf(itemId) > -1 ? true : false}
+                                        disabled={disableButton}/>
                                       <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, group.groupName, itemId)}}>{this.props.itemsById[itemId].value}</label>
                                     </span>
                                   }
