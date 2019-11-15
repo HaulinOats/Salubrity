@@ -689,7 +689,8 @@ export default class EditProcedure extends Component {
                 <div className="vas-edit-procedure-inner-container-main">
                   {procedure.groups.map((group, idx2)=>{
                     let disableButton = false;
-                    if((procedure.procedureId === 4 || procedure.procedureId === 8) && this.state.dressingChangeDate && this.props.currentUser.role === 'user'){
+                    //disable selecting/deselecting line procedure options by normal users when editing a dressing change 
+                    if(procedure.procedureId === 8 && this.state.dressingChangeDate && this.props.currentUser.role === 'user'){
                       disableButton = true;
                     }
                     return(
@@ -726,7 +727,8 @@ export default class EditProcedure extends Component {
                                         data-procedureid={procedure.procedureId} 
                                         placeholder={this.props.itemsById[itemId].value}
                                         value={this.state.currentRecord[group.fieldName]}
-                                        id={itemId} />
+                                        id={itemId} 
+                                        readOnly={disableButton}/>
                                     </span>
                                   }
                                 </span>
