@@ -690,9 +690,9 @@ export default class EditProcedure extends Component {
                   {procedure.groups.map((group, idx2)=>{
                     let disableButton = false;
                     //disable selecting/deselecting line procedure options by normal users when editing a dressing change 
-                    if(procedure.procedureId === 8 && this.state.dressingChangeDate && this.props.currentUser.role === 'user'){
-                      disableButton = true;
-                    }
+                    // if(procedure.procedureId === 8 && this.state.dressingChangeDate && this.props.currentUser.role === 'user'){
+                    //   disableButton = true;
+                    // }
                     return(
                       <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + '_' + group.groupName}>
                         {group.hideGroup &&
