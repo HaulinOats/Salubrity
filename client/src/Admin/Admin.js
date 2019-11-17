@@ -48,7 +48,12 @@ export default class Admin extends Component {
       JSONFileName:'',
       hideUI:false,
       insertionAgg:[],
-      hospitalAgg:[]
+      hospitalAgg:[],
+      updateAdminPassword:false,
+      adminUsername:'',
+      adminPassword:'',
+      adminNewPassword:'',
+      adminNewPasswordConfirm:''
     }
     this.seedProcedures = this.seedProcedures.bind(this);
     this.seedOptions = this.seedOptions.bind(this);
@@ -71,6 +76,11 @@ export default class Admin extends Component {
     this.togglePasswordVisibility = this.togglePasswordVisibility.bind(this);
     this.toggleHideUI = this.toggleHideUI.bind(this);
     this.hidingUI = this.hidingUI.bind(this);
+    this.adminUsernameOnChange = this.adminUsernameOnChange.bind(this);
+    this.adminPasswordOnChange = this.adminPasswordOnChange.bind(this);
+    this.adminNewPasswordOnChange = this.adminNewPasswordOnChange.bind(this);
+    this.adminNewPasswordConfirmOnChange = this.adminNewPasswordConfirmOnChange.bind(this);
+    this.updateAdminPassword = this.updateAdminPassword.bind(this);
   }
 
   componentWillMount(){
@@ -564,6 +574,56 @@ export default class Admin extends Component {
     this.setState({allUsers})
   }
 
+  adminUsernameOnChange(e){
+    this.setState({
+      adminUsername:e.target.value.replace(/\s/g, '')
+    })
+  }
+
+  adminPasswordOnChange(e){
+    this.setState({
+      adminPassword:e.target.value.replace(/\s/g, '')
+    })
+  }
+
+  adminNewPasswordOnChange(e){
+    this.setState({
+      adminNewPassword:e.target.value.replace(/\s/g, '')
+    })
+  }
+
+  adminNewPasswordConfirmOnChange(e){
+    this.setState({
+      adminNewPasswordConfirm:e.target.value.replace(/\s/g, '')
+    })
+  }
+
+  updateAdminPassword(){
+    axios.post('/update-admin-password', {
+      username:this.state.adminUsername,
+      password:this.state.adminPassword,
+      newPassword:this.state.adminNewPassword
+    }).then(resp=>{
+      console.log(resp.data);
+      if(resp.data.error || resp.data._message){
+        alert(resp.data.error || resp.data._message);
+      } else {
+        alert('password successfully updated');
+        this.setState({
+          updateAdminPassword:false,
+          adminUsername:'',
+          adminPassword:'',
+          adminNewPassword:'',
+          adminNewPasswordConfirm:''
+        })
+      }
+      console.log(resp.data);
+    }).catch(err=>{
+      alert('Error updating admin password. Check developer console for details.');
+      console.log(err);
+    })
+  }
+
   render(){
     let isAdmin;
     if(this.state.currentUser){
@@ -661,6 +721,42 @@ export default class Admin extends Component {
                   </select>
                   <p className='vas-admin-add-user-notes'>User ID will automatically be created once new user is added (auto-incrementing)</p>
                   <button className='vas-admin-create-user' onClick={this.addUser}>Add User</button>
+                </div>
+                <div className='vas-admin-update-admin-user-container'>
+                  <h3 className="vas-admin-h3">Update Admin</h3>
+                  {!this.state.updateAdminPassword &&
+                    <button onClick={e=>{this.setState({updateAdminPassword:true})}}>Update Admin Password</button>
+                  }
+                  {this.state.updateAdminPassword && 
+                    <div className='vas-admin-update-admin-credentials-container'>
+                      <div className='vas-admin-update-admin-credentials-old'>
+                        <h3>Login Credentials</h3>
+                        <div>
+                          <label>Username:</label>
+                          <input value={this.state.adminUsername} onChange={this.adminUsernameOnChange} type='text' />
+                        </div>
+                        <div>
+                          <label>Password:</label>
+                          <input value={this.state.adminPassword} onChange={this.adminPasswordOnChange} type='password' />
+                        </div>
+                      </div>
+                      <div className='vas-admin-update-admin-credentials-new'>
+                        <h3>New Password (min length of 5 characters)</h3>
+                        <div>
+                          <label>New Password:</label>
+                          <input value={this.state.adminNewPassword} onChange={this.adminNewPasswordOnChange} type='password'/>
+                        </div>
+                        <div>
+                          <label>Retype New Password:</label>
+                          <input value={this.state.adminNewPasswordConfirm} onChange={this.adminNewPasswordConfirmOnChange} type='password'/>
+                        </div>
+                      </div>
+                      {this.state.adminNewPassword.length > 4 && this.state.adminNewPasswordConfirm.length > 4 &&
+                        this.state.adminNewPassword === this.state.adminNewPasswordConfirm &&
+                        <button onClick={this.updateAdminPassword}>Update Admin Password</button>
+                      }
+                    </div>
+                  }
                 </div>
                 <div className='vas-admin-remove-user-container'>
                   <h3 className="vas-admin-h3">Modify Users</h3>

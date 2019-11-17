@@ -805,6 +805,21 @@ app.get('/get-online-users', (req,res)=>{
 //   })
 // })
 
+app.post('/update-admin-password', (req, res)=>{
+  User.findOne({username:req.body.username}, (err, user)=>{
+    if(err) return res.send(err);
+    if(user.password === req.body.password){
+      user.password = req.body.newPassword;
+      user.save((err2)=>{
+        if(err2) return res.send(err2);
+        res.send(user);
+      })
+    } else {
+      res.send({'error':'incorrect password for that admin user'});
+    }
+  })
+})
+
 //SUPER
 app.post('/send-errors-to-admin', (req,res)=>{
   fs.writeFile('vas-errors.json', JSON.stringify(req.body), (err)=>{

@@ -690,7 +690,7 @@ export default class EditProcedure extends Component {
                   {procedure.groups.map((group, idx2)=>{
                     let disableButton = false;
                     //disable selecting/deselecting line procedure options by normal users when editing a dressing change 
-                    // if(procedure.procedureId === 8 && this.state.dressingChangeDate && this.props.currentUser.role === 'user'){
+                    // if(procedure.procedureId === 8 && this.state.currentRecord.dressingChangeDate && this.props.currentUser.role === 'user'){
                     //   disableButton = true;
                     // }
                     return(
