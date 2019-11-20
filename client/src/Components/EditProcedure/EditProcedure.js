@@ -688,10 +688,10 @@ export default class EditProcedure extends Component {
                 </header>
                 <div className="vas-edit-procedure-inner-container-main">
                   {procedure.groups.map((group, idx2)=>{
-                    let disableButton = false;
+                    let willDisable = false;
                     //disable selecting/deselecting line procedure options by normal users when editing a dressing change 
                     if(procedure.procedureId === 8 && this.state.currentRecord.dressingChangeDate && this.props.currentUser.role === 'user'){
-                      disableButton = true;
+                      willDisable = true;
                     }
                     return(
                       <span className='vas-edit-procedure-inner-span' data-procedure={procedure.procedureId} data-idx={idx2} key={idx + '_' + group.groupName}>
@@ -714,7 +714,7 @@ export default class EditProcedure extends Component {
                                         data-procedureid={procedure.procedureId} id={itemId} 
                                         name={procedure.procedureId + "_" + group.groupName.replace(/\s/g,'')}
                                         defaultChecked={this.state.currentRecord.itemIds.indexOf(itemId) > -1 ? true : false}
-                                        disabled={disableButton}/>
+                                        disabled={willDisable}/>
                                       <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.selectButton(e, group.groupName, itemId)}}>{this.props.itemsById[itemId].value}</label>
                                     </span>
                                   }
@@ -728,7 +728,7 @@ export default class EditProcedure extends Component {
                                         placeholder={this.props.itemsById[itemId].value}
                                         value={this.state.currentRecord[group.fieldName]}
                                         id={itemId} 
-                                        readOnly={disableButton}/>
+                                        readOnly={willDisable}/>
                                     </span>
                                   }
                                 </span>
