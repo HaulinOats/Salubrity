@@ -162,7 +162,9 @@ export default class EditProcedure extends Component {
     //UPDATE
     if(this.state.currentRecord.insertionLength > 0){
       //push insertion length itemId (70) into procedure's object IDs
-      procedureObj['8'].push(70);
+      if(procedureObj['8']){
+        procedureObj['8'].push(70);
+      }
     }
 
     let procedureArr = [];
@@ -313,7 +315,7 @@ export default class EditProcedure extends Component {
       errors += "- Please enter patient's date of birth in the 'hospital' section \n";
     }
 
-    if(isLineType && !this.state.closeLine){
+    if(isLineType && !this.state.closeLine && this.state.currentRecord.hospital === 1){//Erlanger Main
       if(!this.state.dressingChangeDateIsSet && !this.state.isPostEdit){
         errors += '- You must select a future dressing change date\n';
       }
