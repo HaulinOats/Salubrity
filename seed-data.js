@@ -633,7 +633,7 @@ exports.itemSeed = [
     itemId:55,
     procedureName:'Troubleshoot',
     procedureId:7,
-    groupName:'Cathflow',
+    groupName:'Cathflo',
     value:'PAC: Initiated',
     isCustom:false
   },
@@ -641,7 +641,7 @@ exports.itemSeed = [
     itemId:56,
     procedureName:'Troubleshoot',
     procedureId:7,
-    groupName:'Cathflow',
+    groupName:'Cathflo',
     value:'PAC: Completed',
     isCustom:false
   },
@@ -781,7 +781,7 @@ exports.itemSeed = [
     itemId:73,
     procedureName:'Troubleshoot',
     procedureId:7,
-    groupName:'Cathflow',
+    groupName:'Cathflo',
     value:'PICC: Initiated',
     isCustom:false
   },
@@ -789,7 +789,7 @@ exports.itemSeed = [
     itemId:74,
     procedureName:'Troubleshoot',
     procedureId:7,
-    groupName:'Cathflow',
+    groupName:'Cathflo',
     value:'PICC: Completed',
     isCustom:false
   },
@@ -797,7 +797,7 @@ exports.itemSeed = [
     itemId:75,
     procedureName:'Troubleshoot',
     procedureId:7,
-    groupName:'Cathflow',
+    groupName:'Cathflo',
     value:'CVL: Initiated',
     isCustom:false
   },
@@ -805,7 +805,7 @@ exports.itemSeed = [
     itemId:76,
     procedureName:'Troubleshoot',
     procedureId:7,
-    groupName:'Cathflow',
+    groupName:'Cathflo',
     value:'CVL: Completed',
     isCustom:false
   },
@@ -1313,7 +1313,7 @@ exports.procedureSeed = [
       },
       {
         seq:3,
-        groupName:'Cathflow',
+        groupName:'Cathflo',
         inputType:'checkbox',
         hideHeader:true,
         hideGroup:true,
