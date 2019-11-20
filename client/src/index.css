@@ -291,6 +291,7 @@ select {
   padding-left:5px;
   box-shadow: inset 1px 1px 1px black;
   transition:background-color 1s;
+  margin-bottom:15px;
 }
 /* loading container */
 .vas-loading-container {

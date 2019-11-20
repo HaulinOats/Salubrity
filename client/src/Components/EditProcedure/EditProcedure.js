@@ -741,33 +741,47 @@ export default class EditProcedure extends Component {
                       </span>
                     )})
                   }
+                  {procedure.procedureId === 4 &&
+                    <div className='vas-edit-procedure-inner-container-row'>
+                      <label className='vas-mt-15 vas-mb-5 vas-block'>{this.props.allOptions[1].name}:</label>{/* Medical Record Number */}
+                      <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
+                    </div>
+                  }
+                  {procedure.procedureId === 8 &&
+                    <span>
+                      {this.state.currentRecord.insertedBy &&
+                        <span>
+                          <p className='vas-edit-procedure-insertedBy-label'>Placement Inserted By:</p>
+                          <DebounceInput
+                            type="text"
+                            className="vas-input vas-custom-input vas-edit-procedure-insertedBy-input"
+                            debounceTimeout={500}
+                            value={this.state.currentRecord.insertedBy}
+                            onChange={e=>{this.inputLiveUpdate(e, 'insertedBy')}} />
+                        </span>
+                      }
+                      {(this.state.insertionTypeSelected || this.state.isPostEdit || this.state.isDressingChange) &&
+                        <div>
+                          <div className='vas-edit-procedure-inner-container-row'>
+                            <h3>{this.props.allOptions[1].name}:</h3>{/* Medical Record Number */}
+                            <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
+                          </div>
+                          <div className='vas-edit-procedure-inner-container-row'>
+                            <h3>{this.props.allOptions[2].name}:</h3>{/* Provider */}
+                            <DebounceInput className='vas-custom-input' debounceTimeout={750} type="text" value={this.state.currentRecord.provider ? this.state.currentRecord.provider : ''} onChange={e=>{this.inputLiveUpdate(e, 'provider')}} />
+                          </div>
+                        </div>
+                      }
+                    </span>
+                  }
                   {/* Add Dressing Change datepicker for Port-a-Cath and Insertion Procedures*/}
-                  {(procedure.procedureId === 4 || procedure.procedureId === 8) && this.state.willSetDressingChangeDate &&
+                  {(procedure.procedureId === 4 || procedure.procedureId === 8) && this.state.willSetDressingChangeDate && this.state.currentRecord.hospital === 1 &&
                     <span>
                       <div className='vas-edit-procedure-inner-container-row'>
                         <h3>Future Dressing Change Date</h3>
                         <span className='vas-inline-block'><DatePicker className='vas-home-datepicker' selected={this.state.dressingChangeDate} onChange={this.dressingChangeDateOnChange} /></span>
                         <button className='vas-home-save-date' onClick={e=>{this.saveDressingChangeDate(e)}}>Save</button>
                       </div>
-                      {/* Only show MRN in Port-A-Cath section since it's already at the bottom of the Insertion Procedure section by default */}
-                      {procedure.procedureId === 4 && 
-                        <div className='vas-edit-procedure-inner-container-row'>
-                          <label className='vas-mt-15 vas-mb-5 vas-block'>{this.props.allOptions[1].name}:</label>{/* Medical Record Number */}
-                          <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
-                        </div>
-                      }
-                    </span>
-
-                  }
-                  {procedure.procedureId === 8 && this.state.currentRecord.insertedBy &&
-                    <span>
-                      <p className='vas-edit-procedure-insertedBy-label'>Placement Inserted By:</p>
-                      <DebounceInput
-                        type="text"
-                        className="vas-input vas-custom-input vas-edit-procedure-insertedBy-input"
-                        debounceTimeout={500}
-                        value={this.state.currentRecord.insertedBy}
-                        onChange={e=>{this.inputLiveUpdate(e, 'insertedBy')}} />
                     </span>
                   }
                   </div>
@@ -775,18 +789,18 @@ export default class EditProcedure extends Component {
             )
           })
         }
-        {(this.state.insertionTypeSelected || this.state.isPostEdit || this.state.isDressingChange) &&
+        {/* {(this.state.insertionTypeSelected || this.state.isPostEdit || this.state.isDressingChange) &&
           <div className='vas-edit-procedure-options-container'>
             <div className='vas-edit-procedure-option-inner'>
-              <label>{this.props.allOptions[1].name}:</label>{/* Medical Record Number */}
+              <label>{this.props.allOptions[1].name}:</label>
               <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
             </div>
             <div className='vas-edit-procedure-option-inner'>
-              <label>{this.props.allOptions[2].name}:</label>{/* Provider */}
+              <label>{this.props.allOptions[2].name}:</label>
               <DebounceInput className='vas-custom-input' debounceTimeout={750} type="text" value={this.state.currentRecord.provider ? this.state.currentRecord.provider : ''} onChange={e=>{this.inputLiveUpdate(e, 'provider')}} />
             </div>
           </div>
-        }
+        } */}
         <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
           <header className='vas-edit-procedure-inner-container-header'>
             <p className='vas-edit-procedure-inner-container-section-name' onClick={this.toggleShowSection}>MD Order Change</p>
