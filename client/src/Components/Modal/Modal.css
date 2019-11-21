@@ -57,6 +57,11 @@
   height:75%;
   border-bottom: solid 1px grey;
 }
+.vas-modal-content-main-add-call {
+  height:93%;
+  padding:0;
+  overflow:hidden;
+}
 .vas-modal-message {
   line-height: 140%;
   font-size: 120%;

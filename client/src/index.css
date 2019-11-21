@@ -136,6 +136,10 @@ select {
   min-width: 70px;
   padding: 10px 10px;
 }
+.vas-confirm {
+  background:green;
+  color:white;
+}
 .vas-btn-normal {
   
 }

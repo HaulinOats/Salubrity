@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import './Modal.css';
-import axios from 'axios';
-import {DebounceInput} from 'react-debounce-input';
-import helpers from '../../helpers';
+import AddCall from '../AddCall/AddCall';
 
 export default class Modal extends Component {
   constructor(props){
@@ -13,134 +11,22 @@ export default class Modal extends Component {
       modalMessage:this.props.modalMessage,
       currentUser:this.props.currentUser,
       isConfirmation:this.props.isConfirmation,
-      allOptions:[],
-      customSelected:false,
-      custom:'',
-      preComments:'',
       isAddCall:false,
       isEditProcedure:false,
-      roomNumber:null,
-      need:'',
-      needSelected:false,
-      contact:'',
-      inputsValidated:false,
       addedCall:null,
-      status:1,
-      hospital:'',
-      isExternalPlacement:false,
-      insertedBy:''
+      addCallInputsValidated:false
     }
-    this.handleNeedSelect = this.handleNeedSelect.bind(this);
-    this.hospitalSelect = this.hospitalSelect.bind(this);
-    this.toggleStat = this.toggleStat.bind(this);
-    this.toggleExternalPlacement = this.toggleExternalPlacement.bind(this);
+    this.addCallValidated = this.addCallValidated.bind(this);
   };
   
   componentDidMount(){
     if(this.state.modalTitle === "Add Call"){
-      this.setState({isAddCall:true}, ()=>{
-        helpers.getOptionsData().then(resp=>{
-          this.setState({
-            allOptions:resp.options
-          })
-        }).catch(err=>{
-          console.log(err);
-        });
-      });
+      this.setState({isAddCall:true});
     }
   }
 
-  toggleStat(){
-    if(this.state.status === 1){
-      this.setState({status:2})
-    } else {
-      this.setState({status:1});
-    }
-  }
-
-  toggleExternalPlacement(){
-    this.setState({isExternalPlacement:!this.state.isExternalPlacement}, this.validateAddCall);
-  }
-
-  handleNeedSelect(e){
-    switch(e.target.value.toLowerCase()){
-      case 'default':
-        this.setState({need:'', customSelected:false}, this.validateAddCall);
-        break;
-      case 'custom':
-        this.setState({
-          need:e.target.value,
-          customSelected:true
-        }, this.validateAddCall);
-        break;
-      default:
-        this.setState({need:e.target.value, customSelected:false, custom:''}, this.validateAddCall);
-    }
-  }
-
-  hospitalSelect(e){
-    switch(e.target.value){
-      case "default":
-        this.setState({hospital:''});
-        break;
-      default:
-        this.setState({hospital:e.target.value});
-    }
-  }
-
-  validateAddCall(){
-    if(this.state.roomNumber && this.state.roomNumber.length && this.state.need){
-      if(this.state.customSelected){
-        if(this.state.custom.length){
-          this.setState({inputsValidated:true});
-        } else {
-          this.setState({inputsValidated:false});
-        }
-      } else {
-        this.setState({inputsValidated:true});
-      }
-    } else {
-      this.setState({inputsValidated:false});
-    }
-    if(this.state.isExternalPlacement){
-      if(!this.state.insertedBy.trim().length){
-        this.setState({inputsValidated:false});
-      }
-    }
-  }
-
-  addCall(){
-    let addQuery = {
-      room:this.state.roomNumber,
-      job:this.state.need,
-      contact:this.state.contact,
-      createdAt:new Date().toISOString(),
-      createdBy:this.state.currentUser.userId,
-      customJob:this.state.custom.trim().length ? this.state.custom : null,
-      preComments:this.state.preComments.trim().length ? this.state.preComments : null,
-      hospital:this.state.hospital.length ? Number(this.state.hospital) : null,
-      status:this.state.status,
-      isOpen:false,
-      insertedBy:this.state.insertedBy.length ? this.state.insertedBy : null,
-      initialExternalPlacement:this.state.insertedBy.length ? true : false,
-      openBy:this.state.insertedBy.length ? this.props.currentUser.userId : null,
-      startTime:this.state.insertedBy.length ? new Date().toISOString() : null
-    };
-
-    axios.post('/add-call', addQuery)
-    .then((resp)=>{
-      this.setState({
-        isAddCall:false,
-        saveConfirmed:true,
-        customSelected:false,
-        addedCall:resp.data
-      }, ()=>{
-        this.props.closeModal(this.state.addedCall);
-      });
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+  addCallValidated(isValidated){
+    this.setState({addCallInputsValidated:isValidated});
   }
 
   getConfirmation(isConfirmed){
@@ -152,13 +38,13 @@ export default class Modal extends Component {
     return(
       <div className="vas-modal-container" data-isOpen={this.state.isOpen}>
         <div className="vas-modal-clickguard" onClick={e=>{this.props.closeModal()}}></div>
-        <div className={"vas-modal-content " + (this.state.modalTitle === 'Add Call' ? 'vas-modal-content-add-call' : 'vas-modal-content-normal')}>
+        <div className={"vas-modal-content " + (this.state.isAddCall ? 'vas-modal-content-add-call' : 'vas-modal-content-normal')}>
           <div className="vas-modal-content-inner">
             <header className="vas-modal-content-header">
               <p className='vas-modal-header-text'>{this.state.modalTitle}</p>
               <div className="vas-modal-content-closeBtn" onClick={e=>{this.props.closeModal()}}>&#10006;</div>
             </header>
-            <div className={"vas-modal-content-main"}>
+            <div className={"vas-modal-content-main " + (this.state.isAddCall ? 'vas-modal-content-main-add-call' : '')}>
               {this.state.saveConfirmed &&
                 <p className="vas-modal-saved-msg">Item added to queue!</p>
               }
@@ -166,85 +52,19 @@ export default class Modal extends Component {
                 <p className='vas-modal-message'>{this.state.modalMessage}</p>
               }
               {this.state.isAddCall &&
-              <div>
-                <div className='vas-modal-add-call-row-block'>
-                  <input type='checkbox' checked={this.state.status === 2 ? true : false} className="vas-checkbox-select vas-modal-is-important-input" id='is-important' name='is-important'/>
-                  <label className="vas-btn" htmlFor='is-important' onClick={this.toggleStat}>Needed Stat</label>
-                  <input type='checkbox' checked={this.state.isExternalPlacement} className="vas-checkbox-select" id='external-placement' name='external-placement'/>
-                  <label className="vas-btn" htmlFor='external-placement' onClick={this.toggleExternalPlacement}>External Placement</label>
-                </div>
-                {this.state.isExternalPlacement &&
-                  <div className="vas-modal-add-call-row">
-                    <div className="vas-modal-add-call-row-inner">
-                      <p>Placement Inserted By:</p>
-                      <DebounceInput
-                        className="vas-modal-add-call-input"
-                        minLength={1}
-                        debounceTimeout={300}
-                        value={this.state.insertedBy}
-                        onChange={e => {this.setState({insertedBy: e.target.value}, this.validateAddCall)}} />
-                    </div>
-                  </div>
-                }
-                <div className="vas-modal-add-call-row">
-                  <div className="vas-modal-add-call-row-inner">
-                    <p>Room:</p>
-                      <DebounceInput
-                        className="vas-modal-add-call-input"
-                        minLength={1}
-                        debounceTimeout={300}
-                        onChange={e => {this.setState({roomNumber: e.target.value}, this.validateAddCall)}} />
-                  </div>
-                  <div className="vas-modal-add-call-row-inner">
-                      <p>Need:</p>
-                      <select className="vas-modal-add-call-input" onChange={this.handleNeedSelect}>
-                        <option value="default">Select Need</option>
-                        {this.state.allOptions[5] && this.state.allOptions[5].options.map(option=>{
-                          return <option key={option.id}>{option.name}</option>
-                        })}
-                      </select>
-                    </div>
-                    {this.state.customSelected &&
-                      <div className='vas-modal-add-call-row-inner'>
-                        <p>Custom Name:</p>
-                        <input className='vas-modal-add-call-input vas-modal-custom-input' type='text' value={this.state.custom} onChange={e => {this.setState({custom: e.target.value}, this.validateAddCall)}} />
-                      </div>
-                    }
-                    <div className="vas-modal-add-call-row-inner">
-                      <p>Hospital:</p>
-                      <select className="vas-modal-add-call-input" onChange={this.hospitalSelect}>
-                        <option value="default">Select Hospital</option>
-                        {this.state.allOptions[0] && this.state.allOptions[0].options.map(option=>{
-                          return <option key={option.id} value={option.id}>{option.name}</option>
-                        })}
-                      </select>
-                    </div>
-                    <div className="vas-modal-add-call-row-inner">
-                      <p>Contact:</p>
-                      <input type='text' className='vas-modal-add-call-input' value={this.state.contact} onChange={e => {this.setState({contact: e.target.value}, this.validateAddCall)}} />
-                    </div>
-                    <div className='vas-modal-add-call-row-block'>
-                      <p>Pre-Procedure Notes:</p>
-                      <textarea className='vas-modal-add-call-textarea' value={this.state.preComments} onChange={e=>{this.setState({preComments:e.target.value})}}></textarea>
-                    </div>
-                  </div>
-                </div>
+                <AddCall 
+                  currentUser={this.props.currentUser}
+                  closeModal={this.props.closeModal}/>
               }
             </div>
-            <div className='vas-modal-content-buttonContainer-outer'>
-              {this.state.isConfirmation && 
+            {this.state.isConfirmation && 
+              <div className='vas-modal-content-buttonContainer-outer'>
                 <div className='vas-modal-content-buttonContainer'>
                   <button className='vas-btn-confirm vas-btn-no' onClick={e=>{this.getConfirmation(false)}}>Cancel</button>
                   <button className='vas-btn-confirm vas-btn-yes' onClick={e=>{this.getConfirmation(true)}}>OK</button>
                 </div>
-              }
-              {this.state.isAddCall && this.state.inputsValidated &&
-                <div className="vas-modal-content-buttonContainer">
-                  <button className="btn btn-danger vas-modal-cancel" onClick={this.props.toggleModal}>Cancel</button>
-                  <button className="btn btn-success vas-modal-confirm" onClick={()=>{this.addCall()}}>Add To Queue</button>
-                </div>
-              }
-            </div>
+              </div>
+            }
           </div>
         </div>
       </div>

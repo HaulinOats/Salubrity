@@ -260,7 +260,8 @@
     display: inline-flex;
   }
   .vas-call-comments-container,
-  .vas-call-consultation-container {
+  .vas-call-consultation-container,
+  .vas-call-dressing-change-container {
     margin-left: 5%;
     padding: 3px;
   }
