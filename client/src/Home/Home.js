@@ -472,6 +472,8 @@ export default class Home extends Component{
   }
 
   closeModal(callDataReturned){
+    console.log('callDataReturned:');
+    console.log(callDataReturned);
     let callData = callDataReturned;
     if(callData){
       let queueItems = this.state.queueItems;

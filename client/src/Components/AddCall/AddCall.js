@@ -8,7 +8,6 @@ export default class AddCall extends Component {
   constructor(props){
     super(props);
     this.state = {
-      currentUser:this.props.currentUser,
       allOptions:[],
       customSelected:false,
       custom:'',
@@ -17,7 +16,6 @@ export default class AddCall extends Component {
       need:'',
       needSelected:false,
       contact:'',
-      addedCall:null,
       status:1,
       hospital:'',
       isExternalPlacement:false,
@@ -28,7 +26,6 @@ export default class AddCall extends Component {
     this.hospitalSelect = this.hospitalSelect.bind(this);
     this.toggleStat = this.toggleStat.bind(this);
     this.toggleExternalPlacement = this.toggleExternalPlacement.bind(this);
-    this.addCall = this.addCall.bind(this);
   };
   
   componentDidMount(){
@@ -108,7 +105,7 @@ export default class AddCall extends Component {
       job:this.state.need,
       contact:this.state.contact,
       createdAt:new Date().toISOString(),
-      createdBy:this.state.currentUser.userId,
+      createdBy:this.props.currentUser.userId,
       customJob:this.state.custom.trim().length ? this.state.custom : null,
       preComments:this.state.preComments.trim().length ? this.state.preComments : null,
       hospital:this.state.hospital.length ? Number(this.state.hospital) : null,
@@ -122,15 +119,8 @@ export default class AddCall extends Component {
 
     axios.post('/add-call', addQuery)
     .then((resp)=>{
-      this.setState({
-        saveConfirmed:true,
-        customSelected:false,
-        addedCall:resp.data
-      }, ()=>{
-        this.props.closeModal(this.state.addedCall);
-      });
-    })
-    .catch((err)=>{
+      this.props.callAdded(resp.data);
+    }).catch((err)=>{
       console.log(err);
     })
   }
@@ -204,7 +194,7 @@ export default class AddCall extends Component {
         {this.state.isValidated &&
           <div className='vas-add-call-confirmation-container'>
             <button className='vas-warn-btn'>Cancel</button>
-            <button className='vas-confirm' onClick={this.addCall}>Add To Queue</button>
+            <button className='vas-confirm' onClick={e=>{this.addCall()}}>Add To Queue</button>
           </div>
         }
       </div>

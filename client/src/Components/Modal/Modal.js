@@ -13,16 +13,29 @@ export default class Modal extends Component {
       isConfirmation:this.props.isConfirmation,
       isAddCall:false,
       isEditProcedure:false,
-      addedCall:null,
       addCallInputsValidated:false
     }
     this.addCallValidated = this.addCallValidated.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   };
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ 
+      modalTitle:nextProps.modalTitle,
+      modalMessage:nextProps.modalMessage,
+      isConfirmation: nextProps.isConfirmation 
+    }, this.aggregateData);  
+  }
   
   componentDidMount(){
     if(this.state.modalTitle === "Add Call"){
       this.setState({isAddCall:true});
     }
+  }
+
+  closeModal(callData){
+    this.setState({isAddCall:false});
+    this.props.closeModal(callData);
   }
 
   addCallValidated(isValidated){
@@ -54,7 +67,7 @@ export default class Modal extends Component {
               {this.state.isAddCall &&
                 <AddCall 
                   currentUser={this.props.currentUser}
-                  closeModal={this.props.closeModal}/>
+                  callAdded={this.closeModal}/>
               }
             </div>
             {this.state.isConfirmation && 
