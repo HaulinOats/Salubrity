@@ -174,6 +174,12 @@ export default class ReturnedProcedures extends Component {
                             <p className='vas-admin-custom-item-subfield'>MRN:</p>
                             <p className='vas-admin-custom-item-subvalue'>{call.mrn ? call.mrn : 'N/A'}</p>
                           </div>
+                          {call.patientName &&
+                            <div className='vas-admin-custom-table-td vas-admin-custom-table-mrn'>
+                              <p className='vas-admin-custom-item-subfield'>Patient:</p>
+                              <p className='vas-admin-custom-item-subvalue'>{call.patientName}</p>
+                            </div>
+                          }
                           <div className='vas-admin-custom-table-td vas-admin-custom-table-provider'>
                             <p className='vas-admin-custom-item-subfield'>Provider:</p>
                             <p className='vas-admin-custom-item-subvalue'>{call.provider ? call.provider : 'N/A'}</p>

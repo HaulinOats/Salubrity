@@ -90,6 +90,7 @@ export default class Filters extends Component {
         {fieldName:'completedBy', text:'Nurse', options:userOptions},
         {fieldName:'hospital', text:'Hospital', options:hospitalOptions},
         {fieldName:'mrn', text:'MRN'},
+        {fieldName:'patientName', text:'Patient Name', placeholder:'7 characters minimum'},
         {fieldName:'provider', text:'Provider'},
         {fieldName:'room', text:'Room'},
         {fieldName:'procedureId', text:'Procedure', options:procedureOptions},
@@ -235,6 +236,7 @@ export default class Filters extends Component {
                             className="vas-input vas-filters-child-filter"
                             minLength={1}
                             debounceTimeout={300}
+                            placeholder={filter.placeholder ? filter.placeholder : ''}
                             onChange={e=>{this.childFilterOnChange(e, idx, true)}} />
                         }
                       </span>

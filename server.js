@@ -52,7 +52,7 @@ let callSchema = new Schema({
   mrn:{type:Number, default:null},
   openBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
-  patientName:{type:String, default:null},
+  patientName:{type:String, default:null, lowercase:true},
   preComments:{type:String, default:null},
   procedureIds:{type:Array, default:null},
   proceduresDone:[Object],
@@ -534,12 +534,16 @@ app.post('/get-calls-by-query', (req, res)=>{
           queryObj['hospital'] = Number(filterValue);
         }
         break;
+      case 'patientName':
+        //if search criteria too small, stresses database too much
+        if(filterValue.length > 5){
+          queryObj['patientName'] = {$regex:filterValue};
+        }
+        break;
       default:
         queryObj[fieldName] = filterValue;
     }
   })
-
-  queryObj['dressingChangeDate'] = {$eq:null}
 
   Call.find(queryObj, (err, calls)=>{
     if(err) return res.send(err);

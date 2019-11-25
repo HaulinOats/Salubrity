@@ -48,7 +48,6 @@ export default class EditProcedure extends Component {
     this.resetModal = this.resetModal.bind(this);
     this.orderSelect = this.orderSelect.bind(this);
     this.toggleSectionDisplay = this.toggleSectionDisplay.bind(this);
-    // this.setRecordStateItems = this.setRecordStateItems.bind(this);
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
     this.dressingChangeDateOnChange = this.dressingChangeDateOnChange.bind(this);
     this.dobOnChange = this.dobOnChange.bind(this);
@@ -217,11 +216,6 @@ export default class EditProcedure extends Component {
           location.reload();
           break;
         case 'set-dressing-change':
-          // currentRecord.dressingChangeDate = this.state.dressingChangeDate;
-          // this.setState({
-          //   dressingChangeDateIsSet:true,
-          //   currentRecord
-          // }, this.saveCurrentRecord);
           this.setState({
             dressingChangeDateIsSet:true
           })
@@ -315,14 +309,19 @@ export default class EditProcedure extends Component {
       errors += "- Please enter patient's date of birth in the 'hospital' section \n";
     }
 
-    if(isLineType && !this.state.closeLine && this.state.currentRecord.hospital === 10){//Erlanger Main
+    if(isLineType && !this.state.closeLine && this.state.currentRecord.hospital === 'UPDATE'){//Erlanger Main
       if(!this.state.dressingChangeDateIsSet && !this.state.isPostEdit){
         errors += '- You must select a future dressing change date\n';
       }
     }
 
-    if(isPortAccess && !this.state.currentRecord.mrn){
-      errors += '- You must enter a Medical Record Number\n';
+    if(isPortAccess){
+      if(!this.state.currentRecord.mrn || String(this.state.currentRecord.mrn).length < 5 || String(this.state.currentRecord.mrn).length > 7){
+        errors += '- You must enter and Medical Record Number and it must be between 5 and 7 digits\n';
+      }
+      if(!this.state.currentRecord.patientName || this.state.currentRecord.patientName.length < 7){
+        errors += '- You must enter a patient name and it must be at least 7 characters in length\n';
+      }
     }
 
     if(isInsertionProcedure){
@@ -333,7 +332,10 @@ export default class EditProcedure extends Component {
         errors += '- You must select a hospital\n';
       }
       if(!this.state.currentRecord.mrn || String(this.state.currentRecord.mrn).length < 5 || String(this.state.currentRecord.mrn).length > 7){
-        errors += '- Medical Record Number must be between 5 and 7 digits\n';
+        errors += '- You must enter and Medical Record Number and it must be between 5 and 7 digits\n';
+      }
+      if(!this.state.currentRecord.patientName || this.state.currentRecord.patientName.length < 7){
+        errors += '- You must enter a patient name and it must be at least 7 characters in length\n';
       }
       if(!this.state.currentRecord.provider || !this.state.currentRecord.provider.length){
         errors += '- You must enter a provider name\n';
@@ -742,10 +744,17 @@ export default class EditProcedure extends Component {
                     )})
                   }
                   {procedure.procedureId === 4 &&
-                    <div className='vas-edit-procedure-inner-container-row'>
-                      <label className='vas-mt-15 vas-mb-5 vas-block'>{this.props.allOptions[1].name}:</label>{/* Medical Record Number */}
-                      <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
-                    </div>
+                    <span>
+                      <div className='vas-edit-procedure-inner-container-row'>
+                        {/* <label className='vas-mt-15 vas-mb-5 vas-block'>{this.props.allOptions[1].name}:</label>Medical Record Number */}
+                        <label className='vas-mt-15 vas-mb-5 vas-block'>Medical Record Number:</label>
+                        <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
+                      </div>
+                      <div className='vas-edit-procedure-inner-container-row'>
+                        <label className='vas-mt-15 vas-mb-5 vas-block'>Patient Name:</label>
+                        <DebounceInput className='vas-custom-input' debounceTimeout={750} type='text' value={this.state.currentRecord.patientName ? this.state.currentRecord.patientName : ''} onChange={e=>{this.inputLiveUpdate(e, 'patientName')}} />
+                      </div>
+                    </span>
                   }
                   {procedure.procedureId === 8 &&
                     <span>
@@ -763,11 +772,17 @@ export default class EditProcedure extends Component {
                       {(this.state.insertionTypeSelected || this.state.isPostEdit || this.state.isDressingChange) &&
                         <div>
                           <div className='vas-edit-procedure-inner-container-row'>
-                            <h3>{this.props.allOptions[1].name}:</h3>{/* Medical Record Number */}
+                            {/* <h3>{this.props.allOptions[1].name}:</h3>Medical Record Number */}
+                            <h3>Medical Record Number:</h3>
                             <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
                           </div>
                           <div className='vas-edit-procedure-inner-container-row'>
-                            <h3>{this.props.allOptions[2].name}:</h3>{/* Provider */}
+                            <h3>Patient Name:</h3>
+                            <DebounceInput className='vas-custom-input' debounceTimeout={750} type='text' value={this.state.currentRecord.patientName ? this.state.currentRecord.patientName : ''} onChange={e=>{this.inputLiveUpdate(e, 'patientName')}} />
+                          </div>
+                          <div className='vas-edit-procedure-inner-container-row'>
+                            {/* <h3>{this.props.allOptions[2].name}:</h3>Provider */}
+                            <h3>Provider:</h3>
                             <DebounceInput className='vas-custom-input' debounceTimeout={750} type="text" value={this.state.currentRecord.provider ? this.state.currentRecord.provider : ''} onChange={e=>{this.inputLiveUpdate(e, 'provider')}} />
                           </div>
                         </div>
@@ -775,7 +790,7 @@ export default class EditProcedure extends Component {
                     </span>
                   }
                   {/* Add Dressing Change datepicker for Port-a-Cath and Insertion Procedures*/}
-                  {(procedure.procedureId === 4 || procedure.procedureId === 8) && this.state.willSetDressingChangeDate && this.state.currentRecord.hospital === 1 &&
+                  {(procedure.procedureId === 4 || procedure.procedureId === 8) && this.state.willSetDressingChangeDate && this.state.currentRecord.hospital === 'UPDATE' &&
                     <span>
                       <div className='vas-edit-procedure-inner-container-row'>
                         <h3>Future Dressing Change Date</h3>
