@@ -385,7 +385,6 @@ export default class Admin extends Component {
   }
 
   returnedCalls(callsAndAggObj){
-    console.log(callsAndAggObj);
     let queriedCalls = callsAndAggObj.calls;
     let itemsAggregation = callsAndAggObj.aggregation;
     for(let i = 0; i < queriedCalls.length; i++){
@@ -413,6 +412,7 @@ export default class Admin extends Component {
         case 62:
         case 90:
           insertionAgg.push({
+            index:idx,
             itemId:item._id,
             count:itemsAggregation[idx].count
           })

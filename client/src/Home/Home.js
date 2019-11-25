@@ -472,8 +472,6 @@ export default class Home extends Component{
   }
 
   closeModal(callDataReturned){
-    console.log('callDataReturned:');
-    console.log(callDataReturned);
     let callData = callDataReturned;
     if(callData){
       let queueItems = this.state.queueItems;
@@ -629,10 +627,10 @@ export default class Home extends Component{
                 <p className='vas-home-nav-item-text'>Completed</p>
                 <div className='vas-home-nav-item-refresh-bar'></div>
               </li>
-              <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'lines' ? true : false} onClick={e=>{this.setTab('lines', e)}}>
+              {/* <li className='vas-home-nav-item' data-isactive={this.state.activeHomeTab === 'lines' ? true : false} onClick={e=>{this.setTab('lines', e)}}>
                 <p className='vas-home-nav-item-text'>Lines</p>
                 <div className='vas-home-nav-item-refresh-bar'></div>
-              </li>
+              </li> */}
               {this.state.activeRecord &&
                 <li className={'vas-home-nav-item vas-status-' + this.state.activeRecord.status} data-isactive={this.state.activeHomeTab === 'active' ? true : false} onClick={e=>{this.setTab('active', e)}}>
                   <p className='vas-home-nav-item-text'>Open</p>

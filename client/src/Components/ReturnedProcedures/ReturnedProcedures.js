@@ -93,8 +93,9 @@ export default class ReturnedProcedures extends Component {
             <p className='vas-returned-procedures-records-returned'>{this.state.queriedProcedures.length} Records Returned</p>
             <div className='vas-returned-procedures-aggregations-insertions-container'>
               {this.state.insertionAgg.map(insertion=>{
+                console.log(insertion)
                 return(
-                  <div key={insertion.itemId + insertion.count} className='vas-returned-procedures-aggregations-insertions-item'>
+                  <div key={insertion.index } className='vas-returned-procedures-aggregations-insertions-item'>
                     <p className='vas-returned-procedures-aggregations-insertions-item-left'>{this.props.itemsById[insertion.itemId].value}</p>
                     <p className='vas-returned-procedures-aggregations-insertions-item-right'>{insertion.count}</p>
                   </div>

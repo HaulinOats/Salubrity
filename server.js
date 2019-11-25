@@ -44,14 +44,15 @@ let callSchema = new Schema({
   dob:{type:Date, default:null},
   dressingChangeDate:{type:Date, default:null},
   hospital:{type:Number, default:null},
-  initialExternalPlacement:{type:Boolean, default:false},
+  referenceCallId:{type:String, default:null},
   insertedBy:{type:String, default:null},
   insertionLength:{type:Number, default:0},
   itemIds:{type:Array, default:null},
-  job:String,
+  job:{type:String, default:null},
   mrn:{type:Number, default:null},
   openBy:{type:Number, default:null},
   orderChange:{type:Number, default:null},
+  patientName:{type:String, default:null},
   preComments:{type:String, default:null},
   procedureIds:{type:Array, default:null},
   proceduresDone:[Object],
@@ -283,6 +284,8 @@ app.post('/procedure-completed', (req, res)=>{
 
       Call.create(newCallObj, (err2, call2)=>{
         if(err2) return res.send(err2);
+        //delete initial call created for external placement since it shouldn't be 
+        //counted towards insertion aggregations or as it's own call/procedure for VAS
         if(req.body.initialExternalPlacement){
           Call.deleteOne({_id:req.body.newCallObj._id}, (err3)=>{
             if(err3) return res.send(err3);
@@ -535,6 +538,8 @@ app.post('/get-calls-by-query', (req, res)=>{
         queryObj[fieldName] = filterValue;
     }
   })
+
+  queryObj['dressingChangeDate'] = {$eq:null}
 
   Call.find(queryObj, (err, calls)=>{
     if(err) return res.send(err);
@@ -792,6 +797,13 @@ app.get('/get-online-users', (req,res)=>{
 // app.get('/close-all-open-lines', (req,res)=>{
 //   Call.updateMany({dressingChangeDate:{$ne:null}}, 
 //     {$set:{dressingChangeDate:null}}, {multi:true},(err, calls)=>{
+//     if(err) return res.send(err);
+//     res.send(true);
+//   })
+// })
+
+// app.get('/delete-all-open-lines', (req, res)=>{
+//   Call.deleteMany({dressingChangeDate:{$ne:null}}, (err)=>{
 //     if(err) return res.send(err);
 //     res.send(true);
 //   })

@@ -315,7 +315,7 @@ export default class EditProcedure extends Component {
       errors += "- Please enter patient's date of birth in the 'hospital' section \n";
     }
 
-    if(isLineType && !this.state.closeLine && this.state.currentRecord.hospital === 1){//Erlanger Main
+    if(isLineType && !this.state.closeLine && this.state.currentRecord.hospital === 10){//Erlanger Main
       if(!this.state.dressingChangeDateIsSet && !this.state.isPostEdit){
         errors += '- You must select a future dressing change date\n';
       }
@@ -789,18 +789,6 @@ export default class EditProcedure extends Component {
             )
           })
         }
-        {/* {(this.state.insertionTypeSelected || this.state.isPostEdit || this.state.isDressingChange) &&
-          <div className='vas-edit-procedure-options-container'>
-            <div className='vas-edit-procedure-option-inner'>
-              <label>{this.props.allOptions[1].name}:</label>
-              <DebounceInput className='vas-custom-input' debounceTimeout={750} type='number' value={this.state.currentRecord.mrn ? this.state.currentRecord.mrn : ''} onChange={e=>{this.inputLiveUpdate(e, 'mrn')}} />
-            </div>
-            <div className='vas-edit-procedure-option-inner'>
-              <label>{this.props.allOptions[2].name}:</label>
-              <DebounceInput className='vas-custom-input' debounceTimeout={750} type="text" value={this.state.currentRecord.provider ? this.state.currentRecord.provider : ''} onChange={e=>{this.inputLiveUpdate(e, 'provider')}} />
-            </div>
-          </div>
-        } */}
         <div className='vas-edit-procedure-inner-container vas-edit-procedure-order-change'>
           <header className='vas-edit-procedure-inner-container-header'>
             <p className='vas-edit-procedure-inner-container-section-name' onClick={this.toggleShowSection}>MD Order Change</p>

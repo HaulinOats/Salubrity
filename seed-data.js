@@ -1128,6 +1128,14 @@ exports.itemSeed = [
     groupName:'DC ML',
     value:'Per Protocol',
     isCustom:false
+  },
+  {
+    itemId:117,
+    procedureName:'Dressing Change',
+    procedureId:6,
+    groupName:'What',
+    value:'PG',
+    isCustom:false
   }
 ];
 
@@ -1284,7 +1292,7 @@ exports.procedureSeed = [
         seq:1,
         groupName:'What',
         inputType:'radio',
-        groupItems:[37,38,39,40]
+        groupItems:[37,38,39,40,117]
       },
       {
         seq:2,
