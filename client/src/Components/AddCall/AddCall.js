@@ -18,14 +18,17 @@ export default class AddCall extends Component {
       contact:'',
       status:1,
       hospital:'',
+      isValidated:false,
+      insertionProcedureData:null,
       isExternalPlacement:false,
       insertedBy:'',
-      isValidated:false
+      insertionLength:0
     }
     this.handleNeedSelect = this.handleNeedSelect.bind(this);
     this.hospitalSelect = this.hospitalSelect.bind(this);
     this.toggleStat = this.toggleStat.bind(this);
     this.toggleExternalPlacement = this.toggleExternalPlacement.bind(this);
+    this.onInsertionLengthChange = this.onInsertionLengthChange.bind(this);
   };
   
   componentDidMount(){
@@ -36,6 +39,22 @@ export default class AddCall extends Component {
     }).catch(err=>{
       console.log(err);
     });
+
+    helpers.getProcedureData().then(data=>{
+      this.setState({
+        insertionProcedureData:data.proceduresById['8']
+      }, ()=>{
+        console.log(this.state);
+      })
+    }).catch(err=>{
+      this.addToErrorArray(err);
+    })
+
+    helpers.getItemsData().then(data=>{
+      this.setState({itemsById:data});
+    }).catch(err=>{
+      this.addToErrorArray(err);
+    })
   }
 
   toggleStat(){
@@ -112,7 +131,6 @@ export default class AddCall extends Component {
       status:this.state.status,
       isOpen:false,
       insertedBy:this.state.insertedBy.length ? this.state.insertedBy : null,
-      initialExternalPlacement:this.state.insertedBy.length ? true : false,
       openBy:this.state.insertedBy.length ? this.props.currentUser.userId : null,
       startTime:this.state.insertedBy.length ? new Date().toISOString() : null
     };
@@ -123,6 +141,23 @@ export default class AddCall extends Component {
     }).catch((err)=>{
       console.log(err);
     })
+  }
+
+  onInsertionLengthChange(e){
+    let preComments = this.state.preComments;
+    preComments += e.target.value + 'cm';
+    this.setState({
+      insertionLength:e.target.value,
+      preComments
+    }, ()=>{
+
+    })
+  }
+
+  onInsertionSelection(text){
+    let preComments = this.state.preComments;
+    preComments += text + ', ';
+    this.setState({preComments})
   }
 
   render(){
@@ -136,17 +171,86 @@ export default class AddCall extends Component {
             <label className="vas-btn" htmlFor='external-placement' onClick={this.toggleExternalPlacement}>External Placement</label>
           </div>
           {this.state.isExternalPlacement &&
-            <div className="vas-modal-add-call-row">
-              <div className="vas-modal-add-call-row-inner">
-                <p>Placement Inserted By:</p>
-                <DebounceInput
-                  className="vas-modal-add-call-input"
-                  minLength={1}
-                  debounceTimeout={300}
-                  value={this.state.insertedBy}
-                  onChange={e => {this.setState({insertedBy: e.target.value}, this.validateAddCall)}} />
+            <span>
+              <div className="vas-modal-add-call-row">
+                <div className="vas-modal-add-call-row-inner">
+                  <p>Placement Inserted By:</p>
+                  <DebounceInput
+                    className="vas-modal-add-call-input"
+                    minLength={1}
+                    debounceTimeout={300}
+                    value={this.state.insertedBy}
+                    onChange={e => {this.setState({insertedBy: e.target.value}, this.validateAddCall)}} />
+                </div>
               </div>
-            </div>
+              {this.state.insertionProcedureData.groups.map(group=>{
+                return(
+                  <span key={group._id}>
+                    {group.groupName === 'Insertion Type' &&
+                      <div className="vas-modal-add-call-row">
+                        <div className="vas-modal-add-call-row-inner">
+                          <p>{group.groupName}:</p>
+                          {group.groupItems.map((itemId, idx)=>{
+                            return(
+                              <span key={itemId + idx}>
+                                <input type={group.inputType} name={group.groupName.replace(/\s/g, '')} id={itemId} className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} />
+                                <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.onInsertionSelection(this.state.itemsById[itemId].value)}}>{this.state.itemsById[itemId].value}</label>
+                              </span>
+                            )})}
+                        </div>
+                      </div>
+                    }
+                    {group.groupName === 'Vessel' &&
+                      <div className="vas-modal-add-call-row">
+                        <div className="vas-modal-add-call-row-inner">
+                          <p>{group.groupName}:</p>
+                          {group.groupItems.map((itemId, idx)=>{
+                            return(
+                              <span key={itemId + idx}>
+                                <input type={group.inputType} id={itemId} name={group.groupName.replace(/\s/g, '')} className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} />
+                                <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.onInsertionSelection(this.state.itemsById[itemId].value)}}>{this.state.itemsById[itemId].value}</label>
+                              </span>
+                            )})}
+                        </div>
+                      </div>
+                    }
+                    {group.groupName === 'Laterality' &&
+                      <div className="vas-modal-add-call-row">
+                        <div className="vas-modal-add-call-row-inner">
+                          <p>{group.groupName}:</p>
+                          {group.groupItems.map((itemId, idx)=>{
+                            return(
+                              <span key={itemId + idx}>
+                                <input type={group.inputType} id={itemId} name={group.groupName.replace(/\s/g, '')} className={"vas-edit-procedure-select-input vas-"+ group.inputType +"-select"} />
+                                <label className="vas-btn" htmlFor={itemId} onClick={e=>{this.onInsertionSelection(this.state.itemsById[itemId].value)}}>{this.state.itemsById[itemId].value}</label>
+                              </span>
+                            )})}
+                        </div>
+                      </div>
+                    }
+                    {group.groupName === 'Insertion Length' &&
+                      <div className="vas-modal-add-call-row">
+                        <div className="vas-modal-add-call-row-inner">
+                          <p>{group.groupName}:</p>
+                          {group.groupItems.map((itemId, idx)=>{
+                            return(
+                              <span key={itemId + idx}>
+                                <DebounceInput
+                                  type={group.inputType}
+                                  debounceTimeout={1000}
+                                  className={"vas-custom-input vas-"+ group.inputType +"-select"} 
+                                  placeholder={this.state.itemsById[itemId].value}
+                                  onChange={this.onInsertionLengthChange}
+                                  value={this.state.insertionLength < 1 ? '' : this.state.insertionLength}
+                                  id={itemId} />
+                              </span>
+                            )})}
+                        </div>
+                      </div>
+                    }
+                  </span>
+                )})}
+            </span>
           }
           <div className="vas-modal-add-call-row">
             <div className="vas-modal-add-call-row-inner">

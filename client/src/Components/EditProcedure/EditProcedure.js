@@ -480,9 +480,7 @@ export default class EditProcedure extends Component {
           procedureTime:completionTime - startTime,
           responseTime:startTime - callTime,
           openBy:null
-        },
-        initialExternalPlacement:this.state.currentRecord.initialExternalPlacement,
-        dressingChangeDate:this.state.dressingChangeDateIsSet ? this.state.dressingChangeDate.toISOString() : null
+        }
       };
 
       axios.post('/procedure-completed', callObj)

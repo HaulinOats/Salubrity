@@ -241,63 +241,7 @@ app.post('/set-as-done-editing', (req, res)=>{
 app.post('/procedure-completed', (req, res)=>{
   Call.findOneAndUpdate({_id:req.body.newCallObj._id},{$set:req.body.newCallObj}, {new:true}, (err, call)=>{
     if(err) return res.send(err);
-    //if a dressing change date was set, create new call record
-    //and populate with relevant line procedure data
-    if(req.body.dressingChangeDate){
-      let newCallObj = {};
-      newCallObj.completedAt = null;
-      newCallObj.hospital = call.hospital;
-      newCallObj.room = call.room;
-      newCallObj.provider = call.provider;
-      newCallObj.job = call.job;
-      newCallObj.customJob = call.customJob;
-      newCallObj.contact = call.contact;
-      newCallObj.insertionLength = call.insertionLength;
-      newCallObj.mrn = call.mrn;
-      newCallObj.orderChange = call.orderChange;
-      newCallObj.wasConsultation = call.wasConsultation;
-      newCallObj.createdBy = call.completedBy;
-      newCallObj.createdAt = new Date();
-      newCallObj.startTime = new Date();
-      newCallObj.dob = call.dob;
-      newCallObj.insertedBy = call.insertedBy;
-      newCallObj.dressingChangeDate = new Date(req.body.dressingChangeDate);
-
-      //carry over any line procedure selections (anything within Port-A-Cath and Insertion Procedures)
-      let itemIds = [];
-      let procedureIds = [];
-      let proceduresDone = call.proceduresDone;
-      var i = proceduresDone.length;
-      while (i--) {
-        if(proceduresDone[i].procedureId === 4 || proceduresDone[i].procedureId === 8){
-          procedureIds.push(proceduresDone[i].procedureId);
-          proceduresDone[i].itemIds.forEach(itemId=>{
-            itemIds.push(itemId);
-          })
-        } else {
-          proceduresDone.splice(i,1);
-        }
-      }
-      newCallObj.procedureIds = procedureIds;
-      newCallObj.itemIds = itemIds;
-      newCallObj.proceduresDone = proceduresDone;
-
-      Call.create(newCallObj, (err2, call2)=>{
-        if(err2) return res.send(err2);
-        //delete initial call created for external placement since it shouldn't be 
-        //counted towards insertion aggregations or as it's own call/procedure for VAS
-        if(req.body.initialExternalPlacement){
-          Call.deleteOne({_id:req.body.newCallObj._id}, (err3)=>{
-            if(err3) return res.send(err3);
-            res.send(call2);
-          })
-        } else {
-          res.send(call2);
-        }
-      })
-    } else {
-      res.send(call);
-    }
+    res.send(call);
   })
 });
 
