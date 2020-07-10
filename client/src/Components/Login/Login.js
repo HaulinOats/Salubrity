@@ -113,6 +113,8 @@ export default class Login extends Component {
               onKeyUp={e => {if(e.key === 'Enter'){this.login()}}} />
             <button className='vas-login-btn' onClick={e=>{this.login()}}>Sign in</button>
             <button style={{'display':'none'}}onClick={e=>{this.seedSuper()}}>Seed Super</button>
+            <p>Test Username: <b style={{"font-weight":"bold"}}>Tester</b></p>
+            <p>Test Password: <b style={{"font-weight":"bold"}}>1234</b></p>
           </div>
         </div>
         {this.state.modalIsOpen && 
