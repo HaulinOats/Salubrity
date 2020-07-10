@@ -11,7 +11,8 @@ const seedData = require('./seed-data');
 //Mongoose
 const Schema = mongoose.Schema;
 mongoose.set('useFindAndModify', false);
-mongoose.connect('mongodb://brett84c:lisa8484@ds331798-a0.mlab.com:31798,ds331798-a1.mlab.com:31798/heroku_tbkgh512?replicaSet=rs-ds331798', {
+mongoose.connect('mongodb://brett84c:lisa84@ds045970.mlab.com:45970/salubrity', {
+// mongoose.connect('mongodb://brett84c:lisa8484@ds331798-a0.mlab.com:31798,ds331798-a1.mlab.com:31798/heroku_tbkgh512?replicaSet=rs-ds331798', {
   useNewUrlParser:true,
   autoIndex:false
 }, (err)=>{
