@@ -11,7 +11,6 @@ const seedData = require('./seed-data');
 
 //Mongoose
 const Schema = mongoose.Schema;
-console.log(process.env.db_uri);
 mongoose.connect(process.env.db_uri, {
   useFindAndModify:false,
   useNewUrlParser:true,
