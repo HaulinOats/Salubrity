@@ -245,7 +245,6 @@ export default class Admin extends Component {
   seedOptions(){
     axios.get('/seed-options')
     .then(resp=>{
-      console.log(resp.data);
       if(resp.data.error || resp.data._message){
         alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
