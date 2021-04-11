@@ -9,6 +9,8 @@ export default class AddCall extends Component {
     super(props);
     this.state = {
       allOptions:[],
+      callNeeds:[],
+      hospitals:[],
       customSelected:false,
       custom:'',
       preComments:'',
@@ -34,8 +36,10 @@ export default class AddCall extends Component {
   componentDidMount(){
     helpers.getOptionsData().then(resp=>{
       this.setState({
-        allOptions:resp.options
-      })
+        allOptions:resp.options,
+        callNeeds:resp.callNeeds,
+        hospitals:resp.hospitals
+      });
     }).catch(err=>{
       console.log(err);
     });
@@ -265,7 +269,7 @@ export default class AddCall extends Component {
               <p>Need:</p>
               <select className="vas-modal-add-call-input" onChange={this.handleNeedSelect}>
                 <option value="default">Select Need</option>
-                {this.state.allOptions[5] && this.state.allOptions[5].options.map(option=>{
+                {this.state.callNeeds && this.state.callNeeds.map(option=>{
                   return <option key={option.id}>{option.name}</option>
                 })}
               </select>
@@ -280,7 +284,7 @@ export default class AddCall extends Component {
               <p>Hospital:</p>
               <select className="vas-modal-add-call-input" onChange={this.hospitalSelect}>
                 <option value="default">Select Hospital</option>
-                {this.state.allOptions[0] && this.state.allOptions[0].options.map(option=>{
+                {this.state.hospitals && this.state.hospitals.map(option=>{
                   return <option key={option.id} value={option.id}>{option.name}</option>
                 })}
               </select>

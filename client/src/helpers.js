@@ -148,6 +148,7 @@ const helpers = {
               case 'callNeeds':
                 callNeeds = respData[idx];
                 break;
+              default:
             }
           });
           
@@ -171,11 +172,12 @@ const helpers = {
           
           resolve({
             options:respData,
-            hospitals,
+            hospitals:hospitals.options,
             hospitalsById,
             orderChanges,
             orderChangeById,
-            statuses
+            statuses,
+            callNeeds:callNeeds.options
           })
         }
       }).catch((err)=>{
