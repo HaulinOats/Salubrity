@@ -127,25 +127,49 @@ const helpers = {
           reject(resp.data);
         } else {
           let respData = resp.data;
-          let hospitals = respData[0];
+          console.log(respData);
+          let hospitals;
+          let orderChanges;
+          let orderChangeById = {};
           let hospitalsById = {};
-          respData[0].options.forEach(hospital=>{
+          let statuses = {};
+          let callNeeds;
+          
+          respData.forEach((optionItem, idx)=>{
+            switch(optionItem.callFieldName){
+              case 'hospital':
+                hospitals = respData[idx];
+                break;
+              case 'orderChange':
+                orderChanges = respData[idx];
+                break;
+              case 'status':
+                statuses = respData[idx];
+                break;
+              case 'callNeeds':
+                callNeeds = respData[idx];
+                break;
+            }
+          });
+          
+          hospitals.options.forEach(hospital=>{
             hospitalsById[hospital.id] = hospital;
           });
-          let orderChanges = respData[3];
-          let orderChangeById = {};
-          respData[3].options.forEach(order=>{
+
+          orderChanges.options.forEach(order=>{
             orderChangeById[order.id] = order;
           });
-          let statuses = {};
-          respData[6].options.forEach(status=>{
-            statuses[status.id] = status;
-          })
-          respData[5].options.sort((a,b)=>{
+
+          // statuses.options.forEach(status=>{
+          //   statuses[status.id] = status;
+          // });
+
+          callNeeds.options.sort((a,b)=>{
             if(a.seq > b.seq) return 1;
             if(a.seq < b.seq) return -1;
             return 0;
-          })
+          });
+          
           resolve({
             options:respData,
             hospitals,
