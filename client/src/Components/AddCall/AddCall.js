@@ -48,7 +48,7 @@ export default class AddCall extends Component {
       this.setState({
         insertionProcedureData:data.proceduresById['8']
       }, ()=>{
-        console.log(this.state);
+        // console.log(this.state);
       })
     }).catch(err=>{
       this.addToErrorArray(err);

@@ -203,7 +203,7 @@ export default class Admin extends Component {
         proceduresById
       }, ()=>{
         setTimeout(()=>{
-          console.log(this.state);
+          // console.log(this.state);
         },1000)
       })
     }).catch(err=>{
@@ -259,11 +259,11 @@ export default class Admin extends Component {
   seedItems(){
     axios.get('/seed-items')
     .then(resp=>{
-      console.log(resp.data);
+      // console.log(resp.data);
       if(resp.data.error || resp.data._message){
         alert(resp.data.error ? resp.data.error : resp.data._message);
       } else {
-        console.log(resp.data);
+        // console.log(resp.data);
       }
     })
     .catch(err=>{
@@ -285,7 +285,6 @@ export default class Admin extends Component {
       })
       .then((resp)=>{
         if(resp.data.error || resp.data._message){
-          console.log(resp.data);
           alert(resp.data.error ? resp.data.error : resp.data._message);
         } else {
           let users = this.state.allUsers;
@@ -376,7 +375,7 @@ export default class Admin extends Component {
   seedSuper(){
     axios.get('/seed-super')
     .then(resp=>{
-      console.log(resp.data);
+      // console.log(resp.data);
     })
     .catch(err=>{
       console.log(err)

@@ -25,7 +25,7 @@ export default class Filters extends Component {
 
   componentDidMount(){
     setTimeout(()=>{
-      console.log(this.state)
+      // console.log(this.state)
     },1000)
   }
 
@@ -50,7 +50,6 @@ export default class Filters extends Component {
       value:'Erlanger',
       text:'Erlanger (All)'
     }];
-    console.log(this.props);
     for(let i = 0; i < this.props.hospitals.length; i++){
       hospitalOptions.push({
         value:this.props.hospitals[i].id,
@@ -67,7 +66,7 @@ export default class Filters extends Component {
         })
       }
     }
-    console.log(procedureOptions);
+    // console.log(procedureOptions);
     let insertionTypeOptions = [];
     Object.keys(this.props.itemsById).forEach(itemId=>{
       if(this.props.itemsById[itemId].groupName === 'Insertion Type'){
@@ -191,7 +190,7 @@ export default class Filters extends Component {
 
   queryRangeDiff(){
     let dayRange = Math.abs(this.state.startDate.diff(this.state.endDate, 'days'));
-    console.log(dayRange);
+    // console.log(dayRange);
     if(dayRange > 45){
       this.props.hidingUI();
     }
