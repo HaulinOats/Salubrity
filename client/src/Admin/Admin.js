@@ -430,57 +430,81 @@ export default class Admin extends Component {
   }
 
   addHospital(){
-    axios.post('/add-hospital', {
-      hospitalName:this.state.addHospitalName
-    })
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
-      } else {
-        let options = this.state.allOptions;
-        options[0] = resp.data;
-        this.setState({allOptions:options, addHospitalName:''});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
+    if(this.state.addHospitalName.trim().length > 3){
+      axios.post('/add-hospital', {
+        hospitalName:this.state.addHospitalName
+      })
+      .then(resp=>{
+        if(resp.data.error || resp.data._message){
+          alert(resp.data.error ? resp.data.error : resp.data._message);
+        } else {
+          let options = this.state.allOptions;
+          options[0] = resp.data;
+          this.setState({allOptions:options, addHospitalName:''});
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    } else {
+      this.setState({
+        modalTitle:'Hospital Name Too Short',
+        modalMessage:'Hospital name must be at least 4 characters or longer',
+        modalIsOpen:true
+      })
+    }
   }
 
   addOrderChange(){
-    axios.post('/add-order-change', {
-      orderChangeName:this.state.addOrderChangeName
-    })
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
-      } else {
-        let options = this.state.allOptions;
-        options[3] = resp.data;
-        this.setState({allOptions:options, addOrderChangeName:''});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
+    if(this.state.addOrderChangeName.trim().length > 3){
+      axios.post('/add-order-change', {
+        orderChangeName:this.state.addOrderChangeName
+      })
+      .then(resp=>{
+        if(resp.data.error || resp.data._message){
+          alert(resp.data.error ? resp.data.error : resp.data._message);
+        } else {
+          let options = this.state.allOptions;
+          options[3] = resp.data;
+          this.setState({allOptions:options, addOrderChangeName:''});
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    } else {
+      this.setState({
+        modalTitle:'Order Change Name Too Short',
+        modalMessage:'Order change name must be at least 4 characters or longer',
+        modalIsOpen:true
+      })
+    }
   }
 
   addNeed(){
-    axios.post('/add-need-option', {
-      addNeedName:this.state.addNeedName
-    })
-    .then(resp=>{
-      if(resp.data.error || resp.data._message){
-        alert(resp.data.error ? resp.data.error : resp.data._message);
-      } else {
-        let options = this.state.allOptions;
-        options[5] = resp.data;
-        this.setState({allOptions:options, addNeedName:''});
-      }
-    })
-    .catch(err=>{
-      console.log(err);
-    })
+    if(this.state.addNeedName.trim().length > 1){
+      axios.post('/add-need-option', {
+        addNeedName:this.state.addNeedName
+      })
+      .then(resp=>{
+        if(resp.data.error || resp.data._message){
+          alert(resp.data.error ? resp.data.error : resp.data._message);
+        } else {
+          let options = this.state.allOptions;
+          options[5] = resp.data;
+          this.setState({allOptions:options, addNeedName:''});
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    } else {
+      this.setState({
+        modalTitle:'Need Name Is Too Short',
+        modalMessage:'Need name must be at least 1 character or longer',
+        modalIsOpen:true
+      })
+    }
   }
 
   editCompletedCall(callId){
