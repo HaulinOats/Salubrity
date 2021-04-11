@@ -127,7 +127,6 @@ const helpers = {
           reject(resp.data);
         } else {
           let respData = resp.data;
-          console.log(respData);
           let hospitals;
           let orderChanges;
           let orderChangeById = {};
