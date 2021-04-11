@@ -160,9 +160,9 @@ const helpers = {
             orderChangeById[order.id] = order;
           });
 
-          // statuses.options.forEach(status=>{
-          //   statuses[status.id] = status;
-          // });
+          statuses.options.forEach(status=>{
+            statuses[status.id] = status;
+          });
 
           callNeeds.options.sort((a,b)=>{
             if(a.seq > b.seq) return 1;

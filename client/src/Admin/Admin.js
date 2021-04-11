@@ -666,7 +666,7 @@ export default class Admin extends Component {
                   <Filters 
                     orderChanges={this.state.orderChanges.options}
                     procedures={this.state.procedures}
-                    hospitals={this.state.hospitals.options}
+                    hospitals={this.state.hospitals}
                     allUsers={this.state.allUsers}
                     usersById={this.state.usersById} 
                     itemsById={this.state.itemsById}

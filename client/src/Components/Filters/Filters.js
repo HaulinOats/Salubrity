@@ -50,6 +50,7 @@ export default class Filters extends Component {
       value:'Erlanger',
       text:'Erlanger (All)'
     }];
+    console.log(this.props);
     for(let i = 0; i < this.props.hospitals.length; i++){
       hospitalOptions.push({
         value:this.props.hospitals[i].id,
