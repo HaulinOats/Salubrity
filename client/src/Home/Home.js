@@ -35,7 +35,7 @@ export default class Home extends Component{
       hospitalsById:null,
       statusById:null,
       orderChanges:null,
-      callNeeds:[],
+      callNeeds:null,
       orderChangeById:[],
       proceduresById:null,
       selectedProcedures:[],
