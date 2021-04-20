@@ -294,6 +294,7 @@ export default class Home extends Component{
 
   stateLoadCalls(){
     helpers.getAllUsers().then(data=>{
+      console.log('get all users...');
       this.setState({
         allUsers:data.usersArr,
         usersById:data.usersById
