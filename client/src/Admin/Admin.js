@@ -32,7 +32,7 @@ export default class Admin extends Component {
       proceduresById:null,
       orderChanges:null,
       orderChangeById:null,
-      callNeeds:[],
+      callNeeds:null,
       allOptions:[],
       queriedCalls:[],
       secondDropdownArr:[],
