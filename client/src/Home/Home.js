@@ -322,6 +322,7 @@ export default class Home extends Component{
 
   getOptionsData(){
     helpers.getOptionsData().then(data=>{
+      console.log(data);
       this.setState({
         allOptions:data.options,
         hospitals:data.hospitals,
@@ -674,13 +675,16 @@ export default class Home extends Component{
                 }
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
-                {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
+                {this.state.activeRecord && this.state.orderChanges && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
+                    hospitals={this.state.hospitals}
+                    hospitalsById={this.state.hospitalsById}
                     activeRecord={this.state.activeRecord}
                     allOptions={this.state.allOptions}
                     procedures={this.state.procedures}
                     usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
+                    statusById={this.state.statusById}
                     orderChanges={this.state.orderChanges}
                     callNeeds={this.state.callNeeds}
                     refreshUserSession={this.refreshUserSession}

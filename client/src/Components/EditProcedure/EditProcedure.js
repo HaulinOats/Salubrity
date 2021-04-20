@@ -621,7 +621,7 @@ export default class EditProcedure extends Component {
           }
           <p className="vas-edit-procedure-record-header-text">
             <select className="vas-modal-add-call-input" defaultValue={this.state.currentRecord.job} onChange={this.handleNeedSelect}>
-              {this.props.orderChanges && this.props.orderChanges.map(option=>{
+              {this.props.callNeeds && this.props.callNeeds.map(option=>{
                 return <option key={option.id} value={option.name}>{option.name}</option>
               })}
             </select>
@@ -646,7 +646,7 @@ export default class EditProcedure extends Component {
           <div className='vas-edit-procedure-status-container'>
             <p className='vas-edit-procedure-status-text'>Status:</p>
             <select className='vas-select' value={this.state.currentRecord.status} onChange={this.changeStatus}>
-              {this.props.allOptions[6].options.map(option=>{
+              {this.props.statusById.options.map(option=>{
                 return <option key={option.id} value={option.id}>{option.name}</option>
               })}
             </select>
@@ -810,7 +810,7 @@ export default class EditProcedure extends Component {
           <div className='vas-edit-procedure-inner-container-main'>
             <select className='vas-select' value={this.state.currentRecord.orderChange ? this.state.currentRecord.orderChange : ''} onChange={this.orderSelect}>
               <option value=''>Select An Order Change</option>
-              {this.props.orderChanges.options.map((option, idx)=>{
+              {this.props.orderChanges && this.props.orderChanges.options.map((option, idx)=>{
                 return <option key={option.id} value={option.id}>{option.name}</option>
               })}
             </select>
@@ -833,7 +833,7 @@ export default class EditProcedure extends Component {
           <div className='vas-edit-procedure-inner-container-main vas-block'>
             <select className='vas-select' value={this.state.currentRecord.hospital ? this.state.currentRecord.hospital : ''} onChange={this.hospitalChange}>
               <option value=''>Select A Hospital</option>
-              {this.props.allOptions[0] && this.props.allOptions[0].options.map((subOption, idx2)=>{
+              {this.props.hospitals && this.props.hospitals.options.map((subOption, idx2)=>{
                 return <option key={subOption.id} value={subOption.id}>{subOption.name}</option>
               })}
             </select>

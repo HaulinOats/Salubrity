@@ -172,7 +172,7 @@ const helpers = {
           
           resolve({
             options:respData,
-            hospitals:hospitals.options,
+            hospitals,
             hospitalsById,
             orderChanges,
             orderChangeById,

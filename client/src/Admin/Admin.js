@@ -694,7 +694,7 @@ export default class Admin extends Component {
               <div className='vas-admin-page-container vas-admin-date-container' data-isactive={this.state.activePage === 'query' ? true : false}>
                 {this.state.orderChanges && this.state.procedures && this.state.hospitals && this.state.allUsers && this.state.usersById && this.state.hospitalsById && this.state.itemsById &&
                   <Filters 
-                    orderChanges={this.state.orderChanges.options}
+                    orderChanges={this.state.orderChanges}
                     procedures={this.state.procedures}
                     hospitals={this.state.hospitals}
                     allUsers={this.state.allUsers}
@@ -724,6 +724,11 @@ export default class Admin extends Component {
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
                 {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
+                    hospitals={this.state.hospitals}
+                    hospitalsById={this.state.hospitalsById}
+                    callNeeds={this.state.callNeeds}
+                    orderChanges={this.state.orderChanges}
+                    statusById={this.state.statusById}
                     activeRecord={this.state.activeRecord}
                     allOptions={this.state.allOptions}
                     procedures={this.state.procedures}
