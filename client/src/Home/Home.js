@@ -35,8 +35,8 @@ export default class Home extends Component{
       hospitalsById:null,
       statusById:null,
       orderChanges:null,
-      callNeeds:null,
-      orderChangeById:null,
+      callNeeds:[],
+      orderChangeById:[],
       proceduresById:null,
       selectedProcedures:[],
       lastUpdateHide:false,
@@ -321,8 +321,8 @@ export default class Home extends Component{
   }
 
   getOptionsData(){
+    console.log('get options data...');
     helpers.getOptionsData().then(data=>{
-      console.log(data);
       this.setState({
         allOptions:data.options,
         hospitals:data.hospitals,
