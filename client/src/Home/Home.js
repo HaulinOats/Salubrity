@@ -94,9 +94,9 @@ export default class Home extends Component{
         currentUser:ls('currentUser')
       }, ()=>{
         this.refreshUserSession();
+        this.stateLoadCalls();
       });
     }
-    this.stateLoadCalls();
 
     if(ls('activeHomeTab')){
       this.setState({activeHomeTab:ls('activeHomeTab')}, ()=>{
@@ -293,9 +293,7 @@ export default class Home extends Component{
   }
 
   stateLoadCalls(){
-    console.log('state load calls...');
     helpers.getAllUsers().then(data=>{
-      console.log('get all users...');
       this.setState({
         allUsers:data.usersArr,
         usersById:data.usersById

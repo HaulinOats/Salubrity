@@ -169,12 +169,10 @@ const helpers = {
             if(a.seq < b.seq) return -1;
             return 0;
           });
-
-          console.log(callNeeds);
           
           resolve({
             options:respData,
-            hospitals,
+            hospitals:hospitals.options,
             hospitalsById,
             orderChanges,
             orderChangeById,
