@@ -9,6 +9,7 @@ import {DebounceInput} from 'react-debounce-input';
 export default class EditProcedure extends Component {
   constructor(props){
     super(props);
+    console.log(props);
     this.state = {
       currentRecord:this.props.activeRecord,
       isPostEdit:this.props.activeRecord.completedAt ? true : false,
@@ -620,7 +621,7 @@ export default class EditProcedure extends Component {
           }
           <p className="vas-edit-procedure-record-header-text">
             <select className="vas-modal-add-call-input" defaultValue={this.state.currentRecord.job} onChange={this.handleNeedSelect}>
-              {this.props.allOptions[5] && this.props.allOptions[5].options.map(option=>{
+              {this.props.orderChanges && this.props.orderChanges.map(option=>{
                 return <option key={option.id} value={option.name}>{option.name}</option>
               })}
             </select>
@@ -809,7 +810,7 @@ export default class EditProcedure extends Component {
           <div className='vas-edit-procedure-inner-container-main'>
             <select className='vas-select' value={this.state.currentRecord.orderChange ? this.state.currentRecord.orderChange : ''} onChange={this.orderSelect}>
               <option value=''>Select An Order Change</option>
-              {this.props.allOptions[3].options.map((option, idx)=>{
+              {this.props.orderChanges.options.map((option, idx)=>{
                 return <option key={option.id} value={option.id}>{option.name}</option>
               })}
             </select>

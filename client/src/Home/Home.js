@@ -35,6 +35,7 @@ export default class Home extends Component{
       hospitalsById:null,
       statusById:null,
       orderChanges:[],
+      callNeeds:[],
       orderChangeById:null,
       proceduresById:null,
       selectedProcedures:[],
@@ -325,6 +326,7 @@ export default class Home extends Component{
         allOptions:data.options,
         hospitals:data.hospitals,
         hospitalsById:data.hospitalsById,
+        callNeeds:data.callNeeds,
         orderChanges:data.orderChanges,
         orderChangeById:data.orderChangeById,
         statusById:data.statuses
@@ -679,6 +681,8 @@ export default class Home extends Component{
                     procedures={this.state.procedures}
                     usersById={this.state.usersById}
                     itemsById={this.state.itemsById}
+                    orderChanges={this.state.orderChanges}
+                    callNeeds={this.state.callNeeds}
                     refreshUserSession={this.refreshUserSession}
                     closeRecordCallback={this.closeRecordCallback}
                     currentUser={this.state.currentUser}/>

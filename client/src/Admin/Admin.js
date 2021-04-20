@@ -10,7 +10,7 @@ import ReturnedProcedures from '../Components/ReturnedProcedures/ReturnedProcedu
 import ls from 'local-storage';
 // import moment from 'moment';
 // import DatePicker from "react-datepicker";
-import {DebounceInput} from 'react-debounce-input';
+import { DebounceInput } from 'react-debounce-input';
 
 export default class Admin extends Component {
   constructor(props){
@@ -32,6 +32,7 @@ export default class Admin extends Component {
       proceduresById:null,
       orderChanges:null,
       orderChangeById:null,
+      callNeeds:[],
       allOptions:[],
       queriedCalls:[],
       secondDropdownArr:[],
@@ -92,6 +93,10 @@ export default class Admin extends Component {
         this.stateLoadCalls();
       });
     }
+  }
+
+  componentDidMount(){
+    console.log(this.state);
   }
 
   toggleHideUI(){
@@ -181,10 +186,12 @@ export default class Admin extends Component {
 
   stateLoadCalls(){
     helpers.getOptionsData().then(data=>{
+      console.log(data);
       this.setState({
         allOptions:data.options,
         hospitals:data.hospitals,
         hospitalsById:data.hospitalsById,
+        callNeeds:data.callNeeds,
         orderChanges:data.orderChanges,
         orderChangeById:data.orderChangeById,
         statusById:data.statuses
@@ -895,8 +902,7 @@ export default class Admin extends Component {
                         <th>ID</th>
                         <th>Name</th>
                       </tr>
-                      {this.state.allOptions && this.state.allOptions[3] &&
-                        this.state.allOptions[3].options.map((option, idx)=>{
+                      {this.state.orderChanges && this.state.orderChanges.options.map((option, idx)=>{
                         return(
                           <tr key={option.id}>
                             <td>{option.id}</td>
@@ -920,7 +926,7 @@ export default class Admin extends Component {
                         <th>ID</th>
                         <th>Name</th>
                       </tr>
-                      {this.state.allOptions && this.state.allOptions[5] && this.state.allOptions[5].options.map((option, idx)=>{
+                      {this.state.callNeeds && this.state.callNeeds.map((option, idx)=>{
                         return(
                           <tr key={option.id}>
                             <td>{option.id}</td>
