@@ -90,9 +90,9 @@ export default class Admin extends Component {
         currentUser:ls('currentUser')
       }, ()=>{
         this.refreshUserSession();
-        this.stateLoadCalls();
       });
     }
+    this.stateLoadCalls();
   }
 
   componentDidMount(){

@@ -94,9 +94,9 @@ export default class Home extends Component{
         currentUser:ls('currentUser')
       }, ()=>{
         this.refreshUserSession();
-        this.stateLoadCalls();
       });
     }
+    this.stateLoadCalls();
 
     if(ls('activeHomeTab')){
       this.setState({activeHomeTab:ls('activeHomeTab')}, ()=>{
