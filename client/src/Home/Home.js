@@ -293,6 +293,7 @@ export default class Home extends Component{
   }
 
   stateLoadCalls(){
+    console.log('state load calls...');
     helpers.getAllUsers().then(data=>{
       console.log('get all users...');
       this.setState({
