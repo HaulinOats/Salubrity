@@ -722,7 +722,7 @@ export default class Admin extends Component {
                 }
               </div>
               <div className='vas-admin-page-container vas-admin-active-container' data-isactive={this.state.activePage === 'active' ? true : false}>
-                {this.state.activeRecord && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
+                {this.state.activeRecord && this.state.callNeeds && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
                     callNeeds={this.state.callNeeds}
                     hospitals={this.state.hospitals}
