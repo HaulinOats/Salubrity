@@ -9,7 +9,6 @@ import {DebounceInput} from 'react-debounce-input';
 export default class EditProcedure extends Component {
   constructor(props){
     super(props);
-    console.log(props);
     this.state = {
       currentRecord:this.props.activeRecord,
       isPostEdit:this.props.activeRecord.completedAt ? true : false,
@@ -833,7 +832,7 @@ export default class EditProcedure extends Component {
           <div className='vas-edit-procedure-inner-container-main vas-block'>
             <select className='vas-select' value={this.state.currentRecord.hospital ? this.state.currentRecord.hospital : ''} onChange={this.hospitalChange}>
               <option value=''>Select A Hospital</option>
-              {this.props.hospitals && this.props.hospitals.options.map((subOption, idx2)=>{
+              {this.props.hospitals && this.props.hospitals.map((subOption, idx2)=>{
                 return <option key={subOption.id} value={subOption.id}>{subOption.name}</option>
               })}
             </select>

@@ -675,7 +675,7 @@ export default class Home extends Component{
                 }
               </div>
               <div className='vas-home-page-container' data-isactive={this.state.activeHomeTab === 'active' ? true : false}>
-                {this.state.activeRecord && this.state.callNeeds && this.state.orderChanges && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
+                {this.state.activeRecord && this.state.hospitals && this.state.callNeeds && this.state.orderChanges && this.state.procedures && this.state.itemsById && this.state.allOptions.length > 0 &&
                   <EditProcedure 
                     callNeeds={this.state.callNeeds}
                     hospitals={this.state.hospitals}
