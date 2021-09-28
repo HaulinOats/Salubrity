@@ -34,6 +34,7 @@ export default class AddCall extends Component {
   };
   
   componentDidMount(){
+    
     helpers.getOptionsData().then(resp=>{
       this.setState({
         allOptions:resp.options,
